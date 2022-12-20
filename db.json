@@ -1,0 +1,36 @@
+{
+  "eligibilityQuestions": [
+    {
+      "id": 1,
+      "text":"Are you a Category I or II Alternative Investment Funds (AIF) registered with Securities and Exchange Board of India (SEBI) or have applied for the same with SEBI?" 
+    },
+    {
+      "id": 2,
+      "text":"What is your Fund Target Size?",
+      "options": [{"id":1,"text":"<= Rs 300 crore"},{"id":2,"text":">Rs 300 & <= Rs 500 crore"},{"id":3,"text":">Rs 500 & <= Rs 750 crore"},{"id":4,"text":">Rs 750 & <= Rs 1000 crore"},{"id":5,"text":">Rs 1000 crore"}]
+    },
+    {
+      "id": 3,
+      "text":"Startup as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)" 
+    },
+    {
+      "id": 4,
+      "text":"Does your Fund agree to invest at least twice the amount of contribution sought from Fund of Funds for Startups (FFS) into Startups? <br> <br> For instance, if contribution sought is Rs 100 crore, Fund should invest at least Rs 200 crore in Startups as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)" 
+    },
+    {
+      "id": 5,
+      "text":"Does the Fund Manager / team have prior track record in Fund management or prior investment experience?" 
+    },
+    {
+      "id": 6,
+      "text":"Do all the Key members* of the Fund have CIBIL score more than 650? <br> <br> Key member is defined as Director, Sponsor and Senior Personnel of the Fund." 
+    },
+    {
+      "id": 7,
+      "text":"Do all the Key members are legally eligible to be a Director or in a Managerial position under Indian law? (i.e., not barred to be a Director or in a Managerial position under Indian Law) <br> <br> Key member is defined as Director, Sponsor and Senior Personnel of the Fund." 
+    }
+    
+  ],
+  "eligibilityResult":{"value":true},
+  "login":{"value":true}
+}

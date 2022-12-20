@@ -1,0 +1,333 @@
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField } from "@mui/material";
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useState, useEffect } from "react"
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { useNavigate } from 'react-router-dom';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+
+
+export const DetailedApplication2A = () => {
+
+    const navigate = useNavigate()
+    const [expanded, setExpanded] = useState<string | false>(false);
+
+    const handleChange =
+        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+            setExpanded(isExpanded ? panel : false);
+        };
+
+
+    const handleClick = (ev: any, navTo: string) => {
+        if (navTo === 'next') {
+            navigate("/preliminary/profile")
+        }
+    }
+
+    let listItem = ['Please upload the files following convention as "FundName_Documentname_Date" for file (Include date in filename if relevent to the document) ', "Please fill up / answer all the points to the extent possible.", "Receipt of the information does not in any way bind / commits SIDBI to sanction assistance to the VC / PE fund, which will be considered on the merits of the case.", "If any of the points are covered in the Private Placement Memorandum (PPM), then please give reference to the relevant paragraph / page number of the PPM.", "Please upload the copy of supporting documents. Please ensure any single file is not more than 5MB.", "If there are more than one document against a specific question, please zip the relevant documents and upload the zipped file.", "Answers may be specific. Please avoid vague answers."];
+
+    return (
+
+        <Card sx={{ display: 'flex', mb: 2 }}>
+            <CardContent sx={{ flex: 1 }}>
+
+                <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+
+                <Card sx={{ display: 'flex', mb: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body1" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062' }}>Instruction</Typography>
+                        {listItem.map((item) => (
+                            <div>
+                                <ListItem>
+                                    <Typography variant="body2" sx={{ flex: 1, color: '#363062' }}>{item}</Typography>
+                                </ListItem>
+                                <Divider />
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mb: 2, background: '#bfbbdd' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={2}>
+                                <Button sx={{ background: "#363062", color: "white" }} >Click here</Button>
+                            </Grid>
+                            <Grid item xs={10}>
+                                <Box sx={{ justifyContent: "center", ml: -6, mt: 1 }}>
+                                    <Typography variant="body2" sx={{ flex: 1, color: '#363062' }}>To view the Detailed Application format to assess the data required for submission.</Typography>
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                </Card>
+                <Divider sx={{ mt: 6 }} />
+
+                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>A. Key Features of the Fund</Typography>
+                <Typography variant="body2" sx={{ flex: 1, color: '#363062' }}>1. Target corpus (Rs Crores). Please provide provision for Green shoe (if any) </Typography>
+
+                <Card sx={{ display: 'flex', mb: 4, mt: 1 }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <Grid container xs={12} spacing={2}>
+                            <Grid item xs={4}>
+                                <Toolbar disableGutters sx={{ justifyContent: 'center', mt: -2, mr: -2, ml: -2, color: 'white', backgroundColor: '#363062' }}>
+                                    Domestic
+                                </Toolbar>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Toolbar disableGutters sx={{ justifyContent: 'center', mt: -2, mr: -2, ml: -2, color: 'white', backgroundColor: '#363062' }}>
+                                    International
+                                </Toolbar>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Toolbar disableGutters sx={{ justifyContent: 'center', mt: -2, mr: -2, color: 'white', backgroundColor: '#363062' }}>
+                                    Total
+                                </Toolbar>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    id="domesticAmount1"
+                                    label="Response to question is required"
+                                    //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                                    //value={formValue["NameOfTheFund"]}
+                                    variant="standard"
+                                    //onChange={handleChange}
+
+                                    sx={{ display: 'flex', mb: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    id="internationalAmount1"
+                                    label="Response to question is required"
+                                    //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                                    //value={formValue["NameOfTheFund"]}
+                                    variant="standard"
+                                    //onChange={handleChange}
+
+                                    sx={{ display: 'flex', mb: 2, ml: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    id="totalAmount1"
+                                    label="Response to question is required"
+                                    //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                                    //value={formValue["NameOfTheFund"]}
+                                    variant="standard"
+                                    //onChange={handleChange}
+
+                                    sx={{ display: 'flex', mb: 2, ml: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    id="domesticAmount2"
+                                    label="Response to question is required"
+                                    //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                                    //value={formValue["NameOfTheFund"]}
+                                    variant="standard"
+                                    //onChange={handleChange}
+
+                                    sx={{ display: 'flex', mb: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    id="internationalAmount2"
+                                    label="Response to question is required"
+                                    //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                                    //value={formValue["NameOfTheFund"]}
+                                    variant="standard"
+                                    //onChange={handleChange}
+
+                                    sx={{ display: 'flex', mb: 2, ml: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    id="totalAmount2"
+                                    label="Response to question is required"
+                                    //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                                    //value={formValue["NameOfTheFund"]}
+                                    variant="standard"
+                                    //onChange={handleChange}
+
+                                    sx={{ display: 'flex', mb: 2, ml: 2 }}
+                                />
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <TextField
+                            required
+                            id="detailOfFundLife"
+                            label="2. Details of fund life answer and provision for extension."
+                            //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                            //value={formValue["NameOfTheFund"]}
+                            variant="standard"
+                            //onChange={handleChange}
+
+                            sx={{ display: 'flex', ml: 2 }}
+                        />
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <TextField
+                            required
+                            id="detailOfFundLife"
+                            label="3. Investment Period / commitment period."
+                            //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                            //value={formValue["NameOfTheFund"]}
+                            variant="standard"
+                            //onChange={handleChange}
+
+                            sx={{ display: 'flex', ml: 2 }}
+                        />
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <TextField
+                            required
+                            id="detailOfFundLife"
+                            label="4. Target return for the fund."
+                            //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                            //value={formValue["NameOfTheFund"]}
+                            variant="standard"
+                            //onChange={handleChange}
+
+                            sx={{ display: 'flex', ml: 2 }}
+                        />
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <TextField
+                            required
+                            id="detailOfFundLife"
+                            label="5. Hurdle Rate & carried interest with basis / justification for the same."
+                            //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                            //value={formValue["NameOfTheFund"]}
+                            variant="standard"
+                            //onChange={handleChange}
+
+                            sx={{ display: 'flex', ml: 2 }}
+                        />
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <TextField
+                            required
+                            id="detailOfFundLife"
+                            label="6. Management fee and trusteeship fee with basis / justification for the same."
+                            //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                            //value={formValue["NameOfTheFund"]}
+                            variant="standard"
+                            //onChange={handleChange}
+
+                            sx={{ display: 'flex', ml: 2 }}
+                        />
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <TextField
+                            required
+                            id="detailOfFundLife"
+                            label="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
+                            //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                            //value={formValue["NameOfTheFund"]}
+                            variant="standard"
+                            //onChange={handleChange}
+
+                            sx={{ display: 'flex', ml: 2 }}
+                        />
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <TextField
+                            required
+                            id="detailOfFundLife"
+                            label="8. Whether the Fund will make primary investment only i.e. the funds shall be utilized by the investee company only for its growth plans?"
+                            //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                            //value={formValue["NameOfTheFund"]}
+                            variant="standard"
+                            //onChange={handleChange}
+
+                            sx={{ display: 'flex', ml: 2 }}
+                        />
+                    </CardContent>
+                </Card>
+
+                <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                    <CardContent sx={{ flex: 1 }}>
+                        <TextField
+                            required
+                            id="detailOfFundLife"
+                            label="9. Details of existing investment made from the proposed fund (including warehouse investment), if any. What is the current pipeline of deals under considertaion? Give details and timeline for investment."
+                            //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
+                            //value={formValue["NameOfTheFund"]}
+                            variant="standard"
+                            //onChange={handleChange}
+
+                            sx={{ display: 'flex', ml: 2 }}
+                        />
+                    </CardContent>
+                </Card>
+                <Grid container xs={12}>
+                    <Grid item xs={4}>
+                        <Button
+                            onClick={(e) => handleClick(e, "previous")}
+                            startIcon={<ArrowLeftIcon />}
+                            variant="contained"
+                            disabled
+                            disableElevation
+                            sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                            Back
+                        </Button>
+                    </Grid>
+                    <Grid item xs={4} >
+                        <Box sx={{ display:'flex',flexDirection:'column',alignItems:'center'}}>
+                            <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Step 2(A) of 5</Typography>
+                        </Box>
+                    </Grid>
+
+                    <Grid item xs={4} sx={{ justifyContent: 'right' }}>
+                        <Box sx={{display:'flex',flexDirection:'row-reverse'}}>
+                        <Button
+                            onClick={(e) => handleClick(e, "next")}
+                            endIcon={<ArrowRightIcon />}
+                            variant="contained"
+                            disableElevation
+                            sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2,mr:2 }} >
+                            Next
+                        </Button>
+                        </Box>
+                    </Grid>
+                </Grid>
+            </CardContent>
+        </Card>
+    );
+}
+
+
+export default DetailedApplication2A;

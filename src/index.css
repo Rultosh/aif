@@ -1,0 +1,60 @@
+body {
+  margin: 0;
+  font-family:Microsoft Sans Serif ;
+  /*font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;*/
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* background:RGB(213, 134, 247); */
+  background-image: url('./images/industry.png');
+  background-repeat: no-repeat; 
+  background-size: cover;
+  
+  
+  
+}
+
+.arrow {
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+cursor: pointer;
+}
+
+.up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+.right {
+  transform: rotate(-45deg);
+}
+
+.left {
+  transform: rotate(135deg);
+}
+
+.homeComp{
+  /*background:RGB(213, 134, 247); /* #D586F7 */
+  background: #b499c7;
+  font-family:Microsoft Sans Serif ;
+  
+}
+
+.login_card_left{
+  background-image: url('./images/login_card.png');
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+

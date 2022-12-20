@@ -1,0 +1,195 @@
+import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import UploadIcon from '@mui/icons-material/Upload';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import dayjs, { Dayjs } from 'dayjs';
+import { useState, useEffect } from "react"
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { saveFormData, submitResults, fetchTableData, fetchInvestmentTeamsPartnerLevelAsync, selectInvestmentPartners, createInvestmentTeamsPartnerLevelAsync, deleteInvestmentTeamPartnerLevelAsync, updateInvestmentTeamsPartnerLevelAsync } from './investmentPartnerSlice'
+import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
+import React, * as Rect from 'react'
+import { createInvestmentTeamsPartnerLevel, fetchInvestmentTeamsPartnerLevel } from "./investmentPartnerApi";
+import { ActionWrapper, wrapArgument } from "../../../../../lib/api-status/actionWrapper";
+import uuid from "react-uuid";
+import { defaultInvestmentPartner, IInvestmentPartner } from "./IInvestmentPartner";
+import { FetchStatus } from "../../../../../lib/api-status/IStatus";
+import { Delete, Edit, SettingsPowerRounded } from '@mui/icons-material';
+import { InvestmentPartnerRow } from "./InvestmentPartnerRow";
+import { selectPrelimApplication } from "../prelimApplicationDataSlice";
+import { AsyncThunkAction } from "@reduxjs/toolkit";
+
+interface InvestmentPartnerModelProps {
+  investmentPartnerFormData: IInvestmentPartner,
+  prelimApplicationId: Number | undefined,
+  open: boolean,
+  handleClose: () => void;
+}
+
+export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
+
+  const [actionUid] = useState(uuid())
+  const [investmentPartnerFormData, setInvestmentPartnerFormData] = useState(defaultInvestmentPartner)
+
+  const dispatch = useAppDispatch();
+
+  function handleSubmitForm() {
+    console.log("Saving investpment partner", investmentPartnerFormData)
+    if(investmentPartnerFormData.id) {
+      dispatch(
+        updateInvestmentTeamsPartnerLevelAsync(
+          wrapArgument(actionUid, investmentPartnerFormData)
+        )
+      )
+    } else {
+      console.log(investmentPartnerFormData)
+      dispatch(
+        createInvestmentTeamsPartnerLevelAsync(
+          wrapArgument(actionUid, investmentPartnerFormData)
+        )
+      )
+      setInvestmentPartnerFormData({...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId})
+    }
+    props.handleClose();
+  }
+
+  useEffect(() => {
+    setInvestmentPartnerFormData({...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId})
+    console.log({...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId})
+  }, [])
+
+  const handleChange = (ev: any) => {
+    ev.preventDefault();
+    console.log('handle change', ev.target.id, ev.target.value);
+
+    let copiedValue: IInvestmentPartner = { ...investmentPartnerFormData };
+
+    copiedValue[ev.target.id as keyof IInvestmentPartner] =
+      ev.target.id !== undefined ? ev.target.value : ev.target.value
+
+    console.log(copiedValue, props.prelimApplicationId)
+
+    setInvestmentPartnerFormData(copiedValue)
+  };
+
+  const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '80%',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
+
+  return <Modal
+    open={props.open}
+    onClose={props.handleClose}
+    aria-labelledby="modal-modal-title"
+    aria-describedby="modal-modal-description"
+  >
+    <Box sx={style}>
+      <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
+        <Card sx={{ display: 'flex', }}>
+
+          <CardContent sx={{ flex: 1 }}>
+            <Grid container spacing={2} >
+              <Grid item xs={9}>
+                <Box sx={{ display: 'inline-flex' }}>
+                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details of Investment Team</Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={4.5}>
+                <TextField
+                  required
+                  id="name"
+                  label="Name"
+                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+                  value={investmentPartnerFormData.name}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+              </Grid>
+              <Grid item xs={3.5}>
+                <TextField
+                  required
+                  id="designation"
+                  label="Designation"
+                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+                  value={investmentPartnerFormData.designation}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+              </Grid>
+              <Grid item xs={1}>
+                <TextField
+                  required
+                  id="age"
+                  label="Age"
+                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+                  value={investmentPartnerFormData.age}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+              </Grid>
+              <Grid item xs={4.5}>
+                <TextField
+                  required
+                  id="qualification"
+                  label="Qalification"
+                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+                  value={investmentPartnerFormData.qualification}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+              </Grid>
+              <Grid item xs={4.5}>
+                <TextField
+                  required
+                  id="vcpeExperience"
+                  label="VC/PE Experience in investing"
+                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+                  value={investmentPartnerFormData.vcpeExperience}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+              </Grid>
+              <Grid item xs={4.5}>
+                <TextField
+                  required
+                  id="description"
+                  label="Brief details of VC/PE Experience"
+                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+                  value={investmentPartnerFormData.description}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+              </Grid>
+              <Grid item xs={12} >
+                <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+                  Submit
+                </Button>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+
+      </Box>
+    </Box>
+  </Modal>
+}
