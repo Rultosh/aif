@@ -8,8 +8,8 @@
 # testing
 /coverage
 
-# production
-/build
+# production - Uncomment below line, once pipeline build is enabled
+#/build
 
 # misc
 .DS_Store
