@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, InputLabel } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
@@ -7,27 +7,71 @@ import { useNavigate } from 'react-router-dom';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import SideNavBar from '../SideNavBar'
 import { useParams } from "react-router-dom";
+import uuid from "react-uuid";
 import {updateNavIndex}from '../sideNavBarSlice'
 import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
+import { Controller } from "../../../../lib/api-wrappers/Controller";
+import { defaultIDetailedApplication2E, IDetailedApplication2E } from "../2E/IDetailedApplication2E";
+import { detailedApplication2EThunk, selectDetailedApplication2E } from "../2E/detailedApplication2ESlice";
+import UploadComponents from "../uploadComponents";
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import FileUpload from "../../../../components/FileUpload";
 
-export const DetailedApplication2F = () => {
+export const DetailedApplication2F = (props: any) => {
 
     const { id } = useParams()
-    const navigate = useNavigate()
-    const [expanded, setExpanded] = useState<string | false>(false);
+    const [parentId] = useState(Number(id))
+    const [formData, setFormData] = useState(defaultIDetailedApplication2E);
+    const actionId = useState(uuid());
+    const controller = new Controller(actionId, detailedApplication2EThunk);
+    const state = useAppSelector(selectDetailedApplication2E);
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
     const dispatch = useAppDispatch();
 
+    const handleOnClickUpload = () => {
+        setOpen(true)
+    }
+    useEffect(() => {
+        dispatch(updateNavIndex(5))
+        if (parentId) {
+
+            if (!state[parentId]?.data[0]) {
+                setFormData({ ...formData, parentId: parentId })
+                controller.all({ ...formData, parentId: parentId });
+            }
+        }
+    }, [])
 
     useEffect(() => {
         dispatch(updateNavIndex(5))
-    })
-    const handleChange =
-        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            setExpanded(isExpanded ? panel : false);
-        };
+        if (id && state[parentId]?.data) {
+            Object.keys(state[parentId]?.data).map((key) => {
+                let value = state[parentId]?.data[key]
+                if (value && value.id) {
+                    setFormData(value);
+                } else {
+                    setFormData({ ...formData, parentId: parentId })
+                }
+            });
+        }
+    }, [state[parentId]?.data])
+
+    const handleChange = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        setFormData(copiedValue);
+    };
+
+    const handleSave = () => {
+        controller.save(formData);
+    }
 
 
     const handleClick = (ev: any, navTo: string) => {
+        handleSave()
         if (navTo === 'next') {
             navigate(`/Detailed/${id}/detailed2G`);
         }
@@ -47,26 +91,36 @@ export const DetailedApplication2F = () => {
                     <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>F. MIS and communication to contributors </Typography>
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>30. What is the reporting structure / procedure for the contributors (quarterly / half-yearly / annual) .</Typography>
-                    <Typography sx={{ flex: 1, color: '#363062', mt: 2, ml: 7 }}>1. Bulletins (attached sample)</Typography>
-                    <Typography sx={{ flex: 1, color: '#363062', ml: 7 }}>2. NAV reporting </Typography>
-                    <Typography sx={{ flex: 1, color: '#363062', ml: 7 }}>3. Detailed valuation report </Typography>
-                    <Typography sx={{ flex: 1, color: '#363062', ml: 7 }}>4. Guidelines for calculating NAV</Typography>
+                    <Typography variant="body2"  sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>30. What is the reporting structure / procedure for the contributors (quarterly / half-yearly / annual) .</Typography>
+                    <Typography variant="body2"  sx={{ flex: 1, color: '#363062', mt: 2, ml: 7 }}>1. Bulletins (attached sample)</Typography>
+                    <Typography variant="body2"  sx={{ flex: 1, color: '#363062', ml: 7 }}>2. NAV reporting </Typography>
+                    <Typography variant="body2"  sx={{ flex: 1, color: '#363062', ml: 7 }}>3. Detailed valuation report </Typography>
+                    <Typography variant="body2"  sx={{ flex: 1, color: '#363062', ml: 7 }}>4. Guidelines for calculating NAV</Typography>
 
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
                             <TextField
                                 required
-                                id="listOfExternalFirms"
+                                id="reportingStructure"
                                 label=""
                                 //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
-                                //value={formValue["NameOfTheFund"]}
+                                value={formData["reportingStructure"] || ''}
                                 variant="standard"
-                                //onChange={handleChange}
-
+                                onChange={handleChange}
+                                placeholder="Please enter comments"
                                 sx={{ display: 'flex', ml: 2, mb: -3 }}
                             />
+                        </CardContent>
+                    </Card>
+
+                    <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                        <CardContent sx={{ flex: 1 }}>
+                            <Grid item xs={3}>
+                                <div style={{margin: "15px"}}>
+                                    <UploadComponents id={`misAndCommunication${id}`}></UploadComponents>
+                                </div>
+                            </Grid>
                         </CardContent>
                     </Card>
 
@@ -75,12 +129,12 @@ export const DetailedApplication2F = () => {
                         <CardContent sx={{ flex: 1 }}>
                             <TextField
                                 required
-                                id="monitoringPractices"
+                                id="freqOfMeeting"
                                 label="31. Frequency of meetings to update the contributor. "
                                 //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
-                                //value={formValue["NameOfTheFund"]}
+                                value={formData["freqOfMeeting"] || ''}
                                 variant="standard"
-                                //onChange={handleChange}
+                                onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: -3 }}
                             />

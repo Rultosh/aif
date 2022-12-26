@@ -53,8 +53,8 @@ export const FundOverview = () => {
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container spacing={2}>
                             <Grid item xs={2}>
-                                <Card   sx={{ display: 'flex'}}>
-                                    <CardContent sx={{ flex: 1, alignContent: 'center'  }} >
+                                <Card sx={{ display: 'flex' }}>
+                                    <CardContent sx={{ flex: 1, alignContent: 'center' }} >
                                         <IconButton onClick={() => navigate("fund")}>
                                             <CardMedia
                                                 component="img"
@@ -67,79 +67,82 @@ export const FundOverview = () => {
                                         </IconButton>
 
                                         <Typography textAlign="center" sx={{ color: 'red', fontWeight: 700 }}>
-                                            <Link to="fund" style={{ textDecoration: 'none',color:'#363062' }}>
+                                            <Link to="fund" style={{ textDecoration: 'none', color: '#363062' }}>
                                                 Fund Overview
                                             </Link>
                                         </Typography>
                                     </CardContent>
                                 </Card>
                                 <Divider />
-                                <Card  sx={{ display: 'flex' }}>
-                                    <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                        <IconButton onClick={() => navigate("Profile")}>
-                                            <CardMedia
-                                                component="img"
-                                                width="20"
-                                                //height="80"
-                                                image={profileImg}
-                                                alt="test-img"
-                                            />
+                                {id?.toString() !='NEW' ? <>
+                                    <Card sx={{ display: 'flex' }}>
+                                        <CardContent sx={{ flex: 1, alignContent: 'center' }} >
+                                            <IconButton onClick={() => navigate("Profile")}>
+                                                <CardMedia
+                                                    component="img"
+                                                    width="20"
+                                                    //height="80"
+                                                    image={profileImg}
+                                                    alt="test-img"
+                                                />
 
-                                        </IconButton>
+                                            </IconButton>
 
-                                        <Typography textAlign="center" sx={{  fontWeight: 700 }}>
-                                            <Link to="Profile" style={{ textDecoration: 'none',color:'#363062'}}>
-                                            Profile
-                                            </Link>
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                                <Divider />
-                                <Card  sx={{ display: 'flex' }}>
-                                    <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                        <IconButton onClick={() => navigate("selfRating")}>
-                                            <CardMedia
-                                                component="img"
-                                                width="20"
-                                                //height="80"
-                                                image={selfRatingImg}
-                                                alt="test-img"
-                                            />
+                                            <Typography textAlign="center" sx={{ fontWeight: 700 }}>
+                                                <Link to="Profile" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                    Profile
+                                                </Link>
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                    <Divider />
+                                    <Card sx={{ display: 'flex' }}>
+                                        <CardContent sx={{ flex: 1, alignContent: 'center' }} >
+                                            <IconButton onClick={() => navigate("selfRating")}>
+                                                <CardMedia
+                                                    component="img"
+                                                    width="20"
+                                                    //height="80"
+                                                    image={selfRatingImg}
+                                                    alt="test-img"
+                                                />
 
-                                        </IconButton>
+                                            </IconButton>
 
-                                        <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700  }}>
-                                            <Link to="selfRating" style={{ textDecoration: 'none',color:'#363062' }}>
-                                            Self Rating
-                                            </Link>
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                                <Divider />
-                                <Card  sx={{ display: 'flex',mb:2 }}>
-                                    <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                        <IconButton onClick={() => navigate("Declaration")}>
-                                            <CardMedia
-                                                component="img"
-                                                width="20"
-                                                //height="80"
-                                                image={decImg}
-                                                alt="test-img"
-                                            />
+                                            <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
+                                                <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                    Self Rating
+                                                </Link>
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                    <Divider />
+                                    <Card sx={{ display: 'flex', mb: 2 }}>
+                                        <CardContent sx={{ flex: 1, alignContent: 'center' }} >
+                                            <IconButton onClick={() => navigate("Declaration")}>
+                                                <CardMedia
+                                                    component="img"
+                                                    width="20"
+                                                    //height="80"
+                                                    image={decImg}
+                                                    alt="test-img"
+                                                />
 
-                                        </IconButton>
+                                            </IconButton>
 
-                                        <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
-                                            <Link to="declaration" style={{ textDecoration: 'none',color:'#363062' }}>
-                                            Declaration
-                                            </Link>
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
+                                            <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
+                                                <Link to="declaration" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                    Declaration
+                                                </Link>
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </>
+                                    : null}
                             </Grid>
                             <Grid item xs={10}>
                                 <Outlet />
-                               
+
 
                             </Grid>
                         </Grid>

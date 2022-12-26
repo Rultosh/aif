@@ -1,0 +1,41 @@
+import { IEntity } from "../../../lib/api-wrappers/IEntity";
+
+export interface ICarryDistribution extends IEntity {
+  corpus: string | undefined,
+  hurdle: string | undefined,
+  catchup: string | undefined,
+  carry: string | undefined,
+  profit: string | undefined,
+  corpusAssumed: string | undefined,
+  capitalAmount: string | undefined,
+  capitalBalance: string | undefined,
+  hurdleAmount: string | undefined,
+  hurdleBalance: string | undefined,
+  catchupAmount: string | undefined,
+  catchupBalance: string | undefined,
+  profitAmount: string | undefined,
+  profitBalance: string | undefined,
+  carryAmount: string | undefined,
+  carryBalance: string | undefined,
+}
+
+export const defaultICarryDistribution : ICarryDistribution = {
+  id: undefined,
+  parentId: undefined,
+  corpus: undefined,
+  hurdle: undefined,
+  catchup: undefined,
+  carry: undefined,
+  profit: undefined,
+  corpusAssumed: undefined,
+  capitalAmount: undefined,
+  capitalBalance: undefined,
+  hurdleAmount: undefined,
+  hurdleBalance: undefined,
+  catchupAmount: undefined,
+  catchupBalance: undefined,
+  profitAmount: undefined,
+  profitBalance: undefined,
+  carryAmount: undefined,
+  carryBalance: undefined,
+}

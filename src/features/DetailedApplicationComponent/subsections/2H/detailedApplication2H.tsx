@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField } from "@mui/material";
+import { InputLabel, Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
@@ -8,27 +8,63 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import SideNavBar from '../SideNavBar'
 import { useParams } from "react-router-dom";
 import {updateNavIndex}from '../sideNavBarSlice'
+import UploadComponents from "../uploadComponents";
+import uuid from "react-uuid";
 import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
+import { Controller } from "../../../../lib/api-wrappers/Controller";
+import { detailedApplicationThunk, selectedDetailedApplications } from '../../../detailedApplication/sidbiReference/detailedApplicationSlice';
+import { defaultIDetailedApplication } from "../../../detailedApplication/sidbiReference/IDetailedApplication";
 
-export const DetailedApplication2H = () => {
+
+export const DetailedApplication2H = (props:any) => {
+
     const { id } = useParams()
-    const navigate = useNavigate()
-    const [expanded, setExpanded] = useState<string | false>(false);
+    const [formData, setFormData] = useState(defaultIDetailedApplication);
+    const [actionId] = useState(uuid())
+    const controller = new Controller(actionId, detailedApplicationThunk);
+    const state = useAppSelector(selectedDetailedApplications);
+    const [agreed, setAgreed] = useState(false);
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
+
        
+
     useEffect(() => {
         dispatch(updateNavIndex(7))
         
     })
 
-    const handleChange =
-        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            setExpanded(isExpanded ? panel : false);
-        };
+    
+    const handleChange = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        setFormData(copiedValue);
+    };
+
+  const handleSave = () => {
+    controller.save(formData);
+  }
+
+    
+  useEffect(() => {
+    if (id && Number(id)) {
+      if (!state[0]?.data[id]) {
+        controller.fetch({ ...formData, id: Number(id) });
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    let newData = state[0]?.data[Number(id)];
+    if (newData) setFormData(newData)
+  }, [state[0]?.data])
 
 
     const handleClick = (ev: any, navTo: string) => {
+        handleSave()
         if (navTo === 'next') {
             navigate(`/Detailed/${id}/detailed2I`);
         }
@@ -50,7 +86,7 @@ export const DetailedApplication2H = () => {
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>H. Past fund(s) managed by the Investment Manager </Typography>
 
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>43. If the Investment Manager is managing other VC / PE funds, please give details thereof including -</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>43. If the Investment Manager is managing other VC / PE funds, please give details thereof including -</Typography>
 
 
                     <Card sx={{ display: 'flex', mb: 2, ml: 4, background: '#f2f2f2' }}>
@@ -74,13 +110,39 @@ export const DetailedApplication2H = () => {
 
                         </CardContent>
                     </Card>
+
+                    <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                        <CardContent sx={{ flex: 1 }}>
+                            <Grid item xs={3}>
+                                <div style={{margin: "15px"}}>
+                                    <UploadComponents id={`imPastFund${id}`}></UploadComponents>
+                                </div>
+                            </Grid>
+
+                        </CardContent>
+                    </Card>
+                    
                     <Divider sx={{ mt: 2 }} />
 
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>44. Any disputes / litigations with </Typography>
-                    <Typography sx={{ flex: 1, color: '#363062', mt: 4, ml: 7 }}>1. Income Tax, Service Tax, or any other regulatory authorities etc. </Typography>
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, ml: 7 }}>2. any of the investee companies etc.</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>44. Any disputes / litigations with </Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mt: 4, ml: 7 }}>1. Income Tax, Service Tax, or any other regulatory authorities etc. </Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, ml: 7 }}>2. any of the investee companies etc.</Typography>
 
+                    <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                        <CardContent sx={{ flex: 1 }}>
+                            <TextField
+                                required
+                                id="disputes"
+                                label=""
+                                //defaultValue={formData.monitoringPractices === undefined ? " " : formData["monitoringPractices"]}
+                                value={formData["disputes"] || ''}
+                                variant="standard"
+                                onChange={handleChange}
 
+                                sx={{ display: 'flex', ml: 2, mb: -3 }}
+                            />
+                        </CardContent>
+                    </Card>
 
 
                     <Grid container xs={12}>

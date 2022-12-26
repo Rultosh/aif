@@ -9,8 +9,11 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import SideNavBar from '../SideNavBar'
 import { useParams } from "react-router-dom";
-import {updateNavIndex}from '../sideNavBarSlice'
+import { updateNavIndex } from '../sideNavBarSlice'
 import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
+import DocumentUpload from "../../../../components/DocumentUpload";
+import uuid from "react-uuid";
+import ListFiles from "../../../../components/ListFiles";
 
 export const DetailedApplication2J = () => {
     const { id } = useParams()
@@ -22,14 +25,14 @@ export const DetailedApplication2J = () => {
 
     useEffect(() => {
         dispatch(updateNavIndex(9))
-        
+
     })
 
     const handleClick = (ev: any, navTo: string) => {
         if (navTo === 'next') {
             navigate(`/Detailed/${id}/detailed2K`);
         }
-        else{
+        else {
             navigate(`/Detailed/${id}/detailed2I`);
         }
     }
@@ -37,6 +40,26 @@ export const DetailedApplication2J = () => {
     function handleChange() {
 
         setAgreed(!agreed)
+    }
+
+    const [uploadAnnexure1SuccessRefreshId, setUploadAnnexure1Success] = useState(uuid());
+    const uploadAnnexure1Success = () => {
+        setUploadAnnexure1Success(uuid());
+    }
+
+    const [uploadAnnexure2SuccessRefreshId, setUploadAnnexure2Success] = useState(uuid());
+    const uploadAnnexure2Success = () => {
+        setUploadAnnexure2Success(uuid());
+    }
+
+    const [uploadAnnexure3SuccessRefreshId, setUploadAnnexure3Success] = useState(uuid());
+    const uploadAnnexure3Success = () => {
+        setUploadAnnexure3Success(uuid());
+    }
+
+    const [uploadResolutionRefreshId, setUploadResolutionRefreshId] = useState(uuid());
+    const uploadResolutionSuccess = () => {
+        setUploadResolutionRefreshId(uuid());
     }
 
     return (<>
@@ -50,7 +73,7 @@ export const DetailedApplication2J = () => {
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>J. KYC Details and Undertakings</Typography>
 
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>53. Details of Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, I nvestment/Management Team to be provided in the format attached (Annexure I) for verification of Defaulter's Checklist.</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>53. Details of Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, I nvestment/Management Team to be provided in the format attached (Annexure I) for verification of Defaulter's Checklist.</Typography>
                     <Grid container xs={12}>
                         <Grid item xs={4}>
                             <Button
@@ -63,21 +86,27 @@ export const DetailedApplication2J = () => {
                             </Button>
                         </Grid>
                         <Grid item xs={4}>
-                            <Button
-                                //onClick={(e) => handleClick(e, "previous")}
-                                startIcon={<FileUploadIcon />}
-                                variant="contained"
-                                disableElevation
-                                sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
-                                Upload Annexure - I
-                            </Button>
+                            <DocumentUpload id={`uploadAnnexure1${id}`} onSuccess={uploadAnnexure1Success}>
+                                <Button
+                                    //onClick={(e) => handleClick(e, "previous")}
+                                    startIcon={<FileUploadIcon />}
+                                    variant="contained"
+                                    disableElevation
+                                    sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
+                                    Upload Annexure - I
+                                </Button>
+                            </DocumentUpload>
+                            <div style={{ margin: "10px" }}>
+                                <ListFiles
+                                    id={`uploadAnnexure1${id}`} refreshId={uploadAnnexure1SuccessRefreshId} />
+                            </div>
                         </Grid>
                         <Grid item xs={4}>
 
                         </Grid>
                     </Grid>
                     <Divider sx={{ mt: 2 }} />
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>54. Whether provision of the connected lending by the select all-India Financial Institutions (Fls) of RBI vide letter dated December 21, 2002 attracted, (Annexure II).</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>54. Whether provision of the connected lending by the select all-India Financial Institutions (Fls) of RBI vide letter dated December 21, 2002 attracted, (Annexure II).</Typography>
                     <Grid container xs={12}>
                         <Grid item xs={4}>
                             <Button
@@ -88,16 +117,24 @@ export const DetailedApplication2J = () => {
                                 sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
                                 Download Annexure - II
                             </Button>
+
                         </Grid>
                         <Grid item xs={4}>
-                            <Button
-                                //onClick={(e) => handleClick(e, "previous")}
-                                startIcon={<FileUploadIcon />}
-                                variant="contained"
-                                disableElevation
-                                sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
-                                Upload Annexure - II
-                            </Button>
+                            <DocumentUpload id={`uploadAnnexure2${id}`}
+                                onSuccess={uploadAnnexure2Success}>
+                                <Button
+                                    //onClick={(e) => handleClick(e, "previous")}
+                                    startIcon={<FileUploadIcon />}
+                                    variant="contained"
+                                    disableElevation
+                                    sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
+                                    Upload Annexure - II
+                                </Button>
+                            </DocumentUpload>
+                            <div style={{ margin: "10px" }}>
+                                <ListFiles
+                                    id={`uploadAnnexure2${id}`} refreshId={uploadAnnexure2SuccessRefreshId} />
+                            </div>
                         </Grid>
                         <Grid item xs={4}>
 
@@ -105,7 +142,7 @@ export const DetailedApplication2J = () => {
                     </Grid>
                     <Divider sx={{ mt: 2 }} />
 
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>55. KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment/Management Team to be provided in the format attached in Annexure III. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address permanent and correspondent), Two passport size photograph for purpose of KYC.</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>55. KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment/Management Team to be provided in the format attached in Annexure III. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address permanent and correspondent), Two passport size photograph for purpose of KYC.</Typography>
                     <Grid container xs={12}>
                         <Grid item xs={4}>
                             <Button
@@ -118,6 +155,8 @@ export const DetailedApplication2J = () => {
                             </Button>
                         </Grid>
                         <Grid item xs={4}>
+                        <DocumentUpload id={`uploadAnnexure3${id}`}
+                                onSuccess={uploadAnnexure3Success}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
                                 startIcon={<FileUploadIcon />}
@@ -126,13 +165,18 @@ export const DetailedApplication2J = () => {
                                 sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
                                 Upload Annexure - III
                             </Button>
+                            </DocumentUpload>
+                            <div style={{ margin: "10px" }}>
+                                <ListFiles
+                                    id={`uploadAnnexure3${id}`} refreshId={uploadAnnexure3SuccessRefreshId} />
+                            </div>
                         </Grid>
                         <Grid item xs={4}>
 
                         </Grid>
                     </Grid>
                     <Divider sx={{ mt: 2 }} />
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>56. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>56. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM</Typography>
                     <Grid container xs={12}>
                         <Grid item xs={4}>
                             <Button
@@ -145,6 +189,8 @@ export const DetailedApplication2J = () => {
                             </Button>
                         </Grid>
                         <Grid item xs={4}>
+                        <DocumentUpload id={`uploadResolution${id}`}
+                                onSuccess={uploadResolutionSuccess}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
                                 startIcon={<FileUploadIcon />}
@@ -153,6 +199,11 @@ export const DetailedApplication2J = () => {
                                 sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
                                 Upload
                             </Button>
+                            </DocumentUpload>
+                            <div style={{ margin: "10px" }}>
+                                <ListFiles
+                                    id={`uploadResolution${id}`} refreshId={uploadResolutionRefreshId} />
+                            </div>
                         </Grid>
                         <Grid item xs={4}>
 

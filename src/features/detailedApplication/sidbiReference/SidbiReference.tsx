@@ -1,4 +1,4 @@
-import { TextField } from "@mui/material"
+import { Box, Button, Card, CardContent, Divider, Grid, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "../../../app/hooks";
@@ -7,6 +7,8 @@ import { detailedApplicationThunk, selectedDetailedApplications } from "./detail
 import { defaultIDetailedApplication } from "./IDetailedApplication";
 import uuid from "react-uuid";
 import { useNavigate } from "react-router-dom";
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 
 export const SidbiReference = () => {
   const { id } = useParams()
@@ -42,23 +44,86 @@ export const SidbiReference = () => {
   }
 
   const handleNext = () => {
-    if (!Number(id)) navigate(`/detailed/featureOfFunds/${state[0].createdId}`)
-    else navigate(`/detailed/featureOfFunds/${id}`)
+    if (!Number(id) && state[0]) navigate(`/detailed/${state[0].createdId}/detailed2A`)
+    else navigate(`/detailed/${id}/detailed2A`)
+  }
+
+  const handleClick = (ev: any, navTo: string) => {
+    if (!Number(id) && state[0]) navigate(`/detailed/${state[0].createdId}/detailed2A`)
+    else navigate(`/detailed/${id}/detailed2A`)
   }
 
   return <>
     {controller.isActionError(0, state) ?
       <div style={{ margin: "10px", color: "red" }}>{controller.error(0, state)}</div> : <></>}
-    <><TextField
-      required
-      id="sidbiRefeferenceNumber"
-      label="Reference No."
-      value={formData["sidbiRefeferenceNumber"]}
-      variant="standard"
-      onChange={handleChange}
-      sx={{ display: 'flex', ml: 2 }} />
-      <button onClick={handleSave}>Save</button>
-      <button onClick={handleNext}>Next</button></>
+    <Grid item xs={12}>
+
+
+      <Card sx={{ display: 'flex', mb: 2, mt: 2 }}>
+        <CardContent sx={{ flex: 1 }}>
+
+          <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Preliminary Application</Typography>
+
+          <Divider sx={{ mt: 2 }} />
+          <Grid container sx={{ justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap' }}>
+            <Grid item xs={4}>
+              <Card sx={{ display: 'flex', mt: 7, mb: 7, background: '#f2f2f2', height: '100px' }}>
+                <CardContent sx={{ flex: 1 }}>
+                  <TextField
+                    required
+                    id="sidbiRefeferenceNumber"
+                    label="Reference No."
+                    value={formData.sidbiRefeferenceNumber || ''}
+                    variant="standard"
+                    onChange={handleChange}
+                    sx={{ display: 'flex', ml: 2, mb: -3 }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+          <Divider sx={{ mt: 2 }} />
+          <Grid container xs={12}>
+            <Grid item xs={4}>
+              <Button
+                onClick={(e) => handleClick(e, "previous")}
+                startIcon={<ArrowLeftIcon />}
+                variant="contained"
+                disableElevation
+                disabled
+                sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                Back
+              </Button>
+            </Grid>
+            <Grid item xs={4} >
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Step 1 of 5</Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={4} sx={{ justifyContent: 'right' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
+                {(Number(id) || (!Number(id) && state[0]))?<Button
+                  onClick={(e) => handleNext()}
+                  endIcon={<ArrowRightIcon />}
+                  variant="contained"
+                  disableElevation
+                  sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
+                  Next
+                </Button>:<></>}
+                <Button
+                  onClick={(e) => handleSave()}
+                  variant="contained"
+                  disableElevation
+                  sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
+                  Save
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+    </Grid>
   </>
 }
 

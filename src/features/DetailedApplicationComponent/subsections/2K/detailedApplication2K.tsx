@@ -10,13 +10,20 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import SideNavBar from '../SideNavBar'
 import { useParams } from "react-router-dom";
 import {updateNavIndex}from '../sideNavBarSlice'
+import uuid from "react-uuid";
 import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
+import { Controller } from "../../../../lib/api-wrappers/Controller";
+import { detailedApplicationThunk, selectedDetailedApplications } from '../../../detailedApplication/sidbiReference/detailedApplicationSlice';
+import { defaultIDetailedApplication } from "../../../detailedApplication/sidbiReference/IDetailedApplication";
 
 export const DetailedApplication2K = () => {
     const { id } = useParams()
-    const navigate = useNavigate()
-    const [expanded, setExpanded] = useState<string | false>(false);
+    const [formData, setFormData] = useState(defaultIDetailedApplication);
+    const [actionId] = useState(uuid())
+    const controller = new Controller(actionId, detailedApplicationThunk);
+    const state = useAppSelector(selectedDetailedApplications);
     const [agreed, setAgreed] = useState(false);
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
 
@@ -26,6 +33,7 @@ export const DetailedApplication2K = () => {
     })
 
     const handleClick = (ev: any, navTo: string) => {
+        handleSave()
         if (navTo === 'next') {
             navigate(`/Detailed/${id}/InvestmentThemeOfFund`);
         }
@@ -34,11 +42,45 @@ export const DetailedApplication2K = () => {
         }
     }
 
-    function handleChange() {
+    function handleChange1() {
 
         setAgreed(!agreed)
     }
 
+    
+  useEffect(() => {
+    if (id && Number(id)) {
+      if (!state[0]?.data[id]) {
+        controller.fetch({ ...formData, id: Number(id) });
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    let newData = state[0]?.data[Number(id)];
+    if (newData) setFormData(newData)
+  }, [state[0]?.data])
+
+  /*const handleChange = (key:string) => {
+    //ev.preventDefault();
+    setAgreed(!agreed)
+    let copiedValue = { ...formData }
+    //let key =  'declarationAccepted'
+    copiedValue[key as keyof typeof formData]   = (!agreed).toString() ?? " ";
+    setFormData(copiedValue);
+  };*/
+
+  const handleChange = (ev: any) => {
+    ev.preventDefault();
+    setAgreed(!agreed)
+    let copiedValue = { ...formData }
+    copiedValue.declarationAccepted = !agreed;//Boolean(ev.target.value);
+    setFormData(copiedValue);
+  };
+
+  const handleSave = () => {
+    controller.save(formData);
+  }
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -53,19 +95,21 @@ export const DetailedApplication2K = () => {
                 <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>K. Declaration</Typography>
                 <Card sx={{ display: 'flex', mb: 2, background: '#f2f2f2' ,color:'#363062'}}>
                     <CardContent sx={{ flex: 1 }}>
-                        <Typography sx={{ flex: 1, fontWeight: 'bold' }}>I / We (Partner/Directors) hereby declare that</Typography>
-                        <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>1.  The information given above and the statements and other papers enclosed are to be the best of our knowledge and belief,true and correct in all particulars.</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, fontWeight: 'bold' }}>I / We (Partner/Directors) hereby declare that</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>1.  The information given above and the statements and other papers enclosed are to be the best of our knowledge and belief,true and correct in all particulars.</Typography>
                         <Divider />
-                        <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>2.  There are no arrears of statutory dues and no government enquiries/proceedings/prosecution/legal acrtion are pending/initiated against the Fund / Sponsor/ AMC / Trustee Company / promoters / directors / partners except as indicated in the application.</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>2.  There are no arrears of statutory dues and no government enquiries/proceedings/prosecution/legal action are pending/initiated against the Fund / Sponsor/ AMC / Trustee Company / promoters / directors / partners except as indicated in the application.</Typography>
                         <Divider />
-                        <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>3.  I / We also confirm that I/none of the Sponsors / promoters or directors or partners have at any time declared themselves as insolvent;</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>3.  I / We also confirm that I/none of the Sponsors / promoters or directors or partners have at any time declared themselves as insolvent;</Typography>
                         <Divider />
-                        <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>4.  I / We have no objection if SIDBI furnishes the information submitted by me/us to other banks /FIs/CIBIL/RBI/any other agency may be deemed fit in connection with considaration of my.our application for capital Commitment to the proposed venture capital fund.</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>4.  I / We have no objection if SIDBI furnishes the information submitted by me/us to other banks /FIs/CIBIL/RBI/any other agency may be deemed fit in connection with considaration of my.our application for capital Commitment to the proposed venture capital fund.</Typography>
                         <Divider />
-                        <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>5.  I / We have no objection if SIDBI and/or its representatives making necessary enquiries/verification (incuding in CIBIL or any other credit information agencies database) while considering my/our application for capital contribution. I / We undertake to furnish all other information that may be by SIDBI in connection with my/ our application for capital Commitment.</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>5.  I / We have no objection if SIDBI and/or its representatives making necessary enquiries/verification (incuding in CIBIL or any other credit information agencies database) while considering my/our application for capital contribution. I / We undertake to furnish all other information that may be by SIDBI in connection with my/ our application for capital Commitment.</Typography>
                         <Divider />
                         <FormGroup>
-                            <FormControlLabel sx={{ mt: 2 }} control={<Checkbox checked={agreed} onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} />
+                            {/*<FormControlLabel sx={{ mt: 2 }} control={<Checkbox checked={agreed} onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} /> */}
+                            {/*state[0]?.status[actionId].actionStatus.fetchStatus == 'idle' ? <FormControlLabel sx={{ mt: 2 }} name="declarationAccepted" value={!agreed} control={<Checkbox defaultChecked={true}  onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} /> : null}*/}
+                            <FormControlLabel sx={{ mt: 2 }} name="declarationAccepted" value={!agreed} control={<Checkbox defaultChecked={true}  onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} />
                         </FormGroup>
                     </CardContent>
                 </Card>

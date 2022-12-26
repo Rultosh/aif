@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField } from "@mui/material";
 import { useState, useEffect } from "react"
 import { questions } from './selfRatingQuestions'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -6,7 +6,7 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import React, * as Rect from 'react'
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
-import {  ISelfRating } from "./ISelfRating";
+import { ISelfRating } from "./ISelfRating";
 import { selectSelfRatings, fetchSelfRatingAsync, createSelfRatingAsync, updateSelfRatingAsync } from "./selfRatingSlice";
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from 'react-uuid';
@@ -96,13 +96,16 @@ export const SelfRating = () => {
             sum += arr[i];
         }
         let sumStr = sum.toFixed(2);
-        setScore(sumStr)
+        //setScore(sumStr)
+        let copiedValue = { ...selfRatingValue };
+        copiedValue['score'] = sumStr;
+        setSelfRatingValue(copiedValue);
     }
 
 
 
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: any) => {
+    const handleChange = (e: any, idx: any) => {
         e.preventDefault();
         console.log('checking state value', selfRatingValue, e.target.value, idx)
         let copiedValue = { ...selfRatingValue };
@@ -118,7 +121,7 @@ export const SelfRating = () => {
     for (let i = 0; i < selfQuestions.length; i++) {
         let qes = selfQuestions[i].id.toString().concat('. ', selfQuestions[i].text);
         let idxVal = i;
-        if (selfQuestions[i]) {
+        if (selfQuestions[i] && (selfRatingState.status.fetchStatus === FetchStatus.IDLE) || (id?.toString() == 'NEW')) {
             selfRatingQuestionComponents.push(
                 <React.Fragment >
                     < Card sx={{ display: 'flex', mt: 2, backgroundColor: "#f2f2f2" }}>
@@ -132,6 +135,8 @@ export const SelfRating = () => {
                                             </Box>
                                             <RadioGroup
                                                 row
+                                                defaultValue={selfRatingValue["q" + (i + 1).toString() as keyof ISelfRating]}
+                                                //defaultValue= ">=5% but less than 10% of corpus"
                                                 name="position"
                                                 onChange={(e) => handleChange(e, i + 1)}
                                             >
@@ -145,6 +150,24 @@ export const SelfRating = () => {
                                             </RadioGroup>
 
                                         </FormControl>
+                                        <Grid container >
+                                            <Grid item xs={12}>
+                                                <TextField
+                                                    required
+                                                    id={"q" + (i + 1).toString()+"Comments"}
+                                                    label="Comments if any"
+                                                    //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
+                                                    //value={selfRatingValue["q" + (i + 1).toString()+"Comments" as key of  as keyof ISelfRating]] || ''}
+                                                    value={selfRatingValue["q" + (i + 1).toString()+"Comments" as keyof ISelfRating] || ''}
+                                                    
+                                                    variant="standard"
+                                                    onChange={(e) => handleChange(e, (i + 1).toString()+"Comments")}
+
+                                                    sx={{ display: 'flex', ml: 2 }}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                        
                                     </Box>
                                 </Grid>
                             </Grid>
@@ -165,7 +188,7 @@ export const SelfRating = () => {
                     <Grid item xs={1}>
                         <Box sx={{ position: 'fixed', backgroundColor: '#D586F7' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column-reverse', flexWrap: 'wrap', justifyContent: 'center', alignContent: 'flex-end', }}>
-                                <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Score:{score}</Typography>
+                                <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Score:{selfRatingValue.score || 0}</Typography>
                             </Box></Box></Grid>
                 </Grid>
 

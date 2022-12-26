@@ -2,7 +2,7 @@ import { Box, Button, Card, CardActionArea, CardContent, Container, FormControl,
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import React, * as Rect from 'react'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import { fetchQuestions, selected, getQuestions } from './eligibiltyQuestionerSlice'
+import { fetchQuestions, selected, getQuestions, schemName} from './eligibiltyQuestionerSlice'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
@@ -72,6 +72,7 @@ const EligibilityQuestioner = () => {
     function submitOnCheckEligibility() {
         console.log(results);
         dispatch(selected(formData));
+        dispatch(schemName(schemeNames[scheme || 0]));
         navigate('/eligibilityResults')
     }
 
@@ -172,6 +173,7 @@ const EligibilityQuestioner = () => {
                         <Card sx={{ display: 'flex' }}>
                             <CardContent sx={{ flex: 1 }}>
                                 {outputComponents}
+                                <Typography sx={{ flex: 1,fontWeight:'bold' ,mt:5}}>Disclaimer : The value entered / selected are true to your knowledge. In future, at any point of time, if the information submitted by the Fund, is found misleading or incorrect in any manner the application will be suspended at that point of time.</Typography>
                                 <Box display="flex"
                                     justifyContent="center"
                                     alignItems="center">

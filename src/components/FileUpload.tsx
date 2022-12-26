@@ -41,6 +41,7 @@ export default function FileUpload(props: FileUploadProps) {
   const uploadFiles = () => {
     console.log('uploading...', fileInfo);
     FileUploadService.upload(
+      props.id,
       fileInfo.file,
       (event: any) => {
         let uploadProgress = Math.round((100 * event.loaded) / event.total);

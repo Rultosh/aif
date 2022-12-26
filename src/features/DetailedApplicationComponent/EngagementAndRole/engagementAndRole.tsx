@@ -8,28 +8,82 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useParams } from "react-router-dom";
+import DocumentUpload from "../../../components/DocumentUpload";
+import uuid from "react-uuid";
+import ListFiles from "../../../components/ListFiles";
+import { useAppSelector, useAppDispatch } from "../../../app/hooks";
+import { Controller } from "../../../lib/api-wrappers/Controller";
+import { detailedApplicationThunk, selectedDetailedApplications } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
+import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
+
+
 
 
 
 export const EngagementAndRole = () => {
     const { id } = useParams()
-    const navigate = useNavigate()
-    const [expanded, setExpanded] = useState<string | false>(false);
+    const [parentId] = useState(Number(id))
+    const [formData, setFormData] = useState(defaultIDetailedApplication);
+    const actionId = useState(uuid());
+    const controller = new Controller(actionId, detailedApplicationThunk);
+    const state = useAppSelector(selectedDetailedApplications);
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+    const dispatch = useAppDispatch();
 
-    const handleChange =
-        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            setExpanded(isExpanded ? panel : false);
-        };
+    useEffect(() => {
+        
+        if (parentId) {
 
-
-        const handleClick = (ev: any, navTo: string) => {
-            if (navTo === 'next') {
-                navigate(`/Detailed/${id}/carryDistribution`);
-            }
-            else{
-                navigate(`/Detailed/${id}/detailed2K`);
+            if (!state[parentId]?.data[0]) {
+                setFormData({ ...formData, parentId: parentId })
+                controller.all({ ...formData, parentId: parentId });
             }
         }
+    }, [])
+
+    useEffect(() => {
+        
+        if (id && state[parentId]?.data) {
+            Object.keys(state[parentId]?.data).map((key) => {
+                let value = state[parentId]?.data[key]
+                if (value && value.id) {
+                    setFormData(value);
+                } else {
+                    setFormData({ ...formData, parentId: parentId })
+                }
+            });
+        }
+    }, [state[parentId]?.data])
+
+    const handleChange = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        setFormData(copiedValue);
+    };
+
+    const handleSave = () => {
+        controller.save(formData);
+    }
+
+
+    const handleClick = (ev: any, navTo: string) => {
+        handleSave()
+        if (navTo === 'next') {
+            navigate(`/Detailed/${id}/carryDistribution`);
+        }
+        else {
+            navigate(`/Detailed/${id}/InvestmentThemeOfFund`);
+        }
+    }
+
+    const [engagementAndRoleRefreshId, setEngagementAndRoleRefreshId] = useState(uuid());
+
+    const engagementAndRoleSuccess = () => {
+        setEngagementAndRoleRefreshId(uuid());
+    }
 
     return (<>
 
@@ -46,31 +100,37 @@ export const EngagementAndRole = () => {
                         <CardContent sx={{ flex: 1 }}>
                             <TextField
                                 required
-                                id="captionDetails"
+                                id="imRoleAndEngagement"
                                 label="Please provide details as per caption"
-                                //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                //value={formData["fundLaunchedDate"]}
+                                //defaultValue={formData.imRoleAndEngagement === undefined ? " " : formData["fundLaunchedDate"]}
+                                value={formData["imRoleAndEngagement"] || ''}
                                 variant="standard"
-                               // onChange={handleChange}
+                                onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: -3 }}
                             />
                         </CardContent>
                     </Card>
+                    <div style={{marginTop: "10px"}}>
+                    <ListFiles 
+                        id={`engagementAndRole${id}`} refreshId={engagementAndRoleRefreshId}/>
+                    </div>
                     <Button
                         onClick={(e) => handleClick(e, "previous")}
                         variant="outlined"
                         disableElevation
-                        sx={{ textTransform: 'none', mt: 9, mb: 3, ml: 2 ,width:'90px',backgroundColor:'white',color:'black',borderColor:'black'}} >
+                        sx={{ textTransform: 'none', mt: 9, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >
                         Download
                     </Button>
+                    <DocumentUpload id={`engagementAndRole${id}`} onSuccess={engagementAndRoleSuccess}>
                     <Button
-                        onClick={(e) => handleClick(e, "previous")}
+                        // onClick={(e) => handleClick(e, "previous")}
                         variant="outlined"
                         disableElevation
-                        sx={{ textTransform: 'none', mt: 9, mb: 3, ml: 2 ,width:'90px',backgroundColor:'white',color:'black',borderColor:'black'}} >
+                        sx={{ textTransform: 'none', mt: 9, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >
                         Upload
                     </Button>
+                    </DocumentUpload>
                     <Divider sx={{ mt: 2 }} />
                     <Grid container xs={12}>
                         <Grid item xs={4}>

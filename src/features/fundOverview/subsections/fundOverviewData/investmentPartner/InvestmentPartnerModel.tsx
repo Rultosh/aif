@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, CardHeader, Chip, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Modal, Paper, Select, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import UploadIcon from '@mui/icons-material/Upload';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import dayjs, { Dayjs } from 'dayjs';
@@ -35,7 +35,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
   function handleSubmitForm() {
     console.log("Saving investpment partner", investmentPartnerFormData)
-    if(investmentPartnerFormData.id) {
+    if (investmentPartnerFormData.id) {
       dispatch(
         updateInvestmentTeamsPartnerLevelAsync(
           wrapArgument(actionUid, investmentPartnerFormData)
@@ -48,14 +48,14 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
           wrapArgument(actionUid, investmentPartnerFormData)
         )
       )
-      setInvestmentPartnerFormData({...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId})
+      setInvestmentPartnerFormData({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
     }
     props.handleClose();
   }
 
   useEffect(() => {
-    setInvestmentPartnerFormData({...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId})
-    console.log({...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId})
+    setInvestmentPartnerFormData({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
+    console.log({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
   }, [])
 
   const handleChange = (ev: any) => {
@@ -64,9 +64,12 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
     let copiedValue: IInvestmentPartner = { ...investmentPartnerFormData };
 
-    copiedValue[ev.target.id as keyof IInvestmentPartner] =
-      ev.target.id !== undefined ? ev.target.value : ev.target.value
-
+    if (ev.target.id !== undefined) {
+      copiedValue[ev.target.id as keyof IInvestmentPartner] =
+        ev.target.id !== undefined ? ev.target.value : ev.target.value
+    } else {
+      copiedValue[ev.target.name as keyof IInvestmentPartner] = ev.target.value;
+    }
     console.log(copiedValue, props.prelimApplicationId)
 
     setInvestmentPartnerFormData(copiedValue)
@@ -155,7 +158,25 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 />
               </Grid>
               <Grid item xs={4.5}>
-                <TextField
+                <FormControl variant="standard" sx={{  display: 'flex' }}>
+                  <InputLabel id="demo-simple-select-standard-label">VC/PE Experience in investing</InputLabel>
+                  <Select
+                    labelId="vcpeExperience"
+                    id="vcpeExperience"
+                    value={investmentPartnerFormData["vcpeExperience"]}
+                    onChange={handleChange}
+                    name="vcpeExperience"
+                    defaultValue={investmentPartnerFormData["vcpeExperience"] === undefined ? " " : investmentPartnerFormData["vcpeExperience"]}
+                  >
+
+                    <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>
+                    <MenuItem key={"5-10 years"} value={"5-10 years"}>5-10 years</MenuItem>
+                    <MenuItem key={"10-15 years"} value={"10-15 years"}>10-15 years</MenuItem>
+                    <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
+                  </Select>
+                </FormControl>
+
+                {/*<TextField
                   required
                   id="vcpeExperience"
                   label="VC/PE Experience in investing"
@@ -165,7 +186,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
-                />
+/> */}
+
               </Grid>
               <Grid item xs={4.5}>
                 <TextField

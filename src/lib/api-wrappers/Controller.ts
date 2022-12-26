@@ -95,6 +95,17 @@ export class Controller<T extends IEntity> {
     )
   }
 
+  public read(data:T) {
+    this.dispatch(
+      this.thunk.readAsync(
+        wrapArgument(
+          this.actionId,
+          data
+        )
+      )
+    )
+  }
+
   public isActionCompleted(parentId:number|undefined, state: ICommonState<T>): boolean {
     parentId = parentId?parentId:0;
     if(state[parentId])

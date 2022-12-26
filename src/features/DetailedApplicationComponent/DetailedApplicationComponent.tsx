@@ -27,89 +27,6 @@ import { StepIconProps } from '@mui/material/StepIcon';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import fundImg from '../../images/fund.png'
 
-const QontoConnector = styled(StepConnector)(({ theme }) => ({
-    [`&.${stepConnectorClasses.alternativeLabel}`]: {
-        top: 10,
-        left: 'calc(-50% + 16px)',
-        right: 'calc(50% + 16px)',
-    },
-    [`&.${stepConnectorClasses.active}`]: {
-        [`& .${stepConnectorClasses.line}`]: {
-            borderColor: '#784af4',
-        },
-    },
-    [`&.${stepConnectorClasses.completed}`]: {
-        [`& .${stepConnectorClasses.line}`]: {
-            borderColor: '#784af4',
-        },
-    },
-    [`& .${stepConnectorClasses.line}`]: {
-        borderColor: theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#eaeaf0',
-        borderTopWidth: 3,
-        borderRadius: 1,
-    },
-}));
-const QontoStepIconRoot = styled('div')<{ ownerState: { active?: boolean } }>(
-    ({ theme, ownerState }) => ({
-        color: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#eaeaf0',
-        display: 'flex',
-        height: 22,
-        alignItems: 'center',
-        ...(ownerState.active && {
-            color: '#784af4',
-        }),
-        '& .QontoStepIcon-completedIcon': {
-            color: '#784af4',
-            zIndex: 1,
-            fontSize: 18,
-        },
-        '& .QontoStepIcon-circle': {
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            backgroundColor: 'currentColor',
-        },
-    }),
-);
-
-function QontoStepIcon(props: StepIconProps) {
-    const { active, completed, className } = props;
-
-    return (
-        <QontoStepIconRoot ownerState={{ active }} className={className}>
-            {completed ? (
-                <Check className="QontoStepIcon-completedIcon" />
-            ) : (
-                <div className="QontoStepIcon-circle" />
-            )}
-        </QontoStepIconRoot>
-    );
-}
-
-const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
-    [`&.${stepConnectorClasses.alternativeLabel}`]: {
-        top: 22,
-    },
-    [`&.${stepConnectorClasses.active}`]: {
-        [`& .${stepConnectorClasses.line}`]: {
-            backgroundImage:
-                'linear-gradient( 95deg,#2d0c3b 0%,#2d0c3b 50%,#2d0c3b 100%)',
-        },
-    },
-    [`&.${stepConnectorClasses.completed}`]: {
-        [`& .${stepConnectorClasses.line}`]: {
-            backgroundImage:
-                'linear-gradient( 95deg,#2d0c3b 0%,#2d0c3b 50%,#2d0c3b 100%)',
-        },
-    },
-    [`& .${stepConnectorClasses.line}`]: {
-        height: 3,
-        border: 0,
-        backgroundColor:
-            theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#eaeaf0',
-        borderRadius: 1,
-    },
-}));
 
 const ColorlibStepIconRoot = styled('div')<{
     ownerState: { completed?: boolean; active?: boolean };
@@ -126,7 +43,8 @@ const ColorlibStepIconRoot = styled('div')<{
     ...(ownerState.active && {
         backgroundImage:
             'linear-gradient( 136deg, #363062 0%, #363062 50%, #363062 100%)',
-        boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
+        //boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
+        boxShadow: '0 4px 10px 4px #363062',
     }),
     ...(ownerState.completed && {
         backgroundImage:
@@ -153,62 +71,10 @@ function ColorlibStepIcon(props: StepIconProps) {
 const steps = ['Preliminary Application', 'Detailed Application', 'Investment Theme of Fund', 'Detailed Engagement And Role of IM with Portfolio Companies', 'Illustration of carry distribution of Fund'];
 
 
-interface TabPanelProps { 
-    children?: React.ReactNode;
-    index: number;
-    value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`vertical-tabpanel-${index}`}
-            aria-labelledby={`vertical-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box sx={{ p: 3 }}>
-                    <Typography>{children}</Typography>
-                </Box>
-            )}
-        </div>
-    );
-}
-
-function a11yProps(index: number) {
-    return {
-        id: `vertical-tab-${index}`,
-        'aria-controls': `vertical-tabpanel-${index}`,
-    };
-}
-
-const StyledList = styled(List)({
-    // selected and (selected + hover) states
-    '&& .Mui-selected, && .Mui-selected:hover': {
-        backgroundColor: '#363062',
-        '&, & .MuiListItemIcon-root': {
-            color: 'white',
-        },
-        borderRadius: '8px',
-        textDecoration: 'none',
-    },
-    // hover states
-    '& .MuiListItemButton-root:hover': {
-        backgroundColor: '#363062',
-        opacity: 0.5,
-        '&, & .MuiListItemIcon-root': {
-            color: 'white',
-        },
-    },
-});
 
 
 
-let liItems = ["prelimApp", "detailed2A", "InvestmentThemeOfFund","EngagementAndRole", "carryDistribution"]
+let liItems = ["SidbiReference", "detailed2A", "InvestmentThemeOfFund","EngagementAndRole", "carryDistribution"]
 let navLiItems = ["detailed2A", "detailed2B", "detailed2C", "detailed2D","detailed2E", "detailed2F","detailed2G", "detailed2H", "detailed2I", "detailed2J", "detailed2K"]
 
 interface DetailedApplicationComponentProps { }
@@ -217,6 +83,7 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
     const { id } = useParams()
     const [parentId] = useState(Number(id))
     const [value, setValue] = React.useState(0);
+    const [activeStepper, setActiveStepper] = React.useState(0);
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     }
@@ -230,13 +97,14 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
 
     function handleClick(label:string) {
         let val = liItems[steps.indexOf(label)]
+        setActiveStepper(steps.indexOf(label))
         navigate(`/Detailed/${id}/${val}`);
     }
     useEffect(() => {
         console.log("check id number",id)
         if (!id) {
             
-           //ss navigate(`/Detailed/${id}/2A`)
+           navigate(`/Detailed/NEW/SidbiReference`)
         }
     });
     return (
@@ -261,10 +129,10 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
                                         <Grid container spacing={2}>
                                             <Grid container xs={12}>
                                                 <Stack sx={{ ml: '16px', width: '100%', background: "white" }} spacing={0.5}>
-                                                    <Stepper alternativeLabel activeStep={4} connector={null} sx={{ mt: '3%', mb: '3%' }}>
+                                                    <Stepper alternativeLabel activeStep={activeStepper} connector={null} sx={{ mt: '3%', mb: '3%' }}>
                                                         {steps.map((label) => (
                                                             <Step key={label}>
-                                                                <StepLabel StepIconComponent={ColorlibStepIcon} onClick={() => handleClick(label)}>{label}</StepLabel>
+                                                                <StepLabel StepIconComponent={ColorlibStepIcon} onClick={() => handleClick(label)}><Typography variant='body2' sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center',fontWeight:'bold' }}>{label}</Typography></StepLabel>
                                                             </Step>
                                                         ))}
                                                     </Stepper>
@@ -272,37 +140,6 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
 
                                             </Grid>
                                             <Outlet />
-                                            {/*}
-                                            <Grid item xs={3}>
-                                                <Card sx={{ display: 'flex', color: '#363062' }}>
-                                                    <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                                        <StyledList>
-                                                            <List>
-                                                                {liItems.map((item) => (
-                                                                    <Box >
-                                                                        <ListItem disablePadding>
-                                                                            <ListItemButton selected={selectedIndex === liItems.indexOf(item)}
-                                                                                onClick={() => handleListItemClick(liItems.indexOf(item))}>
-                                                                                
-                                                                                <Typography variant="subtitle2" sx={{ flex: 1, mt: 1 }}>
-                                                                                   {liItems[liItems.indexOf(item)]}
-                                                                                </Typography>
-                                                                            </ListItemButton>
-                                                                        </ListItem>
-                                                                        <Divider />
-                                                                    </Box>))}
-
-                                                            </List>
-                                                        </StyledList>
-                                                    </CardContent>
-                                                </Card>
-                                            </Grid>
-                                            
-                                            <Grid item xs={9}>
-                                                <Outlet />
-                                            </Grid>
-                                            */}
-                                            
                                         </Grid>
                                     </Box>
                                 </CardContent>

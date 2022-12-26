@@ -26,6 +26,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
     const [prelimAppicationId, setPrelimApplicationId] = useState(props.prelimApplicationId);
+    const [firstClosingSwitch, setfirstClosingSwitch] = useState(false);
 
     const dispatch = useAppDispatch()
 
@@ -93,6 +94,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         
         setPrelimApplicationFormData(copiedValue);
         dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, copiedValue)));
+    }
+
+    const handleToggle = () =>{
+        let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
+        copiedValue.firstClosing = !firstClosingSwitch;
+        setPrelimApplicationFormData(copiedValue);
+        setfirstClosingSwitch(!firstClosingSwitch)
     }
 
     if(prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
@@ -410,41 +418,30 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         <Grid item xs={12}>
                                             <Box sx={{ display: 'flex' }}>
                                                 <div style={{margin: '5px'}}>
-                                                    {/*onClick={handleClick}*/}
                                                     <DocumentChip 
                                                         label="Pvt. Placement Memorandum" 
-                                                        id="sdPvtPlacementMemorandum"
-                                                        onSuccess={handleDocumentUpload}
-                                                        onDelete={handleDocumentDelete}
-                                                        url={prelimApplicationFormData.sdPvtPlacementMemorandum} />
-                                                    {/* <Chip label="Pvt. Placement Memorandum" size="medium" 
-                                                        sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} /> */}
+                                                        id={`sdPvtPlacementMemorandum${prelimAppicationId}`} />
                                                 </div>
                                                 <div style={{margin: '5px'}}>
                                                     <DocumentChip 
                                                         label="IM Agreement" 
-                                                        id="sdImAgreement"
-                                                        onSuccess={handleDocumentUpload}
-                                                        onDelete={handleDocumentDelete}
-                                                        url={prelimApplicationFormData.sdImAgreement} />
-                                                    {/* <Chip label="IM Agreement" size="medium" sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} /> */}
+                                                        id={`sdImAgreement${prelimAppicationId}`} />
                                                 </div>
                                                 <div style={{margin: '5px'}}>
                                                     <DocumentChip 
                                                         label="Trust Deal" 
-                                                        id="sdTrustDeal"
-                                                        onSuccess={handleDocumentUpload}
-                                                        onDelete={handleDocumentDelete}
-                                                        url={prelimApplicationFormData.sdTrustDeal} />
-                                                    {/* <Chip label="Trust Deal" size="medium" sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} /> */}
+                                                        id={`sdTrustDeal${prelimAppicationId}`} />
                                                 </div>
                                                 <div style={{margin: '5px'}}>
                                                     <DocumentChip 
                                                         label="SEBI Certificate" 
+                                                        id={`sdSEBICertificate${prelimAppicationId}`} />
+                                                    {/* <DocumentChip 
+                                                        label="SEBI Certificate" 
                                                         id="sdSEBICertificate"
                                                         onSuccess={handleDocumentUpload}
                                                         onDelete={handleDocumentDelete}
-                                                        url={prelimApplicationFormData.sdSEBICertificate} />
+                                                        url={prelimApplicationFormData.sdSEBICertificate} /> */}
                                                     {/* <Chip label="SEBI Certificate" size="medium" sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} /> */}
                                                 </div>
                                             </Box>
@@ -507,14 +504,14 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
                                         </Grid>
                                         <Grid item xs={3}>
-                                            <FormControlLabel sx={{ mt: 5 }} control={<Switch />} label="No" />
+                                            <FormControlLabel sx={{ mt: 5 }} control={<Switch checked={prelimApplicationFormData.firstClosing} onChange={handleToggle}/>} label="No" />
                                         </Grid>
                                         <Grid item xs={3}>
                                             <TextField
                                                 required
                                                 type="number"
                                                 id="sdFirstClosingDomesticAmount"
-                                                label="Domestic Amount"
+                                                label={prelimApplicationFormData.firstClosing ? "Expected Domestic Amount" : "Domestic Amount"}
                                                 value={prelimApplicationFormData.sdFirstClosingDomesticAmount || ''}
                                                 onChange={handleChange}
                                                 variant="standard"
@@ -543,7 +540,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdFirstClosingOverseasAmount"
-                                                label="Overseas Amount"
+                                                label={prelimApplicationFormData.firstClosing ? "Expected Overseas Amount" : "Overseas Amount"}
                                                 value={prelimApplicationFormData.sdFirstClosingOverseasAmount || ''}
                                                 onChange={handleChange}
                                                 variant="standard"

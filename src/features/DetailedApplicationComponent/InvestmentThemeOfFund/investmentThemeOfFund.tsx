@@ -8,26 +8,60 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useParams } from "react-router-dom";
-
+import DocumentUpload from "../../../components/DocumentUpload";
+import ListFiles from "../../../components/ListFiles";
+import uuid from "react-uuid";
+import { detailedApplicationThunk, selectedDetailedApplications } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
+import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
+import { Controller } from "../../../lib/api-wrappers/Controller";
+import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 
 export const InvestmentThemeOfFund = () => {
     const { id } = useParams()
-    const navigate = useNavigate()
-    const [expanded, setExpanded] = useState<string | false>(false);
-
-    const handleChange =
-        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            setExpanded(isExpanded ? panel : false);
-        };
-
-
+    const [formData, setFormData] = useState(defaultIDetailedApplication);
+    const [actionId] = useState(uuid())
+    const controller = new Controller(actionId, detailedApplicationThunk);
+    const state = useAppSelector(selectedDetailedApplications);
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+      if (id && Number(id)) {
+        if (!state[0]?.data[id]) {
+          controller.fetch({ ...formData, id: Number(id) });
+        }
+      }
+    }, [])
+  
+    useEffect(() => {
+      let newData = state[0]?.data[Number(id)];
+      if (newData) setFormData(newData)
+    }, [state[0]?.data])
+  
+    const handleChange = (ev: any) => {
+      ev.preventDefault();
+      let copiedValue = { ...formData }
+      let key = ev.target.id ? ev.target.id : ev.target.name;
+      copiedValue[key as keyof typeof formData] = ev.target.value;
+      setFormData(copiedValue);
+    };
+  
+    const handleSave = () => {
+      controller.save(formData);
+    }
+  
     const handleClick = (ev: any, navTo: string) => {
+        handleSave()
         if (navTo === 'next') {
             navigate(`/Detailed/${id}/EngagementAndRole`);
         }
-        else{
+        else {
             navigate(`/Detailed/${id}/detailed2K`);
         }
+    }
+
+    const [investmentThemeOfFundRefreshId, setInvestmentThemeOfFundRefreshId] = useState(uuid());
+    const investmentThemeOfFundSuccess = () => {
+        setInvestmentThemeOfFundRefreshId(uuid());
     }
 
     return (<>
@@ -39,23 +73,41 @@ export const InvestmentThemeOfFund = () => {
                 <CardContent sx={{ flex: 1 }}>
 
                     <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Investment Theme of theFund</Typography>
-
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2 }}>Please provide detailed investment theme of the fund. Role of the Fund Manager in achieving Investment theme of the Fund</Typography>
+                    <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
+                        <CardContent sx={{ flex: 1 }}>
+                            <TextField
+                                required
+                                id="investmentThemeOfFund"
+                                label="Please provide details as per caption"
+                                //defaultValue={formData.investmentThemeOfFund === undefined ? " " : formData["investmentThemeOfFund"]}
+                                value={formData["investmentThemeOfFund"] || ''}
+                                variant="standard"
+                                onChange={handleChange}
+
+                                sx={{ display: 'flex', ml: 2, mb: -3 }}
+                            />
+                        </CardContent>
+                    </Card>
+                    <ListFiles id={`investmentThemeOfFund${id}`} refreshId={investmentThemeOfFundRefreshId} />
                     <Button
                         onClick={(e) => handleClick(e, "previous")}
                         variant="outlined"
                         disableElevation
-                        sx={{ textTransform: 'none', mt: 15, mb: 3, ml: 2 ,width:'90px',backgroundColor:'white',color:'black',borderColor:'black'}} >
+                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >
                         Download
                     </Button>
-                    <Button
-                        onClick={(e) => handleClick(e, "previous")}
-                        variant="outlined"
-                        disableElevation
-                        sx={{ textTransform: 'none', mt: 15, mb: 3, ml: 2 ,width:'90px',backgroundColor:'white',color:'black',borderColor:'black'}} >
-                        Upload
-                    </Button>
+                    <DocumentUpload id={`investmentThemeOfFund${id}`} onSuccess={investmentThemeOfFundSuccess}>
+                        <Button
+                            // onClick={(e) => handleClick(e, "previous")}
+                            variant="outlined"
+                            disableElevation
+                            sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >
+                            Upload
+                        </Button>
+                    </DocumentUpload>
+
                     <Divider sx={{ mt: 2 }} />
                     <Grid container xs={12}>
                         <Grid item xs={4}>

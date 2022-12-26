@@ -128,6 +128,22 @@ export class Thunk<T extends IEntity> {
     }
   );
 
+  
+  readAsync = createAsyncThunk(
+    `read${this.entity}Async/all`,
+    async (args: ActionWrapper<T>, { rejectWithValue }) => {
+      try {
+        if (args.argument) {
+          const response = await this.apiAdaptor?.read(args.argument);
+          return response.data;
+        }
+      } catch (reason) {
+        console.log("Error: " + reason)
+        return rejectWithValue(getError(reason));
+      }
+    }
+  );
+
   setDefaultValues(state: ICommonState<T>, trackingid: string, parentId: number) {
     if(!state[parentId]) {
       state[parentId] = {
@@ -267,6 +283,31 @@ export class Thunk<T extends IEntity> {
       })
       .addCase(this.deleteAsync.rejected, (state, action) => {
         let input = action.meta.arg;
+        state[this.getParentId(input.argument)]
+          .status[input.trackingid].actionStatus = getError(action.payload);
+      })
+      .addCase(this.readAsync.pending, (state, action) => {
+        let input = action.meta.arg;
+        this.setDefaultValues(
+          state as ICommonState<T>, 
+          input.trackingid, 
+          this.getParentId(input.argument));
+        state[this.getParentId(input.argument)]
+          .status[input.trackingid].actionStatus.fetchStatus = FetchStatus.DOING;
+      })
+      .addCase(this.readAsync.fulfilled, (state, action) => {
+        let input = action.meta.arg;
+        state[this.getParentId(input.argument)]
+          .status[input.trackingid].actionStatus.fetchStatus = FetchStatus.IDLE;
+        state[this.getParentId(input.argument)]
+          .data[this.getId(input.argument)] = action.payload;
+        //state['0'].status = FetchStatus.IDLE;
+        //state[0].data[0] = action.payload;
+       // state['applications'] = action.payload;
+      })
+      .addCase(this.readAsync.rejected, (state, action) => {
+        let input = action.meta.arg;
+        console.log('getAsync Error', this.getParentId(input.argument), input.trackingid)
         state[this.getParentId(input.argument)]
           .status[input.trackingid].actionStatus = getError(action.payload);
       })

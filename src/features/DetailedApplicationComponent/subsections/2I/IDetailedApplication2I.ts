@@ -8,6 +8,7 @@ export interface IDetailedApplication2I extends IEntity {
   trustDeed: string | undefined,
   sebiRegistration: string | undefined,
   sebiCompliance: string | undefined,
+  sebiComplianceAvailable: boolean | undefined
 }
 
 export const defaultIDetailedApplication2I : IDetailedApplication2I = {
@@ -20,4 +21,5 @@ export const defaultIDetailedApplication2I : IDetailedApplication2I = {
   trustDeed: undefined,
   sebiRegistration: undefined,
   sebiCompliance: undefined,
+  sebiComplianceAvailable: undefined
 }

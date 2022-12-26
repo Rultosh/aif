@@ -10,7 +10,18 @@ export interface ISelfRating {
   q7: string | undefined,
   q8: string | undefined,
   q9: string | undefined,
-  q10: string | undefined
+  q10: string | undefined,
+  q1Comments: string | undefined,
+  q2Comments: string | undefined,
+  q3Comments: string | undefined,
+  q4Comments: string | undefined,
+  q5Comments: string | undefined,
+  q6Comments: string | undefined,
+  q7Comments: string | undefined,
+  q8Comments: string | undefined,
+  q9Comments: string | undefined,
+  q10Comments: string | undefined,
+  score: string | undefined,
 }
 
 export const defaultIISelfRating = {
@@ -25,5 +36,16 @@ export const defaultIISelfRating = {
   q7: undefined,
   q8: undefined,
   q9: undefined,
-  q10: undefined
+  q10: undefined,
+  q1Comments: undefined,
+  q2Comments: undefined,
+  q3Comments: undefined,
+  q4Comments: undefined,
+  q5Comments: undefined,
+  q6Comments: undefined,
+  q7Comments: undefined,
+  q8Comments: undefined,
+  q9Comments: undefined,
+  q10Comments: undefined,
+  score: undefined,
 }

@@ -90,7 +90,7 @@ export const DetailedApplication2D = () => {
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>D. Deal flow</Typography>
 
-                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>25. Please furnish following information (fund-wise):</Typography>
+                    <Typography variant="body2"  sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>25. Please furnish following information (fund-wise):</Typography>
 
                     <Card sx={{ display: 'flex', mt: 2, ml: 7, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
@@ -98,8 +98,8 @@ export const DetailedApplication2D = () => {
                                 required
                                 id="numberOfDealsEvaluated"
                                 label="A. Total number of business plans / deals evaluated since fund inception"
-                                defaultValue={formData.numberOfDealsEvaluated === undefined ? " " : formData["numberOfDealsEvaluated"]}
-                                value={formData["numberOfDealsEvaluated"]}
+                                //defaultValue={formData.numberOfDealsEvaluated === undefined ? " " : formData["numberOfDealsEvaluated"]}
+                                value={formData["numberOfDealsEvaluated"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -114,8 +114,8 @@ export const DetailedApplication2D = () => {
                                 required
                                 id="sourcingBreakUps"
                                 label="B. Break-up of sourcing of the deals - investment banks, sponsor network, direct etc."
-                                defaultValue={formData.sourcingBreakUps === undefined ? " " : formData["sourcingBreakUps"]}
-                                value={formData["sourcingBreakUps"]}
+                                //defaultValue={formData.sourcingBreakUps === undefined ? " " : formData["sourcingBreakUps"]}
+                                value={formData["sourcingBreakUps"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -130,8 +130,8 @@ export const DetailedApplication2D = () => {
                                 required
                                 id="businessPlanBreakUps"
                                 label="C. Break-up of business plans / deals industry / sector-wise and stage-wise. "
-                                defaultValue={formData.businessPlanBreakUps === undefined ? " " : formData["businessPlanBreakUps"]}
-                                value={formData["businessPlanBreakUps"]}
+                                //defaultValue={formData.businessPlanBreakUps === undefined ? " " : formData["businessPlanBreakUps"]}
+                                value={formData["businessPlanBreakUps"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -146,8 +146,8 @@ export const DetailedApplication2D = () => {
                                 required
                                 id="conversionRation"
                                 label="D. Conversion ratio for transactions sourced to those completed."
-                                defaultValue={formData.conversionRation === undefined ? " " : formData["conversionRation"]}
-                                value={formData["conversionRation"]}
+                                //defaultValue={formData.conversionRation === undefined ? " " : formData["conversionRation"]}
+                                value={formData["conversionRation"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 

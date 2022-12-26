@@ -7,6 +7,12 @@ export interface IDetailedApplication2G extends IEntity {
   cvs: string | undefined,
   investmentExperience: string | undefined,
   otherVCFsManaged: string | undefined,
+  overallEmployeeCost: string | undefined,
+  employeeCarry: string | undefined,
+  regulartoryInvestigation: string | undefined,
+  vcExlusive: string | undefined,
+  directorship: string | undefined,
+  employeeShareHolding: string | undefined,
 }
 
 export const defaultIDetailedApplication2G : IDetailedApplication2G = {
@@ -18,4 +24,10 @@ export const defaultIDetailedApplication2G : IDetailedApplication2G = {
   cvs: undefined,
   investmentExperience: undefined,
   otherVCFsManaged: undefined,
+  overallEmployeeCost: undefined,
+  employeeCarry: undefined,
+  regulartoryInvestigation: undefined,
+  vcExlusive: undefined,
+  directorship: undefined,
+  employeeShareHolding: undefined,
 }

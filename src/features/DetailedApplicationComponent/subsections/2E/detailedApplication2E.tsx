@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, InputLabel } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
@@ -13,9 +13,12 @@ import { Controller } from "../../../../lib/api-wrappers/Controller";
 import { defaultIDetailedApplication2E, IDetailedApplication2E } from "./IDetailedApplication2E";
 import { detailedApplication2EThunk, selectDetailedApplication2E } from "./detailedApplication2ESlice";
 import {updateNavIndex}from '../sideNavBarSlice'
+import UploadComponents from '../uploadComponents'
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import FileUpload from "../../../../components/FileUpload";
 
 
-export const DetailedApplication2E = () => {
+export const DetailedApplication2E = (props: any) => {
 
     const { id } = useParams()
     const [parentId] = useState(Number(id))
@@ -27,7 +30,10 @@ export const DetailedApplication2E = () => {
     const [open, setOpen] = useState(false);
     const dispatch = useAppDispatch();
 
-    
+    const handleOnClickUpload = () => {
+        setOpen(true)
+    }
+
     useEffect(() => {
         dispatch(updateNavIndex(4))
         if (parentId) {
@@ -95,8 +101,8 @@ export const DetailedApplication2E = () => {
                                 required
                                 id="listOfExternalFirms"
                                 label="26. List of external firms (legal, technical, financial / accounting etc.) who are assisting / would be assisting the Investment Manager in the due diligence process."
-                                defaultValue={formData.listOfExternalFirms === undefined ? " " : formData["listOfExternalFirms"]}
-                                value={formData["listOfExternalFirms"]}
+                                //defaultValue={formDatalistOfExternalFirms === undefined ? " " : formData["listOfExternalFirms"]}
+                                value={formData["listOfExternalFirms"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -111,9 +117,9 @@ export const DetailedApplication2E = () => {
                             <TextField
                                 required
                                 id="monitoringPractices"
-                                label="27. List the activities involved in monitoring and follow-up of investments? How frequently do the investee companies fumish reports to the Investment Manager? Please give details of the same."
-                                defaultValue={formData.monitoringPractices === undefined ? " " : formData["monitoringPractices"]}
-                                value={formData["monitoringPractices"]}
+                                label="27. List the activities involved in monitoring and follow-up of investments? How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same."
+                                //defaultValue={formDatamonitoringPractices === undefined ? " " : formData["monitoringPractices"]}
+                                value={formData["monitoringPractices"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -129,8 +135,8 @@ export const DetailedApplication2E = () => {
                                 required
                                 id="imValueAdd"
                                 label="28. Please describe how the investment manager(s) add value / propose to add value to the investments."
-                                defaultValue={formData.imValueAdd === undefined ? " " : formData["imValueAdd"]}
-                                value={formData["imValueAdd"]}
+                                //defaultValue={formDataimValueAdd === undefined ? " " : formData["imValueAdd"]}
+                                value={formData["imValueAdd"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -141,20 +147,29 @@ export const DetailedApplication2E = () => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                            <TextField
-                                required
-                                id="investmentRisksAndMitigations"
-                                label="29. What are the risks in the investments planned for this fund and what are the risk mitigation efforts?"
-                                defaultValue={formData.investmentRisksAndMitigations === undefined ? " " : formData["investmentRisksAndMitigations"]}
-                                value={formData["investmentRisksAndMitigations"]}
-                                variant="standard"
-                                onChange={handleChange}
+                            <Grid container>
+                                <Grid item xs={9}>
+                                    <InputLabel variant="standard" sx={{ml:2}}>29. What are the risks in the investments planned for this fund and what are the risk mitigation efforts?
+                                        <FileUploadIcon onClick={handleOnClickUpload} >
+                                        </FileUploadIcon>
+                                        <FileUpload
+                                            id={props.id}
+                                            onSuccess={(id: String, url: String) => {
+                                                props.onSuccess(props.id, url);
+                                            }}
+                                            open={open} setOpen={setOpen}></FileUpload>
+                                    </InputLabel>
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={3}>
+                                <div style={{margin: "15px"}}>
+                                    <UploadComponents id={`riskInInvestment${id}`}></UploadComponents>
+                                </div>
+                            </Grid>
 
-                                sx={{ display: 'flex', ml: 2, mb: -3 }}
-                            />
                         </CardContent>
                     </Card>
-
+                    
 
                     <Grid container xs={12}>
                         <Grid item xs={4}>

@@ -39,6 +39,22 @@ export class APIAdaptor<T> {
     }
   }
 
+  read(object:T) : any {
+    if(this.parentEntity) {
+      return api({
+        method: 'get',
+        url: `/api/${this.parentEntity}/${this.getParentId(object)}/${this.entity}/${this.getId(object)}`
+       // url: `/api/prelims/page/${pageInfo?.pageNumber}/${pageInfo?.pageSize}`
+      });
+    } else {
+      return api({
+        method: 'get',
+        url: `/api/${this.entity}`
+        //url: `/api/prelims/page/${pageInfo?.pageNumber}/${pageInfo?.pageSize}`
+      });
+    }
+  }
+
   post(object:T) : any {
     if(this.parentEntity) {
       return api({

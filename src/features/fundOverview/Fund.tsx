@@ -51,7 +51,7 @@ export const Fund = () => {
     }, [])
 
     const navigate = useNavigate()
-    const [expanded, setExpanded] = useState<string | false>(false);
+    const [expanded, setExpanded] = useState<string | false>("1");
 
     const handleChange =
         (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {

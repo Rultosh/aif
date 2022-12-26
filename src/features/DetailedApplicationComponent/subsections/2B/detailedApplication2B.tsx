@@ -18,6 +18,8 @@ import { detailedApplication2BThunk, selectDetailedApplication2B } from "./detai
 import { InputLabel } from '@mui/material';
 import SideNavBar from '../SideNavBar'
 import {updateNavIndex}from '../sideNavBarSlice'
+import DocumentUpload from "../../../../components/DocumentUpload";
+import ListFiles from "../../../../components/ListFiles";
 
 export const DetailedApplication2B = (props: any) => {
 
@@ -30,8 +32,12 @@ export const DetailedApplication2B = (props: any) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const dispatch = useAppDispatch();
-    
 
+
+    const [firstClosingUid, setFirstClosingUid] = useState(uuid());
+    const firstClosingSuccess = () => {
+        setFirstClosingUid(uuid());
+    }
 
 
 
@@ -91,7 +97,7 @@ export const DetailedApplication2B = (props: any) => {
         if (navTo === 'next') {
             navigate(`/Detailed/${id}/detailed2C`);
         }
-        else{
+        else {
             navigate(`/Detailed/${id}/detailed2A`);
         }
     }
@@ -138,8 +144,8 @@ export const DetailedApplication2B = (props: any) => {
                                 required
                                 id="fundLaunchedDate"
                                 label="10. When was the fund launched?"
-                                defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                value={formData["fundLaunchedDate"]}
+                                //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                value={formData["fundLaunchedDate"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -154,8 +160,8 @@ export const DetailedApplication2B = (props: any) => {
                                 required
                                 id="commitmentReceived"
                                 label="11. How much commitments have been  received so far? Please indicate what % of commitments received from the investors who contributed to earlier Funds managed by the Investment Manager and from non-institutonal source including employee(s) of the fund. List name(s) of contributors with amounts commited and atttac copies of their commitment letters, document signed with them."
-                                defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
-                                value={formData["commitmentReceived"]}
+                                //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
+                                value={formData["commitmentReceived"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -166,63 +172,34 @@ export const DetailedApplication2B = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                            <Grid container>                                <Grid item xs={9}>
-                                <InputLabel>12. Has the "first closing"/"Initial closing" been done? If so, when and at what amount?
-                                    <FileUploadIcon onClick={handleOnClickUpload} >
-                                    </FileUploadIcon>
-                                    <FileUpload
-                                        id={props.id}
-                                        onSuccess={(id: String, url: String) => {
-                                            props.onSuccess(props.id, url);
-                                        }}
-                                        open={open} setOpen={setOpen}></FileUpload>
-                                </InputLabel>
-                            </Grid>
-                                <Grid item xs={3}>
-                                    <Box>
-                                        <TableContainer component={Paper}  >
-                                            <Table sx={{ minWidth: 45, mt: 1, mb: 1 }} aria-label="customized table">
-                                                <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
-                                                    <TableRow>
-                                                        {headerComponent}
-                                                    </TableRow>
-                                                </TableHead>
-                                                <TableBody>
-                                                    {rows.map((row: any) => (
-                                                        <TableRow key={row}>
-                                                            <TableCell align="center" component="th" scope="row">
-                                                                {row}
-                                                            </TableCell>
-                                                            <TableCell align="center">
-                                                                <FileDownloadIcon />&nbsp;
-                                                                <Delete ></Delete>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))}
-
-                                                </TableBody>
-                                            </Table>
-                                        </TableContainer>
-
-
-
-                                    </Box>
+                            <Grid container>                                
+                                <Grid item xs={9}>
+                                    <InputLabel>12. Has the "first closing"/"Initial closing" been done? If so, when and at what amount?
+                                        <DocumentUpload id={`firstClosing${props.id}`} 
+                                            onSuccess={firstClosingSuccess}>
+                                            <FileUploadIcon onClick={handleOnClickUpload} >
+                                            </FileUploadIcon>
+                                        </DocumentUpload>
+                                    </InputLabel>
                                 </Grid>
                             </Grid>
-
+                            <Grid item xs={3}>
+                                <Box>
+                                    <ListFiles 
+                                        id={`firstClosing${props.id}`} 
+                                        refreshId={firstClosingUid}/>
+                                </Box>
+                            </Grid>
                         </CardContent>
                     </Card>
-
-
-
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
                             <TextField
                                 required
                                 id="dateOfFinalClosing"
                                 label="13. What is expected date of final closing of the fund?"
-                                defaultValue={formData.dateOfFinalClosing === undefined ? " " : formData["dateOfFinalClosing"]}
-                                value={formData["dateOfFinalClosing"]}
+                                //defaultValue={formData.dateOfFinalClosing === undefined ? " " : formData["dateOfFinalClosing"]}
+                                value={formData["dateOfFinalClosing"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -237,8 +214,8 @@ export const DetailedApplication2B = (props: any) => {
                                 required
                                 id="contribTerms"
                                 label="14. Are all contributors governed by same team and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor(along with reasons)"
-                                defaultValue={formData.contribTerms === undefined ? " " : formData["contribTerms"]}
-                                value={formData["contribTerms"]}
+                                //defaultValue={formData.contribTerms === undefined ? " " : formData["contribTerms"]}
+                                value={formData["contribTerms"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -253,8 +230,8 @@ export const DetailedApplication2B = (props: any) => {
                                 required
                                 id="investmentManagerPlacementAgent"
                                 label="15. Has the Investment Manager or the Fund or the sponsor of anyone associated with the fund engaged any placement agents? If yes, please provide details of funds raised and payment(s) made / to be made to the agents. Please also clarify as to who is bearing the cost of the agents?"
-                                defaultValue={formData.investmentManagerPlacementAgent === undefined ? " " : formData["investmentManagerPlacementAgent"]}
-                                value={formData["investmentManagerPlacementAgent"]}
+                                //defaultValue={formData.investmentManagerPlacementAgent === undefined ? " " : formData["investmentManagerPlacementAgent"]}
+                                value={formData["investmentManagerPlacementAgent"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 

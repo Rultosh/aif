@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, Modal, TextField, Stack } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button, Modal, TextField, Stack, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useEffect, useState } from "react"
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import { createTeamMemberAsync, updateTeamMemberAsync } from "./teamMemberSlice";
@@ -156,7 +156,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                       disableFuture={true}
                       label="Date Of Birth"
                       value={teamMember.dob || null}
-                     // minDate={Today.toString()}
+                      // minDate={Today.toString()}
                       onChange={(newValue) => {
                         setDateValue("dob", newValue);
                       }}
@@ -196,7 +196,24 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                 />
               </Grid>
               <Grid item xs={4.5}>
-                <TextField
+                <FormControl variant="standard" sx={{ display: 'flex' }}>
+                  <InputLabel id="demo-simple-select-standard-label">Years of Relevent Experience</InputLabel>
+                  <Select
+                    labelId="yearsOfRelevantExp"
+                    id="yearsOfRelevantExp"
+                    value={teamMember["yearsOfRelevantExp"]}
+                    onChange={handleChange}
+                    name="yearsOfRelevantExp"
+                    defaultValue={teamMember["yearsOfRelevantExp"] === undefined ? " " : teamMember["yearsOfRelevantExp"]}
+                  >
+
+                    <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>
+                    <MenuItem key={"5-10 years"} value={"5-10 years"}>5-10 years</MenuItem>
+                    <MenuItem key={"10-15 years"} value={"10-15 years"}>10-15 years</MenuItem>
+                    <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
+                  </Select>
+                </FormControl>
+                {/*} <TextField
                   required
                   type="number"
                   id="yearsOfRelevantExp"
@@ -208,10 +225,25 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
-                />
+                    />*/}
               </Grid>
               <Grid item xs={4.5}>
-                <TextField
+                <FormControl variant="standard" sx={{ display: 'flex' }}>
+                  <InputLabel id="demo-simple-select-standard-label">Key Person</InputLabel>
+                  <Select
+                    labelId="keyPerson"
+                    id="keyPerson"
+                    value={teamMember["keyPerson"]}
+                    onChange={handleChange}
+                    name="keyPerson"
+                    defaultValue={teamMember["keyPerson"] === undefined ? " " : teamMember["keyPerson"]}
+                  >
+
+                    <MenuItem key={"Yes"} value={"Yes"}>Yes</MenuItem>
+                    <MenuItem key={"No"} value={"No"}>No</MenuItem>
+                  </Select>
+                </FormControl>
+                {/*<TextField
                   required
                   type="number"
                   id="keyPerson"
@@ -223,7 +255,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
-                />
+                  />*/}
               </Grid>
               <Grid item xs={4.5}>
                 <TextField

@@ -73,7 +73,7 @@ export const DetailedApplication2A = () => {
             navigate(`/Detailed/${id}/detailed2B`);
         }
         else{
-            navigate(`/Detailed/${id}/prelimApp`);
+            navigate(`/Detailed/${id}/SidbiReference`);
         }
     }
 
@@ -147,8 +147,8 @@ export const DetailedApplication2A = () => {
                                         required
                                         id="domesticAmount1"
                                         label="Response to question is required "
-                                        defaultValue={formData.domesticAmount1 === undefined ? " " : formData["domesticAmount1"]}
-                                        value={formData["domesticAmount1"]}
+                                        //defaultValue={formData.domesticAmount1 === undefined ? " " : formData["domesticAmount1"]}
+                                        value={formData["domesticAmount1"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
 
@@ -160,8 +160,8 @@ export const DetailedApplication2A = () => {
                                         required
                                         id="internationalAmount1"
                                         label="Response to question is required"
-                                        defaultValue={formData.internationalAmount1 === undefined ? " " : formData["internationalAmount1"]}
-                                        value={formData["internationalAmount1"]}
+                                        //defaultValue={formData.internationalAmount1 === undefined ? " " : formData["internationalAmount1"]}
+                                        value={formData["internationalAmount1"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
 
@@ -173,8 +173,8 @@ export const DetailedApplication2A = () => {
                                         required
                                         id="totalAmount1"
                                         label="Response to question is required"
-                                        defaultValue={formData.totalAmount1 === undefined ? " " : formData["totalAmount1"]}
-                                        value={formData["totalAmount1"]}
+                                        //defaultValue={formData.totalAmount1 === undefined ? " " : formData["totalAmount1"]}
+                                        value={formData["totalAmount1"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
 
@@ -186,8 +186,8 @@ export const DetailedApplication2A = () => {
                                         required
                                         id="domesticAmount2"
                                         label="Response to question is required"
-                                        defaultValue={formData.domesticAmount2 === undefined ? " " : formData["domesticAmount2"]}
-                                        value={formData["domesticAmount2"]}
+                                        //defaultValue={formData.domesticAmount2 === undefined ? " " : formData["domesticAmount2"]}
+                                        value={formData["domesticAmount2"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
 
@@ -199,8 +199,8 @@ export const DetailedApplication2A = () => {
                                         required
                                         id="internationalAmount2"
                                         label="Response to question is required"
-                                        defaultValue={formData.internationalAmount2 === undefined ? " " : formData["internationalAmount2"]}
-                                        value={formData["internationalAmount2"]}
+                                        //defaultValue={formData.internationalAmount2 === undefined ? " " : formData["internationalAmount2"]}
+                                        value={formData["internationalAmount2"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
 
@@ -212,8 +212,8 @@ export const DetailedApplication2A = () => {
                                         required
                                         id="totalAmount2"
                                         label="Response to question is required"
-                                        defaultValue={formData.totalAmount2 === undefined ? " " : formData["totalAmount2"]}
-                                        value={formData["totalAmount2"]}
+                                        //defaultValue={formData.totalAmount2 === undefined ? " " : formData["totalAmount2"]}
+                                        value={formData["totalAmount2"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
 
@@ -230,8 +230,8 @@ export const DetailedApplication2A = () => {
                                 required
                                 id="detailOfFundLife"
                                 label="2. Details of fund life answer and provision for extension."
-                                defaultValue={formData.detailOfFundLife === undefined ? " " : formData["detailOfFundLife"]}
-                                value={formData["detailOfFundLife"]}
+                                //defaultValue={formData.detailOfFundLife === undefined ? " " : formData["detailOfFundLife"]}
+                                value={formData["detailOfFundLife"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -246,8 +246,8 @@ export const DetailedApplication2A = () => {
                                 required
                                 id="investmentPeriod"
                                 label="3. Investment Period / commitment period."
-                                defaultValue={formData.investmentPeriod === undefined ? " " : formData["investmentPeriod"]}
-                                value={formData["investmentPeriod"]}
+                                //defaultValue={formData.investmentPeriod === undefined ? " " : formData["investmentPeriod"]}
+                                value={formData["investmentPeriod"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -262,8 +262,8 @@ export const DetailedApplication2A = () => {
                                 required
                                 id="targetReturnOfTheFund"
                                 label="4. Target return for the fund."
-                                defaultValue={formData.targetReturnOfTheFund === undefined ? " " : formData["targetReturnOfTheFund"]}
-                                value={formData["targetReturnOfTheFund"]}
+                                //defaultValue={formData.targetReturnOfTheFund === undefined ? " " : formData["targetReturnOfTheFund"]}
+                                value={formData["targetReturnOfTheFund"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -278,8 +278,8 @@ export const DetailedApplication2A = () => {
                                 required
                                 id="hurdleRate"
                                 label="5. Hurdle Rate & carried interest with basis / justification for the same."
-                                defaultValue={formData.hurdleRate === undefined ? " " : formData["hurdleRate"]}
-                                value={formData["hurdleRate"]}
+                                //defaultValue={formData.hurdleRate === undefined ? " " : formData["hurdleRate"]}
+                                value={formData["hurdleRate"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -294,8 +294,8 @@ export const DetailedApplication2A = () => {
                                 required
                                 id="managementFee"
                                 label="6. Management fee and trusteeship fee with basis / justification for the same."
-                                defaultValue={formData.managementFee === undefined ? " " : formData["managementFee"]}
-                                value={formData["managementFee"]}
+                                //defaultValue={formData.managementFee === undefined ? " " : formData["managementFee"]}
+                                value={formData["managementFee"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -310,8 +310,8 @@ export const DetailedApplication2A = () => {
                                 required
                                 id="provisionOfFundSetup"
                                 label="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
-                                defaultValue={formData.provisionOfFundSetup === undefined ? " " : formData["provisionOfFundSetup"]}
-                                value={formData["provisionOfFundSetup"]}
+                                //defaultValue={formData.provisionOfFundSetup === undefined ? " " : formData["provisionOfFundSetup"]}
+                                value={formData["provisionOfFundSetup"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -326,8 +326,8 @@ export const DetailedApplication2A = () => {
                                 required
                                 id="fundOnlyPrimaryInvestment"
                                 label="8. Whether the Fund will make primary investment only i.e. the funds shall be utilized by the investee company only for its growth plans?"
-                                defaultValue={formData.fundOnlyPrimaryInvestment === undefined ? " " : formData["fundOnlyPrimaryInvestment"]}
-                                value={formData["fundOnlyPrimaryInvestment"]}
+                                //defaultValue={formData.fundOnlyPrimaryInvestment === undefined ? " " : formData["fundOnlyPrimaryInvestment"]}
+                                value={formData["fundOnlyPrimaryInvestment"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
@@ -342,8 +342,8 @@ export const DetailedApplication2A = () => {
                                 required
                                 id="detailsOfExistingFund"
                                 label="9. Details of existing investment made from the proposed fund (including warehouse investment), if any. What is the current pipeline of deals under considertaion? Give details and timeline for investment."
-                                defaultValue={formData.detailsOfExistingFund === undefined ? " " : formData["detailsOfExistingFund"]}
-                                value={formData["detailsOfExistingFund"]}
+                                //defaultValue={formData.detailsOfExistingFund === undefined ? " " : formData["detailsOfExistingFund"]}
+                                value={formData["detailsOfExistingFund"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 

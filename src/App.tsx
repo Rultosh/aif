@@ -47,8 +47,8 @@ function App() {
       <Routes>
         <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
         <Route path='/detailed/sidbiReference' element={<SidbiReference />}></Route>
-        <Route path='/detailed/sidbiReference/:id' element={<SidbiReference />}></Route>
-        <Route path='/detailed/featureOfFunds/:id' element={<FeatureOfFunds />}></Route>
+        {/*<Route path='/detailed/sidbiReference/:id' element={<SidbiReference />}></Route>
+        <Route path='/detailed/featureOfFunds/:id' element={<FeatureOfFunds />}></Route>*/}
         <Route path='home' element={<Home />}></Route>
         <Route path='workflow' element={<Workflow />}></Route>
         <Route path='eligibilityQuestioner' element={<EligibilityQuestioner />}></Route>
@@ -78,7 +78,8 @@ function App() {
           <Route path='detailed2K' element={<DetailedApplication2K />}></Route>
           <Route path='InvestmentThemeOfFund' element={<InvestmentThemeOfFund />}></Route>
           <Route path='EngagementAndRole' element={<EngagementAndRole />}></Route>
-          <Route path='PrelimApp' element={<PrelimApp />}></Route>
+          <Route path='SidbiReference' element={<SidbiReference />}></Route>
+          {/*<Route path='PrelimApp' element={<PrelimApp />}></Route>*/}
           <Route path='carryDistribution' element={<CarryDistribution />}></Route>
           
         </Route>

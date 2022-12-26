@@ -4,7 +4,8 @@ export interface IDetailedApplication extends IEntity {
   sidbiRefeferenceNumber : string | undefined,
   investmentThemeOfFund : string | undefined,
   imRoleAndEngagement : string | undefined,
-  declarationAccepted : string | undefined
+  declarationAccepted : boolean | undefined,
+  disputes : string | undefined,
 }
 
 export const defaultIDetailedApplication : IDetailedApplication = {
@@ -13,5 +14,8 @@ export const defaultIDetailedApplication : IDetailedApplication = {
   sidbiRefeferenceNumber : undefined,
   investmentThemeOfFund : undefined,
   imRoleAndEngagement : undefined,
-  declarationAccepted : undefined
+  declarationAccepted : undefined,
+  disputes : undefined
 }
+
+export const listDefaultIDetailedApplication: IDetailedApplication[] =[];

@@ -11,12 +11,14 @@ type resultSchema = {
 type InitialState = {
   questions: any
   error: string
-  results: any
+  results: any,
+  scheme: string
 }
 const initialState: InitialState = {
   questions: [],
   error: '',
-  results:{} as resultSchema
+  results:{} as resultSchema,
+  scheme: ''
 }
 
 // Generates pending, fulfilled and rejected action types
@@ -43,6 +45,9 @@ const eligibilityQuestionerSlice = createSlice({
       //state.questions = questions.eligibilityQuestions['Fund of funds']
       state.questions = questions.eligibilityQuestions
      
+    },
+    schemName: (state, action: PayloadAction<string>) =>{
+      state.scheme = action.payload;
     }
   },
   extraReducers: builder => {
@@ -63,4 +68,4 @@ const eligibilityQuestionerSlice = createSlice({
 })
 
 export default eligibilityQuestionerSlice.reducer
-export const { selected, getQuestions } = eligibilityQuestionerSlice.actions
+export const { selected, getQuestions, schemName } = eligibilityQuestionerSlice.actions

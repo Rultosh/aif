@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Grid, Modal,  TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, FormControl, Grid, InputLabel, MenuItem, Modal, Select, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
 import { createInvestmentTeamsAssociateLevelAsync, updateInvestmentTeamsAssociateLevelAsync } from './investmentAssociateSlice'
 import { useAppDispatch } from '../../../../../app/hooks'
@@ -22,7 +22,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
   function handleSubmitForm() {
     console.log("Saving investpment Associate", investmentAssociateFormData)
-    if(investmentAssociateFormData.id) {
+    if (investmentAssociateFormData.id) {
       dispatch(
         updateInvestmentTeamsAssociateLevelAsync(
           wrapArgument(actionUid, investmentAssociateFormData)
@@ -35,14 +35,14 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
           wrapArgument(actionUid, investmentAssociateFormData)
         )
       )
-      setInvestmentAssociateFormData({...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId})
+      setInvestmentAssociateFormData({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
     }
     props.handleClose();
   }
 
   useEffect(() => {
-    setInvestmentAssociateFormData({...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId})
-    console.log({...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId})
+    setInvestmentAssociateFormData({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
+    console.log({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
   }, [])
 
   const handleChange = (ev: any) => {
@@ -51,8 +51,13 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
     let copiedValue: IInvestmentAssociate = { ...investmentAssociateFormData };
 
-    copiedValue[ev.target.id as keyof IInvestmentAssociate] =
-      ev.target.id !== undefined ? ev.target.value : ev.target.value
+    if (ev.target.id !== undefined) {
+      copiedValue[ev.target.id as keyof IInvestmentAssociate] =
+        ev.target.id !== undefined ? ev.target.value : ev.target.value
+    } else {
+      copiedValue[ev.target.name as keyof IInvestmentAssociate] = ev.target.value;
+    }
+
 
     console.log(copiedValue, props.prelimApplicationId)
 
@@ -143,7 +148,24 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 />
               </Grid>
               <Grid item xs={4.5}>
-                <TextField
+                <FormControl variant="standard" sx={{display: 'flex' }}>
+                  <InputLabel id="demo-simple-select-standard-label">Investment Experience</InputLabel>
+                  <Select
+                    labelId="investmentExperience"
+                    id="investmentExperience"
+                    value={investmentAssociateFormData["investmentExperience"]}
+                    onChange={handleChange}
+                    name="vcpeExperience"
+                    defaultValue={investmentAssociateFormData["investmentExperience"] === undefined ? " " : investmentAssociateFormData["investmentExperience"]}
+                  >
+
+                    <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>
+                    <MenuItem key={"5-10 years"} value={"5-10 years"}>5-10 years</MenuItem>
+                    <MenuItem key={"10-15 years"} value={"10-15 years"}>10-15 years</MenuItem>
+                    <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
+                  </Select>
+                </FormControl>
+                {/*<TextField
                   required
                   type="number"
                   id="investmentExperience"
@@ -154,7 +176,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
-                />
+/>*/}
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
