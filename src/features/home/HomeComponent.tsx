@@ -28,7 +28,7 @@ export const Home = () => {
     const [actionId] = useState(uuid())
     const controller = new Controller(actionId, detailedApplicationThunk);
     //const stateDetailsApplication = useAppSelector(selectedDetailedApplications);
-    const state = useAppSelector(selectedDetailedApplications);
+    // const state = useAppSelector(selectedDetailedApplications);
     const dispatch = useAppDispatch();
     const prelimApplications = useAppSelector(selectPrelimApplication);
 
@@ -44,21 +44,21 @@ export const Home = () => {
     }, [prelimApplications.prelimApplication])
 
 
-    useEffect(() => {
-        if (id && Number(id)) {
-          if (!state[0]?.data[id]) {
-            controller.read({ ...formData, id: Number(id) });
-          }
-        }
-      }, [])
+    // useEffect(() => {
+    //     if (id && Number(id)) {
+    //       if (!state[0]?.data[id]) {
+    //         controller.read({ ...formData, id: Number(id) });
+    //       }
+    //     }
+    //   }, [])
     
-      useEffect(() => {
-        let newData = state[0]?.data[Number(id)];
-        if (newData) {
-            setFormData(newData)
-            setDetailedApplications(newData)
-        }
-      }, [state[0]?.data])
+    //   useEffect(() => {
+    //     let newData = state[0]?.data[Number(id)];
+    //     if (newData) {
+    //         setFormData(newData)
+    //         setDetailedApplications(newData)
+    //     }
+    //   }, [state[0]?.data])
 
    /* useEffect(() => {
         
@@ -147,40 +147,6 @@ export const Home = () => {
                     {prelimApplications.prelimApplications.length >= 5 ? <Button variant='outlined' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
                 </div>
             </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div> }
-
-            {state[0]?.status[actionId]?.actionStatus.fetchStatus === FetchStatus.IDLE ? <div >
-                <TableContainer component={Paper}  >
-                    <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
-                        <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
-                            <TableRow>
-                                {detailedHeaderComponent}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {
-                                detailedApplications ? detailedApplications.map((row : IDetailedApplication) => {
-                                    return <TableRow key={`${row.id}`}>
-                                        <TableCell align="center" component="th" scope="row">
-                                            <a href={`/Detailed/${row.id}/SidbiReference`}>{row.id}</a>
-                                        </TableCell>
-                                        <TableCell align="center">Sample Contact</TableCell>
-                                        <TableCell align="center">{String(row.sidbiRefeferenceNumber)}</TableCell>
-                                        {/*<TableCell align="center">{row.createdOn}</TableCell>
-                                        <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
-                                        <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>
-                                        <TableCell align="center"></TableCell>
-                                <TableCell align="center"></TableCell>*/}
-                                    </TableRow>
-                                }) : <></>
-                            }
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <div style={{ float: 'right' }}>
-                    {pageInfo.pageNumber > 0 ? <Button variant='outlined' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
-                    {prelimApplications.prelimApplications.length >= 5 ? <Button variant='outlined' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
-                </div>
-            </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
         </div>
     )
 }

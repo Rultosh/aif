@@ -25,7 +25,7 @@ export const SelfRating = () => {
 
     const selfRatingState = useAppSelector(selectSelfRatings)
 
-    const [selfRatingValue, setSelfRatingValue] = useState(selfRatingState.selfRatings);
+    const [selfRatingValue, setSelfRatingValue] = useState<ISelfRating>(selfRatingState.selfRatings);
     const [scoreBoard, setScoreBoard] = useState({} as any);
     const [score, setScore] = useState('0');
 
@@ -114,6 +114,15 @@ export const SelfRating = () => {
         setSelfRatingValue(copiedValue);
     };
 
+    function getValue(key:string) : string {
+        if(selfRatingValue && selfRatingValue[key as keyof ISelfRating]) {
+            return String(selfRatingValue[key as keyof ISelfRating]);
+        }
+        else {
+            return "";
+        }
+    }
+
     let selfRatingQuestionComponents = []
 
     let selfQuestions = questions.selfRatingQuestions
@@ -135,15 +144,15 @@ export const SelfRating = () => {
                                             </Box>
                                             <RadioGroup
                                                 row
-                                                defaultValue={selfRatingValue["q" + (i + 1).toString() as keyof ISelfRating]}
+                                                value={getValue("q" + (i + 1).toString())}
                                                 //defaultValue= ">=5% but less than 10% of corpus"
                                                 name="position"
                                                 onChange={(e) => handleChange(e, i + 1)}
                                             >
                                                 {selfQuestions[i].options.map((val, index) => (
                                                     <Grid item xs={selfQuestions[idxVal].size}>
-                                                        <FormControlLabel onChange={() => calculateScore(selfQuestions[i], val, idxVal)} value={val} control={<Radio />}
-                                                            // checked={selfRatingValue["Q" + (idxVal + 1)] === val} 
+                                                        <FormControlLabel onChange={() => calculateScore(selfQuestions[i], val, idxVal)} 
+                                                            value={val} control={<Radio />}
                                                             label={val} />
                                                     </Grid>
                                                 ))}
@@ -158,7 +167,7 @@ export const SelfRating = () => {
                                                     label="Comments if any"
                                                     //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
                                                     //value={selfRatingValue["q" + (i + 1).toString()+"Comments" as key of  as keyof ISelfRating]] || ''}
-                                                    value={selfRatingValue["q" + (i + 1).toString()+"Comments" as keyof ISelfRating] || ''}
+                                                    value={getValue("q" + (i + 1).toString()+"Comments")|| ''}
                                                     
                                                     variant="standard"
                                                     onChange={(e) => handleChange(e, (i + 1).toString()+"Comments")}

@@ -109,7 +109,13 @@ const selfRatingSlice = createSlice({
     builder.addCase(
       fetchSelfRatingAsync.fulfilled,
       (state, action: PayloadAction<ISelfRating[]>) => {
-        state.selfRatings = action.payload[0]
+        console.log("Full Payload", action.payload);
+        if(action.payload.length === 0) {
+          state.selfRatings = defaultIISelfRating;
+        } else {
+          state.selfRatings = action.payload[0]
+        }
+        
         console.log(state.selfRatings)
         state.status.fetchStatus = FetchStatus.IDLE;
       }

@@ -12,6 +12,7 @@ import { getPrelimApplicationData, selectPrelimApplication, updatePrelimApplicat
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import { defaultIPrelimApplicationData } from "../fundOverviewData/IPrelimApplicationData";
 import uuid from 'react-uuid';
+import { FetchStatus } from "../../../../lib/api-status/IStatus";
 
 export const Declaration = () => {
 
@@ -23,7 +24,9 @@ export const Declaration = () => {
 
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
 
-    const [agreed, setAgreed] = useState(prelimApplicationState.prelimApplication.declarationAccepted);
+    const [agreed, setAgreed] = useState<boolean>(!!prelimApplicationState.prelimApplication.declarationAccepted);
+
+    console.log(agreed, !!prelimApplicationState.prelimApplication.declarationAccepted)
 
     const dispatch = useAppDispatch()
 
@@ -45,6 +48,10 @@ export const Declaration = () => {
             ))
         }
     }, [])
+
+    useEffect(() => {
+        setAgreed(!!prelimApplicationState.prelimApplication.declarationAccepted)
+    }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
 
     function handleChange() {
 
@@ -86,7 +93,10 @@ export const Declaration = () => {
                                 <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>E.  I / We have no objection if SIDBI and/or its representatives making necessary enquiries/verification (incuding in CIBIL or any other credit information agencies database) while considering my/our application for capital contribution. I / We undertake to furnish all other information that may be by SIDBI in connection with my/ our application for capital Commitment.</Typography>
                                 <Divider />
                                 <FormGroup>
-                                    <FormControlLabel sx={{mt:2}} control={<Checkbox  checked={agreed}  onChange={handleChange}/>} label= {<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I / We (Partner/Directors) hereby declare that</Typography>} />
+                                    <FormControlLabel sx={{mt:2}} control={
+                                        <Checkbox  checked={!!agreed}  onChange={handleChange}/>} 
+                                        label= {<Typography sx={{ flex: 1, fontWeight: 'bold' }}>
+                                            I / We (Partner/Directors) hereby declare that</Typography>} />
                                 </FormGroup>
                             </CardContent>
                         </Card>
@@ -105,7 +115,7 @@ export const Declaration = () => {
                     Save
                 </Button>
 
-                <Button  onClick={(e) => handleClick(e, "previous")} disabled={!agreed} endIcon={<ArrowRightIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                <Button disabled={!agreed} endIcon={<ArrowRightIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Preview
                 </Button>
 

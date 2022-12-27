@@ -143,6 +143,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   value={investmentAssociateFormData.qualification}
                   variant="standard"
                   onChange={handleChange}
+                  name="qualification"
 
                   sx={{ display: 'flex' }}
                 />
@@ -153,10 +154,9 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   <Select
                     labelId="investmentExperience"
                     id="investmentExperience"
-                    value={investmentAssociateFormData["investmentExperience"]}
+                    value={String(investmentAssociateFormData.investmentExperience)}
                     onChange={handleChange}
-                    name="vcpeExperience"
-                    defaultValue={investmentAssociateFormData["investmentExperience"] === undefined ? " " : investmentAssociateFormData["investmentExperience"]}
+                    name="investmentExperience"
                   >
 
                     <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>

@@ -5,8 +5,8 @@ export interface ITeamMember {
   dob: string | undefined,
   dateofJoiningAMC: string | undefined,
   location: string | undefined,
-  yearsOfRelevantExp: number | undefined,
-  keyPerson: number | undefined,
+  yearsOfRelevantExp: string | undefined,
+  keyPerson: string | undefined,
   directorship: string | undefined
 }
 

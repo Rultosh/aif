@@ -116,7 +116,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     sx={{ display: 'flex' }}
                   />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={3.5}>
                   <TextField
                     required
                     id="organisation"

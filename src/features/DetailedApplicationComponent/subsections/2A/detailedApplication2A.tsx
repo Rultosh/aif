@@ -28,8 +28,6 @@ export const DetailedApplication2A = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-
-
     useEffect(() => {
         dispatch(updateNavIndex(0))
         if (parentId) {
@@ -325,15 +323,15 @@ export const DetailedApplication2A = () => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                            <Textarea
+                            {/* <Textarea
                                 id="provisionOfFundSetup"
                                 placeholder="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
                                 required
                                 sx={{ display: 'flex', ml: 2 }}
                                 value={formData["provisionOfFundSetup"] || ''}
                                 onChange={handleChange}
-                            />
-                            {/*<TextField
+                            /> */}
+                            <TextField
                                 required
                                 id="provisionOfFundSetup"
                                 label="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
@@ -343,7 +341,7 @@ export const DetailedApplication2A = () => {
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2 }}
-                            />*/}
+                            />
                         </CardContent>
                     </Card>
 

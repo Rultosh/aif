@@ -40,7 +40,7 @@ export const DetailedApplication2B = (props: any) => {
         setFirstClosingUid(uuid());
     }
 
-
+    console.log('Ganesan', formData.id);
 
     const tableHeaders = ["File Name", "Action"]
 
@@ -58,7 +58,6 @@ export const DetailedApplication2B = (props: any) => {
     useEffect(() => {
         dispatch(updateNavIndex(1))
         if (parentId) {
-
             if (!state[parentId]?.data[0]) {
                 setFormData({ ...formData, parentId: parentId })
                 controller.all({ ...formData, parentId: parentId });
@@ -69,10 +68,13 @@ export const DetailedApplication2B = (props: any) => {
     useEffect(() => {
         dispatch(updateNavIndex(1))
         if (id && state[parentId]?.data) {
+            console.log('looping key', parentId, state[parentId]?.data)
             Object.keys(state[parentId]?.data).map((key) => {
+                console.log(key)
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
                     setFormData(value);
+                    console.log('Ganesan setting value', value);
                 } else {
                     setFormData({ ...formData, parentId: parentId })
                 }

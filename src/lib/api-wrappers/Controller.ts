@@ -52,6 +52,7 @@ export class Controller<T extends IEntity> {
   }
 
   public save(data:T) {
+    console.log(data);
     if(data.id) {
       this.dispatch(
         this.thunk.updateAsync(

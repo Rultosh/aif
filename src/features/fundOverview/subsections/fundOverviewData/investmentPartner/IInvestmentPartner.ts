@@ -3,9 +3,9 @@ export interface IInvestmentPartner {
     prelimApplicationId: Number | undefined,
     name: String | undefined,
     designation: String | undefined,
-    age : Number | undefined,
+    age : String | undefined,
     qualification : String | undefined,
-    vcpeExperience : Number | undefined,
+    vcpeExperience : String | undefined,
     description : String | undefined
 }
 

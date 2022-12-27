@@ -153,11 +153,12 @@ export class Thunk<T extends IEntity> {
       };
     }
 
-    if (!state[parentId].status[trackingid])
+    if (!state[parentId].status[trackingid]){
       console.log('doing 2')
       state[parentId].status[trackingid] = {
         actionStatus: { fetchStatus: FetchStatus.IDLE },
         allStatus: { fetchStatus: FetchStatus.IDLE }
+      }
     }
   }
 
@@ -171,6 +172,8 @@ export class Thunk<T extends IEntity> {
           this.getParentId(input.argument));
         state[this.getParentId(input.argument)]
           .status[input.trackingid].allStatus.fetchStatus = FetchStatus.DOING;
+        state[this.getParentId(input.argument)].data = {}
+        console.log('ganesan', this.getParentId(input.argument), 'setting state data to blank', state[this.getParentId(input.argument)].data)
       })
       .addCase(this.getAllAsync.fulfilled, (state, action) => {
         let input = action.meta.arg;
@@ -178,7 +181,7 @@ export class Thunk<T extends IEntity> {
           .status[input.trackingid].allStatus.fetchStatus = FetchStatus.IDLE;
         state[this.getParentId(input.argument)]
           .data = this.spreadArrayAsHash(action.payload);
-          console.log('getAllSync', 
+          console.log('getAllSync', this.entity,
             this.getParentId(input.argument), 
             input.trackingid, 
             state[this.getParentId(input.argument)]

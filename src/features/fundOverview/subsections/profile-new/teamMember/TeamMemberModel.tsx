@@ -174,7 +174,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                       value={teamMember.dateofJoiningAMC || null}
                       minDate={Today.toString()}
                       onChange={(newValue) => {
-                        setDateValue("dateOfFilingWithSEBI", newValue);
+                        setDateValue("dateofJoiningAMC", newValue);
                       }}
                       renderInput={(params) => <TextField {...params} />}
                     />
@@ -201,10 +201,9 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                   <Select
                     labelId="yearsOfRelevantExp"
                     id="yearsOfRelevantExp"
-                    value={teamMember["yearsOfRelevantExp"]}
+                    value={String(teamMember.yearsOfRelevantExp)}
                     onChange={handleChange}
                     name="yearsOfRelevantExp"
-                    defaultValue={teamMember["yearsOfRelevantExp"] === undefined ? " " : teamMember["yearsOfRelevantExp"]}
                   >
 
                     <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>

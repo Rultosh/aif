@@ -116,12 +116,12 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   sx={{ display: 'flex' }}
                 />
               </Grid>
-              <Grid item xs={1}>
+              <Grid item xs={3.5}>
                 <TextField
                   type="number"
                   required
-                  id="age"
-                  label="Age"
+                  id="percentOfCorpus"
+                  label="% of Corpus"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={contributorDetailsFormData.percentOfCorpus}
                   variant="standard"

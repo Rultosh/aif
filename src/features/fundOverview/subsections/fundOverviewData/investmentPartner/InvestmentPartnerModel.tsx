@@ -134,6 +134,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               <Grid item xs={1}>
                 <TextField
                   required
+                  type="number"
                   id="age"
                   label="Age"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
@@ -163,13 +164,12 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   <Select
                     labelId="vcpeExperience"
                     id="vcpeExperience"
-                    value={investmentPartnerFormData["vcpeExperience"]}
+                    value={String(investmentPartnerFormData.vcpeExperience)}
                     onChange={handleChange}
                     name="vcpeExperience"
-                    defaultValue={investmentPartnerFormData["vcpeExperience"] === undefined ? " " : investmentPartnerFormData["vcpeExperience"]}
                   >
 
-                    <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>
+                    <MenuItem key="0-5 years" value="0-5 years">0-5 years</MenuItem>
                     <MenuItem key={"5-10 years"} value={"5-10 years"}>5-10 years</MenuItem>
                     <MenuItem key={"10-15 years"} value={"10-15 years"}>10-15 years</MenuItem>
                     <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
