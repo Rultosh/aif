@@ -17,9 +17,10 @@ import { defaultIDetailedApplication2B, IDetailedApplication2B } from "./IDetail
 import { detailedApplication2BThunk, selectDetailedApplication2B } from "./detailedApplication2BSlice";
 import { InputLabel } from '@mui/material';
 import SideNavBar from '../SideNavBar'
-import {updateNavIndex}from '../sideNavBarSlice'
+import { updateNavIndex } from '../sideNavBarSlice'
 import DocumentUpload from "../../../../components/DocumentUpload";
 import ListFiles from "../../../../components/ListFiles";
+import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2B = (props: any) => {
 
@@ -133,7 +134,26 @@ export const DetailedApplication2B = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                    <Grid container spacing={2} >
+                        <Grid item xs={11}>
+                            <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                        </Grid>
+                        <Grid item xs={1}>
+                            {/*} <IconButton onClick={handleSave} style={{ float: 'right' }} sx={{ position: 'fixed', backgroundColor: '#D586F7', display: 'flex', borderRadius: '8%', cursor: 'pointer' }}>
+                                <SaveIcon  ></SaveIcon>
+    </IconButton>*/}
+                            <Button
+                                onClick={handleSave}
+                                endIcon={<SaveIcon />}
+                                variant="contained"
+                                disableElevation
+                                color='success'
+                                sx={{ textTransform: 'none', position: 'fixed'}} >
+                                Save
+                            </Button>
+
+                        </Grid>
+                    </Grid>
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>B. Details of fund raising</Typography>
 
@@ -156,40 +176,60 @@ export const DetailedApplication2B = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                            <TextField
-                                required
-                                id="commitmentReceived"
-                                label="11. How much commitments have been  received so far? Please indicate what % of commitments received from the investors who contributed to earlier Funds managed by the Investment Manager and from non-institutonal source including employee(s) of the fund. List name(s) of contributors with amounts commited and atttac copies of their commitment letters, document signed with them."
-                                //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
-                                value={formData["commitmentReceived"] || ''}
-                                variant="standard"
-                                onChange={handleChange}
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        id="commitmentReceived"
+                                        label="11. How much commitments have been  received so far? Please indicate what % of commitments received from the investors who contributed to earlier Funds managed by the Investment Manager and from non-institutonal source including employee(s) of the fund. List name(s) of contributors with amounts commited and atttac copies of their commitment letters, document signed with them."
+                                        //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
+                                        value={formData["commitmentReceived"] || ''}
+                                        variant="standard"
+                                        onChange={handleChange}
 
-                                sx={{ display: 'flex', ml: 2, mb: -3 }}
-                            />
-                        </CardContent>
-                    </Card>
+                                        sx={{ display: 'flex', ml: 2, mb: -3 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={9} sx={{ mt: 2 }}>
 
-                    <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
-                        <CardContent sx={{ flex: 1 }}>
-                            <Grid container>                                
-                                <Grid item xs={9}>
-                                    <InputLabel>12. Has the "first closing"/"Initial closing" been done? If so, when and at what amount?
-                                        <DocumentUpload id={`firstClosing${props.id}`} 
+                                    <InputLabel variant="standard" sx={{ ml: 2 }}>
+                                        <DocumentUpload id={`firstClosing${props.id}`}
                                             onSuccess={firstClosingSuccess}>
                                             <FileUploadIcon onClick={handleOnClickUpload} >
                                             </FileUploadIcon>
                                         </DocumentUpload>
                                     </InputLabel>
                                 </Grid>
+                                <Grid item xs={3}>
+                                    <Box>
+                                        <ListFiles
+                                            id={`firstClosing${props.id}`}
+                                            refreshId={firstClosingUid} />
+                                    </Box>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={3}>
-                                <Box>
-                                    <ListFiles 
-                                        id={`firstClosing${props.id}`} 
-                                        refreshId={firstClosingUid}/>
-                                </Box>
+                        </CardContent>
+                    </Card>
+
+                    <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                        <CardContent sx={{ flex: 1 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        id="firstClosing"
+                                        label='12. Has the "first closing"/"Initial closing" been done? If so, when and at what amount?'
+                                        //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
+                                        value={formData["firstClosing"] || ''}
+                                        variant="standard"
+                                        onChange={handleChange}
+
+                                        sx={{ display: 'flex', ml: 2, mb: -3 }}
+                                    />
+                                </Grid>
+
                             </Grid>
+
                         </CardContent>
                     </Card>
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
@@ -272,7 +312,7 @@ export const DetailedApplication2B = (props: any) => {
                     </Grid>
                 </CardContent>
             </Card>
-        </Grid>
+        </Grid >
     </>
     );
 }

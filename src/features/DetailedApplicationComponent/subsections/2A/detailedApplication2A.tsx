@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField } from "@mui/material";
+import { InputLabel, Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, IconButton } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
@@ -12,7 +12,9 @@ import uuid from "react-uuid";
 import { defaultIFeaturesOfFunds, IFeaturesOfFunds } from "./IFeaturesOfFund";
 import { featureOfFundsThunk, selectFeatureOfFunds } from "./featuresOfFundSlice";
 import SideNavBar from '../SideNavBar'
-import {updateNavIndex}from '../sideNavBarSlice'
+import { updateNavIndex } from '../sideNavBarSlice'
+import Textarea from '@mui/joy/Textarea';
+import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2A = () => {
 
@@ -25,7 +27,7 @@ export const DetailedApplication2A = () => {
     const state = useAppSelector(selectFeatureOfFunds);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    
+
 
 
     useEffect(() => {
@@ -72,7 +74,7 @@ export const DetailedApplication2A = () => {
         if (navTo === 'next') {
             navigate(`/Detailed/${id}/detailed2B`);
         }
-        else{
+        else {
             navigate(`/Detailed/${id}/SidbiReference`);
         }
     }
@@ -88,9 +90,26 @@ export const DetailedApplication2A = () => {
         <Grid item xs={9}>
             <Card sx={{ display: 'flex', mb: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
+                    <Grid container spacing={2} >
+                        <Grid item xs={11}>
+                            <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                        </Grid>
+                        <Grid item xs={1}>
+                            {/*} <IconButton onClick={handleSave} style={{ float: 'right' }} sx={{ position: 'fixed', backgroundColor: '#D586F7', display: 'flex', borderRadius: '8%', cursor: 'pointer' }}>
+                                <SaveIcon  ></SaveIcon>
+    </IconButton>*/}
+                            <Button
+                                onClick={handleSave}
+                                endIcon={<SaveIcon />}
+                                variant="contained"
+                                disableElevation
+                                color='success'
+                                sx={{ textTransform: 'none', position: 'fixed' }} >
+                                Save
+                            </Button>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
-
+                        </Grid>
+                    </Grid>
                     <Card sx={{ display: 'flex', mb: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
                             <Typography variant="body1" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062' }}>Instruction</Typography>
@@ -185,7 +204,7 @@ export const DetailedApplication2A = () => {
                                     <TextField
                                         required
                                         id="domesticAmount2"
-                                        label="Response to question is required"
+                                        label="Green shoe Response to question is required"
                                         //defaultValue={formData.domesticAmount2 === undefined ? " " : formData["domesticAmount2"]}
                                         value={formData["domesticAmount2"] || ''}
                                         variant="standard"
@@ -198,7 +217,7 @@ export const DetailedApplication2A = () => {
                                     <TextField
                                         required
                                         id="internationalAmount2"
-                                        label="Response to question is required"
+                                        label="Green shoe Response to question is required"
                                         //defaultValue={formData.internationalAmount2 === undefined ? " " : formData["internationalAmount2"]}
                                         value={formData["internationalAmount2"] || ''}
                                         variant="standard"
@@ -211,7 +230,7 @@ export const DetailedApplication2A = () => {
                                     <TextField
                                         required
                                         id="totalAmount2"
-                                        label="Response to question is required"
+                                        label="Green shoe Response to question is required"
                                         //defaultValue={formData.totalAmount2 === undefined ? " " : formData["totalAmount2"]}
                                         value={formData["totalAmount2"] || ''}
                                         variant="standard"
@@ -306,7 +325,15 @@ export const DetailedApplication2A = () => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                            <TextField
+                            <Textarea
+                                id="provisionOfFundSetup"
+                                placeholder="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
+                                required
+                                sx={{ display: 'flex', ml: 2 }}
+                                value={formData["provisionOfFundSetup"] || ''}
+                                onChange={handleChange}
+                            />
+                            {/*<TextField
                                 required
                                 id="provisionOfFundSetup"
                                 label="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
@@ -316,7 +343,7 @@ export const DetailedApplication2A = () => {
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2 }}
-                            />
+                            />*/}
                         </CardContent>
                     </Card>
 

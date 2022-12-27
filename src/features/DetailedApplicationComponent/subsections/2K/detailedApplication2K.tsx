@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, FormControlLabel, Switch, Checkbox, FormGroup } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, FormControlLabel, Switch, Checkbox, FormGroup, IconButton } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
@@ -15,6 +15,7 @@ import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
 import { Controller } from "../../../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from '../../../detailedApplication/sidbiReference/detailedApplicationSlice';
 import { defaultIDetailedApplication } from "../../../detailedApplication/sidbiReference/IDetailedApplication";
+import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2K = () => {
     const { id } = useParams()
@@ -89,8 +90,26 @@ export const DetailedApplication2K = () => {
         <Card sx={{ display: 'flex', mb: 2 }}>
             <CardContent sx={{ flex: 1 }}>
 
-                <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+            <Grid container spacing={2} >
+                        <Grid item xs={11}>
+                            <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                        </Grid>
+                        <Grid item xs={1}>
+                            {/*} <IconButton onClick={handleSave} style={{ float: 'right' }} sx={{ position: 'fixed', backgroundColor: '#D586F7', display: 'flex', borderRadius: '8%', cursor: 'pointer' }}>
+                                <SaveIcon  ></SaveIcon>
+    </IconButton>*/}
+                            <Button
+                                onClick={handleSave}
+                                endIcon={<SaveIcon />}
+                                variant="contained"
+                                disableElevation
+                                color='success'
+                                sx={{ textTransform: 'none', position: 'fixed'}} >
+                                Save
+                            </Button>
 
+                        </Grid>
+                    </Grid>
                 <Divider sx={{ mt: 2 }} />
                 <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>K. Declaration</Typography>
                 <Card sx={{ display: 'flex', mb: 2, background: '#f2f2f2' ,color:'#363062'}}>
@@ -109,7 +128,9 @@ export const DetailedApplication2K = () => {
                         <FormGroup>
                             {/*<FormControlLabel sx={{ mt: 2 }} control={<Checkbox checked={agreed} onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} /> */}
                             {/*state[0]?.status[actionId].actionStatus.fetchStatus == 'idle' ? <FormControlLabel sx={{ mt: 2 }} name="declarationAccepted" value={!agreed} control={<Checkbox defaultChecked={true}  onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} /> : null}*/}
-                            <FormControlLabel sx={{ mt: 2 }} name="declarationAccepted" value={!agreed} control={<Checkbox defaultChecked={true}  onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} />
+                            {/*<FormControlLabel sx={{ mt: 2 }} name="declarationAccepted" value={!agreed} control={<Checkbox defaultChecked={true}  onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} />*/}
+                            <FormControlLabel sx={{mt:2}} control={<Checkbox  checked={agreed}  onChange={handleChange}/>} label= {<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I / We (Partner/Directors) hereby declare that</Typography>} />
+                                
                         </FormGroup>
                     </CardContent>
                 </Card>

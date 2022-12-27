@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, Divider, Toolbar, TextField, FormControlLabel, Switch } from "@mui/material";
+import { IconButton, Card, CardContent, Typography, Grid, Box, Button, Divider, Toolbar, TextField, FormControlLabel, Switch } from "@mui/material";
 
 import { useState, useEffect } from "react"
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -13,6 +13,7 @@ import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
 import { Controller } from "../../../../lib/api-wrappers/Controller";
 import { defaultIDetailedApplication2I, IDetailedApplication2I } from "./IDetailedApplication2I";
 import { detailedApplication2IThunk, selectDetailedApplication2I } from "./detailedApplication2ISlice";
+import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2I = (props: any) => {
     const { id } = useParams()
@@ -38,7 +39,7 @@ export const DetailedApplication2I = (props: any) => {
         setOpen(true)
     }
     useEffect(() => {
-        dispatch(updateNavIndex(6))
+        dispatch(updateNavIndex(8))
         if (parentId) {
 
             if (!state[parentId]?.data[0]) {
@@ -49,7 +50,7 @@ export const DetailedApplication2I = (props: any) => {
     }, [])
 
     useEffect(() => {
-        dispatch(updateNavIndex(6))
+        dispatch(updateNavIndex(8))
         if (id && state[parentId]?.data) {
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
@@ -92,7 +93,26 @@ export const DetailedApplication2I = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                <Grid container spacing={2} >
+                        <Grid item xs={11}>
+                            <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                        </Grid>
+                        <Grid item xs={1}>
+                            {/*} <IconButton onClick={handleSave} style={{ float: 'right' }} sx={{ position: 'fixed', backgroundColor: '#D586F7', display: 'flex', borderRadius: '8%', cursor: 'pointer' }}>
+                                <SaveIcon  ></SaveIcon>
+    </IconButton>*/}
+                            <Button
+                                onClick={handleSave}
+                                endIcon={<SaveIcon />}
+                                variant="contained"
+                                disableElevation
+                                color='success'
+                                sx={{ textTransform: 'none', position: 'fixed'}} >
+                                Save
+                            </Button>
+
+                        </Grid>
+                    </Grid>
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>I. Fund Related Documents</Typography>
 

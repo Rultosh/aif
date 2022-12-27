@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, InputLabel } from "@mui/material";
+import { IconButton, Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, InputLabel } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
@@ -16,6 +16,7 @@ import {updateNavIndex}from '../sideNavBarSlice'
 import UploadComponents from '../uploadComponents'
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileUpload from "../../../../components/FileUpload";
+import SaveIcon from '@mui/icons-material/Save';
 
 
 export const DetailedApplication2E = (props: any) => {
@@ -90,7 +91,26 @@ export const DetailedApplication2E = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                <Grid container spacing={2} >
+                        <Grid item xs={11}>
+                            <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                        </Grid>
+                        <Grid item xs={1}>
+                            {/*} <IconButton onClick={handleSave} style={{ float: 'right' }} sx={{ position: 'fixed', backgroundColor: '#D586F7', display: 'flex', borderRadius: '8%', cursor: 'pointer' }}>
+                                <SaveIcon  ></SaveIcon>
+    </IconButton>*/}
+                            <Button
+                                onClick={handleSave}
+                                endIcon={<SaveIcon />}
+                                variant="contained"
+                                disableElevation
+                                color='success'
+                                sx={{ textTransform: 'none', position: 'fixed'}} >
+                                Save
+                            </Button>
+
+                        </Grid>
+                    </Grid>
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>E. Due diligence, documentation and monitoring </Typography>
 

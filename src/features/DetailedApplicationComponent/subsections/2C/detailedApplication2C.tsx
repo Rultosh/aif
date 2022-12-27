@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, InputLabel, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { IconButton, Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, InputLabel, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
@@ -19,6 +19,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import React, * as Rect from 'react'
 import FileUpload from "../../../../components/FileUpload";
 import UploadComponents from '../uploadComponents'
+import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2C = (props: any) => {
 
@@ -91,7 +92,26 @@ export const DetailedApplication2C = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                    <Grid container spacing={2} >
+                        <Grid item xs={11}>
+                            <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Application</Typography>
+                        </Grid>
+                        <Grid item xs={1}>
+                            {/*} <IconButton onClick={handleSave} style={{ float: 'right' }} sx={{ position: 'fixed', backgroundColor: '#D586F7', display: 'flex', borderRadius: '8%', cursor: 'pointer' }}>
+                                <SaveIcon  ></SaveIcon>
+    </IconButton>*/}
+                            <Button
+                                onClick={handleSave}
+                                endIcon={<SaveIcon />}
+                                variant="contained"
+                                disableElevation
+                                color='success'
+                                sx={{ textTransform: 'none', position: 'fixed' }} >
+                                Save
+                            </Button>
+
+                        </Grid>
+                    </Grid>
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>C. Investment, divestment & other matters </Typography>
 
@@ -137,10 +157,10 @@ export const DetailedApplication2C = (props: any) => {
                                 </Grid>
                             </Grid>
                             <Grid item xs={3}>
-                                <div style={{margin: "15px"}}>
+                                <div style={{ margin: "15px" }}>
                                     <UploadComponents id={`detailedApplicationDetailedProfile${id}`}></UploadComponents>
                                 </div>
-                            </Grid>                            
+                            </Grid>
                         </CardContent>
                     </Card>
 
@@ -159,10 +179,10 @@ export const DetailedApplication2C = (props: any) => {
                                             open={open} setOpen={setOpen}></FileUpload>
                                     </InputLabel>
                                 </Grid>
-                                
+
                             </Grid>
                             <Grid item xs={3}>
-                                <div style={{margin: "15px"}}>
+                                <div style={{ margin: "15px" }}>
                                     <UploadComponents id={`profileLocRenum${id}`}></UploadComponents>
                                 </div>
                             </Grid>

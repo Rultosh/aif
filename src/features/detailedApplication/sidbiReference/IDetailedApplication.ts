@@ -14,7 +14,7 @@ export const defaultIDetailedApplication : IDetailedApplication = {
   sidbiRefeferenceNumber : undefined,
   investmentThemeOfFund : undefined,
   imRoleAndEngagement : undefined,
-  declarationAccepted : undefined,
+  declarationAccepted : false,
   disputes : undefined
 }
 
