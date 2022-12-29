@@ -62,12 +62,17 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
-        // console.log('handle change', ev.target.id, ev.target.value);
+        console.log('handle change', ev, ev.target.id, ev.target.value);
 
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
 
-        copiedValue[ev.target.id as keyof IPrelimApplicationData] =
-            ev.target.id !== undefined ? ev.target.value : ev.target.value
+        if(ev.target.id) {
+            copiedValue[ev.target.id as keyof IPrelimApplicationData] =
+                ev.target.id !== undefined ? ev.target.value : ev.target.value
+        } else {
+            copiedValue[ev.target.name as keyof IPrelimApplicationData] = ev.target.value
+        }
+        
 
         setPrelimApplicationFormData(copiedValue)
     };
@@ -78,30 +83,66 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         setPrelimApplicationFormData(copiedValue);
     }
 
-    const handleDocumentUpload = (id: String, url: any) => {
-        let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
-        copiedValue[id as keyof IPrelimApplicationData] = url;
-        setPrelimApplicationFormData(copiedValue);
-        dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, copiedValue)));
-    }
-
-    const handleDocumentDelete = (id: String) => {
-        let copiedValue: IPrelimApplicationData = { ...defaultIPrelimApplicationData };
-        console.log(copiedValue);
-        console.log('handleDocDel', id)
-        copiedValue.id = prelimApplicationFormData.id;
-        copiedValue[id as keyof IPrelimApplicationData] = "" as any;
-        
-        setPrelimApplicationFormData(copiedValue);
-        dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, copiedValue)));
-    }
-
     const handleToggle = () =>{
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
         copiedValue.firstClosing = !firstClosingSwitch;
         setPrelimApplicationFormData(copiedValue);
         setfirstClosingSwitch(!firstClosingSwitch)
     }
+
+    const dealSubSectorValues = {
+        "26": {
+            values: ["Blue Collar Outsourcing",
+                     "Equipment Rental",
+                     "Specialised BPO or IT Services",
+                     "White Collar Outsourcing",
+                     "Other"
+                    ]
+            },
+        "27": {
+            values: ["Apparel",
+                "Education",
+                "Food Retailers",
+                "General Retailers",
+                "Healthcare",
+                "Household Durables",
+                "Leisure",
+                "Restaurants",
+                "Other"
+            ]
+        },
+        "28": {
+            values: [
+                "Banking",
+                "Wealth and Distribution", 
+                "Specialty Credit",
+                "Other"
+            ]
+        }, 
+        "29": {
+            values: [
+                "Electronics", "Medical Technology", "Industrial Consumables", "Power" , "Transportation Equipment", "Water Waste Management" , "Other"
+            ]            
+        }, 
+        "30": {
+            values: [
+                "Distribution", "Non Renewables", "Renewables", "Transport", "Other"
+            ]
+        },
+        "31": {
+            values: [
+                "Hospitality", "Industrial", "Office", "Residential", "Retail", "Other"
+
+            ]
+        },
+        "32": {
+            values: [
+                "Agribusiness", "Media", "Regional or Sector Funds", "Telecoms", "Other"
+            ]
+        }
+    }
+
+    console.log((dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)]?.values, prelimApplicationFormData.dealSubsector);
 
     if(prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
     return (
@@ -359,21 +400,23 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                     <Grid item xs={4}>
                         <FormControl variant="standard" sx={{ display: 'flex' }}>
                             <InputLabel id="demo-simple-select-standard-label">Deal Sub Sector</InputLabel>
-                            {/* <Select
-                                labelId="dealSubSector"
-                                id="dealSubSector"
-                                value={prelimApplicationFormData.dealSubsector || ''}
+                            <Select
+                                labelId="dealSubsector"
+                                id="dealSubsector"
+                                value={String(prelimApplicationFormData.dealSubsector || '')}
                                 onChange={handleChange}
-                                name="dealSubSector"
+                                name="dealSubsector"
                             >
 
-                                <MenuItem key={"Fund of funds"} value={"Fund of funds Sampath"}>Fund of funds Sampath</MenuItem>
-                                <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups Sampath"}>Asipre for Start-ups Sampath</MenuItem>
-                                <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
-                            </Select> */}
-                            <MasterData propertyType="dealSubsector" 
+                                {prelimApplicationFormData.dealSector && 
+                                    (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)]  && 
+                                    (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)].values.map((item : string) => {
+                                        return <MenuItem key={item} value={item} selected={String(prelimApplicationFormData.dealSubsector || '') === item}>{item}</MenuItem>
+                                    })}
+                            </Select>
+                            {/* <MasterData propertyType="dealSubsector" 
                                 propertyValue={prelimApplicationFormData.dealSubsector || 0}
-                                onChange={handleSelectChange}/>
+                                onChange={handleSelectChange}/> */}
                         </FormControl>
                     </Grid>
                     <Grid item xs={4}>
@@ -415,7 +458,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                         (Max. file size 5 MB each)</span> </Typography>
                                             </Box>
                                         </Grid>
-                                        <Grid item xs={12}>
+                                        {Number(prelimAppicationId) ?<Grid item xs={12}>
                                             <Box sx={{ display: 'flex' }}>
                                                 <div style={{margin: '5px'}}>
                                                     <DocumentChip 
@@ -445,13 +488,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                     {/* <Chip label="SEBI Certificate" size="medium" sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} /> */}
                                                 </div>
                                             </Box>
-                                        </Grid>
+                                        </Grid>:<Grid item xs={12}>Please save the form to upload documents</Grid>}
                                         <Grid item xs={12}>
                                             <Grid item xs={4}>
                                                 <TextField
                                                     required
                                                     id="sdDescription"
-                                                    label="Description"
+                                                    label="Capital raised till date (INR Crore)"
                                                     value={prelimApplicationFormData.sdDescription || ''}
                                                     onChange={handleChange}
                                                     variant="standard"
@@ -504,7 +547,10 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
                                         </Grid>
                                         <Grid item xs={3}>
-                                            <FormControlLabel sx={{ mt: 5 }} control={<Switch checked={prelimApplicationFormData.firstClosing} onChange={handleToggle}/>} label="No" />
+                                            <FormControlLabel sx={{ mt: 5 }} control={<
+                                                Switch checked={!!prelimApplicationFormData.firstClosing} 
+                                                onChange={handleToggle}/>} 
+                                                label={prelimApplicationFormData.firstClosing?"Yes":"No"} />
                                         </Grid>
                                         <Grid item xs={3}>
                                             <TextField

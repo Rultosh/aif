@@ -7,7 +7,10 @@ export interface ITeamMember {
   location: string | undefined,
   yearsOfRelevantExp: string | undefined,
   keyPerson: string | undefined,
-  directorship: string | undefined
+  directorship: string | undefined,
+  prevProfessionalExp : string | undefined,
+  education: string | undefined,
+  memberOfInvesteeCommitte: string | undefined,
 }
 
 export const defaultTeamMember = {
@@ -19,7 +22,10 @@ export const defaultTeamMember = {
   location: undefined,
   yearsOfRelevantExp: undefined,
   keyPerson: undefined,
-  directorship: undefined
+  directorship: undefined,
+  prevProfessionalExp :  undefined,
+  education: undefined,
+  memberOfInvesteeCommitte: undefined,
 }
 
 // export interface IInvestmentResponsbileAsLead {

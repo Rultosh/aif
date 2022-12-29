@@ -22,7 +22,7 @@ export interface IPrelimApplicationData {
     managementFees: Number | undefined,
     carriedInterest: Number | undefined,
     dealSector: Number | undefined,
-    dealSubsector: Number | undefined,
+    dealSubsector: String | undefined,
     description: String | undefined,
     investmentStrategy: String | undefined,
     sdPvtPlacementMemorandum: String | undefined,
@@ -39,7 +39,7 @@ export interface IPrelimApplicationData {
     sdFirstCorpusOverseasAmountDate: String | undefined,
     investmentTrackRecord: String | undefined,
     declarationAccepted: boolean,
-    firstClosing: boolean|undefined,
+    firstClosing: boolean,
 }
 
 export const defaultIPrelimApplicationData : IPrelimApplicationData = {
@@ -83,5 +83,5 @@ export const defaultIPrelimApplicationData : IPrelimApplicationData = {
   sdFirstCorpusOverseasAmountDate:  undefined,
   investmentTrackRecord:  undefined,
   declarationAccepted: false,
-  firstClosing: undefined
+  firstClosing: false
 }

@@ -26,7 +26,18 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
   const [show, setShow] = useState(true);
   const handleShow = () => setShow(!show);
 
-  const tableHeaders = ["Name", "DOB", "Date of Joining", "Location", "Year of Relevent Experience", "Key Person", "Directorship Held", "Action"]
+  const tableHeaders = [
+    "Name", 
+    "DOB", 
+    "Date of Joining", 
+    "Location", 
+    "Eduction",
+    "Year of Relevent Experience", 
+    "Previous Professional Experience",
+    "Key Person", 
+    "Member of Investee Committee",
+    "Directorship Held", 
+    "Action"]
 
   let headerComponent = []
 
@@ -74,8 +85,11 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
                       <TableCell align="center">{teamMember.dob}</TableCell>
                       <TableCell align="center">{teamMember.dateofJoiningAMC}</TableCell>
                       <TableCell align="center">{teamMember.location}</TableCell>
+                      <TableCell align="center">{teamMember.education}</TableCell>
                       <TableCell align="center">{teamMember.yearsOfRelevantExp}</TableCell>
+                      <TableCell align="center">{teamMember.prevProfessionalExp}</TableCell>
                       <TableCell align="center">{teamMember.keyPerson}</TableCell>
+                      <TableCell align="center">{teamMember.memberOfInvesteeCommitte}</TableCell>
                       <TableCell align="center">{teamMember.directorship}</TableCell>
                       <TableCell align="center">
                         <Edit onClick={handleOpen} />&nbsp;

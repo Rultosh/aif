@@ -105,7 +105,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
             <Grid container spacing={2} >
               <Grid item xs={9}>
                 <Box sx={{ display: 'inline-flex' }}>
-                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details of Investment Team</Typography>
+                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Team Member</Typography>
                 </Box>
               </Grid>
               <Grid item xs={4.5}>
@@ -170,7 +170,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                   <Stack spacing={3}>
                     <DesktopDatePicker
                       disableFuture={true}
-                      label="Date Of Joining"
+                      label="Date Of Joining AMC/IM"
                       value={teamMember.dateofJoiningAMC || null}
                       minDate={Today.toString()}
                       onChange={(newValue) => {
@@ -211,20 +211,31 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                     <MenuItem key={"10-15 years"} value={"10-15 years"}>10-15 years</MenuItem>
                     <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
                   </Select>
-                </FormControl>
-                {/*} <TextField
+                </FormControl>                
+              </Grid>
+              <Grid item xs={4.5}>
+
+              <TextField
                   required
-                  type="number"
-                  id="yearsOfRelevantExp"
-                  value={teamMember.yearsOfRelevantExp}
-                  label="Years of Relevent Experience"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  //value={formValue["NameOfTheFund"]}
+                  id="prevProfessionalExp"
+                  label="Previous Professional Experience"
+                  value={teamMember.prevProfessionalExp}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
-                    />*/}
+                />
+              </Grid>
+              <Grid item xs={4.5}>
+                <TextField
+                  required
+                  id="education"
+                  label="Education"
+                  value={teamMember.education}
+                  variant="standard"
+                  onChange={handleChange}
+                  sx={{ display: 'flex' }}
+                />              
               </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
@@ -242,19 +253,23 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                     <MenuItem key={"No"} value={"No"}>No</MenuItem>
                   </Select>
                 </FormControl>
-                {/*<TextField
-                  required
-                  type="number"
-                  id="keyPerson"
-                  label="Key Person"
-                  value={teamMember.keyPerson}
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  //value={formValue["NameOfTheFund"]}
-                  variant="standard"
-                  onChange={handleChange}
+              </Grid>
+              <Grid item xs={4.5}>
+                <FormControl variant="standard" sx={{ display: 'flex' }}>
+                  <InputLabel id="demo-simple-select-standard-label">Member of Investee Committee</InputLabel>
+                  <Select
+                    labelId="memberOfInvesteeCommitte"
+                    id="memberOfInvesteeCommitte"
+                    value={teamMember["memberOfInvesteeCommitte"]}
+                    onChange={handleChange}
+                    name="memberOfInvesteeCommitte"
+                    defaultValue={teamMember["memberOfInvesteeCommitte"] === undefined ? " " : teamMember["memberOfInvesteeCommitte"]}
+                  >
 
-                  sx={{ display: 'flex' }}
-                  />*/}
+                    <MenuItem key={"Yes"} value={"Yes"}>Yes</MenuItem>
+                    <MenuItem key={"No"} value={"No"}>No</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField

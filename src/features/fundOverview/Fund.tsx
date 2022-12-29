@@ -12,6 +12,7 @@ import PrelimApplicationData from "./subsections/fundOverviewData/PrelimApplicat
 import { clearPrelimApplication, selectPrelimApplication } from "./subsections/fundOverviewData/prelimApplicationDataSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { FetchStatus } from "../../lib/api-status/IStatus";
+import UploadComponents from "../DetailedApplicationComponent/subsections/uploadComponents";
 
 export const Fund = () => {
 
@@ -67,7 +68,6 @@ export const Fund = () => {
     return (
         <Card sx={{ display: 'flex', mb: 2 }}>
             <CardContent sx={{ flex: 1 }}>
-
                 <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062' }}>Fund Overview</Typography>
                 <Divider color='#363062' />
                 <Typography variant="subtitle1" sx={{ flex: 1, textAlign: "center", mt: 4, mb: 1, color: '#363062', fontWeight: '500' }}>Details of the Fund</Typography>
@@ -157,6 +157,24 @@ export const Fund = () => {
                             <AccordionDetails>
                                 <Box sx={{ backgroundColor: "#f2f2f2" }}>
                                     <InvestmentPast prelimApplicationId={Number(prelimApplicationId)}></InvestmentPast>
+                                </Box>
+                            </AccordionDetails>
+                        </Accordion>
+                    </Grid> : <></>}
+                    {Number(prelimApplicationId) ? <Grid item xs={12}>
+                        <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "6"} onChange={handleChange("6")}>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+                            >
+                                <Typography sx={{ color: 'white' }}>
+                                6. Past investment track record of the AMC
+                                </Typography>
+
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Box sx={{ backgroundColor: "#f2f2f2" }}>
+                                    <div style={{display: "inline", padding: "10px"}}><a href="">Download Template</a></div>
+                                    <div style={{display: "inline", padding: "10px"}}><UploadComponents id={`pastInvestmentTrackRecord${id}`}></UploadComponents></div>
                                 </Box>
                             </AccordionDetails>
                         </Accordion>

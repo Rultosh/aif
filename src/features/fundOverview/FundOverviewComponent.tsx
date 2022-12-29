@@ -47,9 +47,17 @@ export const FundOverview = () => {
 
     return (
         <div className="homeComp">
+            
             <NavigationBar></NavigationBar>
             <div >
-                <Container maxWidth={false} sx={{ mt: '90px' }} >
+                <Container maxWidth={false} sx={{ mt: '40px' }} >
+                    <div>
+                        <h2 style={{color: "gray"}}>Preliminary Application Process</h2>
+                        <span>
+                            Note: <a target="_blank" rel="noopener" href='/templates/SIDBI ASF-Preliminary Application.pdf'>Click</a> here, to view the Preliminary Application format to assess the data required for submission
+                        </span>
+                        <hr></hr>
+                    </div>
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container spacing={2}>
                             <Grid item xs={2}>

@@ -181,13 +181,13 @@ export class Thunk<T extends IEntity> {
           .status[input.trackingid].allStatus.fetchStatus = FetchStatus.IDLE;
         state[this.getParentId(input.argument)]
           .data = this.spreadArrayAsHash(action.payload);
-          console.log('getAllSync', this.entity,
-            this.getParentId(input.argument), 
-            input.trackingid, 
-            state[this.getParentId(input.argument)]
-              .status[input.trackingid],
-            state[this.getParentId(input.argument)]
-              .data);
+        console.log('getAllSync', this.entity,
+          this.getParentId(input.argument), 
+          input.trackingid, 
+          state[this.getParentId(input.argument)]
+            .status[input.trackingid],
+          state[this.getParentId(input.argument)]
+            .data);
       })
       .addCase(this.getAllAsync.rejected, (state, action) => {
         let input = action.meta.arg;
