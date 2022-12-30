@@ -24,8 +24,8 @@ import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2B = (props: any) => {
 
-    const { id } = useParams()
-    const [parentId] = useState(Number(id))
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication2B);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, detailedApplication2BThunk);
@@ -33,6 +33,7 @@ export const DetailedApplication2B = (props: any) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const dispatch = useAppDispatch();
+    //let isValidToUpdate = false
 
 
     const [firstClosingUid, setFirstClosingUid] = useState(uuid());
@@ -40,7 +41,7 @@ export const DetailedApplication2B = (props: any) => {
         setFirstClosingUid(uuid());
     }
 
-    console.log('Ganesan', formData.id);
+
 
     const tableHeaders = ["File Name", "Action"]
 
@@ -56,8 +57,10 @@ export const DetailedApplication2B = (props: any) => {
 
 
     useEffect(() => {
+        //isValidToUpdate = false
         dispatch(updateNavIndex(1))
         if (parentId) {
+
             if (!state[parentId]?.data[0]) {
                 setFormData({ ...formData, parentId: parentId })
                 controller.all({ ...formData, parentId: parentId });
@@ -66,21 +69,20 @@ export const DetailedApplication2B = (props: any) => {
     }, [])
 
     useEffect(() => {
+        //isValidToUpdate = false
         dispatch(updateNavIndex(1))
-        if (id && state[parentId]?.data) {
-            console.log('looping key', parentId, state[parentId]?.data)
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultIDetailedApplication2B)){//&& state[Number(parentId)]?.data?.id) {
             Object.keys(state[parentId]?.data).map((key) => {
-                console.log(key)
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
                     setFormData(value);
-                    console.log('Ganesan setting value', value);
                 } else {
                     setFormData({ ...formData, parentId: parentId })
                 }
             });
         }
-    }, [state[parentId]?.data])
+    }, [state[Number(parentId)]?.data])
+
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -97,11 +99,12 @@ export const DetailedApplication2B = (props: any) => {
 
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
+        //controller.clear({ ...formData, parentId: parentId });
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/detailed2C`);
+            navigate(`/Detailed/${parentId}/detailed2C`);
         }
         else {
-            navigate(`/Detailed/${id}/detailed2A`);
+            navigate(`/Detailed/${parentId}/detailed2A`);
         }
     }
 
@@ -195,7 +198,7 @@ export const DetailedApplication2B = (props: any) => {
                                 <Grid item xs={9} sx={{ mt: 2 }}>
 
                                     <InputLabel variant="standard" sx={{ ml: 2 }}>
-                                        <DocumentUpload id={`firstClosing${props.id}`}
+                                        <DocumentUpload id={`firstClosing${props.parentId}`}
                                             onSuccess={firstClosingSuccess}>
                                             <FileUploadIcon onClick={handleOnClickUpload} >
                                             </FileUploadIcon>
@@ -205,7 +208,7 @@ export const DetailedApplication2B = (props: any) => {
                                 <Grid item xs={3}>
                                     <Box>
                                         <ListFiles
-                                            id={`firstClosing${props.id}`}
+                                            id={`firstClosing${props.parentId}`}
                                             refreshId={firstClosingUid} />
                                     </Box>
                                 </Grid>

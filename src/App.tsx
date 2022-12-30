@@ -39,6 +39,18 @@ import { FeatureOfFunds } from './features/detailedApplication/featureOfFunds/fe
 function App() {
 
   const userLogged = useAppSelector(state => state.landing.validUser);//false;
+  const checkIsCorrectStateToUpdate = (data: any, keyObj:any) => {
+    let tempVal = false
+    let keys = Object.keys(keyObj);
+    let checkData = data ? data[Object.keys(data)[0]] : data
+    keys.forEach((key) => {
+        
+        if (key != 'id'  && key != 'parentId' && checkData.hasOwnProperty(key)){
+            tempVal =  true;
+        }
+    });
+    return tempVal
+}
 
   return (
     <div className="App"  >
@@ -66,16 +78,16 @@ function App() {
         <Route path='Detailed' element={<DetailedApplicationComponent />}></Route>
         <Route path='Detailed/:id' element={<DetailedApplicationComponent />}>
           <Route path='detailed2A' element={<DetailedApplication2A />}></Route>
-          <Route path='detailed2B' element={<DetailedApplication2B />}></Route>
-          <Route path='detailed2C' element={<DetailedApplication2C />}></Route>
-          <Route path='detailed2D' element={<DetailedApplication2D />}></Route>
-          <Route path='detailed2E' element={<DetailedApplication2E />}></Route>
-          <Route path='detailed2F' element={<DetailedApplication2F />}></Route>
-          <Route path='detailed2G' element={<DetailedApplication2G />}></Route>
-          <Route path='detailed2H' element={<DetailedApplication2H />}></Route>
-          <Route path='detailed2I' element={<DetailedApplication2I />}></Route>
-          <Route path='detailed2J' element={<DetailedApplication2J />}></Route>
-          <Route path='detailed2K' element={<DetailedApplication2K />}></Route>
+          <Route path='detailed2B' element={<DetailedApplication2B isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2C' element={<DetailedApplication2C isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2D' element={<DetailedApplication2D isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2E' element={<DetailedApplication2E isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2F' element={<DetailedApplication2F isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2G' element={<DetailedApplication2G isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2H' element={<DetailedApplication2H isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2I' element={<DetailedApplication2I isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2J' element={<DetailedApplication2J isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='detailed2K' element={<DetailedApplication2K isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
           <Route path='InvestmentThemeOfFund' element={<InvestmentThemeOfFund />}></Route>
           <Route path='EngagementAndRole' element={<EngagementAndRole />}></Route>
           <Route path='SidbiReference' element={<SidbiReference />}></Route>

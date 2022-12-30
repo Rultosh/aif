@@ -20,8 +20,8 @@ import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2F = (props: any) => {
 
-    const { id } = useParams()
-    const [parentId] = useState(Number(id))
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication2E);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, detailedApplication2EThunk);
@@ -46,7 +46,7 @@ export const DetailedApplication2F = (props: any) => {
 
     useEffect(() => {
         dispatch(updateNavIndex(5))
-        if (id && state[parentId]?.data) {
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultIDetailedApplication2E)){
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
@@ -74,10 +74,10 @@ export const DetailedApplication2F = (props: any) => {
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/detailed2G`);
+            navigate(`/Detailed/${parentId}/detailed2G`);
         }
         else{
-            navigate(`/Detailed/${id}/detailed2E`);
+            navigate(`/Detailed/${parentId}/detailed2E`);
         }
     }
 
@@ -138,7 +138,7 @@ export const DetailedApplication2F = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{margin: "15px"}}>
-                                    <UploadComponents id={`misAndCommunication${id}`}></UploadComponents>
+                                    <UploadComponents id={`misAndCommunication${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
                         </CardContent>

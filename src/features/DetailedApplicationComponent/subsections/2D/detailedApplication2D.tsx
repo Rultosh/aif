@@ -18,10 +18,10 @@ import SaveIcon from '@mui/icons-material/Save';
 
 
 
-export const DetailedApplication2D = () => {
+export const DetailedApplication2D = (props: any) => {
 
-    const { id } = useParams()
-    const [parentId] = useState(Number(id))
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication2D);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, detailedApplication2DThunk);
@@ -44,7 +44,7 @@ export const DetailedApplication2D = () => {
 
     useEffect(() => {
         dispatch(updateNavIndex(3))
-        if (id && state[parentId]?.data) {
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultIDetailedApplication2D)){
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
@@ -72,10 +72,10 @@ export const DetailedApplication2D = () => {
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/detailed2E`);
+            navigate(`/Detailed/${parentId}/detailed2E`);
         }
         else{
-            navigate(`/Detailed/${id}/detailed2C`);
+            navigate(`/Detailed/${parentId}/detailed2C`);
         }
     }
 

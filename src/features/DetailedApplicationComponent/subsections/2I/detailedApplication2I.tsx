@@ -16,8 +16,9 @@ import { detailedApplication2IThunk, selectDetailedApplication2I } from "./detai
 import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2I = (props: any) => {
-    const { id } = useParams()
-    const [parentId] = useState(Number(id))
+
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication2I);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, detailedApplication2IThunk);
@@ -51,7 +52,7 @@ export const DetailedApplication2I = (props: any) => {
 
     useEffect(() => {
         dispatch(updateNavIndex(8))
-        if (id && state[parentId]?.data) {
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultIDetailedApplication2I)){
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
@@ -79,10 +80,10 @@ export const DetailedApplication2I = (props: any) => {
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/detailed2J`);
+            navigate(`/Detailed/${parentId}/detailed2J`);
         }
         else {
-            navigate(`/Detailed/${id}/detailed2H`);
+            navigate(`/Detailed/${parentId}/detailed2H`);
         }
     }
 
@@ -121,7 +122,7 @@ export const DetailedApplication2I = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`ppm${id}`}></UploadComponents>
+                                    <UploadComponents id={`ppm${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
@@ -133,7 +134,7 @@ export const DetailedApplication2I = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`pitch${id}`}></UploadComponents>
+                                    <UploadComponents id={`pitch${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
@@ -145,7 +146,7 @@ export const DetailedApplication2I = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`contributorAgreement${id}`}></UploadComponents>
+                                    <UploadComponents id={`contributorAgreement${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
                         </CardContent>
@@ -156,7 +157,7 @@ export const DetailedApplication2I = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`imAgreement${id}`}></UploadComponents>
+                                    <UploadComponents id={`imAgreement${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
@@ -168,7 +169,7 @@ export const DetailedApplication2I = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`trustDeed${id}`}></UploadComponents>
+                                    <UploadComponents id={`trustDeed${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
@@ -180,7 +181,7 @@ export const DetailedApplication2I = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`sebiRegistrationCertificate${id}`}></UploadComponents>
+                                    <UploadComponents id={`sebiRegistrationCertificate${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
@@ -205,7 +206,7 @@ export const DetailedApplication2I = (props: any) => {
                                 <Grid item xs={3}>
                                     <div style={{ margin: "15px" }}>
                                         {/*Need to change the upload doc ID*/}
-                                        <UploadComponents id={`sebiRegistrationCertificate${id}`}></UploadComponents>
+                                        <UploadComponents id={`sebiComplianceCertificate${parentId}`}></UploadComponents>
                                     </div>
                                 </Grid>}
                         </CardContent></Card>
@@ -242,7 +243,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`balanceSheetY1${id}`}></UploadComponents>
+                                                <UploadComponents id={`balanceSheetY1${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -251,7 +252,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`balanceSheetY2${id}`}></UploadComponents>
+                                                <UploadComponents id={`balanceSheetY2${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -260,7 +261,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`balanceSheetY3${id}`}></UploadComponents>
+                                                <UploadComponents id={`balanceSheetY3${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -276,7 +277,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`incomeAndExpenditureY1${id}`}></UploadComponents>
+                                                <UploadComponents id={`incomeAndExpenditureY1${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -285,7 +286,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`incomeAndExpenditureY2${id}`}></UploadComponents>
+                                                <UploadComponents id={`incomeAndExpenditureY2${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -294,7 +295,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`incomeAndExpenditureY3${id}`}></UploadComponents>
+                                                <UploadComponents id={`incomeAndExpenditureY3${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -310,7 +311,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`truesteeCompanyY1${id}`}></UploadComponents>
+                                                <UploadComponents id={`truesteeCompanyY1${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -319,7 +320,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`truesteeCompanyY2${id}`}></UploadComponents>
+                                                <UploadComponents id={`truesteeCompanyY2${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -328,7 +329,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`truesteeCompanyY3${id}`}></UploadComponents>
+                                                <UploadComponents id={`truesteeCompanyY3${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -344,7 +345,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`assetManagementCmpY1${id}`}></UploadComponents>
+                                                <UploadComponents id={`assetManagementCmpY1${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -353,7 +354,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`assetManagementCmpY2${id}`}></UploadComponents>
+                                                <UploadComponents id={`assetManagementCmpY2${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -362,7 +363,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`assetManagementCmpY3${id}`}></UploadComponents>
+                                                <UploadComponents id={`assetManagementCmpY3${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -377,7 +378,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`priorAndPresentFundyY1${id}`}></UploadComponents>
+                                                <UploadComponents id={`priorAndPresentFundyY1${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -386,7 +387,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`priorAndPresentFundyY2${id}`}></UploadComponents>
+                                                <UploadComponents id={`priorAndPresentFundyY2${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>
@@ -395,7 +396,7 @@ export const DetailedApplication2I = (props: any) => {
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                         <Grid item xs={3}>
                                             <div style={{ margin: "15px" }}>
-                                                <UploadComponents id={`priorAndPresentFundyY3${id}`}></UploadComponents>
+                                                <UploadComponents id={`priorAndPresentFundyY3${parentId}`}></UploadComponents>
                                             </div>
                                         </Grid>
                                     </Box>

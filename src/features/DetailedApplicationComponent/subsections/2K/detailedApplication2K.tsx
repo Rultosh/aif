@@ -17,8 +17,10 @@ import { detailedApplicationThunk, selectedDetailedApplications } from '../../..
 import { defaultIDetailedApplication } from "../../../detailedApplication/sidbiReference/IDetailedApplication";
 import SaveIcon from '@mui/icons-material/Save';
 
-export const DetailedApplication2K = () => {
-    const { id } = useParams()
+export const DetailedApplication2K = (props: any) => {
+
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication);
     const [actionId] = useState(uuid())
     const controller = new Controller(actionId, detailedApplicationThunk);
@@ -36,10 +38,10 @@ export const DetailedApplication2K = () => {
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/InvestmentThemeOfFund`);
+            navigate(`/Detailed/${parentId}/InvestmentThemeOfFund`);
         }
         else{
-            navigate(`/Detailed/${id}/detailed2J`);
+            navigate(`/Detailed/${parentId}/detailed2J`);
         }
     }
 
@@ -50,15 +52,15 @@ export const DetailedApplication2K = () => {
 
     
   useEffect(() => {
-    if (id && Number(id)) {
-      if (!state[0]?.data[id]) {
-        controller.fetch({ ...formData, id: Number(id) });
+    if (parentId && Number(parentId)) {
+      if (!state[0]?.data[parentId]) {
+        controller.fetch({ ...formData, parentId: Number(parentId) });
       }
     }
   }, [])
 
   useEffect(() => {
-    let newData = state[0]?.data[Number(id)];
+    let newData = state[0]?.data[Number(parentId)];
     if (newData) setFormData(newData)
   }, [state[0]?.data])
 

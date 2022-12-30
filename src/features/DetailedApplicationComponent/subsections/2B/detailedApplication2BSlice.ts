@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../../../app/store'
-import { ICommonState, Thunk } from '../../../../lib/api-wrappers/Thunk';
+import { Thunk } from '../../../../lib/api-wrappers/Thunk';
 import { IDetailedApplication2B } from './IDetailedApplication2B';
 
 const thunk : Thunk<IDetailedApplication2B> = new Thunk("detailedApplications", 'fundRaisings');
-const initialState : ICommonState<IDetailedApplication2B> = {};
+const initialState = thunk.initialState;
 
 const detailedApplication2BSlice = createSlice({
   name: thunk.getEntityName(),

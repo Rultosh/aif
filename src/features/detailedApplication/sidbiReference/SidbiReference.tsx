@@ -18,8 +18,6 @@ export const SidbiReference = () => {
   const state = useAppSelector(selectedDetailedApplications);
   const navigate = useNavigate();
 
-  console.log('Ganesan', id, state[0])
-
   useEffect(() => {
     if (id && Number(id)) {
       if (!state[0]?.data[id]) {
@@ -105,7 +103,7 @@ export const SidbiReference = () => {
 
             <Grid item xs={4} sx={{ justifyContent: 'right' }}>
               <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                {((id && Number(id)) || (!Number(id) && state[0]))?<Button
+                {(Number(id) || (!Number(id) && state[0]))?<Button
                   onClick={(e) => handleNext()}
                   endIcon={<ArrowRightIcon />}
                   variant="contained"

@@ -16,8 +16,10 @@ import uuid from "react-uuid";
 import ListFiles from "../../../../components/ListFiles";
 import SaveIcon from '@mui/icons-material/Save';
 
-export const DetailedApplication2J = () => {
-    const { id } = useParams()
+export const DetailedApplication2J = (props: any) => {
+
+    const params = useParams()
+    const parentId  = Number(params.id)
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState<string | false>(false);
     const [agreed, setAgreed] = useState(false);
@@ -36,10 +38,10 @@ export const DetailedApplication2J = () => {
 
     const handleClick = (ev: any, navTo: string) => {
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/detailed2K`);
+            navigate(`/Detailed/${parentId}/detailed2K`);
         }
         else {
-            navigate(`/Detailed/${id}/detailed2I`);
+            navigate(`/Detailed/${parentId}/detailed2I`);
         }
     }
 
@@ -110,7 +112,7 @@ export const DetailedApplication2J = () => {
                             </Button>
                         </Grid>
                         <Grid item xs={4}>
-                            <DocumentUpload id={`uploadAnnexure1${id}`} onSuccess={uploadAnnexure1Success}>
+                            <DocumentUpload id={`uploadAnnexure1${parentId}`} onSuccess={uploadAnnexure1Success}>
                                 <Button
                                     //onClick={(e) => handleClick(e, "previous")}
                                     startIcon={<FileUploadIcon />}
@@ -122,7 +124,7 @@ export const DetailedApplication2J = () => {
                             </DocumentUpload>
                             <div style={{ margin: "10px" }}>
                                 <ListFiles
-                                    id={`uploadAnnexure1${id}`} refreshId={uploadAnnexure1SuccessRefreshId} />
+                                    id={`uploadAnnexure1${parentId}`} refreshId={uploadAnnexure1SuccessRefreshId} />
                             </div>
                         </Grid>
                         <Grid item xs={4}>
@@ -144,7 +146,7 @@ export const DetailedApplication2J = () => {
 
                         </Grid>
                         <Grid item xs={4}>
-                            <DocumentUpload id={`uploadAnnexure2${id}`}
+                            <DocumentUpload id={`uploadAnnexure2${parentId}`}
                                 onSuccess={uploadAnnexure2Success}>
                                 <Button
                                     //onClick={(e) => handleClick(e, "previous")}
@@ -157,7 +159,7 @@ export const DetailedApplication2J = () => {
                             </DocumentUpload>
                             <div style={{ margin: "10px" }}>
                                 <ListFiles
-                                    id={`uploadAnnexure2${id}`} refreshId={uploadAnnexure2SuccessRefreshId} />
+                                    id={`uploadAnnexure2${parentId}`} refreshId={uploadAnnexure2SuccessRefreshId} />
                             </div>
                         </Grid>
                         <Grid item xs={4}>
@@ -179,7 +181,7 @@ export const DetailedApplication2J = () => {
                             </Button>
                         </Grid>
                         <Grid item xs={4}>
-                        <DocumentUpload id={`uploadAnnexure3${id}`}
+                        <DocumentUpload id={`uploadAnnexure3${parentId}`}
                                 onSuccess={uploadAnnexure3Success}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
@@ -192,7 +194,7 @@ export const DetailedApplication2J = () => {
                             </DocumentUpload>
                             <div style={{ margin: "10px" }}>
                                 <ListFiles
-                                    id={`uploadAnnexure3${id}`} refreshId={uploadAnnexure3SuccessRefreshId} />
+                                    id={`uploadAnnexure3${parentId}`} refreshId={uploadAnnexure3SuccessRefreshId} />
                             </div>
                         </Grid>
                         <Grid item xs={4}>
@@ -213,7 +215,7 @@ export const DetailedApplication2J = () => {
                             </Button>
                         </Grid>
                         <Grid item xs={4}>
-                        <DocumentUpload id={`uploadResolution${id}`}
+                        <DocumentUpload id={`uploadResolution${parentId}`}
                                 onSuccess={uploadResolutionSuccess}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
@@ -226,7 +228,7 @@ export const DetailedApplication2J = () => {
                             </DocumentUpload>
                             <div style={{ margin: "10px" }}>
                                 <ListFiles
-                                    id={`uploadResolution${id}`} refreshId={uploadResolutionRefreshId} />
+                                    id={`uploadResolution${parentId}`} refreshId={uploadResolutionRefreshId} />
                             </div>
                         </Grid>
                         <Grid item xs={4}>

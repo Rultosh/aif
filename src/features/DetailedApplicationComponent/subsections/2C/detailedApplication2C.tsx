@@ -23,8 +23,8 @@ import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2C = (props: any) => {
 
-    const { id } = useParams()
-    const [parentId] = useState(Number(id))
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication2C);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, detailedApplication2CThunk);
@@ -42,15 +42,15 @@ export const DetailedApplication2C = (props: any) => {
         if (parentId) {
 
             if (!state[parentId]?.data[0]) {
-                setFormData({ ...formData, parentId: parentId })
-                controller.all({ ...formData, parentId: parentId });
+                setFormData({ ...formData, parentId: Number(parentId) })
+                controller.all({ ...formData, parentId: Number(parentId) });
             }
         }
     }, [])
 
     useEffect(() => {
         dispatch(updateNavIndex(2))
-        if (id && state[parentId]?.data) {
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultIDetailedApplication2C)){
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
@@ -77,11 +77,12 @@ export const DetailedApplication2C = (props: any) => {
 
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
+        //controller.clear({ ...formData, parentId: parentId });
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/detailed2D`);
+            navigate(`/Detailed/${parentId}/detailed2D`);
         }
         else {
-            navigate(`/Detailed/${id}/detailed2B`);
+            navigate(`/Detailed/${parentId}/detailed2B`);
         }
     }
 
@@ -158,7 +159,7 @@ export const DetailedApplication2C = (props: any) => {
                             </Grid>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`detailedApplicationDetailedProfile${id}`}></UploadComponents>
+                                    <UploadComponents id={`detailedApplicationDetailedProfile${formData.id}`}></UploadComponents>
                                 </div>
                             </Grid>
                         </CardContent>
@@ -183,7 +184,7 @@ export const DetailedApplication2C = (props: any) => {
                             </Grid>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`profileLocRenum${id}`}></UploadComponents>
+                                    <UploadComponents id={`profileLocRenum${formData.id}`}></UploadComponents>
                                 </div>
                             </Grid>
                         </CardContent>

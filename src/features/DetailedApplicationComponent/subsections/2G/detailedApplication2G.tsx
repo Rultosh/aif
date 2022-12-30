@@ -20,8 +20,8 @@ import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2G = (props:any) => {
 
-    const { id } = useParams()
-    const [parentId] = useState(Number(id))
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication2G);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, detailedApplication2GThunk);
@@ -47,7 +47,7 @@ export const DetailedApplication2G = (props:any) => {
 
     useEffect(() => {
         dispatch(updateNavIndex(6))
-        if (id && state[parentId]?.data) {
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultIDetailedApplication2G)){
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
@@ -75,10 +75,10 @@ export const DetailedApplication2G = (props:any) => {
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/detailed2H`);
+            navigate(`/Detailed/${parentId}/detailed2H`);
         }
         else {
-            navigate(`/Detailed/${id}/detailed2F`);
+            navigate(`/Detailed/${parentId}/detailed2F`);
         }
     }
 
@@ -119,7 +119,7 @@ export const DetailedApplication2G = (props:any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{margin: "15px"}}>
-                                    <UploadComponents id={`imShareholdingPattern${id}`}></UploadComponents>
+                                    <UploadComponents id={`imShareholdingPattern${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
@@ -146,7 +146,7 @@ export const DetailedApplication2G = (props:any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{margin: "15px"}}>
-                                    <UploadComponents id={`imSubsidiary${id}`}></UploadComponents>
+                                    <UploadComponents id={`imSubsidiary${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
                         </CardContent>
@@ -158,7 +158,7 @@ export const DetailedApplication2G = (props:any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{margin: "15px"}}>
-                                    <UploadComponents id={`imOrgStructure${id}`}></UploadComponents>
+                                    <UploadComponents id={`imOrgStructure${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
@@ -171,7 +171,7 @@ export const DetailedApplication2G = (props:any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{margin: "15px"}}>
-                                    <UploadComponents id={`imCVS${id}`}></UploadComponents>
+                                    <UploadComponents id={`imCVS${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
@@ -205,7 +205,7 @@ export const DetailedApplication2G = (props:any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{margin: "15px"}}>
-                                    <UploadComponents id={`imTeamsExperience${id}`}></UploadComponents>
+                                    <UploadComponents id={`imTeamsExperience${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
                         </CardContent>

@@ -18,7 +18,8 @@ import SaveIcon from '@mui/icons-material/Save';
 
 export const DetailedApplication2H = (props:any) => {
 
-    const { id } = useParams()
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication);
     const [actionId] = useState(uuid())
     const controller = new Controller(actionId, detailedApplicationThunk);
@@ -50,15 +51,15 @@ export const DetailedApplication2H = (props:any) => {
 
     
   useEffect(() => {
-    if (id && Number(id)) {
-      if (!state[0]?.data[id]) {
-        controller.fetch({ ...formData, id: Number(id) });
+    if (parentId && Number(parentId)) {
+      if (!state[0]?.data[parentId]) {
+        controller.fetch({ ...formData, parentId: Number(parentId) });
       }
     }
   }, [])
 
   useEffect(() => {
-    let newData = state[0]?.data[Number(id)];
+    let newData = state[0]?.data[Number(parentId)];
     if (newData) setFormData(newData)
   }, [state[0]?.data])
 
@@ -66,10 +67,10 @@ export const DetailedApplication2H = (props:any) => {
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/detailed2I`);
+            navigate(`/Detailed/${parentId}/detailed2I`);
         }
         else{
-            navigate(`/Detailed/${id}/detailed2G`);
+            navigate(`/Detailed/${parentId}/detailed2G`);
         }
     }
 
@@ -134,7 +135,7 @@ export const DetailedApplication2H = (props:any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{margin: "15px"}}>
-                                    <UploadComponents id={`imPastFund${id}`}></UploadComponents>
+                                    <UploadComponents id={`imPastFund${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
 
