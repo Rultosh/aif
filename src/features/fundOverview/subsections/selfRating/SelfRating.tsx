@@ -58,6 +58,9 @@ export const SelfRating = () => {
     }, [])
 
     const handleClick = (ev: any, navTo: string) => {
+
+        handleClickSave();
+
         if (navTo === 'previous') {
             navigate(`/preliminary/${id}/profile`)
         } else {
