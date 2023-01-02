@@ -14,20 +14,25 @@ import uuid from "react-uuid";
 import { useParams } from "react-router-dom";
 import { defaultICarryDistribution, ICarryDistribution } from "./ICarryDistribution";
 import { carryDistributionThunk, selectCarryDistribution } from "./carryDistributionSlice";
+import { defaultICarryDistributionDetails } from "./ICarryDistributionDetails";
+import { carryDistributionDetailsThunk, selectCarryDistributionDetails } from "./carryDistributionDetailsSlice";
 import UploadComponents from "../subsections/uploadComponents";
 
 
-export const CarryDistribution = () => {
+export const CarryDistribution = (props: any) => {
 
-    const { id } = useParams()
-    const [parentId] = useState(Number(id))
-    const [featureOfFundId, setFeatureOfFundId] = useState(0)
+
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultICarryDistribution);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, carryDistributionThunk);
     const state = useAppSelector(selectCarryDistribution);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const [formDataDetails, setFormDataDetails] = useState(defaultICarryDistributionDetails);
+    const detailsController = new Controller(actionId, carryDistributionDetailsThunk);
+    const detailsState = useAppSelector(selectCarryDistributionDetails);
 
 
 
@@ -42,18 +47,36 @@ export const CarryDistribution = () => {
     }, [])
 
     useEffect(() => {
-        if (id && state[parentId]?.data) {
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultICarryDistribution)){
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
                     setFormData(value);
-                    setFeatureOfFundId(value.id);
-                } else {
-                    setFormData({ ...formData, parentId: parentId })
                 }
             });
         }
     }, [state[parentId]?.data])
+
+    useEffect(() => {
+        if (parentId) {
+
+            if (!detailsState[parentId]?.data[0]) {
+                setFormDataDetails({ ...formDataDetails, parentId: parentId })
+                detailsController.all({ ...formDataDetails, parentId: parentId });
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+        if (detailsState[parentId]?.data && Object.keys(detailsState[parentId]?.data).length > 0 && props.isCrtStateToUpdate(detailsState[parentId]?.data, defaultICarryDistributionDetails)){
+            Object.keys(detailsState[parentId]?.data).map((key) => {
+                let value = detailsState[parentId]?.data[key]
+                if (value && value.id) {
+                    setFormDataDetails(value);
+                }
+            });
+        }
+    }, [detailsState[parentId]?.data])
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -63,15 +86,24 @@ export const CarryDistribution = () => {
         setFormData(copiedValue);
     };
 
+    const handleChangeCarryDetails = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formDataDetails }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formDataDetails] = ev.target.value;
+        setFormDataDetails(copiedValue);
+    };
+
     const handleSave = () => {
         controller.save(formData);
+        detailsController.save(formDataDetails);
     }
 
 
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'previous') {
-            navigate(`/Detailed/${id}/EngagementAndRole`);
+            navigate(`/Detailed/${parentId}/EngagementAndRole`);
         }
     }
 
@@ -501,12 +533,12 @@ export const CarryDistribution = () => {
                                 <Grid item xs={6}>
                                     <TextField
                                         required
-                                        id="captionDetails"
+                                        id="distribution"
                                         label="8."
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        //value={formData["fundLaunchedDate"]}
+                                        value={formDataDetails["distribution"] || ''}
                                         variant="standard"
-                                        // onChange={handleChange}
+                                        onChange={handleChangeCarryDetails}
 
                                         sx={{ display: 'flex', ml: 2 }}
                                     />
@@ -515,12 +547,12 @@ export const CarryDistribution = () => {
                                     <TextField
                                         required
                                         type="number"
-                                        id="captionDetails"
+                                        id="percent"
                                         label="%"
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        //value={formData["fundLaunchedDate"]}
+                                        value={formDataDetails["percent"] || ''}
                                         variant="standard"
-                                        // onChange={handleChange}
+                                        onChange={handleChangeCarryDetails}
 
                                         sx={{ display: 'flex' }}
                                     />
@@ -530,12 +562,12 @@ export const CarryDistribution = () => {
                                     <TextField
                                         required
                                         type="number"
-                                        id="captionDetails"
+                                        id="carryOutOfCrore"
                                         label="%"
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        //value={formData["fundLaunchedDate"]}
+                                        value={formDataDetails["carryOutOfCrore"] || ''}
                                         variant="standard"
-                                        // onChange={handleChange}
+                                        onChange={handleChangeCarryDetails}
 
                                         sx={{ display: 'flex' }}
                                     />
@@ -616,7 +648,7 @@ export const CarryDistribution = () => {
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                                 <Grid item xs={3}>
                                                     <div style={{ margin: "15px" }}>
-                                                        <UploadComponents id={`carryDetailedApplication${id}`}></UploadComponents>
+                                                        <UploadComponents id={`carryDetailedApplication${parentId}`}></UploadComponents>
                                                     </div>
                                                 </Grid>
                                             </Box>
@@ -638,7 +670,7 @@ export const CarryDistribution = () => {
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                                 <Grid item xs={3}>
                                                     <div style={{ margin: "15px" }}>
-                                                        <UploadComponents id={`carryInvestmentThemeOfFund${id}`}></UploadComponents>
+                                                        <UploadComponents id={`carryInvestmentThemeOfFund${parentId}`}></UploadComponents>
                                                     </div>
                                                 </Grid>
                                             </Box>
@@ -660,7 +692,7 @@ export const CarryDistribution = () => {
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                                 <Grid item xs={3}>
                                                     <div style={{ margin: "15px" }}>
-                                                        <UploadComponents id={`carryDetailedEngagement${id}`}></UploadComponents>
+                                                        <UploadComponents id={`carryDetailedEngagement${parentId}`}></UploadComponents>
                                                     </div>
                                                 </Grid>
                                             </Box>
@@ -682,7 +714,7 @@ export const CarryDistribution = () => {
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                                                 <Grid item xs={3}>
                                                     <div style={{ margin: "15px" }}>
-                                                        <UploadComponents id={`carryIllustration${id}`}></UploadComponents>
+                                                        <UploadComponents id={`carryIllustration${parentId}`}></UploadComponents>
                                                     </div>
                                                 </Grid>
                                             </Box>

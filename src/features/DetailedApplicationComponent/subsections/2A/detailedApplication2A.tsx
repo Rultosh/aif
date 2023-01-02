@@ -327,34 +327,28 @@ export const DetailedApplication2A = () => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                            <Textarea
-                                id="provisionOfFundSetup"
-                                placeholder="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
-                                required
-                                sx={{ display: 'flex', ml: 2 }}
-                                value={formData["provisionOfFundSetup"] || ''}
-                                onChange={handleChange}
-                            />
-                            {/*<TextField
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?.</Typography>
+                            <TextField
                                 required
                                 id="provisionOfFundSetup"
-                                label="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
+                                //label="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
                                 //defaultValue={formData.provisionOfFundSetup === undefined ? " " : formData["provisionOfFundSetup"]}
                                 value={formData["provisionOfFundSetup"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2 }}
-                            />*/}
+                            />
                         </CardContent>
                     </Card>
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >8. Whether the Fund will make primary investment only i.e. the funds shall be utilized by the investee company only for its growth plans?</Typography>
                             <TextField
                                 required
                                 id="fundOnlyPrimaryInvestment"
-                                label="8. Whether the Fund will make primary investment only i.e. the funds shall be utilized by the investee company only for its growth plans?"
+                                //label="8. Whether the Fund will make primary investment only i.e. the funds shall be utilized by the investee company only for its growth plans?"
                                 //defaultValue={formData.fundOnlyPrimaryInvestment === undefined ? " " : formData["fundOnlyPrimaryInvestment"]}
                                 value={formData["fundOnlyPrimaryInvestment"] || ''}
                                 variant="standard"
@@ -367,10 +361,11 @@ export const DetailedApplication2A = () => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >9. Details of existing investment made from the proposed fund (including warehouse investment), if any. What is the current pipeline of deals under considertaion? Give details and timeline for investment.</Typography>
                             <TextField
                                 required
                                 id="detailsOfExistingFund"
-                                label="9. Details of existing investment made from the proposed fund (including warehouse investment), if any. What is the current pipeline of deals under considertaion? Give details and timeline for investment."
+                                //label="9. Details of existing investment made from the proposed fund (including warehouse investment), if any. What is the current pipeline of deals under considertaion? Give details and timeline for investment."
                                 //defaultValue={formData.detailsOfExistingFund === undefined ? " " : formData["detailsOfExistingFund"]}
                                 value={formData["detailsOfExistingFund"] || ''}
                                 variant="standard"

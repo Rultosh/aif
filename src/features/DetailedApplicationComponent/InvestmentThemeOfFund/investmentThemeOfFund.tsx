@@ -16,7 +16,7 @@ import { defaultIDetailedApplication } from "../../detailedApplication/sidbiRefe
 import { Controller } from "../../../lib/api-wrappers/Controller";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 
-export const InvestmentThemeOfFund = () => {
+export const InvestmentThemeOfFund = (props: any) => {
     const { id } = useParams()
     const [formData, setFormData] = useState(defaultIDetailedApplication);
     const [actionId] = useState(uuid())

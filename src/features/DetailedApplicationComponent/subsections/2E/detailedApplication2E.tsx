@@ -117,10 +117,11 @@ export const DetailedApplication2E = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >26. List of external firms (legal, technical, financial / accounting etc.) who are assisting / would be assisting the Investment Manager in the due diligence process.</Typography>
                             <TextField
                                 required
                                 id="listOfExternalFirms"
-                                label="26. List of external firms (legal, technical, financial / accounting etc.) who are assisting / would be assisting the Investment Manager in the due diligence process."
+                                //label="26. List of external firms (legal, technical, financial / accounting etc.) who are assisting / would be assisting the Investment Manager in the due diligence process."
                                 //defaultValue={formDatalistOfExternalFirms === undefined ? " " : formData["listOfExternalFirms"]}
                                 value={formData["listOfExternalFirms"] || ''}
                                 variant="standard"
@@ -134,10 +135,11 @@ export const DetailedApplication2E = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >27. List the activities involved in monitoring and follow-up of investments? How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same.</Typography>
                             <TextField
                                 required
                                 id="monitoringPractices"
-                                label="27. List the activities involved in monitoring and follow-up of investments? How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same."
+                                //label="27. List the activities involved in monitoring and follow-up of investments? How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same."
                                 //defaultValue={formDatamonitoringPractices === undefined ? " " : formData["monitoringPractices"]}
                                 value={formData["monitoringPractices"] || ''}
                                 variant="standard"
@@ -169,7 +171,8 @@ export const DetailedApplication2E = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid container>
                                 <Grid item xs={9}>
-                                    <InputLabel variant="standard" sx={{ml:2}}>29. What are the risks in the investments planned for this fund and what are the risk mitigation efforts?
+                                <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >29. What are the risks in the investments planned for this fund and what are the risk mitigation efforts?</Typography>
+                                   {/*} <InputLabel variant="standard" sx={{ml:2}}>29. What are the risks in the investments planned for this fund and what are the risk mitigation efforts?
                                         <FileUploadIcon onClick={handleOnClickUpload} >
                                         </FileUploadIcon>
                                         <FileUpload
@@ -178,7 +181,7 @@ export const DetailedApplication2E = (props: any) => {
                                                 props.onSuccess(props.id, url);
                                             }}
                                             open={open} setOpen={setOpen}></FileUpload>
-                                    </InputLabel>
+                                        </InputLabel>*/}
                                 </Grid>
                             </Grid>
                             <Grid item xs={3}>

@@ -183,10 +183,11 @@ export const DetailedApplication2B = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
+                                <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >11. How much commitments have been  received so far? Please indicate what % of commitments received from the investors who contributed to earlier Funds managed by the Investment Manager and from non-institutonal source including employee(s) of the fund. List name(s) of contributors with amounts commited and atttac copies of their commitment letters, document signed with them.</Typography>
                                     <TextField
                                         required
                                         id="commitmentReceived"
-                                        label="11. How much commitments have been  received so far? Please indicate what % of commitments received from the investors who contributed to earlier Funds managed by the Investment Manager and from non-institutonal source including employee(s) of the fund. List name(s) of contributors with amounts commited and atttac copies of their commitment letters, document signed with them."
+                                        //label="11. How much commitments have been  received so far? Please indicate what % of commitments received from the investors who contributed to earlier Funds managed by the Investment Manager and from non-institutonal source including employee(s) of the fund. List name(s) of contributors with amounts commited and atttac copies of their commitment letters, document signed with them."
                                         //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                                         value={formData["commitmentReceived"] || ''}
                                         variant="standard"
@@ -255,10 +256,11 @@ export const DetailedApplication2B = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >14. Are all contributors governed by same team and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor(along with reasons)</Typography>          
                             <TextField
                                 required
                                 id="contribTerms"
-                                label="14. Are all contributors governed by same team and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor(along with reasons)"
+                                //label="14. Are all contributors governed by same team and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor(along with reasons)"
                                 //defaultValue={formData.contribTerms === undefined ? " " : formData["contribTerms"]}
                                 value={formData["contribTerms"] || ''}
                                 variant="standard"
@@ -271,10 +273,11 @@ export const DetailedApplication2B = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >15. Has the Investment Manager or the Fund or the sponsor of anyone associated with the fund engaged any placement agents? If yes, please provide details of funds raised and payment(s) made / to be made to the agents. Please also clarify as to who is bearing the cost of the agents?</Typography>
                             <TextField
                                 required
                                 id="investmentManagerPlacementAgent"
-                                label="15. Has the Investment Manager or the Fund or the sponsor of anyone associated with the fund engaged any placement agents? If yes, please provide details of funds raised and payment(s) made / to be made to the agents. Please also clarify as to who is bearing the cost of the agents?"
+                                //label="15. Has the Investment Manager or the Fund or the sponsor of anyone associated with the fund engaged any placement agents? If yes, please provide details of funds raised and payment(s) made / to be made to the agents. Please also clarify as to who is bearing the cost of the agents?"
                                 //defaultValue={formData.investmentManagerPlacementAgent === undefined ? " " : formData["investmentManagerPlacementAgent"]}
                                 value={formData["investmentManagerPlacementAgent"] || ''}
                                 variant="standard"

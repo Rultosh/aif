@@ -20,7 +20,7 @@ import { defaultIDetailedApplication } from "../../detailedApplication/sidbiRefe
 
 
 
-export const EngagementAndRole = () => {
+export const EngagementAndRole = (props: any) => {
     const { id } = useParams()
     const [parentId] = useState(Number(id))
     const [formData, setFormData] = useState(defaultIDetailedApplication);

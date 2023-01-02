@@ -88,11 +88,11 @@ function App() {
           <Route path='detailed2I' element={<DetailedApplication2I isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
           <Route path='detailed2J' element={<DetailedApplication2J isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
           <Route path='detailed2K' element={<DetailedApplication2K isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='InvestmentThemeOfFund' element={<InvestmentThemeOfFund />}></Route>
-          <Route path='EngagementAndRole' element={<EngagementAndRole />}></Route>
+          <Route path='InvestmentThemeOfFund' element={<InvestmentThemeOfFund isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
+          <Route path='EngagementAndRole' element={<EngagementAndRole isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
           <Route path='SidbiReference' element={<SidbiReference />}></Route>
           {/*<Route path='PrelimApp' element={<PrelimApp />}></Route>*/}
-          <Route path='carryDistribution' element={<CarryDistribution />}></Route>
+          <Route path='carryDistribution' element={<CarryDistribution isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
           
         </Route>
        

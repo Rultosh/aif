@@ -26,7 +26,7 @@ export const DetailedApplication2I = (props: any) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const dispatch = useAppDispatch();
-    const [sebiComplianceAvailableSwitch, setsebiComplianceAvailableSwitch] = useState(false);
+    const [sebiComplianceAvailableSwitch, setsebiComplianceAvailableSwitch] = useState(formData.sebiComplianceAvailable || false);
 
 
     const handleToggle = () => {
