@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, Divider, Grid, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAppSelector } from "../../../app/hooks";
+import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import { Controller } from "../../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from "./detailedApplicationSlice";
 import { defaultIDetailedApplication } from "./IDetailedApplication";
@@ -9,6 +9,7 @@ import uuid from "react-uuid";
 import { useNavigate } from "react-router-dom";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import { updateStepperIndex}from '../../DetailedApplicationComponent/subsections/sideNavBarSlice'
 
 export const SidbiReference = () => {
   const { id } = useParams()
@@ -17,8 +18,10 @@ export const SidbiReference = () => {
   const controller = new Controller(actionId, detailedApplicationThunk);
   const state = useAppSelector(selectedDetailedApplications);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
+    dispatch(updateStepperIndex(0))
     if (id && Number(id)) {
       if (!state[0]?.data[id]) {
         controller.fetch({ ...formData, id: Number(id) });
@@ -27,6 +30,7 @@ export const SidbiReference = () => {
   }, [])
 
   useEffect(() => {
+    dispatch(updateStepperIndex(0))
     let newData = state[0]?.data[Number(id)];
     if (newData) setFormData(newData)
   }, [state[0]?.data])

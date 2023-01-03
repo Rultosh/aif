@@ -17,19 +17,22 @@ import { carryDistributionThunk, selectCarryDistribution } from "./carryDistribu
 import { defaultICarryDistributionDetails } from "./ICarryDistributionDetails";
 import { carryDistributionDetailsThunk, selectCarryDistributionDetails } from "./carryDistributionDetailsSlice";
 import UploadComponents from "../subsections/uploadComponents";
+import React, * as Rect from 'react'
+import { updateStepperIndex } from '../subsections/sideNavBarSlice'
 
 
 export const CarryDistribution = (props: any) => {
 
 
     const params = useParams()
-    const parentId  = Number(params.id)
+    const parentId = Number(params.id)
     const [formData, setFormData] = useState(defaultICarryDistribution);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, carryDistributionThunk);
     const state = useAppSelector(selectCarryDistribution);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const [formDataDetailsList, setFormDataDetailsList] = useState([] as any);
     const [formDataDetails, setFormDataDetails] = useState(defaultICarryDistributionDetails);
     const detailsController = new Controller(actionId, carryDistributionDetailsThunk);
     const detailsState = useAppSelector(selectCarryDistributionDetails);
@@ -37,6 +40,7 @@ export const CarryDistribution = (props: any) => {
 
 
     useEffect(() => {
+        dispatch(updateStepperIndex(4))
         if (parentId) {
 
             if (!state[parentId]?.data[0]) {
@@ -47,7 +51,8 @@ export const CarryDistribution = (props: any) => {
     }, [])
 
     useEffect(() => {
-        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultICarryDistribution)){
+        dispatch(updateStepperIndex(4))
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultICarryDistribution)) {
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
@@ -68,13 +73,22 @@ export const CarryDistribution = (props: any) => {
     }, [])
 
     useEffect(() => {
-        if (detailsState[parentId]?.data && Object.keys(detailsState[parentId]?.data).length > 0 && props.isCrtStateToUpdate(detailsState[parentId]?.data, defaultICarryDistributionDetails)){
+        if (detailsState[parentId]?.data && Object.keys(detailsState[parentId]?.data).length > 0 && props.isCrtStateToUpdate(detailsState[parentId]?.data, defaultICarryDistributionDetails)) {
             Object.keys(detailsState[parentId]?.data).map((key) => {
                 let value = detailsState[parentId]?.data[key]
                 if (value && value.id) {
                     setFormDataDetails(value);
                 }
             });
+        }
+    }, [detailsState[parentId]?.data])
+
+    useEffect(() => {
+        if (detailsState[parentId]?.data != undefined && (Object.keys(detailsState[parentId]?.data).length > 0) && props.isCrtStateToUpdate(detailsState[parentId]?.data, defaultICarryDistributionDetails)) {
+            let newData = detailsState[parentId]?.data;
+            if (newData) {
+                setFormDataDetailsList([newData])
+            }
         }
     }, [detailsState[parentId]?.data])
 
@@ -112,6 +126,63 @@ export const CarryDistribution = (props: any) => {
          copiedValue[id as keyof IPrelimApplicationData] = value;
          setPrelimApplicationFormData(copiedValue);*/
     }
+
+
+    let carryDetailsComponent = []
+    if (formDataDetailsList[0] != undefined) {
+        let keysArr = Object.keys(formDataDetailsList[0])
+        for (let i = 0; i < keysArr.length; i++) {
+            carryDetailsComponent.push(
+                <React.Fragment >
+                    <Grid container spacing={6} >
+                        <Grid item xs={6}>
+                            <TextField
+                                required
+                                id={formDataDetailsList[0][keysArr[i]]["distribution"]}
+                                label=""
+                                //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                value={formDataDetailsList[0][keysArr[i]]["distribution"] || ''}
+                                variant="standard"
+                                onChange={handleChangeCarryDetails}
+
+                                sx={{ display: 'flex', ml: 2 }}
+                            />
+                        </Grid>
+                        <Grid item xs={2.5}>
+                            <TextField
+                                required
+                                //type="number"
+                                id={formDataDetailsList[0][keysArr[i]]["percent"]}
+                                label="%"
+                                //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                value={formDataDetailsList[0][keysArr[i]]["percent"] || ''}
+                                variant="standard"
+                                onChange={handleChangeCarryDetails}
+
+                                sx={{ display: 'flex' }}
+                            />
+                        </Grid>
+
+                        <Grid item xs={2.5}>
+                            <TextField
+                                required
+                                //type="number"
+                                id={formDataDetailsList[0][keysArr[i]]["carryOutOfCrore"]}
+                                label=""
+                                //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                value={formDataDetailsList[0][keysArr[i]]["carryOutOfCrore"] || ''}
+                                variant="standard"
+                                onChange={handleChangeCarryDetails}
+
+                                sx={{ display: 'flex' }}
+                            />
+                        </Grid>
+
+                    </Grid>
+                </React.Fragment>)
+        }
+    }
+
 
     return (<>
 
@@ -528,8 +599,8 @@ export const CarryDistribution = (props: any) => {
 
                                 </Grid>
                             </Grid>
-
-                            <Grid container spacing={6} >
+                            {carryDetailsComponent}
+                            {/*<Grid container spacing={6} >
                                 <Grid item xs={6}>
                                     <TextField
                                         required
@@ -563,7 +634,7 @@ export const CarryDistribution = (props: any) => {
                                         required
                                         type="number"
                                         id="carryOutOfCrore"
-                                        label="%"
+                                        label=""
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                         value={formDataDetails["carryOutOfCrore"] || ''}
                                         variant="standard"
@@ -573,7 +644,7 @@ export const CarryDistribution = (props: any) => {
                                     />
                                 </Grid>
 
-                            </Grid>
+                            </Grid> */}
 
                             <Grid container spacing={6} >
                                 <Grid item xs={6}></Grid>
@@ -628,10 +699,10 @@ export const CarryDistribution = (props: any) => {
 
                                             </Grid>
                                             <Grid item xs={3}>
-                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Download unsigned document</Typography>
+                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Download unsigned document</Typography>
                                             </Grid>
                                             <Grid item xs={3}>
-                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Upload signed document</Typography>
+                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Upload signed document</Typography>
                                             </Grid>
                                         </Grid>
                                     </Toolbar>
@@ -722,7 +793,7 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Divider sx={{ mt: 2 }} />
 
-                                    
+
                                 </CardContent>
                             </Card>
                         </CardContent>

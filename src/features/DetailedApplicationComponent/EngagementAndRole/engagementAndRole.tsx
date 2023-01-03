@@ -15,6 +15,7 @@ import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import { Controller } from "../../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
 import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
+import { updateStepperIndex } from '../subsections/sideNavBarSlice'
 
 
 
@@ -32,7 +33,7 @@ export const EngagementAndRole = (props: any) => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        
+        dispatch(updateStepperIndex(3))
         if (parentId) {
 
             if (!state[parentId]?.data[0]) {
@@ -43,7 +44,7 @@ export const EngagementAndRole = (props: any) => {
     }, [])
 
     useEffect(() => {
-        
+        dispatch(updateStepperIndex(3))
         if (id && state[parentId]?.data) {
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]

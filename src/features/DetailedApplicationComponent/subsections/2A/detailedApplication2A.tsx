@@ -12,7 +12,7 @@ import uuid from "react-uuid";
 import { defaultIFeaturesOfFunds, IFeaturesOfFunds } from "./IFeaturesOfFund";
 import { featureOfFundsThunk, selectFeatureOfFunds } from "./featuresOfFundSlice";
 import SideNavBar from '../SideNavBar'
-import { updateNavIndex } from '../sideNavBarSlice'
+import { updateNavIndex, updateStepperIndex } from '../sideNavBarSlice'
 import Textarea from '@mui/joy/Textarea';
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -32,6 +32,7 @@ export const DetailedApplication2A = () => {
 
     useEffect(() => {
         dispatch(updateNavIndex(0))
+        dispatch(updateStepperIndex(1))
         if (parentId) {
 
             if (!state[parentId]?.data[0]) {
@@ -43,6 +44,7 @@ export const DetailedApplication2A = () => {
 
     useEffect(() => {
         dispatch(updateNavIndex(0))
+        dispatch(updateStepperIndex(1))
         if (id && state[parentId]?.data) {
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
