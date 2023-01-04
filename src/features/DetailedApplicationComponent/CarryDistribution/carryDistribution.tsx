@@ -32,7 +32,7 @@ export const CarryDistribution = (props: any) => {
     const state = useAppSelector(selectCarryDistribution);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const [formDataDetailsList, setFormDataDetailsList] = useState([] as any);
+    const [formDataDetailsList, setFormDataDetailsList] = useState({} as any);
     const [formDataDetails, setFormDataDetails] = useState(defaultICarryDistributionDetails);
     const detailsController = new Controller(actionId, carryDistributionDetailsThunk);
     const detailsState = useAppSelector(selectCarryDistributionDetails);
@@ -87,10 +87,15 @@ export const CarryDistribution = (props: any) => {
         if (detailsState[parentId]?.data != undefined && (Object.keys(detailsState[parentId]?.data).length > 0) && props.isCrtStateToUpdate(detailsState[parentId]?.data, defaultICarryDistributionDetails)) {
             let newData = detailsState[parentId]?.data;
             if (newData) {
-                setFormDataDetailsList([newData])
+                setFormDataDetailsList(newData)
             }
         }
     }, [detailsState[parentId]?.data])
+
+    useEffect(() => {
+       console.log("sampath test ",formDataDetailsList)
+    }, [formDataDetailsList])
+    
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -100,17 +105,24 @@ export const CarryDistribution = (props: any) => {
         setFormData(copiedValue);
     };
 
-    const handleChangeCarryDetails = (ev: any) => {
+    const handleChangeCarryDetails = (ev: any, id_key:any) => {
         ev.preventDefault();
-        let copiedValue = { ...formDataDetails }
+        let copiedValue = { ...formDataDetailsList }
         let key = ev.target.id ? ev.target.id : ev.target.name;
-        copiedValue[key as keyof typeof formDataDetails] = ev.target.value;
-        setFormDataDetails(copiedValue);
+        let statusCopy = Object.assign({}, copiedValue[id_key]);
+        statusCopy[key] = ev.target.value;
+        let obj = {} as any
+        obj[id_key] = statusCopy
+        copiedValue = {...copiedValue , ...obj}
+        setFormDataDetailsList(copiedValue);
     };
 
     const handleSave = () => {
         controller.save(formData);
-        detailsController.save(formDataDetails);
+        for (let i=0; i< Object.keys(formDataDetailsList).length;i++){
+            detailsController.save(formDataDetailsList[Object.keys(formDataDetailsList)[i]]);
+        }
+        
     }
 
 
@@ -129,8 +141,8 @@ export const CarryDistribution = (props: any) => {
 
 
     let carryDetailsComponent = []
-    if (formDataDetailsList[0] != undefined) {
-        let keysArr = Object.keys(formDataDetailsList[0])
+    if (formDataDetailsList != undefined) {
+        let keysArr = Object.keys(formDataDetailsList)
         for (let i = 0; i < keysArr.length; i++) {
             carryDetailsComponent.push(
                 <React.Fragment >
@@ -138,12 +150,12 @@ export const CarryDistribution = (props: any) => {
                         <Grid item xs={6}>
                             <TextField
                                 required
-                                id={formDataDetailsList[0][keysArr[i]]["distribution"]}
+                                id="distribution"
                                 label=""
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                value={formDataDetailsList[0][keysArr[i]]["distribution"] || ''}
+                                value={formDataDetailsList[keysArr[i]]["distribution"] || ''}
                                 variant="standard"
-                                onChange={handleChangeCarryDetails}
+                                onChange={(e) => handleChangeCarryDetails(e, keysArr[i])}
 
                                 sx={{ display: 'flex', ml: 2 }}
                             />
@@ -152,12 +164,12 @@ export const CarryDistribution = (props: any) => {
                             <TextField
                                 required
                                 //type="number"
-                                id={formDataDetailsList[0][keysArr[i]]["percent"]}
+                                id="percent"
                                 label="%"
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                value={formDataDetailsList[0][keysArr[i]]["percent"] || ''}
+                                value={formDataDetailsList[keysArr[i]]["percent"] || ''}
                                 variant="standard"
-                                onChange={handleChangeCarryDetails}
+                                //onChange={handleChangeCarryDetails}
 
                                 sx={{ display: 'flex' }}
                             />
@@ -167,12 +179,12 @@ export const CarryDistribution = (props: any) => {
                             <TextField
                                 required
                                 //type="number"
-                                id={formDataDetailsList[0][keysArr[i]]["carryOutOfCrore"]}
+                                id="carryOutOfCrore"
                                 label=""
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                value={formDataDetailsList[0][keysArr[i]]["carryOutOfCrore"] || ''}
+                                value={formDataDetailsList[keysArr[i]]["carryOutOfCrore"] || ''}
                                 variant="standard"
-                                onChange={handleChangeCarryDetails}
+                               // onChange={handleChangeCarryDetails}
 
                                 sx={{ display: 'flex' }}
                             />
