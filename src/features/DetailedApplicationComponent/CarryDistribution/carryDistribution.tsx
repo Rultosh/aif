@@ -125,6 +125,30 @@ export const CarryDistribution = (props: any) => {
         
     }
 
+    const getAmount = () => {
+        let sum = (Number(formData?.capitalAmount) || 0) + (Number(formData?.hurdleAmount) || 0) + (Number(formData.catchupAmount) || 0 ) + (Number(formData.profitAmount) || 0 ) + (Number(formData.carryAmount || 0 ))
+        console.log(sum)
+        return sum
+    }
+
+    const getBalanceAmount = () => {
+        let sum = (Number(formData?.capitalBalance) || 0) + (Number(formData?.hurdleBalance) || 0) + (Number(formData.catchupBalance) || 0 ) + (Number(formData.profitBalance) || 0 ) + (Number(formData.carryBalance || 0 ))
+        console.log(sum)
+        return sum
+    }
+
+    const getDisAmount = () => {
+        let sum = ((Number(formData?.hurdleAmount) || 0) + (Number(formData.profitAmount) || 0 ) )
+        console.log(sum)
+        return sum
+    }
+
+    const getDisBalanceAmount = () => {
+        let sum = ((Number(formData?.hurdleBalance) || 0) + (Number(formData.profitBalance) || 0 ) )
+        console.log(sum)
+        return sum
+    }
+
 
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
@@ -517,9 +541,12 @@ export const CarryDistribution = (props: any) => {
                             <Grid container spacing={6} >
                                 <Grid item xs={6}></Grid>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Total</Typography>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total "+getAmount()}</Typography>
                                 </Grid>
-
+                                <Grid item xs={3}>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getBalanceAmount()}</Typography>
+                                </Grid>
+                                
                             </Grid>
 
                             <Divider sx={{ mt: 2 }} />
@@ -547,7 +574,7 @@ export const CarryDistribution = (props: any) => {
                                         type="number"
                                         id="captionDetails"
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        //value={formData["fundLaunchedDate"]}
+                                        value={Number(formData.hurdleBalance || 0) + Number(formData.profitBalance || 0)}
                                         variant="standard"
                                         // onChange={handleChange}
 
@@ -579,7 +606,7 @@ export const CarryDistribution = (props: any) => {
                                         type="number"
                                         id="captionDetails"
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        //value={formData["fundLaunchedDate"]}
+                                        value={Number(formData.catchupBalance || 0) + Number(formData.carryBalance || 0)}
                                         variant="standard"
                                         // onChange={handleChange}
 
@@ -591,7 +618,10 @@ export const CarryDistribution = (props: any) => {
                             <Grid container spacing={6} >
                                 <Grid item xs={6}></Grid>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Total</Typography>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total "+getDisAmount()}</Typography>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getDisBalanceAmount()}</Typography>
                                 </Grid>
 
                             </Grid>
