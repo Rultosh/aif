@@ -40,6 +40,8 @@ export interface IPrelimApplicationData {
     investmentTrackRecord: String | undefined,
     declarationAccepted: boolean,
     firstClosing: boolean,
+    stage: String | undefined,
+    detailedApplicationId: Number | undefined,
 }
 
 export const defaultIPrelimApplicationData : IPrelimApplicationData = {
@@ -83,5 +85,7 @@ export const defaultIPrelimApplicationData : IPrelimApplicationData = {
   sdFirstCorpusOverseasAmountDate:  undefined,
   investmentTrackRecord:  undefined,
   declarationAccepted: false,
-  firstClosing: false
+  firstClosing: false,
+  stage: undefined,
+  detailedApplicationId: undefined,
 }

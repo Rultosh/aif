@@ -20,7 +20,7 @@ const NavigationBar = (props: any) => {
 
   const navigate = useNavigate();
 
-  const pages = ['Home', 'Workflow', 'Preliminary', 'Detailed'];
+  const pages = ['Home', 'Workflow', 'Preliminary'];
   const settings = [ 'Logout'];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);

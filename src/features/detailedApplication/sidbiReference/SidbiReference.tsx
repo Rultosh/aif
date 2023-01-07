@@ -73,15 +73,18 @@ export const SidbiReference = () => {
             <Grid item xs={4}>
               <Card sx={{ display: 'flex', mt: 7, mb: 7, background: '#f2f2f2', height: '100px' }}>
                 <CardContent sx={{ flex: 1 }}>
-                  <TextField
+                  {/* <TextField
                     required
                     id="sidbiRefeferenceNumber"
                     label="Reference No."
+                    disabled
                     value={formData.sidbiRefeferenceNumber || ''}
                     variant="standard"
                     onChange={handleChange}
                     sx={{ display: 'flex', ml: 2, mb: -3 }}
-                  />
+                  /> */}
+                  <div>Reference Number:</div>
+                  <div style={{fontWeight: "bold", marginTop: "20px"}}>{formData.sidbiRefeferenceNumber || ''}</div>
                 </CardContent>
               </Card>
             </Grid>
@@ -115,13 +118,13 @@ export const SidbiReference = () => {
                   sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
                   Next
                 </Button>:<></>}
-                <Button
+                {/* <Button
                   onClick={(e) => handleSave()}
                   variant="contained"
                   disableElevation
                   sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
                   Save
-                </Button>
+                </Button> */}
               </Box>
             </Grid>
           </Grid>

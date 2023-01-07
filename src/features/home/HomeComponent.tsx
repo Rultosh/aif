@@ -1,30 +1,24 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, CardContent, Container, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import NavigationBar from '../../components/NavigationBar'
 import React, * as Rect from 'react'
 import { useState, useEffect } from "react"
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { fetchGridData } from './homeSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import DownloadFileRenderer from './DownloadFileRenderer'
 import { wrapArgument } from '../../lib/api-status/actionWrapper';
 import { getPrelimApplicationList, IPageInfo, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
 import uuid from "react-uuid";
 import { FetchStatus } from '../../lib/api-status/IStatus';
 import { Controller } from "../../lib/api-wrappers/Controller";
-import { useParams } from "react-router-dom";
 import { detailedApplicationThunk, selectedDetailedApplications } from "../detailedApplication/sidbiReference/detailedApplicationSlice";
-import { defaultIDetailedApplication, IDetailedApplication, listDefaultIDetailedApplication} from "../detailedApplication/sidbiReference/IDetailedApplication";
+import { defaultIDetailedApplication} from "../detailedApplication/sidbiReference/IDetailedApplication";
 
 export const Home = () => {
 
     //const { id } = useParams()
     const id =1;
     const [formData, setFormData] = useState(defaultIDetailedApplication);
-    const [detailedApplications, setDetailedApplications] = useState([] as any);
+    // const [detailedApplications, setDetailedApplications] = useState([] as any);
     const [actionId] = useState(uuid())
     const controller = new Controller(actionId, detailedApplicationThunk);
     //const stateDetailsApplication = useAppSelector(selectedDetailedApplications);
@@ -52,13 +46,13 @@ export const Home = () => {
         }
       }, [])
     
-      useEffect(() => {
-        let newData = state[0]?.data[Number(id)];
-        if (newData) {
-            setFormData(newData)
-            setDetailedApplications(newData)
-        }
-      }, [state[0]?.data])
+    //   useEffect(() => {
+    //     let newData = state[0]?.data[Number(id)];
+    //     if (newData) {
+    //         setFormData(newData)
+    //         setDetailedApplications(newData)
+    //     }
+    //   }, [state[0]?.data])
 
    /* useEffect(() => {
         
@@ -111,6 +105,27 @@ export const Home = () => {
         )))
     }
 
+    const getStatusDescription = (stage : String | undefined, status : String | undefined) => {
+
+        const stageDescription = stage === "PRELIM"?"Preliminary application":"Detailed application";
+
+        switch(status) {
+            case "CREATED":
+                return "Pending submission - " + stageDescription;
+            case "SUBMITTED":
+                return "Pending review - " + stageDescription;
+            case "REVISE":
+                return "Pending revision - " + stageDescription;
+            case "APPROVED":
+                return "Approved - " + stageDescription;
+            case "REJECTED":
+                return "Rejected - " + stageDescription;
+            default:
+                return "Invalid Status";
+        }
+
+    }
+
     return (
         <div className="homeComp">
             <NavigationBar></NavigationBar>
@@ -126,11 +141,13 @@ export const Home = () => {
                             {
                                 prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
                                     return <TableRow key={`${row.nameOfTheFund}`}>
-                                        <TableCell align="center" component="th" scope="row">
+                                        {row.stage === "PRELIM"?<TableCell align="center" component="th" scope="row">
                                             <a href={`/preliminary/${row.id}/fund`}>{row.nameOfTheFund}</a>
-                                        </TableCell>
-                                        <TableCell align="center">Sample Contact</TableCell>
-                                        <TableCell align="center">{String(row.status)}</TableCell>
+                                        </TableCell>:<TableCell align="center" component="th" scope="row">
+                                            <a href={`/detailed/${row.detailedApplicationId}`}>{row.nameOfTheFund}</a>
+                                        </TableCell>}
+                                        <TableCell align="center">{row.investmentManager}</TableCell>
+                                        <TableCell align="center">{String(getStatusDescription(row.stage, row.status))}</TableCell>
                                         <TableCell align="center">{row.createdOn}</TableCell>
                                         <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
                                         <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>
@@ -148,7 +165,7 @@ export const Home = () => {
                 </div>
             </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div> }
 
-            {state[0]?.status[actionId]?.actionStatus.fetchStatus === FetchStatus.IDLE ? <div >
+            {/* {state[0]?.status[actionId]?.actionStatus.fetchStatus === FetchStatus.IDLE ? <div >
                 <TableContainer component={Paper}  >
                     <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
                         <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
@@ -165,11 +182,6 @@ export const Home = () => {
                                         </TableCell>
                                         <TableCell align="center">Sample Contact</TableCell>
                                         <TableCell align="center">{String(row.sidbiRefeferenceNumber)}</TableCell>
-                                        {/*<TableCell align="center">{row.createdOn}</TableCell>
-                                        <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
-                                        <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>
-                                        <TableCell align="center"></TableCell>
-                                <TableCell align="center"></TableCell>*/}
                                     </TableRow>
                                 }) : <></>
                             }
@@ -180,7 +192,7 @@ export const Home = () => {
                     {pageInfo.pageNumber > 0 ? <Button variant='outlined' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
                     {prelimApplications.prelimApplications.length >= 5 ? <Button variant='outlined' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
                 </div>
-            </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
+            </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>} */}
         </div>
     )
 }
