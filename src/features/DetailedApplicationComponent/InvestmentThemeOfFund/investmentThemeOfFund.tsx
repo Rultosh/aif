@@ -15,16 +15,19 @@ import { detailedApplicationThunk, selectedDetailedApplications } from "../../de
 import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
 import { Controller } from "../../../lib/api-wrappers/Controller";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
+import { updateStepperIndex } from '../subsections/sideNavBarSlice'
 
-export const InvestmentThemeOfFund = () => {
+export const InvestmentThemeOfFund = (props: any) => {
     const { id } = useParams()
     const [formData, setFormData] = useState(defaultIDetailedApplication);
     const [actionId] = useState(uuid())
     const controller = new Controller(actionId, detailedApplicationThunk);
     const state = useAppSelector(selectedDetailedApplications);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
   
     useEffect(() => {
+        dispatch(updateStepperIndex(2))
       if (id && Number(id)) {
         if (!state[0]?.data[id]) {
           controller.fetch({ ...formData, id: Number(id) });
@@ -33,6 +36,7 @@ export const InvestmentThemeOfFund = () => {
     }, [])
   
     useEffect(() => {
+        dispatch(updateStepperIndex(2))
       let newData = state[0]?.data[Number(id)];
       if (newData) setFormData(newData)
     }, [state[0]?.data])

@@ -9,7 +9,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import SideNavBar from '../SideNavBar'
 import { useParams } from "react-router-dom";
-import {updateNavIndex}from '../sideNavBarSlice'
+import {updateNavIndex, updateStepperIndex}from '../sideNavBarSlice'
 import uuid from "react-uuid";
 import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
 import { Controller } from "../../../../lib/api-wrappers/Controller";
@@ -32,6 +32,7 @@ export const DetailedApplication2K = (props: any) => {
 
     useEffect(() => {
         dispatch(updateNavIndex(10))
+        dispatch(updateStepperIndex(1))
        
     })
 

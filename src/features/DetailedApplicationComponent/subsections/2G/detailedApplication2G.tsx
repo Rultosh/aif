@@ -129,10 +129,12 @@ export const DetailedApplication2G = (props:any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >33. Is the Investment Manager a subsidiary of another Company? If yes, details of the same and please attach copies of the Annual Reports of the Holding Company for the last 3 years.</Typography>
                             <TextField
                                 required
                                 id="subsidiaryOfAnotherCompany"
-                                label="33. Is the Investment Manager a subsidiary of another Company? If yes, details of the same and please attach copies of the Annual Reports of the Holding Company for the last 3 years. "
+                                //label="33. Is the Investment Manager a subsidiary of another Company? If yes, details of the same and please attach copies of the Annual Reports of the Holding Company for the last 3 years."
+                                //label={<Typography variant="body2" sx={{ flex: 1, color: '#363062' }} >33. Is the Investment Manager a subsidiary of another Company? If yes, details of the same and please attach copies of the Annual Reports of the Holding Company for the last 3 years.</Typography>}
                                 //defaultValue={formData.subsidiaryOfAnotherCompany === undefined ? " " : formData["subsidiaryOfAnotherCompany"]}
                                 value={formData["subsidiaryOfAnotherCompany"] || ''}
                                 variant="standard"
@@ -213,10 +215,12 @@ export const DetailedApplication2G = (props:any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >37. What is the overall employee cost for the last 3 years? Please indicate the CTC bands of various grades of employees (total, fixed & variable).</Typography>
+                           
                             <TextField
                                 required
                                 id="overallEmployeeCost"
-                                label="37. What is the overall employee cost for the last 3 years? Please indicate the CTC bands of various grades of employees (total, fixed & variable)."
+                                //label="37. What is the overall employee cost for the last 3 years? Please indicate the CTC bands of various grades of employees (total, fixed & variable)."
                                 //defaultValue={formData.monitoringPractices === undefined ? " " : formData["monitoringPractices"]}
                                 value={formData["overallEmployeeCost"] || ''}
                                 variant="standard"
@@ -229,10 +233,12 @@ export const DetailedApplication2G = (props:any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >38. What is the policy regarding carry How much do the employees get? How are the carried interest tied up if key man provisions are triggered?</Typography>
+                           
                             <TextField
                                 required
                                 id="employeeCarry"
-                                label="38. What is the policy regarding carry How much do the employees get? How are the carried interest tied up if key man provisions are triggered? "
+                                //label="38. What is the policy regarding carry How much do the employees get? How are the carried interest tied up if key man provisions are triggered? "
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                 value={formData["employeeCarry"] || ''}
                                 variant="standard"
@@ -245,10 +251,12 @@ export const DetailedApplication2G = (props:any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >39. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employes(e)of the Investment Manager been reported to / investigated by any regulatory authority during the last 5 years? If yes, please give .11 details of the same.</Typography>
+                           
                             <TextField
                                 required
                                 id="regulartoryInvestigation"
-                                label="39. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employes(e)of the Investment Manager been reported to / investigated by any regulatory authority during the last 5 years? If yes, please give .11 details of the same."
+                                //label="39. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employes(e)of the Investment Manager been reported to / investigated by any regulatory authority during the last 5 years? If yes, please give .11 details of the same."
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                 value={formData["regulartoryInvestigation"] || ''}
                                 variant="standard"
@@ -293,10 +301,12 @@ export const DetailedApplication2G = (props:any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >42. Details of shareholding (controlling stake) by any employee in any investee company / public / private company, directly or indirectly.</Typography>
+                           
                             <TextField
                                 required
                                 id="employeeShareHolding"
-                                label="42. Details of shareholding (controlling stake) by any employee in any investee company / public / private company, directly or indirectly."
+                                //label="42. Details of shareholding (controlling stake) by any employee in any investee company / public / private company, directly or indirectly."
                                 //defaultValue={formData.shareHoldingPattern === undefined ? " " : formData["shareHoldingPattern"]}
                                 value={formData["employeeShareHolding"] || ''}
                                 variant="standard"

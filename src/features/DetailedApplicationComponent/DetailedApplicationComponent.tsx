@@ -26,6 +26,8 @@ import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector
 import { StepIconProps } from '@mui/material/StepIcon';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import fundImg from '../../images/fund.png'
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import { updateStepperIndex } from './subsections/sideNavBarSlice'
 
 
 const ColorlibStepIconRoot = styled('div')<{
@@ -84,6 +86,8 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
     const [parentId] = useState(Number(id))
     const [value, setValue] = React.useState(0);
     const [activeStepper, setActiveStepper] = React.useState(0);
+    const activeStepperIndex = useAppSelector(state => state.sideNavBarStore.activeStepper)
+    const dispatch = useAppDispatch();
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     }
@@ -129,7 +133,7 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
                                         <Grid container spacing={2}>
                                             <Grid container xs={12}>
                                                 <Stack sx={{ ml: '16px', width: '100%', background: "white" }} spacing={0.5}>
-                                                    <Stepper alternativeLabel activeStep={activeStepper} connector={null} sx={{ mt: '3%', mb: '3%' }}>
+                                                    <Stepper alternativeLabel activeStep={activeStepperIndex} connector={null} sx={{ mt: '3%', mb: '3%' }}>
                                                         {steps.map((label) => (
                                                             <Step key={label}>
                                                                 <StepLabel StepIconComponent={ColorlibStepIcon} onClick={() => handleClick(label)}><Typography variant='body2' sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center',fontWeight:'bold' }}>{label}</Typography></StepLabel>

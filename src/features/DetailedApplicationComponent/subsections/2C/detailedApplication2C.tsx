@@ -24,7 +24,7 @@ import SaveIcon from '@mui/icons-material/Save';
 export const DetailedApplication2C = (props: any) => {
 
     const params = useParams()
-    const parentId  = Number(params.id)
+    const parentId = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication2C);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, detailedApplication2CThunk);
@@ -50,7 +50,7 @@ export const DetailedApplication2C = (props: any) => {
 
     useEffect(() => {
         dispatch(updateNavIndex(2))
-        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultIDetailedApplication2C)){
+        if (state[parentId]?.data && Object.keys(state[parentId]?.data).length > 0 && props.isCrtStateToUpdate(state[parentId]?.data, defaultIDetailedApplication2C)) {
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
@@ -135,10 +135,11 @@ export const DetailedApplication2C = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                            <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >17. Please provide policy for nomination of representatives on any of the Committees and furnish details of the composition of the Investment Committee (IC), reporting relationships between the IC and the Investment Manager.</Typography>
                             <TextField
                                 required
                                 id="nominatinPolicy"
-                                label="17. Please provide policy for nomination of representatives on any of the Committees and furnish details of the composition of the Investment Committee (IC), reporting relationships between the IC and the Investment Manager."
+                                //label="17. Please provide policy for nomination of representatives on any of the Committees and furnish details of the composition of the Investment Committee (IC), reporting relationships between the IC and the Investment Manager."
                                 //defaultValue={formData.nominatinPolicy === undefined ? " " : formData["nominatinPolicy"]}
                                 value={formData["nominatinPolicy"] || ''}
                                 variant="standard"
@@ -153,8 +154,7 @@ export const DetailedApplication2C = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid container>
                                 <Grid item xs={9}>
-                                    <InputLabel variant="standard" sx={{ ml: 2 }}>18. Please furnish detailed profile, remuneration details, location of each member of the IC
-                                    </InputLabel>
+                                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >18. Please furnish detailed profile, remuneration details, location of each member of the IC</Typography>
                                 </Grid>
                             </Grid>
                             <Grid item xs={3}>
@@ -169,7 +169,9 @@ export const DetailedApplication2C = (props: any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid container>
                                 <Grid item xs={9}>
-                                    <InputLabel variant="standard" sx={{ ml: 2 }}>19. Please furnish profile, location and remuneration details, location of each member of the Advisory Board(if applicable).
+                                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >19. Please furnish profile, location and remuneration details, location of each member of the Advisory Board(if applicable).</Typography>
+                                    {/*<InputLabel variant="standard" sx={{ ml: 2 }}>
+
                                         <FileUploadIcon onClick={handleOnClickUpload} >
                                         </FileUploadIcon>
                                         <FileUpload
@@ -178,7 +180,7 @@ export const DetailedApplication2C = (props: any) => {
                                                 props.onSuccess(props.id, url);
                                             }}
                                             open={open} setOpen={setOpen}></FileUpload>
-                                    </InputLabel>
+                                        </InputLabel> */}
                                 </Grid>
 
                             </Grid>
@@ -193,10 +195,11 @@ export const DetailedApplication2C = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >20. What is your investment strategy and what is its basis? What are the focus investment sectors for the fund? How does the investment strategy compare to the past fund strategies (if applicable)? Explain the reason for any significant change in your strategy. Are there any sectors or types of transactions/situations you would not invest in? If yes, please give details and reasons for the same</Typography>
                             <TextField
                                 required
                                 id="investmentStrategy"
-                                label="20. What is your investment strategy and what is its basis? What are the focus investment sectors for the fund? How does the investment strategy compare to the past fund strategies (if applicable)? Explain the reason for any significant change in your strategy. Are there any sectors or types of transactions/situations you would not invest in? If yes, please give details and reasons for the same"
+                                //label="20. What is your investment strategy and what is its basis? What are the focus investment sectors for the fund? How does the investment strategy compare to the past fund strategies (if applicable)? Explain the reason for any significant change in your strategy. Are there any sectors or types of transactions/situations you would not invest in? If yes, please give details and reasons for the same"
                                 //defaultValue={formData.investmentStrategy === undefined ? " " : formData["investmentStrategy"]}
                                 value={formData["investmentStrategy"] || ''}
                                 variant="standard"
@@ -291,10 +294,11 @@ export const DetailedApplication2C = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >22. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
                             <TextField
                                 required
                                 id="controlsAndRights"
-                                label='22. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.'
+                                //label='22. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.'
                                 //defaultValue={formData.controlsAndRights === undefined ? " " : formData["controlsAndRights"]}
                                 value={formData["controlsAndRights"] || ''}
                                 variant="standard"
@@ -307,10 +311,11 @@ export const DetailedApplication2C = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >23. In how many cases in your previous fund(s), were you active in replacing the management team when it was needed? How successful was the fund in doing so?</Typography>
                             <TextField
                                 required
                                 id="managementReplacements"
-                                label='23. In how many cases in your previous fund(s), were you active in replacing the management team when it was needed? How successful was the fund in doing so?'
+                                //label='23. In how many cases in your previous fund(s), were you active in replacing the management team when it was needed? How successful was the fund in doing so?'
                                 //defaultValue={formData.managementReplacements === undefined ? " " : formData["managementReplacements"]}
                                 value={formData["managementReplacements"] || ''}
                                 variant="standard"

@@ -28,6 +28,7 @@ import detailedApplication2HSlice from '../features/DetailedApplicationComponent
 import detailedApplication2ISlice from '../features/DetailedApplicationComponent/subsections/2I/detailedApplication2ISlice'
 import detailedApplication2JSlice from '../features/DetailedApplicationComponent/subsections/2J/detailedApplication2JSlice'
 import carryDistributionSlice from '../features/DetailedApplicationComponent/CarryDistribution/carryDistributionSlice'
+import carryDistributionDetailsSlice from '../features/DetailedApplicationComponent/CarryDistribution/carryDistributionDetailsSlice'
 import contributorDetailsSlice from '../features/fundOverview/subsections/fundOverviewData/contributorDetails/contributorDetailsSlice'
 import investmentAssociateSlice from '../features/fundOverview/subsections/fundOverviewData/investmentAssociate/investmentAssociateSlice'
 import investmentPastSlice from '../features/fundOverview/subsections/fundOverviewData/investmentPast/investmentPastSlice'
@@ -68,6 +69,7 @@ const store = configureStore({
     detailedApplication2J: detailedApplication2JSlice,
     sideNavBarStore: sideNavBarSliceReducer,
     carryDistribution: carryDistributionSlice,
+    carryDistributionDetails: carryDistributionDetailsSlice,
     engagementAndRole: engagementAndRoleSlice,
     
   }
