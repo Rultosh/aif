@@ -13,6 +13,7 @@ import FundOverview from './features/fundOverview/FundOverviewComponent';
 import Fund from './features/fundOverview/Fund'
 import SelfRating from './features/fundOverview/subsections/selfRating/SelfRating'
 import Declaration from './features/fundOverview/subsections/declaration/Declaration'
+import Preview from './features/fundOverview/subsections/preview/Preview'
 import Home from './features/home/HomeComponent'
 import { ProfileNew } from './features/fundOverview/subsections/profile-new/ProfileNew';
 import Workflow from './components/Workflow'
@@ -74,6 +75,7 @@ function App() {
           <Route path='profile' element={<ProfileNew />}></Route>
           <Route path='selfRating' element={<SelfRating />}></Route>
           <Route path='declaration' element={<Declaration />}></Route>
+          <Route path='preview' element={<Preview />}></Route>
         </Route>
         <Route path='Detailed' element={<DetailedApplicationComponent />}></Route>
         <Route path='Detailed/:id' element={<DetailedApplicationComponent />}>

@@ -125,7 +125,7 @@ export const FundOverview = () => {
                                         </CardContent>
                                     </Card>
                                     <Divider />
-                                    <Card sx={{ display: 'flex', mb: 2 }}>
+                                    <Card sx={{ display: 'flex'}}>
                                         <CardContent sx={{ flex: 1, alignContent: 'center' }} >
                                             <IconButton onClick={() => navigate("Declaration")}>
                                                 <CardMedia
@@ -145,6 +145,28 @@ export const FundOverview = () => {
                                             </Typography>
                                         </CardContent>
                                     </Card>
+                                    <Divider />
+                                    <Card sx={{ display: 'flex', mb: 2  }}>
+                                        <CardContent sx={{ flex: 1, alignContent: 'center' }} >
+                                            <IconButton onClick={() => navigate("preview")}>
+                                                <CardMedia
+                                                    component="img"
+                                                    width="20"
+                                                    //height="80"
+                                                    image={selfRatingImg}
+                                                    alt="test-img"
+                                                />
+
+                                            </IconButton>
+
+                                            <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
+                                                <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                    Preview
+                                                </Link>
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                    <Divider />
                                 </>
                                     : null}
                             </Grid>
