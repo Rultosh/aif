@@ -81,7 +81,12 @@ export const Preview = () => {
 
                         <Card>
                             <CardContent>
-
+                                <object 
+                                    width="100%" 
+                                    height="600" 
+                                    data={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview`}
+                                    type="application/pdf">   
+                                </object>
                             </CardContent>
                         </Card>
 
