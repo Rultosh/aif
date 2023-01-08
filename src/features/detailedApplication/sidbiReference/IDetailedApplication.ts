@@ -6,6 +6,8 @@ export interface IDetailedApplication extends IEntity {
   imRoleAndEngagement : string | undefined,
   declarationAccepted : boolean | undefined,
   disputes : string | undefined,
+  prelimApplicationId: string | undefined,
+  status: string | undefined,
 }
 
 export const defaultIDetailedApplication : IDetailedApplication = {
@@ -15,7 +17,9 @@ export const defaultIDetailedApplication : IDetailedApplication = {
   investmentThemeOfFund : undefined,
   imRoleAndEngagement : undefined,
   declarationAccepted : false,
-  disputes : undefined
+  disputes : undefined , 
+  prelimApplicationId: undefined,
+  status: undefined,
 }
 
 export const listDefaultIDetailedApplication: IDetailedApplication[] =[];

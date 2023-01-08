@@ -19,7 +19,10 @@ import { carryDistributionDetailsThunk, selectCarryDistributionDetails } from ".
 import UploadComponents from "../subsections/uploadComponents";
 import React, * as Rect from 'react'
 import { updateStepperIndex } from '../subsections/sideNavBarSlice'
-
+import { wrapArgument } from "../../../lib/api-status/actionWrapper";
+import { createApplicationAsync } from "../../../../src/features/fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
+import { selectedDetailedApplications, detailedApplicationThunk } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
+import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
 
 export const CarryDistribution = (props: any) => {
 
@@ -27,7 +30,7 @@ export const CarryDistribution = (props: any) => {
     const params = useParams()
     const parentId = Number(params.id)
     const [formData, setFormData] = useState(defaultICarryDistribution);
-    const actionId = useState(uuid());
+    const [actionId] = useState(uuid());
     const controller = new Controller(actionId, carryDistributionThunk);
     const state = useAppSelector(selectCarryDistribution);
     const navigate = useNavigate();
@@ -36,6 +39,12 @@ export const CarryDistribution = (props: any) => {
     const [formDataDetails, setFormDataDetails] = useState(defaultICarryDistributionDetails);
     const detailsController = new Controller(actionId, carryDistributionDetailsThunk);
     const detailsState = useAppSelector(selectCarryDistributionDetails);
+    const detailedApplicationState = useAppSelector(selectedDetailedApplications);
+    const detailedController = new Controller(actionId, detailedApplicationThunk);
+    const [prilimFormData, setPrilimFormData] = useState(defaultIDetailedApplication);
+    const [commentPreview, setCommentPreview] = useState<String | undefined>(undefined);
+
+    //const prelimApplicationId = detailedApplicationState.
 
 
 
@@ -93,9 +102,23 @@ export const CarryDistribution = (props: any) => {
     }, [detailsState[parentId]?.data])
 
     useEffect(() => {
-       console.log("sampath test ",formDataDetailsList)
+        console.log("sampath test ", formDataDetailsList)
     }, [formDataDetailsList])
-    
+
+    useEffect(() => {
+
+        if (parentId) {
+            if (!detailedApplicationState[0]?.data[parentId]) {
+                detailedController.fetch({ ...prilimFormData, id: parentId });
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+
+        let newData = detailedApplicationState[0]?.data[parentId];
+        if (newData) setPrilimFormData(newData)
+    }, [detailedApplicationState[0]?.data])
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -105,7 +128,7 @@ export const CarryDistribution = (props: any) => {
         setFormData(copiedValue);
     };
 
-    const handleChangeCarryDetails = (ev: any, id_key:any) => {
+    const handleChangeCarryDetails = (ev: any, id_key: any) => {
         ev.preventDefault();
         let copiedValue = { ...formDataDetailsList }
         let key = ev.target.id ? ev.target.id : ev.target.name;
@@ -113,55 +136,70 @@ export const CarryDistribution = (props: any) => {
         statusCopy[key] = ev.target.value;
         let obj = {} as any
         obj[id_key] = statusCopy
-        copiedValue = {...copiedValue , ...obj}
+        copiedValue = { ...copiedValue, ...obj }
         setFormDataDetailsList(copiedValue);
     };
 
     const handleSave = () => {
         controller.save(formData);
-        for (let i=0; i< Object.keys(formDataDetailsList).length;i++){
+        for (let i = 0; i < Object.keys(formDataDetailsList).length; i++) {
             detailsController.save(formDataDetailsList[Object.keys(formDataDetailsList)[i]]);
         }
-        
+
     }
 
     const getAmount = () => {
-        let sum = (Number(formData?.capitalAmount) || 0) + (Number(formData?.hurdleAmount) || 0) + (Number(formData.catchupAmount) || 0 ) + (Number(formData.profitAmount) || 0 ) + (Number(formData.carryAmount || 0 ))
+        let sum = (Number(formData?.capitalAmount) || 0) + (Number(formData?.hurdleAmount) || 0) + (Number(formData.catchupAmount) || 0) + (Number(formData.profitAmount) || 0) + (Number(formData.carryAmount || 0))
         console.log(sum)
         return sum
     }
 
     const getBalanceAmount = () => {
-        let sum = (Number(formData?.capitalBalance) || 0) + (Number(formData?.hurdleBalance) || 0) + (Number(formData.catchupBalance) || 0 ) + (Number(formData.profitBalance) || 0 ) + (Number(formData.carryBalance || 0 ))
+        let sum = (Number(formData?.capitalBalance) || 0) + (Number(formData?.hurdleBalance) || 0) + (Number(formData.catchupBalance) || 0) + (Number(formData.profitBalance) || 0) + (Number(formData.carryBalance || 0))
         console.log(sum)
         return sum
     }
 
     const getDisAmount = () => {
-        let sum = ((Number(formData?.hurdleAmount) || 0) + (Number(formData.profitAmount) || 0 ) )
+        let sum = ((Number(formData?.hurdleAmount) || 0) + (Number(formData.profitAmount) || 0))
         console.log(sum)
         return sum
     }
 
     const getDisBalanceAmount = () => {
-        let sum = ((Number(formData?.hurdleBalance) || 0) + (Number(formData.profitBalance) || 0 ) )
+        let sum = ((Number(formData?.hurdleBalance) || 0) + (Number(formData.profitBalance) || 0))
         console.log(sum)
         return sum
     }
 
 
-    const handleClick = (ev: any, navTo: string) => {
+    const handleClickSave = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'previous') {
             navigate(`/Detailed/${parentId}/EngagementAndRole`);
         }
     }
 
-    const handleSelectChange = (id: String, value: any) => {
-        /* let copiedValue: IPrelimApplicationData = { ...formData };
-         copiedValue[id as keyof IPrelimApplicationData] = value;
-         setPrelimApplicationFormData(copiedValue);*/
+    const handlePreviewComments = (ev: any) => {
+        ev.preventDefault();
+        console.log('handle change', ev, ev.target.id, ev.target.value);
+        setCommentPreview(ev.target.value)
+    };
+
+
+    function handleClickSubmit(ev: any) {
+        console.log("prelimId", parentId)
+        handleSave()
+        dispatch(
+            createApplicationAsync(
+                wrapArgument(
+                    actionId, { id: Number(prilimFormData.prelimApplicationId), statusComments: commentPreview, status: ev.target.id }
+                )
+            )
+        );
+        navigate('/home')
     }
+
 
 
     let carryDetailsComponent = []
@@ -208,7 +246,7 @@ export const CarryDistribution = (props: any) => {
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                 value={formDataDetailsList[keysArr[i]]["carryOutOfCrore"] || ''}
                                 variant="standard"
-                               // onChange={handleChangeCarryDetails}
+                                // onChange={handleChangeCarryDetails}
 
                                 sx={{ display: 'flex' }}
                             />
@@ -541,12 +579,12 @@ export const CarryDistribution = (props: any) => {
                             <Grid container spacing={6} >
                                 <Grid item xs={6}></Grid>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total "+getAmount()}</Typography>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + getAmount()}</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getBalanceAmount()}</Typography>
                                 </Grid>
-                                
+
                             </Grid>
 
                             <Divider sx={{ mt: 2 }} />
@@ -618,7 +656,7 @@ export const CarryDistribution = (props: any) => {
                             <Grid container spacing={6} >
                                 <Grid item xs={6}></Grid>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total "+getDisAmount()}</Typography>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + getDisAmount()}</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getDisBalanceAmount()}</Typography>
@@ -841,9 +879,26 @@ export const CarryDistribution = (props: any) => {
                         </CardContent>
                     </Card>
                     <Grid container xs={12}>
+                        <Grid item xs={12}>
+                            <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                                <CardContent sx={{ flex: 1 }}>
+                                    <TextField
+                                        required
+                                        id="previewComments"
+                                        label="Leave a comment"
+                                        //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
+                                        //value={formData["commitmentReceived"] || ''}
+                                        variant="standard"
+                                        onChange={handlePreviewComments}
+
+                                        sx={{ display: 'flex', }}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>
                         <Grid item xs={4}>
                             <Button
-                                onClick={(e) => handleClick(e, "previous")}
+                                onClick={(e) => handleClickSave(e, "previous")}
                                 startIcon={<ArrowLeftIcon />}
                                 variant="contained"
                                 disableElevation
@@ -859,15 +914,29 @@ export const CarryDistribution = (props: any) => {
 
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                                <Button
-                                    onClick={(e) => handleClick(e, "submit")}
+                                {!(prilimFormData.status == 'SUBMITTED') ? <Button
+                                    //onClick={(e) => handleClickSave(e, "submit")}
+                                    onClick={handleClickSubmit}
                                     //endIcon={<ArrowRightIcon />}
+                                    id = 'submit'
                                     color='success'
                                     variant="contained"
                                     disableElevation
                                     sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
                                     Submit
-                                </Button>
+                                </Button> :
+
+                                    <>
+                                        <Button color='success' id='approve' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                            Approve
+                                        </Button>
+                                        <Button color='warning' id='revise' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                            Revise
+                                        </Button>
+                                        <Button color='error' id='reject' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                            Reject
+                                        </Button>
+                                    </>}
                             </Box>
                         </Grid>
                     </Grid>

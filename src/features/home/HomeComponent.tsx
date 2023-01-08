@@ -144,7 +144,7 @@ export const Home = () => {
                                         {row.stage === "PRELIM"?<TableCell align="center" component="th" scope="row">
                                             <a href={`/preliminary/${row.id}/fund`}>{row.nameOfTheFund}</a>
                                         </TableCell>:<TableCell align="center" component="th" scope="row">
-                                            <a href={`/detailed/${row.detailedApplicationId}`}>{row.nameOfTheFund}</a>
+                                            <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a>
                                         </TableCell>}
                                         <TableCell align="center">{row.investmentManager}</TableCell>
                                         <TableCell align="center">{String(getStatusDescription(row.stage, row.status))}</TableCell>
