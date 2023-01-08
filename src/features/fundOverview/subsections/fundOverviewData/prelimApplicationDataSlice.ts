@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ActionWrapper } from '../../../../lib/api-status/actionWrapper'
-import { fetchFundOverviewData, fetchFundOverviewList, patchPrelimApplication, postPrelimApplication } from './fundOverviewDataApi'
+import { fetchFundOverviewData, fetchFundOverviewList, patchPrelimApplication, postPrelimApplication, postApplication } from './fundOverviewDataApi'
 import { getError } from '../../../../lib/api-status/errorHandler'
-import { defaultIPrelimApplicationData, IPrelimApplicationData } from './IPrelimApplicationData'
+import { defaultIPrelimApplicationData, IPrelimApplicationData, IApplicationData } from './IPrelimApplicationData'
 import { FetchStatus, IStatus } from '../../../../lib/api-status/IStatus'
 import { RootState } from '../../../../app/store'
 
@@ -78,6 +78,23 @@ export const createPrelimApplicationAsync = createAsyncThunk(
       if(args.argument) {
         const response = await postPrelimApplication(args.argument);
         console.log('prelimApplicationdata/create', args.argument);
+        return response.data;
+      }
+    } catch(reason) {
+      console.log("Error: " + reason)
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
+
+
+export const createApplicationAsync = createAsyncThunk(
+  'applicationdata/create',
+  async (args: ActionWrapper<IApplicationData>, {rejectWithValue}) => { 
+    try {
+      if(args.argument) {
+        const response = await postApplication(args.argument);
+        console.log('applicationdata/create', args.argument);
         return response.data;
       }
     } catch(reason) {

@@ -89,3 +89,9 @@ export const defaultIPrelimApplicationData : IPrelimApplicationData = {
   stage: undefined,
   detailedApplicationId: undefined,
 }
+
+export interface IApplicationData {
+  id: Number | undefined,
+  statusComments: String | undefined,
+  status: String | undefined,
+}

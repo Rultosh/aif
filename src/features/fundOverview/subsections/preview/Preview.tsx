@@ -7,7 +7,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import React, * as Rect from 'react'
 import { iteratorSymbol } from "immer/dist/internal";
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
-import { getPrelimApplicationData, selectPrelimApplication, updatePrelimApplicationAsync } from "../fundOverviewData/prelimApplicationDataSlice";
+import { getPrelimApplicationData, selectPrelimApplication, updatePrelimApplicationAsync , createApplicationAsync} from "../fundOverviewData/prelimApplicationDataSlice";
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import { defaultIPrelimApplicationData } from "../fundOverviewData/IPrelimApplicationData";
 import uuid from 'react-uuid';
@@ -21,16 +21,20 @@ export const Preview = () => {
     const navigate = useNavigate()
 
     // const isAgreed = useAppSelector(state => state.declaration.agreed)
-
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
-
-    const [agreed, setAgreed] = useState<boolean>(!!prelimApplicationState.prelimApplication.declarationAccepted);
-
-    console.log(agreed, !!prelimApplicationState.prelimApplication.declarationAccepted)
-
+    console.log(!prelimApplicationState.prelimApplication.declarationAccepted)
     const dispatch = useAppDispatch()
-
+    const statusPrelims = prelimApplicationState.prelimApplication.status
+    //const [statusPrelims, setStatusPrelims] = useState<String | undefined>(undefined);
+    const [commentPreview, setCommentPreview] = useState<String | undefined>(undefined);
     const [actionUid] = useState(uuid());
+
+
+    const handleChange = (ev: any) => {
+        ev.preventDefault();
+        console.log('handle change', ev, ev.target.id, ev.target.value);
+        setCommentPreview(ev.target.value)
+    };
 
     const handleClick = (ev: any, navTo: string) => {
         if (navTo === 'previous') {
@@ -48,24 +52,22 @@ export const Preview = () => {
     }, [])
 
     useEffect(() => {
-        setAgreed(!!prelimApplicationState.prelimApplication.declarationAccepted)
+
+        //setStatusPrelims(prelimApplicationState.prelimApplication.status)
     }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
 
-    function handleChange() {
 
-        setAgreed(!agreed)
-    }
 
-    function handleClickSave() {
+    function handleClickSave(ev:any) {
         console.log("prelimId", Number(id))
-        const obj = { value: agreed }
         dispatch(
-            updatePrelimApplicationAsync(
+            createApplicationAsync(
                 wrapArgument(
-                    actionUid, { ...defaultIPrelimApplicationData, id: Number(id), declarationAccepted: agreed }
+                    actionUid, { id: Number(id), statusComments: commentPreview , status: ev.target.id}
                 )
             )
         );
+        navigate('/home')
     }
 
 
@@ -92,7 +94,7 @@ export const Preview = () => {
                     <CardContent sx={{ flex: 1 }}>
                         <Typography sx={{ flex: 1, mb: 1 }}>Please follow below steps:</Typography>
                         <Divider color='#363062' sx={{ mb: 2 }} />
-                        <Card sx={{mb:2}}>
+                        <Card sx={{ mb: 2 }}>
                             <CardContent>
                                 <Typography sx={{ flex: 1, mb: 1 }}>1. Download Application</Typography>
                                 <Typography sx={{ flex: 1, mb: 1 }}>2. Either digitally sign the application and upload Digitally Signed Application</Typography>
@@ -130,9 +132,9 @@ export const Preview = () => {
                             //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                             //value={formData["commitmentReceived"] || ''}
                             variant="standard"
-                            // onChange={handleChange}
+                            onChange={handleChange}
 
-                            sx={{ display: 'flex',  }}
+                            sx={{ display: 'flex', }}
                         />
 
 
@@ -144,9 +146,19 @@ export const Preview = () => {
                     Declaration
                 </Button>
 
-                <Button color='success' onClick={handleClickSave} disabled={!agreed} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                {!(statusPrelims == 'SUBMITTED') ? <Button color='success' id= 'submit' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Submit
-                </Button>
+                </Button> : <>
+                    <Button color='success' id= 'approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Approve
+                    </Button>
+                    <Button color='warning' id= 'revise' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Revise
+                    </Button>
+                    <Button color='error' id= 'reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Reject
+                    </Button>
+                </>}
 
 
 

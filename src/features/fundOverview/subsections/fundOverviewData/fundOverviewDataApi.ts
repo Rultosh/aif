@@ -1,5 +1,5 @@
 import api from "../../../../app/api";
-import { IPrelimApplicationData } from "./IPrelimApplicationData";
+import { IPrelimApplicationData, IApplicationData } from "./IPrelimApplicationData";
 import { IPageInfo } from "./prelimApplicationDataSlice";
 
 export function fetchFundOverviewData(prelimAppId:Number) {
@@ -21,6 +21,14 @@ export function postPrelimApplication(prelimAppData:IPrelimApplicationData) {
     method: 'post',
     data: prelimAppData,
     url: `/api/prelims`
+  });
+}
+
+export function postApplication(prelimAppData:IApplicationData) {
+  return api({
+    method: 'post',
+    data: prelimAppData.statusComments,
+    url: `/api/application/${prelimAppData.id}/${prelimAppData.status}`
   });
 }
 
