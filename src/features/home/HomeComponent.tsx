@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import NavigationBar from '../../components/NavigationBar'
 import React, * as Rect from 'react'
 import { useState, useEffect } from "react"
@@ -12,6 +12,7 @@ import { FetchStatus } from '../../lib/api-status/IStatus';
 import { Controller } from "../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from "../detailedApplication/sidbiReference/detailedApplicationSlice";
 import { defaultIDetailedApplication} from "../detailedApplication/sidbiReference/IDetailedApplication";
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 export const Home = () => {
 
@@ -67,7 +68,7 @@ export const Home = () => {
         if (newData) setFormData(newData)
     }, [stateDetailsApplication['applications']])*/
 
-    const tableHeaders = ["Fund Name", "Contact Person", "Status", "Application Date", "Target Corpus", "Contribution Sought", "Query Resolution", "Workflow State"]
+    const tableHeaders = ["Fund Name", "Contact Person", "Status", "Application Date", "Target Corpus", "Contribution Sought", "Download", "Query Resolution", "Workflow State"]
 
     let headerComponent = []
 
@@ -151,6 +152,29 @@ export const Home = () => {
                                         <TableCell align="center">{row.createdOn}</TableCell>
                                         <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
                                         <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>
+                                        {row.stage === "PRELIM"?<TableCell align="center" component="th" scope="row">
+                                            <Tooltip title="Download">
+                                                <IconButton>
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview`)} />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Download All">
+                                                <IconButton>
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip`)} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>:<TableCell align="center" component="th" scope="row">
+                                            <Tooltip title="Download">
+                                                <IconButton>
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview`)} />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Download All">
+                                                <IconButton>
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip`)} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>}
                                         <TableCell align="center"></TableCell>
                                         <TableCell align="center"></TableCell>
                                     </TableRow>

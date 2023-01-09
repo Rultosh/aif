@@ -98,7 +98,7 @@ export const Preview = () => {
                                 <object
                                     width="100%"
                                     height="600"
-                                    data={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview`}
+                                    data={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview`}
                                     //data={`${client.getUri()}/api/prelims/${id}/preview`}
                                     type="application/pdf">
                                 </object>
@@ -130,7 +130,16 @@ export const Preview = () => {
                                     label="Download Applicaton"
                                     size="medium"
                                     component="a"
-                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview`}
+                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downlaodPreview`}
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
+                            </div>
+                            <div style={{ margin: '5px' }}>
+                                <Chip
+                                    icon={<FileDownloadIcon />}
+                                    label="Download All as Zip"
+                                    size="medium"
+                                    component="a"
+                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip`}
                                     sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
                             </div>
                             <div style={{ margin: '5px' }}>
@@ -147,15 +156,6 @@ export const Preview = () => {
                                 <DocumentChip
                                     label="Upload"
                                     id={''} />
-                            </div>
-                            <div style={{ margin: '5px' }}>
-                                <Chip
-                                    icon={<FileDownloadIcon />}
-                                    label="Download All as Zip"
-                                    size="medium"
-                                    component="a"
-                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip`}
-                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
                             </div>
                         </Box>
                         <TextField
