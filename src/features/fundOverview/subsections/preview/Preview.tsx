@@ -7,12 +7,17 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import React, * as Rect from 'react'
 import { iteratorSymbol } from "immer/dist/internal";
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
-import { getPrelimApplicationData, selectPrelimApplication, updatePrelimApplicationAsync , createApplicationAsync} from "../fundOverviewData/prelimApplicationDataSlice";
+import { getPrelimApplicationData, selectPrelimApplication, updatePrelimApplicationAsync, createApplicationAsync } from "../fundOverviewData/prelimApplicationDataSlice";
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import { defaultIPrelimApplicationData } from "../fundOverviewData/IPrelimApplicationData";
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import DocumentChip from "../../../../components/DocumentChip";
+import client from '../../../../app/api'
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+//import { useForm } from "react-hook-form";
+//import { yupResolver } from "@hookform/resolvers/yup";
+//import * as Yup from "yup";
 
 export const Preview = () => {
 
@@ -26,8 +31,17 @@ export const Preview = () => {
     const dispatch = useAppDispatch()
     const statusPrelims = prelimApplicationState.prelimApplication.status
     //const [statusPrelims, setStatusPrelims] = useState<String | undefined>(undefined);
-    const [commentPreview, setCommentPreview] = useState<String | undefined>(undefined);
+    const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
     const [actionUid] = useState(uuid());
+
+    /*const validationSchema = Yup.object().shape({
+        previewComments: Yup.string().required("Comments is required"),
+    });
+
+    const { register, handleSubmit, formState: { errors },} = useForm({
+        resolver: yupResolver(validationSchema),
+        });*/
+
 
 
     const handleChange = (ev: any) => {
@@ -56,14 +70,14 @@ export const Preview = () => {
         //setStatusPrelims(prelimApplicationState.prelimApplication.status)
     }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
 
+    
 
-
-    function handleClickSave(ev:any) {
+    function handleClickSave(ev: any) {
         console.log("prelimId", Number(id))
         dispatch(
             createApplicationAsync(
                 wrapArgument(
-                    actionUid, { id: Number(id), statusComments: commentPreview , status: ev.target.id}
+                    actionUid, { id: Number(id), statusComments: commentPreview, status: ev.target.id }
                 )
             )
         );
@@ -81,11 +95,12 @@ export const Preview = () => {
 
                         <Card>
                             <CardContent>
-                                <object 
-                                    width="100%" 
-                                    height="600" 
-                                    data={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview`}
-                                    type="application/pdf">   
+                                <object
+                                    width="100%"
+                                    height="600"
+                                    data={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview`}
+                                    //data={`${client.getUri()}/api/prelims/${id}/preview`}
+                                    type="application/pdf">
                                 </object>
                             </CardContent>
                         </Card>
@@ -110,9 +125,13 @@ export const Preview = () => {
 
                         <Box sx={{ display: 'flex' }}>
                             <div style={{ margin: '5px' }}>
-                                <DocumentChip
+                                <Chip
+                                    icon={<FileDownloadIcon />}
                                     label="Download Applicaton"
-                                    id={''} />
+                                    size="medium"
+                                    component="a"
+                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview`}
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
                             </div>
                             <div style={{ margin: '5px' }}>
                                 <DocumentChip
@@ -129,11 +148,22 @@ export const Preview = () => {
                                     label="Upload"
                                     id={''} />
                             </div>
+                            <div style={{ margin: '5px' }}>
+                                <Chip
+                                    icon={<FileDownloadIcon />}
+                                    label="Download All as Zip"
+                                    size="medium"
+                                    component="a"
+                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip`}
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
+                            </div>
                         </Box>
                         <TextField
                             required
                             id="previewComments"
                             label="Leave a comment"
+                            //{...register("previewComments")}
+                            //error={errors.previewComments ? true : false}
                             //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                             //value={formData["commitmentReceived"] || ''}
                             variant="standard"
@@ -151,16 +181,16 @@ export const Preview = () => {
                     Declaration
                 </Button>
 
-                {!(statusPrelims == 'SUBMITTED') ? <Button color='success' id= 'submit' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                {!(statusPrelims == 'SUBMITTED') ? <Button color='success' id='submit' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Submit
                 </Button> : <>
-                    <Button color='success' id= 'approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                    <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Approve
                     </Button>
-                    <Button color='warning' id= 'revise' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                    <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Revise
                     </Button>
-                    <Button color='error' id= 'reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                    <Button color='error' id='reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Reject
                     </Button>
                 </>}

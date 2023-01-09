@@ -42,7 +42,7 @@ export const CarryDistribution = (props: any) => {
     const detailedApplicationState = useAppSelector(selectedDetailedApplications);
     const detailedController = new Controller(actionId, detailedApplicationThunk);
     const [prilimFormData, setPrilimFormData] = useState(defaultIDetailedApplication);
-    const [commentPreview, setCommentPreview] = useState<String | undefined>(undefined);
+    const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
 
     //const prelimApplicationId = detailedApplicationState.
 

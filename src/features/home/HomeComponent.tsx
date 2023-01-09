@@ -1,4 +1,4 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import NavigationBar from '../../components/NavigationBar'
 import React, * as Rect from 'react'
 import { useState, useEffect } from "react"
@@ -127,7 +127,7 @@ export const Home = () => {
     }
 
     return (
-        <div className="homeComp">
+        <div className="homeComp" style={{height:670}}>
             <NavigationBar></NavigationBar>
             {prelimApplications.allStatus.fetchStatus === FetchStatus.IDLE ? <div >
                 <TableContainer component={Paper}  >
@@ -159,10 +159,15 @@ export const Home = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <div style={{ float: 'right' }}>
+                <Grid container sx={{flexDirection:'row',justifyContent :'center'}}>
+                    <Grid item xs={4}>
+                <Box >
                     {pageInfo.pageNumber > 0 ? <Button variant='outlined' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
                     {prelimApplications.prelimApplications.length >= 5 ? <Button variant='outlined' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
-                </div>
+                </Box>
+                </Grid>
+                </Grid>
+                
             </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div> }
 
             {/* {state[0]?.status[actionId]?.actionStatus.fetchStatus === FetchStatus.IDLE ? <div >
