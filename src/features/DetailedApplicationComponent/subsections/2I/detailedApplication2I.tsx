@@ -14,9 +14,12 @@ import { Controller } from "../../../../lib/api-wrappers/Controller";
 import { defaultIDetailedApplication2I, IDetailedApplication2I } from "./IDetailedApplication2I";
 import { detailedApplication2IThunk, selectDetailedApplication2I } from "./detailedApplication2ISlice";
 import SaveIcon from '@mui/icons-material/Save';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const DetailedApplication2I = (props: any) => {
-
+ 
     const params = useParams()
     const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication2I);
@@ -87,6 +90,23 @@ export const DetailedApplication2I = (props: any) => {
         }
     }
 
+    const validationSchema = Yup.object().shape({
+        sebiCompliance: Yup.string().required("Compliance is required")
+    });
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleSave();
+    };
+
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -103,7 +123,8 @@ export const DetailedApplication2I = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                onClick={handleSave}
+                                type="submit"
+                                onClick={handleSubmit(onSubmit)}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -197,11 +218,13 @@ export const DetailedApplication2I = (props: any) => {
                                     required
                                     id="sebiCompliance"
                                     label='If No, reasons therefore'
+                                    {...register("sebiCompliance")}
+                                    error={errors.sebiCompliance ? true : false}
                                     // defaultValue={formData.reason === undefined ? " " : formData["reason"]}
-                                    value={formData["sebiCompliance"] || ''}
+                                    //value={formData["sebiCompliance"] || ''}
                                     variant="standard"
-                                    onChange={handleChange}
-                                    sx={{ display: 'flex', ml: 2, mb: -3 }}
+                                    //onChange={handleChange}
+                                    sx={{ display: 'flex', ml: 2, mb: 2 }}
                                 /> :
                                 <Grid item xs={3}>
                                     <div style={{ margin: "15px" }}>
@@ -209,6 +232,12 @@ export const DetailedApplication2I = (props: any) => {
                                         <UploadComponents id={`sebiComplianceCertificate${parentId}`}></UploadComponents>
                                     </div>
                                 </Grid>}
+                            {errors.sebiCompliance ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.sebiCompliance?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent></Card>
                     <Divider sx={{ mt: 2 }} />
 

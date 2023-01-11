@@ -10,6 +10,9 @@ import { useNavigate } from "react-router-dom";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import { updateStepperIndex}from '../../DetailedApplicationComponent/subsections/sideNavBarSlice'
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const SidbiReference = () => {
   const { id } = useParams()
@@ -57,6 +60,23 @@ export const SidbiReference = () => {
     else navigate(`/detailed/${id}/detailed2A`)
   }
 
+  const validationSchema = Yup.object().shape({
+    sidbiRefeferenceNumber: Yup.string().required("Reference Number is required")
+  });
+
+  const {
+      register,
+      handleSubmit,
+      formState: { errors },
+  } = useForm({
+      resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    setFormData(data);
+    handleSave();
+  };
+
   return <>
     {controller.isActionError(0, state) ?
       <div style={{ margin: "10px", color: "red" }}>{controller.error(0, state)}</div> : <></>}
@@ -77,12 +97,16 @@ export const SidbiReference = () => {
                     required
                     id="sidbiRefeferenceNumber"
                     label="Reference No."
-                    disabled
-                    value={formData.sidbiRefeferenceNumber || ''}
+                    {...register("sidbiRefeferenceNumber")}
+                    error={errors.sidbiRefeferenceNumber ? true : false}
+                    // value={formData.sidbiRefeferenceNumber || ''}
                     variant="standard"
-                    onChange={handleChange}
+                    // onChange={handleChange}
                     sx={{ display: 'flex', ml: 2, mb: -3 }}
-                  /> */}
+                  />
+                  <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                      <>{errors.sidbiRefeferenceNumber?.message}</>
+                  </Typography> */}
                   <div>Reference Number:</div>
                   <div style={{fontWeight: "bold", marginTop: "20px"}}>{formData.sidbiRefeferenceNumber || ''}</div>
                 </CardContent>
@@ -119,7 +143,9 @@ export const SidbiReference = () => {
                   Next
                 </Button>:<></>}
                 {/* <Button
-                  onClick={(e) => handleSave()}
+                  type="submit"
+                  onClick={handleSubmit(onSubmit)}
+                  // onClick={(e) => handleSave()}
                   variant="contained"
                   disableElevation
                   sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
