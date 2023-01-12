@@ -129,7 +129,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
             <Grid container spacing={2} >
               <Grid item xs={9}>
                 <Box sx={{ display: 'inline-flex' }}>
-                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details of Investment Team</Typography>
+                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details Of Investment Team (At Partner Level)</Typography>
                 </Box>
               </Grid>
               <Grid item xs={4.5}>
@@ -214,16 +214,16 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     id="vcpeExperience"
                     {...register("vcpeExperience")}
                     error={(errors.vcpeExperience && getValues("vcpeExperience") =='') ? true : false}
-                    value={String(investmentPartnerFormData.vcpeExperience)}
+                    // value={String(investmentPartnerFormData.vcpeExperience)}
                     onChange={handleChange}
                     name="vcpeExperience"
                     // defaultValue={investmentPartnerFormData["vcpeExperience"] === undefined ? " " : investmentPartnerFormData["vcpeExperience"]}
                   >
 
-                    <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>
-                    <MenuItem key={"5-10 years"} value={"5-10 years"}>5-10 years</MenuItem>
-                    <MenuItem key={"10-15 years"} value={"10-15 years"}>10-15 years</MenuItem>
-                    <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
+                    <MenuItem key={"0-5 years"} value="0-5 years" selected={String(investmentPartnerFormData.vcpeExperience) == "0-5 years"}>0-5 years</MenuItem>
+                    <MenuItem key={"5-10 years"} value="5-10 years" selected={String(investmentPartnerFormData.vcpeExperience) == "5-10 years"}>5-10 years</MenuItem>
+                    <MenuItem key={"10-15 years"} value="10-15 years" selected={String(investmentPartnerFormData.vcpeExperience) == "10-15 years"}>10-15 years</MenuItem>
+                    <MenuItem key={"15+ years"} value="15+ years" selected={String(investmentPartnerFormData.vcpeExperience) == "15+ years"}>15+ years</MenuItem>
                   </Select>
                 </FormControl>
                 <Typography variant="caption" color="error">

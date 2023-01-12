@@ -93,6 +93,58 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         setPrelimApplicationFormData(copiedValue);
         setfirstClosingSwitch(!firstClosingSwitch)
     }
+    
+    const validationSchema = Yup.object().shape({
+        nameOfTheFund: Yup.string().required("Name of the Fund is required"),
+        sponsor: Yup.string().required("Sponsor is required"),
+        investmentManager: Yup.string().required("Investment Manager is required"),
+        fundManager: Yup.string(),
+        dealType: Yup.string(),
+        impact: Yup.string(),
+        aifCategory: Yup.string(),
+        dateOfFilingWithSEBI: Yup.string().required("This value is required").nullable(),
+        dealSector: Yup.string(),
+        // dealSubsector: Yup.string(),
+        sdFirstClosingDomesticAmountDate: Yup.string().required("This value is required").nullable(),
+        sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
+        nameOfTrustee: Yup.string().required("Name of Trustee is required"),
+        contributionSought: Yup.string().required("Contribution Sought is required"),
+        termOfFund: Yup.string().required("Term of Fund is required"),
+        commitmentPeriod: Yup.string().required("Commitment Period is required"),
+        preferredReturn: Yup.string().required("Preferred Return is required"),
+        managementFees: Yup.string().required("Management Fees is required"),
+        carriedInterest: Yup.string().required("Carried Interest is required"),
+        description: Yup.string().required("Description is required"),
+        investmentStrategy: Yup.string().required("Investment Strategy is required"),
+        sdDescription: Yup.string().required("Capital raised till date is required"),
+        sdTargetCorpusDomestic: Yup.string().required("Domestic is required"),
+        sdTargetCorpusOverseas: Yup.string().required("Overseas is required"),
+        sdTotalTargetCorpus: Yup.string().required("Total Target Corpus is required"),
+        sdFirstClosingDomesticAmount: Yup.string().required("Domestic Amount is required"),
+        sdFirstClosingOverseasAmount: Yup.string().required("Overseas Amount is required"),
+    });
+
+    const {
+        control,
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    const childToParentSelect = (formDataName: any, data: any) => {
+        console.log(data);
+        setValue(formDataName, data);
+    };
+
+    const onSubmit = (data: any) => {
+        console.log(data);
+        setPrelimApplicationFormData(data);
+        savePrelimApplicationForm(data);
+    };
 
     const dealSubSectorValues = {
         "26": {
@@ -147,58 +199,6 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
     }
 
     console.log((dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)]?.values, prelimApplicationFormData.dealSubsector);
-
-    const validationSchema = Yup.object().shape({
-        nameOfTheFund: Yup.string().required("Name of the Fund is required"),
-        sponsor: Yup.string().required("Sponsor is required"),
-        investmentManager: Yup.string().required("Investment Manager is required"),
-        fundManager: Yup.string(),
-        dealType: Yup.string(),
-        impact: Yup.string(),
-        aifCategory: Yup.string(),
-        dateOfFilingWithSEBI: Yup.string().required("This value is required").nullable(),
-        dealSector: Yup.string(),
-        dealSubsector: Yup.string(),
-        sdFirstClosingDomesticAmountDate: Yup.string().required("This value is required").nullable(),
-        sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
-        nameOfTrustee: Yup.string().required("Name of Trustee is required"),
-        contributionSought: Yup.string().required("Contribution Sought is required"),
-        termOfFund: Yup.string().required("Term of Fund is required"),
-        commitmentPeriod: Yup.string().required("Commitment Period is required"),
-        preferredReturn: Yup.string().required("Preferred Return is required"),
-        managementFees: Yup.string().required("Management Fees is required"),
-        carriedInterest: Yup.string().required("Carried Interest is required"),
-        description: Yup.string().required("Description is required"),
-        investmentStrategy: Yup.string().required("Investment Strategy is required"),
-        sdDescription: Yup.string().required("Capital raised till date is required"),
-        sdTargetCorpusDomestic: Yup.string().required("Domestic is required"),
-        sdTargetCorpusOverseas: Yup.string().required("Overseas is required"),
-        sdTotalTargetCorpus: Yup.string().required("Total Target Corpus is required"),
-        sdFirstClosingDomesticAmount: Yup.string().required("Domestic Amount is required"),
-        sdFirstClosingOverseasAmount: Yup.string().required("Overseas Amount is required"),
-    });
-
-    const {
-        control,
-        register,
-        handleSubmit,
-        getValues,
-        setValue,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-    });
-
-    const childToParentSelect = (formDataName: any, data: any) => {
-        console.log(data);
-        setValue(formDataName, data);
-    };
-
-    const onSubmit = (data: any) => {
-        console.log(data);
-        setPrelimApplicationFormData(data);
-        savePrelimApplicationForm(data);
-    };
 
     if (prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
         return (

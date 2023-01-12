@@ -62,6 +62,9 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
   const handleChange = (ev: any) => {
     ev.preventDefault();
     console.log('handle change', ev.target.id, ev.target.value);
+    // if(ev.target.id = "dateOfInvestment"){
+    //   ev.target.value = moment(ev.target.value).utc().format('YYYY-MM-DD')
+    // }
 
     let copiedValue: IInvestmentPast = { ...investmentPastFormData };
 
@@ -70,6 +73,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
 
     console.log(copiedValue, props.prelimApplicationId)
 
+    setValue(ev.target.name, ev.target.value);
     setinvestmentPastFormData(copiedValue)
   };
 
@@ -123,7 +127,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <Grid container spacing={2} >
               <Grid item xs={9}>
                 <Box sx={{ display: 'inline-flex' }}>
-                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details of Investment Team</Typography>
+                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Add Investment</Typography>
                 </Box>
               </Grid>
               <Grid item xs={4.5}>
@@ -132,7 +136,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   id="nameOfCompany"
                   label="Name Of Company"
                   {...register("nameOfCompany")}
-                  error={errors.nameOfCompany ? true : false}
+                  error={(errors.nameOfCompany && getValues("nameOfCompany") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.nameOfCompany}
                   variant="standard"
@@ -141,7 +145,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{errors.nameOfCompany?.message}</>
+                  <>{(errors.nameOfCompany && getValues("nameOfCompany") == '')?errors.nameOfCompany.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={3.5}>
@@ -150,7 +154,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   id="sector"
                   label="Sector"
                   {...register("sector")}
-                  error={errors.sector ? true : false}
+                  error={(errors.sector && getValues("sector") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.sector}
                   variant="standard"
@@ -159,7 +163,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{errors.sector?.message}</>
+                  <>{(errors.sector && getValues("sector") == '')?errors.sector.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4}>
@@ -169,7 +173,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   id="amountInvested"
                   label="Amount Invested"
                   {...register("amountInvested")}
-                  error={errors.amountInvested ? true : false}
+                  error={(errors.amountInvested && getValues("amountInvested") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.amountInvested}
                   variant="standard"
@@ -178,7 +182,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{errors.amountInvested?.message}</>
+                  <>{(errors.amountInvested && getValues("amountInvested") == '')?errors.amountInvested.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>

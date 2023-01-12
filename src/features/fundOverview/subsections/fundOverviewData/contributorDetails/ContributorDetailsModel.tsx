@@ -59,6 +59,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
     console.log(copiedValue, props.prelimApplicationId)
 
+    setValue(ev.target.name, ev.target.value);
     setContributorDetailsFormData(copiedValue)
   };
 
@@ -81,6 +82,8 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
   });
 
   const {
+    setValue,
+    getValues,
     register,
     handleSubmit,
     formState: { errors },
@@ -124,16 +127,16 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   id="name"
                   label="Name"
                   {...register("name")}
-                  error={errors.name ? true : false}
+                  error={(errors.name && getValues("name") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={contributorDetailsFormData.name}
+                  // value={contributorDetailsFormData.name}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                    <>{errors.name?.message}</>
+                    <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={3.5}>
@@ -143,7 +146,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   id="amount"
                   label="Amount"
                   {...register("amount")}
-                  error={errors.amount ? true : false}
+                  error={(errors.amount && getValues("amount") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   // value={contributorDetailsFormData.amount}
                   variant="standard"
@@ -152,7 +155,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                    <>{errors.amount?.message}</>
+                    <>{(errors.amount && getValues("amount") == '')?errors.amount.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={1}>
@@ -162,7 +165,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   id="percentOfCorpus"
                   label="% of Corpus"
                   {...register("percentOfCorpus")}
-                  error={errors.percentOfCorpus ? true : false}
+                  error={(errors.percentOfCorpus && getValues("percentOfCorpus") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   // value={contributorDetailsFormData.percentOfCorpus}
                   variant="standard"
@@ -171,7 +174,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                    <>{errors.percentOfCorpus?.message}</>
+                    <>{(errors.percentOfCorpus && getValues("percentOfCorpus") == '')?errors.percentOfCorpus.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={12} >
