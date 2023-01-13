@@ -34,9 +34,11 @@ import investmentAssociateSlice from '../features/fundOverview/subsections/fundO
 import investmentPastSlice from '../features/fundOverview/subsections/fundOverviewData/investmentPast/investmentPastSlice'
 import sideNavBarSliceReducer from '../features/DetailedApplicationComponent/subsections/sideNavBarSlice'
 import engagementAndRoleSlice from '../features/DetailedApplicationComponent/EngagementAndRole/engagementAndRoleSlice'
+import authenticationSlice from '../components/auth/authenticationSlice'
 
 const store = configureStore({
   reducer: {
+    auth: authenticationSlice,
     home: homeReducer,
     eligibilityResults: eligibilityResultsReducer,
     eligibilityQuestioner: eligibilityQuestionerReducer,

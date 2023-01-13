@@ -41,6 +41,11 @@ const NavigationBar = (props: any) => {
     setAnchorElUser(null);
  };
 
+ const handleLogout = () => {
+  localStorage.removeItem('token');
+  navigate('/login');
+ }
+
   return (
     <AppBar position="static" component='nav' sx={{backgroundColor:'white'}}>
       <Container  maxWidth="xl">
@@ -167,7 +172,7 @@ const NavigationBar = (props: any) => {
             >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                  <Typography textAlign="center" onClick={handleLogout}>{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>

@@ -2,11 +2,14 @@ import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, T
 import logo from '../../images/logo.png'
 import azadiLogo from '../../images/Azadi.png'
 import { useNavigate } from 'react-router-dom';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { validateUser } from './landingSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import '../../index.css'
 import loginIconImg from '../../images/aif_login_icon.png'
+import { authenticateThunk, defaultLoginRequest, selectAuthenticatedUser } from "../../components/auth/authenticationSlice";
+import { wrapArgument } from "../../lib/api-status/actionWrapper";
+import uuid from "react-uuid";
 
 
 const Landing = () => {
@@ -16,17 +19,21 @@ const Landing = () => {
     const handleClose = () => setOpen(false);
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
+    const auth = useAppSelector(selectAuthenticatedUser)
 
-    const initialState = {
-        'name': "",
-        'password': ""
-    }
+    const initialState = defaultLoginRequest
 
     const [value, setValue] = useState(initialState);
     const errorMsg = useAppSelector(state => state.landing.error);
     const isValidUser = useAppSelector(state => state.landing.validUser);
 
+    const [actionId] = useState(uuid());
 
+    useEffect(() => {
+        // console.log(auth.token);
+        // if(auth.token) navigate('/home')
+        if(localStorage.getItem('token')) navigate('/home')
+    })
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -41,7 +48,10 @@ const Landing = () => {
     }
 
     function isUserValid() {
-        dispatch(validateUser(value))
+        // dispatch(validateUser(value))
+        dispatch(authenticateThunk(wrapArgument(
+            actionId, value
+        )));
        // navigate('/home')
     }
     return (
@@ -146,10 +156,10 @@ const Landing = () => {
                                         <Grid item xs={12}>
                                             <TextField
                                                 required
-                                                id="name"
+                                                id="username"
                                                 label="Email Id"
-                                                defaultValue={value["name"] === undefined ? "" : value["name"]}
-                                                value={value["name"]}
+                                                defaultValue={value.username === undefined ? "" : value.username}
+                                                value={value.username}
                                                 onChange={handleChange}
                                                 sx={{ display: 'flex', mb: 2 }}
                                             />

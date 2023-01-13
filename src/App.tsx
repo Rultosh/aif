@@ -35,6 +35,7 @@ import CarryDistribution from './features/DetailedApplicationComponent/CarryDist
 import DetailedApplicationComponent from './features/DetailedApplicationComponent/DetailedApplicationComponent';
 import { SidbiReference } from './features/detailedApplication/sidbiReference/SidbiReference';
 import { FeatureOfFunds } from './features/detailedApplication/featureOfFunds/featureOfFunds_dep';
+import { PrivateRoute } from './components/auth/PrivateRoute';
 
 
 function App() {
@@ -59,10 +60,15 @@ function App() {
       </Header>
       <Routes>
         <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
+        <Route path='/login' element={<Landing />}></Route>
         <Route path='/detailed/sidbiReference' element={<SidbiReference />}></Route>
         {/*<Route path='/detailed/sidbiReference/:id' element={<SidbiReference />}></Route>
         <Route path='/detailed/featureOfFunds/:id' element={<FeatureOfFunds />}></Route>*/}
-        <Route path='home' element={<Home />}></Route>
+        <Route path='home' element={
+          <PrivateRoute>
+            <Home />
+          </PrivateRoute>
+        }></Route>
         <Route path='workflow' element={<Workflow />}></Route>
         <Route path='eligibilityQuestioner' element={<EligibilityQuestioner />}></Route>
         <Route path='eligibilityResults' element={<EligibilityResults />}></Route>

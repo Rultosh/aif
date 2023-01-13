@@ -84,6 +84,7 @@ export const Preview = () => {
         navigate('/home')
     }
 
+    console.log(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`);
 
     return (
         <Card sx={{ display: 'flex', mb: 2 }}>
@@ -95,13 +96,20 @@ export const Preview = () => {
 
                         <Card>
                             <CardContent>
-                                <object
+                                {/* <object
                                     width="100%"
                                     height="600"
-                                    data={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview`}
+                                    data={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`}
                                     //data={`${client.getUri()}/api/prelims/${id}/preview`}
                                     type="application/pdf">
-                                </object>
+                                </object> */}
+                                {/* <embed 
+                                    src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`} 
+                                    width="800px" 
+                                    height="2100px" /> */}
+                                <iframe src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`} 
+                                    width="100%"
+                                    height="600"></iframe>
                             </CardContent>
                         </Card>
 
@@ -130,7 +138,7 @@ export const Preview = () => {
                                     label="Download Applicaton"
                                     size="medium"
                                     component="a"
-                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downlaodPreview`}
+                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
                                     sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
                             </div>
                             <div style={{ margin: '5px' }}>
@@ -139,7 +147,7 @@ export const Preview = () => {
                                     label="Download All as Zip"
                                     size="medium"
                                     component="a"
-                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip`}
+                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
                                     sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
                             </div>
                             <div style={{ margin: '5px' }}>
