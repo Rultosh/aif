@@ -36,7 +36,7 @@ export default function ListFiles(props: ListFilesProps) {
     {
       files.map((file) => {
         return <div>
-            <a href={file.url} onClick={(event) => {event.stopPropagation()}}>{file.name}</a>
+            <a href={`${file.url}?access_token=${localStorage.getItem('token')}`} onClick={(event) => {event.stopPropagation()}}>{file.name}</a>
             <div onClick={(event) => {event.stopPropagation(); deleteFile(file)}} 
               style={{display: "inline"}}>
                 <CloseIcon style={{fontSize: "20px", color: "red", fontWeight: "bold", verticalAlign: "bottom", marginLeft: "7px"}}/></div>
