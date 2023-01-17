@@ -6,6 +6,9 @@ import { ICompanyContactDetails } from "./ICompanyContactDetails";
 import uuid from "react-uuid";
 import { useAppDispatch } from "../../../../../app/hooks";
 import { useParams } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -44,6 +47,8 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
     } else {
       copiedValue[ev.target.name as keyof ICompanyContactDetails] = ev.target.value;
     }
+    
+    setValue(ev.target.id, ev.target.value);
     setCompanyContactDetails(copiedValue);
   };
 
@@ -75,6 +80,60 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
     handleClose();
   }
 
+  const validationSchema = Yup.object().shape({
+    nameOfCompany: Yup.string().required("Name Of Company is required"),
+    nameOfPromoter: Yup.string().required("Name Of Promoter is required"),
+    address: Yup.string().required("Address is required"),
+    telephoneNo: Yup.string().required("Telephone No is required"),
+    mobileNo: Yup.string().required("Mobile No is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
+      const PhoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change This Regex Based On Requirement
+      const IsValidPhone = PhoneRegex.test(value);
+      if (!IsValidPhone) {
+        return false;
+      }
+      return true;
+    }),
+    email: Yup.string().required("Email is required").test("test-name", "Enter a valid Email", function (value: any) {
+      const EmailRegex =
+        /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+      const IsValidEmail = EmailRegex.test(value);
+      if (!IsValidEmail) {
+        return false;
+      }
+      return true;
+    }),
+    alternateEmail: Yup.string().required("Alternate Email is required").test("test-name", "Enter a valid Email", function (value: any) {
+      const EmailRegex =
+        /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+      const IsValidEmail = EmailRegex.test(value);
+      if (!IsValidEmail) {
+        return false;
+      }
+      return true;
+    }),
+    yearOfInvestment: Yup.string().required("Year Of Investment is required")
+  });
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    setCompanyContactDetails(data);
+    // setInvestmentResponsibleAsLead({ ...teamMember, prelimApplicationId: Number(id) })
+    handleSubmitForm();
+  };
+
   return <Modal
     open={open}
     onClose={handleClose}
@@ -97,6 +156,8 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
                   required
                   id="nameOfCompany"
                   label="Name of company"
+                  {...register("nameOfCompany")}
+                  error={(errors.nameOfCompany && getValues("nameOfCompany") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.nameOfCompany}
                   variant="standard"
@@ -104,12 +165,17 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.nameOfCompany && getValues("nameOfCompany") == '') ? errors.nameOfCompany.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={2.5}>
                 <TextField
                   required
                   id="nameOfPromoter"
                   label="Name of promoter/CEO"
+                  {...register("nameOfPromoter")}
+                  error={(errors.nameOfPromoter && getValues("nameOfPromoter") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.nameOfPromoter}
@@ -118,12 +184,17 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.nameOfPromoter && getValues("nameOfPromoter") == '') ? errors.nameOfPromoter.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={3}>
                 <TextField
                   required
                   id="address"
                   label="Address"
+                  {...register("address")}
+                  error={(errors.address && getValues("address") == '') ? true : false}
                   value={investmentResponsibleAsLead.address}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
@@ -132,12 +203,17 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.address && getValues("address") == '') ? errors.address.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
                   required
                   id="telephoneNo"
                   label="Telephone No."
+                  {...register("telephoneNo")}
+                  error={(errors.telephoneNo && getValues("telephoneNo") == '') ? true : false}
                   value={investmentResponsibleAsLead.telephoneNo}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
@@ -146,6 +222,9 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.telephoneNo && getValues("telephoneNo") == '') ? errors.telephoneNo.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
@@ -153,6 +232,8 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
                   id="mobileNo"
                   value={investmentResponsibleAsLead.mobileNo}
                   label="Mobile No"
+                  {...register("mobileNo")}
+                  error={(errors.mobileNo) ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   variant="standard"
@@ -160,12 +241,17 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.mobileNo) ? errors.mobileNo.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
                   required
                   id="email"
                   label="Email"
+                  {...register("email")}
+                  error={(errors.email) ? true : false}
                   value={investmentResponsibleAsLead.email}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
@@ -174,12 +260,17 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.email) ? errors.email.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
                   required
                   id="alternateEmail"
                   label="Alternate Email"
+                  {...register("alternateEmail")}
+                  error={(errors.alternateEmail && getValues("alternateEmail") == '') ? true : false}
                   value={investmentResponsibleAsLead.alternateEmail}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
@@ -188,6 +279,9 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.alternateEmail && getValues("alternateEmail") == '') ? errors.alternateEmail.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
@@ -195,6 +289,8 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
                   type="number"
                   id="yearOfInvestment"
                   label="Year of investment"
+                  {...register("yearOfInvestment")}
+                  error={(errors.yearOfInvestment && getValues("yearOfInvestment") == '') ? true : false}
                   value={investmentResponsibleAsLead.yearOfInvestment}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
@@ -203,6 +299,9 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.yearOfInvestment && getValues("yearOfInvestment") == '') ? errors.yearOfInvestment.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 {/* <TextField
@@ -218,7 +317,7 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
                 /> */}
               </Grid>
               <Grid item xs={12} >
-                <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+                <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
                   Submit
                 </Button>
               </Grid>

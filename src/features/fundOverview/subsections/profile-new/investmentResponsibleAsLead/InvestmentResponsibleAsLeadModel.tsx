@@ -8,6 +8,9 @@ import { useAppDispatch } from "../../../../../app/hooks";
 import { useParams } from "react-router-dom";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -46,6 +49,8 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
     } else {
       copiedValue[ev.target.name as keyof IInvestmentResponsibleAsLead] = ev.target.value;
     }
+    
+    setValue(ev.target.name, ev.target.value);
     setInvestmentResponsibleAsLead(copiedValue);
   };
 
@@ -85,6 +90,33 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
     handleClose();
   }
 
+  const validationSchema = Yup.object().shape({
+    nameOfCompany: Yup.string().required("Name Of Company is required"),
+    amountInvested: Yup.string().required("Amount Invested is required"),
+    dateOfInvestment: Yup.string().required("Date of Investment is required").nullable(),
+    exitOrWriteOff: Yup.string().required("Exit Or Writeoff is required"),
+    dateofExitorWriteOff: Yup.string().required("Date of Exit Or Writeoff is required").nullable(),
+    comment: Yup.string().required("Comment is required")
+  });
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    setInvestmentResponsibleAsLead(data);
+    // setInvestmentResponsibleAsLead({ ...teamMember, prelimApplicationId: Number(id) })
+    handleSubmitForm();
+  };
+
   return <Modal
     open={open}
     onClose={handleClose}
@@ -107,6 +139,8 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
                   required
                   id="nameOfCompany"
                   label="Name of company"
+                  {...register("nameOfCompany")}
+                  error={(errors.nameOfCompany && getValues("nameOfCompany") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.nameOfCompany}
                   variant="standard"
@@ -114,6 +148,9 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.nameOfCompany && getValues("nameOfCompany") == '') ? errors.nameOfCompany.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={2.25}>
                 <TextField
@@ -121,6 +158,8 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
                   type="number"
                   id="amountInvested"
                   label="Amount invested"
+                  {...register("amountInvested")}
+                  error={(errors.amountInvested && getValues("amountInvested") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.amountInvested}
@@ -129,19 +168,37 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.amountInvested && getValues("amountInvested") == '') ? errors.amountInvested.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={2.25}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} >
                   <Stack spacing={3}>
-                    <DesktopDatePicker
-                      disableFuture={true}
-                      label="Date Of Investment"
-                      value={investmentResponsibleAsLead.dateOfInvestment || null}
-                      // minDate={Today.toString()}
-                      onChange={(newValue) => {
-                        setDateValue("dateOfInvestment", newValue);
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
+                    <Controller
+                      name="dateOfInvestment"
+                      control={control}
+                      defaultValue={null}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error, invalid }
+                      }) => (
+                        // console.log(invalid),
+                        (<DesktopDatePicker
+                          inputFormat='DD/MM/YYYY'
+                          disableFuture={true}
+                          label="Date Of Investment"
+                          value={investmentResponsibleAsLead.dateOfInvestment || null}
+                          // minDate={Today.toString()}
+                          onChange={(newValue) => {
+                            setValue('dateOfInvestment', newValue);
+                            setDateValue("dateOfInvestment", newValue);
+                          }}
+                          renderInput={(params) => <TextField
+                            helperText={(invalid && getValues("dateOfInvestment") == null) ? <Typography variant="caption" {...register('dateOfInvestment')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                        />
+                        )
+                      )}
                     />
                   </Stack>
                 </LocalizationProvider>
@@ -164,6 +221,8 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
                   type="number"
                   id="exitOrWriteOff"
                   label="Exit or writeoff"
+                  {...register("exitOrWriteOff")}
+                  error={(errors.exitOrWriteOff && getValues("exitOrWriteOff") == '') ? true : false}
                   value={investmentResponsibleAsLead.exitOrWriteOff}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
@@ -172,6 +231,9 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.exitOrWriteOff && getValues("exitOrWriteOff") == '') ? errors.exitOrWriteOff.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 {/*<TextField
@@ -188,15 +250,30 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
 />*/}
                 <LocalizationProvider dateAdapter={AdapterDayjs} >
                   <Stack spacing={3}>
-                    <DesktopDatePicker
-                      disableFuture={true}
-                      label="Date of exit or writeoff"
-                      value={investmentResponsibleAsLead.dateofExitorWriteOff || null}
-                      // minDate={Today.toString()}
-                      onChange={(newValue) => {
-                        setDateValue("dateofExitorWriteOff", newValue);
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
+                    <Controller
+                      name="dateofExitorWriteOff"
+                      control={control}
+                      defaultValue={null}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error, invalid }
+                      }) => (
+                        // console.log(invalid),
+                        (<DesktopDatePicker
+                          inputFormat='DD/MM/YYYY'
+                          disableFuture={true}
+                          label="Date of exit or writeoff"
+                          value={investmentResponsibleAsLead.dateofExitorWriteOff || null}
+                          // minDate={Today.toString()}
+                          onChange={(newValue) => {
+                            setValue('dateofExitorWriteOff', newValue);
+                            setDateValue("dateofExitorWriteOff", newValue);
+                          }}
+                          renderInput={(params) => <TextField
+                            helperText={(invalid && getValues("dateofExitorWriteOff") == null) ? <Typography variant="caption" {...register('dateofExitorWriteOff')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                        />
+                        )
+                      )}
                     />
                   </Stack>
                 </LocalizationProvider>
@@ -206,6 +283,8 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
                   required
                   id="comment"
                   label="Comment"
+                  {...register("comment")}
+                  error={(errors.Comment && getValues("comment") == '') ? true : false}
                   value={investmentResponsibleAsLead.comment}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
@@ -214,6 +293,9 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                  <>{(errors.comment && getValues("comment") == '') ? errors.comment.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 {/* <TextField
@@ -229,7 +311,7 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
                 /> */}
               </Grid>
               <Grid item xs={12} >
-                <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+                <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
                   Submit
                 </Button>
               </Grid>

@@ -23,12 +23,16 @@ import { wrapArgument } from "../../../lib/api-status/actionWrapper";
 import { createApplicationAsync } from "../../../../src/features/fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
 import { selectedDetailedApplications, detailedApplicationThunk } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
 import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const CarryDistribution = (props: any) => {
 
 
     const params = useParams()
     const parentId = Number(params.id)
+    const [featureOfFundId, setFeatureOfFundId] = useState(0)
     const [formData, setFormData] = useState(defaultICarryDistribution);
     const [actionId] = useState(uuid());
     const controller = new Controller(actionId, carryDistributionThunk);
@@ -70,6 +74,7 @@ export const CarryDistribution = (props: any) => {
             });
         }
     }, [state[parentId]?.data])
+
 
     useEffect(() => {
         if (parentId) {
@@ -257,6 +262,46 @@ export const CarryDistribution = (props: any) => {
         }
     }
 
+    const validationSchema = Yup.object().shape({
+        corpus: Yup.string().required("Corpus is required"),
+        hurdle: Yup.string().required("Hurdle is required"),
+        catchup: Yup.string().required("Catchup is required"),
+        carry: Yup.string().required("Carry is required"),
+        profit: Yup.string().required("Profit to investors is required"),
+        corpusAssumed: Yup.string().required("Distributable corpus assumed for illustration is required"),
+        capitalAmount: Yup.string().required("This value is required"),
+        capitalBalance: Yup.string().required("This value is required"),
+        hurdleAmount: Yup.string().required("This value is required"),
+        hurdleBalance: Yup.string().required("This value is required"),
+        catchupAmount: Yup.string().required("This value is required"),
+        catchupBalance: Yup.string().required("This value is required"),
+        profitAmount: Yup.string().required("This value is required"),
+        profitBalance: Yup.string().required("This value is required"),
+        carryAmount: Yup.string().required("This value is required"),
+        carryBalance: Yup.string().required("This value is required"),
+        profittoInvestorsAmount: Yup.string().required("This value is required"),
+        profittoInvestors: Yup.string().required("This value is required"),
+        distributionAmount: Yup.string().required("This value is required"),
+        distribution: Yup.string().required("This value is required"),
+        distributionofCarry: Yup.string().required("This value is required"),
+        carry1: Yup.string().required("This value is required"),
+        outOfRs1: Yup.string().required("This value is required"),
+        carry2: Yup.string().required("This value is required"),
+        outOfRs2: Yup.string().required("This value is required"),
+    });
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleClickSubmit(parentId);
+    };
 
     return (<>
 
@@ -278,13 +323,21 @@ export const CarryDistribution = (props: any) => {
                                         required
                                         id="corpus"
                                         label="Corpus[Rs. In crore]"
+                                        {...register("corpus")}
+                                        error={errors.corpus ? true : false}
                                         //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["corpus"] || ''}
+                                        // value={formData["corpus"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2 }}
+                                        sx={{ display: 'flex', ml: 2, mb: 2}}
                                     />
+                                    {errors.corpus ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.corpus?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
@@ -292,13 +345,21 @@ export const CarryDistribution = (props: any) => {
                                         type="number"
                                         id="hurdle"
                                         label="Hurdle"
+                                        {...register("hurdle")}
+                                        error={errors.hurdle ? true : false}
                                         //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["hurdle"] || ''}
+                                        // value={formData["hurdle"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2 }}
+                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
+                                    {errors.hurdle ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.hurdle?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                     {/*<FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Hurdle</InputLabel>
 
@@ -315,13 +376,21 @@ export const CarryDistribution = (props: any) => {
                                         type="number"
                                         id="catchup"
                                         label="Catchup(%)"
+                                        {...register("catchup")}
+                                        error={errors.catchup ? true : false}
                                         //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["catchup"] || ''}
+                                        // value={formData["catchup"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2 }}
+                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
+                                    {errors.catchup ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.catchup?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                     {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Catchup(%)</InputLabel>
@@ -338,13 +407,21 @@ export const CarryDistribution = (props: any) => {
                                         type="number"
                                         id="carry"
                                         label="Carry(%)"
+                                        {...register("carry")}
+                                        error={errors.carry ? true : false}
                                         //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["carry"] || ''}
+                                        // value={formData["carry"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2 }}
+                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
+                                    {errors.carry ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.carry?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                     {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Carry(%)</InputLabel>
@@ -362,13 +439,22 @@ export const CarryDistribution = (props: any) => {
                                         type="number"
                                         id="profit"
                                         label="Profit to investors(%)"
+                                        {...register("profit")}
+                                        error={errors.profit ? true : false}
                                         //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["profit"] || ''}
+                                        // value={formData["profit"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2 }}
-                                    />{/*}
+                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
+                                    />
+                                    {errors.profit ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.profit?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
+                                        {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, mt: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Profit to investors(%)</InputLabel>
 
@@ -385,14 +471,22 @@ export const CarryDistribution = (props: any) => {
                                         required
                                         type="number"
                                         id="corpusAssumed"
+                                        {...register("corpusAssumed")}
+                                        error={errors.corpusAssumed ? true : false}
                                         label="Distributable corpus assumed for illustration[Rs. Crore]"
                                         //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["corpusAssumed"] || ''}
+                                        // value={formData["corpusAssumed"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2 }}
+                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
+                                    {errors.corpusAssumed ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.corpusAssumed?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                     {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, mt: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Distributable corpus assumed for illustration[Rs. Crore]</InputLabel>
@@ -426,26 +520,42 @@ export const CarryDistribution = (props: any) => {
                                         required
                                         type="number"
                                         id="capitalAmount"
+                                        {...register("capitalAmount")}
+                                        error={errors.capitalAmount ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["capitalAmount"] || ''}
+                                        // value={formData["capitalAmount"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.capitalAmount ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.capitalAmount?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         required
                                         type="number"
                                         id="capitalBalance"
+                                        {...register("capitalBalance")}
+                                        error={errors.capitalBalance ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["capitalBalance"] || ''}
+                                        // value={formData["capitalBalance"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.capitalBalance ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.capitalBalance?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                             </Grid>
 
@@ -458,26 +568,42 @@ export const CarryDistribution = (props: any) => {
                                         required
                                         type="number"
                                         id="hurdleAmount"
+                                        {...register("hurdleAmount")}
+                                        error={errors.hurdleAmount ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["hurdleAmount"] || ''}
+                                        // value={formData["hurdleAmount"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.hurdleAmount ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.hurdleAmount?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         required
                                         type="number"
                                         id="hurdleBalance"
+                                        {...register("hurdleBalance")}
+                                        error={errors.hurdleBalance ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["hurdleBalance"] || ''}
+                                        // value={formData["hurdleBalance"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.hurdleBalance ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.hurdleBalance?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                             </Grid>
 
@@ -490,25 +616,41 @@ export const CarryDistribution = (props: any) => {
                                         required
                                         type="number"
                                         id="catchupAmount"
+                                        {...register("catchupAmount")}
+                                        error={errors.catchupAmount ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["catchupAmount"] || ''}
+                                        // value={formData["catchupAmount"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.catchupAmount ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.catchupAmount?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         required
                                         type="number"
                                         id="catchupBalance"
+                                        {...register("catchupBalance")}
+                                        error={errors.catchupBalance ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["catchupBalance"] || ''}
+                                        // value={formData["catchupBalance"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        // onChange={handleChange}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.catchupBalance ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.catchupBalance?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                             </Grid>
 
@@ -521,26 +663,42 @@ export const CarryDistribution = (props: any) => {
                                         required
                                         type="number"
                                         id="profitAmount"
+                                        {...register("profitAmount")}
+                                        error={errors.profitAmount ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["profitAmount"] || ''}
+                                        // value={formData["profitAmount"] || ''}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.profitAmount ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.profitAmount?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         required
                                         type="number"
                                         id="profitBalance"
+                                        {...register("profitBalance")}
+                                        error={errors.profitBalance ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["profitBalance"]}
+                                        // value={formData["profitBalance"]}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.profitBalance ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.profitBalance?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                             </Grid>
 
@@ -553,26 +711,42 @@ export const CarryDistribution = (props: any) => {
                                         required
                                         type="number"
                                         id="carryAmount"
+                                        {...register("carryAmount")}
+                                        error={errors.carryAmount ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["carryAmount"]}
+                                        // value={formData["carryAmount"]}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.carryAmount ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.carryAmount?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         required
                                         type="number"
                                         id="carryBalance"
+                                        {...register("carryBalance")}
+                                        error={errors.carryBalance ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["carryBalance"]}
+                                        // value={formData["carryBalance"]}
                                         variant="standard"
-                                        onChange={handleChange}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.carryBalance ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.carryBalance?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                             </Grid>
 
@@ -597,27 +771,43 @@ export const CarryDistribution = (props: any) => {
                                     <TextField
                                         required
                                         type="number"
-                                        id="captionDetails"
+                                        id="profittoInvestorsAmount"
+                                        {...register("profittoInvestorsAmount")}
+                                        error={errors.profittoInvestorsAmount ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={Number(formData.hurdleAmount || 0) + Number(formData.profitAmount || 0)}
+                                        // value={Number(formData.hurdleAmount || 0) + Number(formData.profitAmount || 0)}
                                         variant="standard"
                                         // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.profittoInvestorsAmount ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.profittoInvestorsAmount?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         required
                                         type="number"
-                                        id="captionDetails"
+                                        id="profittoInvestors"
+                                        {...register("profittoInvestors")}
+                                        error={errors.profittoInvestors ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={Number(formData.hurdleBalance || 0) + Number(formData.profitBalance || 0)}
+                                        //value={formData["fundLaunchedDate"]}
                                         variant="standard"
                                         // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.profittoInvestors ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.profittoInvestors?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                             </Grid>
 
@@ -629,33 +819,50 @@ export const CarryDistribution = (props: any) => {
                                     <TextField
                                         required
                                         type="number"
-                                        id="captionDetails"
+                                        id="distributionAmount"
+                                        {...register("distributionAmount")}
+                                        error={errors.distributionAmount ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={Number(formData.catchupAmount || 0) + Number(formData.carryAmount || 0)}
+                                        // value={Number(formData.catchupAmount || 0) + Number(formData.carryAmount || 0)}
                                         variant="standard"
                                         // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.distributionAmount ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.distributionAmount?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         required
                                         type="number"
-                                        id="captionDetails"
+                                        id="distribution"
+                                        {...register("distribution")}
+                                        error={errors.distribution ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={Number(formData.catchupBalance || 0) + Number(formData.carryBalance || 0)}
+                                        //value={formData["fundLaunchedDate"]}
                                         variant="standard"
                                         // onChange={handleChange}
 
-                                        sx={{ display: 'flex', mt: 2 }}
+                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
                                     />
+                                    {errors.distribution ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.distribution?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                             </Grid>
 
                             <Grid container spacing={6} >
                                 <Grid item xs={6}></Grid>
                                 <Grid item xs={3}>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Total</Typography>
                                     <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + getDisAmount()}</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
@@ -684,44 +891,68 @@ export const CarryDistribution = (props: any) => {
                                 <Grid item xs={6}>
                                     <TextField
                                         required
-                                        id="distribution"
+                                        id="distributionofCarry"
                                         label="8."
+                                        {...register("distributionofCarry")}
+                                        error={errors.distributionofCarry ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formDataDetails["distribution"] || ''}
+                                        //value={formData["fundLaunchedDate"]}
                                         variant="standard"
-                                        onChange={handleChangeCarryDetails}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2 }}
+                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
+                                    {errors.distributionofCarry ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.distributionofCarry?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
                                 <Grid item xs={2.5}>
                                     <TextField
                                         required
                                         type="number"
-                                        id="percent"
+                                        id="carry1"
                                         label="%"
+                                        {...register("carry1")}
+                                        error={errors.carry1 ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formDataDetails["percent"] || ''}
+                                        //value={formData["fundLaunchedDate"]}
                                         variant="standard"
-                                        onChange={handleChangeCarryDetails}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex' }}
+                                        sx={{ display: 'flex', mb: 2 }}
                                     />
+                                    {errors.carry1 ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.carry1?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
 
                                 <Grid item xs={2.5}>
                                     <TextField
                                         required
                                         type="number"
-                                        id="carryOutOfCrore"
-                                        label=""
+                                        id="outOfRs1"
+                                        label="%"
+                                        {...register("outOfRs")}
+                                        error={errors.outOfRs1 ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formDataDetails["carryOutOfCrore"] || ''}
+                                        //value={formData["fundLaunchedDate"]}
                                         variant="standard"
-                                        onChange={handleChangeCarryDetails}
+                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex' }}
+                                        sx={{ display: 'flex', mb: 2 }}
                                     />
+                                    {errors.outOfRs1 ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.outOfRs1?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
 
                             </Grid> */}
@@ -732,30 +963,46 @@ export const CarryDistribution = (props: any) => {
                                     <TextField
                                         required
                                         type="number"
-                                        id="captionDetails"
+                                        id="carry2"
                                         label="%"
+                                        {...register("carry2")}
+                                        error={errors.carry2 ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                         //value={formData["fundLaunchedDate"]}
                                         variant="standard"
                                         // onChange={handleChange}
 
-                                        sx={{ display: 'flex' }}
+                                        sx={{ display: 'flex', mb: 2 }}
                                     />
+                                    {errors.carry2 ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.carry2?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
 
                                 <Grid item xs={2.5}>
                                     <TextField
                                         required
                                         type="number"
-                                        id="captionDetails"
+                                        id="outOfRs2"
                                         label="%"
+                                        {...register("outOfRs2")}
+                                        error={errors.outOfRs2 ? true : false}
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                         //value={formData["fundLaunchedDate"]}
                                         variant="standard"
                                         // onChange={handleChange}
 
-                                        sx={{ display: 'flex' }}
+                                        sx={{ display: 'flex', mb: 2 }}
                                     />
+                                    {errors.outOfRs2 ?
+                                        <div  style={{ marginTop: '-10px' }}>
+                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                <>{errors.outOfRs2?.message}</>
+                                            </Typography>
+                                        </div> : <></>}
                                 </Grid>
 
                             </Grid>
@@ -779,10 +1026,10 @@ export const CarryDistribution = (props: any) => {
 
                                             </Grid>
                                             <Grid item xs={3}>
-                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Download unsigned document</Typography>
+                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Download unsigned document</Typography>
                                             </Grid>
                                             <Grid item xs={3}>
-                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Upload signed document</Typography>
+                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Upload signed document</Typography>
                                             </Grid>
                                         </Grid>
                                     </Toolbar>
@@ -873,7 +1120,7 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Divider sx={{ mt: 2 }} />
 
-
+                                    
                                 </CardContent>
                             </Card>
                         </CardContent>
@@ -914,9 +1161,22 @@ export const CarryDistribution = (props: any) => {
 
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
+                                <Button
+                                    type="submit"
+                                    onClick={handleSubmit(onSubmit)}
+                                    // onClick={(e) => handleClick(e, "submit")}
+                                    //endIcon={<ArrowRightIcon />}
+                                    color='success'
+                                    variant="contained"
+                                    disableElevation
+                                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
+                                    Submit
+                                </Button>
                                 {!(prilimFormData.status == 'SUBMITTED') ? <Button
                                     //onClick={(e) => handleClickSave(e, "submit")}
-                                    onClick={handleClickSubmit}
+                                    // onClick={handleClickSubmit}
+                                    type="submit"
+                                    onClick={handleSubmit(onSubmit)}
                                     //endIcon={<ArrowRightIcon />}
                                     id = 'submit'
                                     color='success'

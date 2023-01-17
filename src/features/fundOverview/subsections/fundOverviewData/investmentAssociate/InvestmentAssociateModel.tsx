@@ -5,6 +5,9 @@ import { useAppDispatch } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultInvestmentAssociate, IInvestmentAssociate } from "./IInvestmentAssociate";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 interface InvestmentAssociateModelProps {
   investmentAssociateFormData: IInvestmentAssociate,
@@ -61,6 +64,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
     console.log(copiedValue, props.prelimApplicationId)
 
+    setValue(ev.target.name, ev.target.value);
     setInvestmentAssociateFormData(copiedValue)
   };
 
@@ -76,6 +80,30 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     p: 4,
   };
 
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    designation: Yup.string().required("Designation is required"),
+    age: Yup.string().required("Age is required"),
+    qualification: Yup.string().required("Qualification is required"),
+    investmentExperience: Yup.string().required("Investment Experience is required"),
+    description: Yup.string().required("Description is required")
+  });
+
+  const {
+    setValue,
+    getValues,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    setInvestmentAssociateFormData(data);
+    handleSubmitForm();
+  };
 
   return <Modal
     open={props.open}
@@ -91,7 +119,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
             <Grid container spacing={2} >
               <Grid item xs={9}>
                 <Box sx={{ display: 'inline-flex' }}>
-                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details of Investment Team</Typography>
+                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details of Investment Team (At Associate Level)</Typography>
                 </Box>
               </Grid>
               <Grid item xs={4.5}>
@@ -99,26 +127,36 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   required
                   id="name"
                   label="Name"
+                  {...register("name")}
+                  error={(errors.name && getValues("name") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentAssociateFormData.name}
+                  // value={investmentAssociateFormData.name}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={3.5}>
                 <TextField
                   required
                   id="designation"
                   label="Designation"
+                  {...register("designation")}
+                  error={(errors.designation && getValues("designation") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentAssociateFormData.designation}
+                  // value={investmentAssociateFormData.designation}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.designation && getValues("designation") == '')?errors.designation.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={1}>
                 <TextField
@@ -126,6 +164,8 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   type="number"
                   id="age"
                   label="Age"
+                  {...register("age")}
+                  error={(errors.age && getValues("age") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.age}
                   variant="standard"
@@ -133,12 +173,17 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.age && getValues("age") == '')?errors.age.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
                   required
                   id="qualification"
-                  label="Qalification"
+                  label="Qualification"
+                  {...register("qualification")}
+                  error={(errors.qualification && getValues("qualification") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.qualification}
                   variant="standard"
@@ -147,16 +192,23 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.qualification && getValues("qualification") == '')?errors.qualification.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
-                <FormControl variant="standard" sx={{display: 'flex' }}>
+                <FormControl variant="standard" sx={{ display: 'flex' }}>
                   <InputLabel id="demo-simple-select-standard-label">Investment Experience</InputLabel>
                   <Select
                     labelId="investmentExperience"
                     id="investmentExperience"
-                    value={String(investmentAssociateFormData.investmentExperience)}
+                    {...register("investmentExperience")}
+                    error={(errors.investmentExperience && getValues("investmentExperience") == '') ? true : false}
+                    // value={String(investmentAssociateFormData.investmentExperience)}
                     onChange={handleChange}
+                    // onChange={(ev: any) => setValue('investmentExperience', ev.target.value)}
                     name="investmentExperience"
+                    // defaultValue={investmentAssociateFormData["investmentExperience"] === undefined ? " " : investmentAssociateFormData["investmentExperience"]}
                   >
 
                     <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>
@@ -177,12 +229,17 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
                   sx={{ display: 'flex' }}
 />*/}
+                <Typography variant="caption" color="error">
+                  <>{(errors.investmentExperience && getValues("investmentExperience") == '')? errors.investmentExperience.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
                   required
                   id="description"
                   label="Brief details of VC/PE Experience"
+                  {...register("description")}
+                  error={(errors.description && getValues("description") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.description}
                   variant="standard"
@@ -190,9 +247,12 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.description && getValues("description") == '')?errors.description.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={12} >
-                <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+                <Button type="submit" color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} onClick={handleSubmit(onSubmit)} >
                   Submit
                 </Button>
               </Grid>

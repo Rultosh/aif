@@ -15,9 +15,9 @@ import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import DocumentChip from "../../../../components/DocumentChip";
 import client from '../../../../app/api'
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-//import { useForm } from "react-hook-form";
-//import { yupResolver } from "@hookform/resolvers/yup";
-//import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const Preview = () => {
 
@@ -47,6 +47,7 @@ export const Preview = () => {
     const handleChange = (ev: any) => {
         ev.preventDefault();
         console.log('handle change', ev, ev.target.id, ev.target.value);
+        setValue(ev.target.id, ev.target.value);
         setCommentPreview(ev.target.value)
     };
 
@@ -70,8 +71,6 @@ export const Preview = () => {
         //setStatusPrelims(prelimApplicationState.prelimApplication.status)
     }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
 
-    
-
     function handleClickSave(ev: any) {
         console.log("prelimId", Number(id))
         dispatch(
@@ -84,7 +83,27 @@ export const Preview = () => {
         navigate('/home')
     }
 
-    console.log(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`);
+    const validationSchema = Yup.object().shape({
+        previewComments: Yup.string().required("Comment is required")
+    });
+
+    const {
+        control,
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        formState: { errors },
+    } = useForm({
+    resolver: yupResolver(validationSchema),
+    });
+
+    const onSubmit = (data: any, e: any) => {
+        console.log(data);
+        setCommentPreview(data);
+        // setInvestmentResponsibleAsLead({ ...teamMember, prelimApplicationId: Number(id) })
+        handleClickSave(e);
+    };
 
     return (
         <Card sx={{ display: 'flex', mb: 2 }}>
@@ -170,8 +189,8 @@ export const Preview = () => {
                             required
                             id="previewComments"
                             label="Leave a comment"
-                            //{...register("previewComments")}
-                            //error={errors.previewComments ? true : false}
+                            {...register("previewComments")}
+                            error={(errors.previewComments && getValues("previewComments") == '') ? true : false}
                             //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                             //value={formData["commitmentReceived"] || ''}
                             variant="standard"
@@ -179,6 +198,9 @@ export const Preview = () => {
 
                             sx={{ display: 'flex', }}
                         />
+                        <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                          <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
+                        </Typography>
 
 
                     </CardContent>
@@ -189,7 +211,7 @@ export const Preview = () => {
                     Declaration
                 </Button>
 
-                {!(statusPrelims == 'SUBMITTED') ? <Button color='success' id='submit' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                {!(statusPrelims == 'SUBMITTED') ? <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Submit
                 </Button> : <>
                     <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >

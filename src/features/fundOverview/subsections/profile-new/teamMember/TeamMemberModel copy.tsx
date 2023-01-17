@@ -104,7 +104,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
     location: Yup.string().required("Location is required"),
     yearsOfRelevantExp: Yup.string().required("Years Of Relevant Experience is required").nullable(),
     prevProfessionalExp: Yup.string().required("Previous Professional Experience is required"),
-    education: Yup.string().required("Education is required"),
+    Education: Yup.string().required("Education is required"),
     keyPerson: Yup.string().required("Key Person is required").nullable(),
     directorship: Yup.string().required("Directorship Held is required").nullable()
   });

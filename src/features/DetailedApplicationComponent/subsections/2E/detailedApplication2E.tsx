@@ -17,7 +17,9 @@ import UploadComponents from '../uploadComponents'
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileUpload from "../../../../components/FileUpload";
 import SaveIcon from '@mui/icons-material/Save';
-
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const DetailedApplication2E = (props: any) => {
 
@@ -83,6 +85,24 @@ export const DetailedApplication2E = (props: any) => {
         }
     }
 
+    const validationSchema = Yup.object().shape({
+        listOfExternalFirms: Yup.string().required("List Of External Firms is required"),
+        monitoringPractices: Yup.string().required("Monitoring Practices is required"),
+        imValueAdd: Yup.string().required("Please describe how the investment manager(s) add value / propose to add value to the investments is required")
+    });
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleSave();
+    };
 
     return (<>
         <SideNavBar></SideNavBar>
@@ -100,7 +120,8 @@ export const DetailedApplication2E = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                onClick={handleSave}
+                                type="submit"
+                                onClick={handleSubmit(onSubmit)}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -122,13 +143,21 @@ export const DetailedApplication2E = (props: any) => {
                                 required
                                 id="listOfExternalFirms"
                                 //label="26. List of external firms (legal, technical, financial / accounting etc.) who are assisting / would be assisting the Investment Manager in the due diligence process."
+                                {...register("listOfExternalFirms")}
+                                error={errors.listOfExternalFirms ? true : false}
                                 //defaultValue={formDatalistOfExternalFirms === undefined ? " " : formData["listOfExternalFirms"]}
-                                value={formData["listOfExternalFirms"] || ''}
+                               // value={formData["listOfExternalFirms"] || ''}
                                 variant="standard"
-                                onChange={handleChange}
+                                // onChange={handleChange}
 
-                                sx={{ display: 'flex', ml: 2, mb: -3 }}
+                                sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.listOfExternalFirms ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.listOfExternalFirms?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -140,13 +169,21 @@ export const DetailedApplication2E = (props: any) => {
                                 required
                                 id="monitoringPractices"
                                 //label="27. List the activities involved in monitoring and follow-up of investments? How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same."
+                                {...register("monitoringPractices")}
+                                error={errors.monitoringPractices ? true : false}
                                 //defaultValue={formDatamonitoringPractices === undefined ? " " : formData["monitoringPractices"]}
-                                value={formData["monitoringPractices"] || ''}
+                               // value={formData["monitoringPractices"] || ''}
                                 variant="standard"
-                                onChange={handleChange}
+                                // onChange={handleChange}
 
-                                sx={{ display: 'flex', ml: 2, mb: -3 }}
+                                sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.monitoringPractices ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.monitoringPractices?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -157,13 +194,21 @@ export const DetailedApplication2E = (props: any) => {
                                 required
                                 id="imValueAdd"
                                 label="28. Please describe how the investment manager(s) add value / propose to add value to the investments."
+                                {...register("imValueAdd")}
+                                error={errors.imValueAdd ? true : false}
                                 //defaultValue={formDataimValueAdd === undefined ? " " : formData["imValueAdd"]}
-                                value={formData["imValueAdd"] || ''}
+                               // value={formData["imValueAdd"] || ''}
                                 variant="standard"
-                                onChange={handleChange}
+                                // onChange={handleChange}
 
-                                sx={{ display: 'flex', ml: 2, mb: -3 }}
+                                sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.imValueAdd ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.imValueAdd?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -172,7 +217,7 @@ export const DetailedApplication2E = (props: any) => {
                             <Grid container>
                                 <Grid item xs={9}>
                                 <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >29. What are the risks in the investments planned for this fund and what are the risk mitigation efforts?</Typography>
-                                   {/*} <InputLabel variant="standard" sx={{ml:2}}>29. What are the risks in the investments planned for this fund and what are the risk mitigation efforts?
+                                    {/*} <InputLabel variant="standard" sx={{ml:2}}>29. What are the risks in the investments planned for this fund and what are the risk mitigation efforts?
                                         <FileUploadIcon onClick={handleOnClickUpload} >
                                         </FileUploadIcon>
                                         <FileUpload
@@ -181,7 +226,7 @@ export const DetailedApplication2E = (props: any) => {
                                                 props.onSuccess(props.id, url);
                                             }}
                                             open={open} setOpen={setOpen}></FileUpload>
-                                        </InputLabel>*/}
+                                    </InputLabel>*/}
                                 </Grid>
                             </Grid>
                             <Grid item xs={3}>
