@@ -17,9 +17,6 @@ import UploadComponents from "../uploadComponents";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileUpload from "../../../../components/FileUpload";
 import SaveIcon from '@mui/icons-material/Save';
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 
 export const DetailedApplication2F = (props: any) => {
 
@@ -84,24 +81,6 @@ export const DetailedApplication2F = (props: any) => {
         }
     }
 
-    const validationSchema = Yup.object().shape({
-        reportingStructure: Yup.string().required("Comments is required"),
-        freqOfMeeting: Yup.string().required("Frequency of meetings is required")
-    });
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-    });
-
-    const onSubmit = (data: any) => {
-        setFormData(data);
-        handleSave();
-    };
-
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -118,8 +97,7 @@ export const DetailedApplication2F = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                type="submit"
-                                onClick={handleSubmit(onSubmit)}
+                                onClick={handleSave}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -145,8 +123,6 @@ export const DetailedApplication2F = (props: any) => {
                                 required
                                 id="reportingStructure"
                                 label=""
-                                {...register("reportingStructure")}
-                                error={errors.reportingStructure ? true : false}
                                 //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
                                 value={formData["reportingStructure"] || ''}
                                 variant="standard"
@@ -154,12 +130,6 @@ export const DetailedApplication2F = (props: any) => {
                                 placeholder="Please enter comments"
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.reportingStructure ?
-                                <div  style={{ marginTop: '-10px' }}>
-                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                        <>{errors.reportingStructure?.message}</>
-                                    </Typography>
-                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -180,8 +150,6 @@ export const DetailedApplication2F = (props: any) => {
                                 required
                                 id="freqOfMeeting"
                                 label="31. Frequency of meetings to update the contributor. "
-                                {...register("freqOfMeeting")}
-                                error={errors.freqOfMeeting ? true : false}
                                 //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
                                 value={formData["freqOfMeeting"] || ''}
                                 variant="standard"
@@ -189,12 +157,6 @@ export const DetailedApplication2F = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.freqOfMeeting ?
-                                <div  style={{ marginTop: '-10px' }}>
-                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                        <>{errors.freqOfMeeting?.message}</>
-                                    </Typography>
-                                </div> : <></>}
                         </CardContent>
                     </Card>
 

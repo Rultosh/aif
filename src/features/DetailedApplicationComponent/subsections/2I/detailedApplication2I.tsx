@@ -14,9 +14,6 @@ import { Controller } from "../../../../lib/api-wrappers/Controller";
 import { defaultIDetailedApplication2I, IDetailedApplication2I } from "./IDetailedApplication2I";
 import { detailedApplication2IThunk, selectDetailedApplication2I } from "./detailedApplication2ISlice";
 import SaveIcon from '@mui/icons-material/Save';
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 
 export const DetailedApplication2I = (props: any) => {
  
@@ -90,23 +87,6 @@ export const DetailedApplication2I = (props: any) => {
         }
     }
 
-    const validationSchema = Yup.object().shape({
-        sebiCompliance: Yup.string().required("Compliance is required")
-    });
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-    });
-
-    const onSubmit = (data: any) => {
-        setFormData(data);
-        handleSave();
-    };
-
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -123,8 +103,7 @@ export const DetailedApplication2I = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                type="submit"
-                                onClick={handleSubmit(onSubmit)}
+                                onClick={handleSave}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -218,12 +197,10 @@ export const DetailedApplication2I = (props: any) => {
                                     required
                                     id="sebiCompliance"
                                     label='If No, reasons therefore'
-                                    {...register("sebiCompliance")}
-                                    error={errors.sebiCompliance ? true : false}
                                     // defaultValue={formData.reason === undefined ? " " : formData["reason"]}
-                                    //value={formData["sebiCompliance"] || ''}
+                                    value={formData["sebiCompliance"] || ''}
                                     variant="standard"
-                                    //onChange={handleChange}
+                                    onChange={handleChange}
                                     sx={{ display: 'flex', ml: 2, mb: 2 }}
                                 /> :
                                 <Grid item xs={3}>
@@ -232,12 +209,6 @@ export const DetailedApplication2I = (props: any) => {
                                         <UploadComponents id={`sebiComplianceCertificate${parentId}`}></UploadComponents>
                                     </div>
                                 </Grid>}
-                            {errors.sebiCompliance ?
-                                <div  style={{ marginTop: '-10px' }}>
-                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                        <>{errors.sebiCompliance?.message}</>
-                                    </Typography>
-                                </div> : <></>}
                         </CardContent></Card>
                     <Divider sx={{ mt: 2 }} />
 

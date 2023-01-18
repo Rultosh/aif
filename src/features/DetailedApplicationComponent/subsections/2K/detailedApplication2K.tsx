@@ -16,9 +16,6 @@ import { Controller } from "../../../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from '../../../detailedApplication/sidbiReference/detailedApplicationSlice';
 import { defaultIDetailedApplication } from "../../../detailedApplication/sidbiReference/IDetailedApplication";
 import SaveIcon from '@mui/icons-material/Save';
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 
 export const DetailedApplication2K = (props: any) => {
 
@@ -90,23 +87,6 @@ export const DetailedApplication2K = (props: any) => {
         controller.save(formData);
     }
 
-    const validationSchema = Yup.object().shape({
-        declarationCheckbox: Yup.string().required("This value is required")
-    });
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-    });
-
-    const onSubmit = (data: any) => {
-        setFormData(data);
-        handleSave();
-    };
-
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -124,8 +104,7 @@ export const DetailedApplication2K = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                type="submit"
-                                onClick={() => {setSubmitForm(true); handleSubmit(onSubmit);}}
+                                onClick={handleSave}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -155,7 +134,7 @@ export const DetailedApplication2K = (props: any) => {
                                 {/*<FormControlLabel sx={{ mt: 2 }} control={<Checkbox checked={agreed} onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} /> */}
                                 {/*state[0]?.status[actionId].actionStatus.fetchStatus == 'idle' ? <FormControlLabel sx={{ mt: 2 }} name="declarationAccepted" value={!agreed} control={<Checkbox defaultChecked={true}  onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} /> : null}*/}
                                 {/*<FormControlLabel sx={{ mt: 2 }} name="declarationAccepted" value={!agreed} control={<Checkbox defaultChecked={true}  onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} />*/}
-                                <FormControlLabel sx={{ mt: 2 }} control={<Checkbox required id="declarationCheckbox" {...register("declarationCheckbox")} checked={agreed} onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I / We (Partner/Directors) hereby declare that</Typography>} />
+                                <FormControlLabel sx={{mt:2}} control={<Checkbox  checked={agreed}  onChange={handleChange}/>} label= {<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I / We (Partner/Directors) hereby declare that</Typography>} />
 
                             </FormGroup>
                             {agreed == false && submitForm == true ?

@@ -10,9 +10,6 @@ import { useNavigate } from "react-router-dom";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import { updateStepperIndex}from '../../DetailedApplicationComponent/subsections/sideNavBarSlice'
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 
 export const SidbiReference = () => {
   const { id } = useParams()
@@ -59,23 +56,6 @@ export const SidbiReference = () => {
     if (!Number(id) && state[0]) navigate(`/detailed/${state[0].createdId}/detailed2A`)
     else navigate(`/detailed/${id}/detailed2A`)
   }
-
-  const validationSchema = Yup.object().shape({
-    sidbiRefeferenceNumber: Yup.string().required("Reference Number is required")
-  });
-
-  const {
-      register,
-      handleSubmit,
-      formState: { errors },
-  } = useForm({
-      resolver: yupResolver(validationSchema),
-  });
-
-  const onSubmit = (data: any) => {
-    setFormData(data);
-    handleSave();
-  };
 
   return <>
     {controller.isActionError(0, state) ?

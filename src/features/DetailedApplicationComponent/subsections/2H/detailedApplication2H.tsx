@@ -15,9 +15,6 @@ import { Controller } from "../../../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from '../../../detailedApplication/sidbiReference/detailedApplicationSlice';
 import { defaultIDetailedApplication } from "../../../detailedApplication/sidbiReference/IDetailedApplication";
 import SaveIcon from '@mui/icons-material/Save';
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 
 export const DetailedApplication2H = (props:any) => {
 
@@ -80,23 +77,6 @@ export const DetailedApplication2H = (props:any) => {
     let listItem = ["a. Name of the fund(s), features of the fund like industry / sector / investment stage / geographic focus etc. (as may be applicable),", "b. total corpus, total amount invested, total number of investments, average investment size,", "c. total amount distributed to the contributors,", "d. undrawn capital (if any, with reasons thereof),", "e. IRR of the kind (full exits, partial exits, entire fund, in the hands of the contributors),", "f. Please furnish the list of investee companies along with their status (current valuation / exit value) of those fund(s)."]
     let subListItem = [":- Company & amount invested holding & valuation (pre-money and post-money)", ":- Key reasons for the investment & basis for investment valuation", ":- What was / is the value add made by the Investment Manager", ":- Strategy for exit (if not exited);", ":- If not exited (as on date), then valuation as on recent date along with valuation report", ":- If exited, then exit amount, IRR on exit, method of exit."]
 
-    const validationSchema = Yup.object().shape({
-        disputes: Yup.string().required("Disputes is required")
-    });
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-    });
-
-    const onSubmit = (data: any) => {
-        setFormData(data);
-        handleSave();
-    };
-
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -113,8 +93,7 @@ export const DetailedApplication2H = (props:any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                type="submit"
-                                onClick={handleSubmit(onSubmit)}
+                                onClick={handleSave}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -176,21 +155,13 @@ export const DetailedApplication2H = (props:any) => {
                                 required
                                 id="disputes"
                                 label=""
-                                {...register("disputes")}
-                                error={errors.disputes ? true : false}
                                 //defaultValue={formData.monitoringPractices === undefined ? " " : formData["monitoringPractices"]}
-                                // value={formData["disputes"] || ''}
+                                value={formData["disputes"] || ''}
                                 variant="standard"
-                                // onChange={handleChange}
+                                onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.disputes ?
-                                <div  style={{ marginTop: '-10px' }}>
-                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                        <>{errors.disputes?.message}</>
-                                    </Typography>
-                                </div> : <></>}
                         </CardContent>
                     </Card>
 

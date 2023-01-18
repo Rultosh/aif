@@ -18,9 +18,6 @@ import { Delete, Edit, SettingsPowerRounded } from '@mui/icons-material';
 import { InvestmentPartnerRow } from "./InvestmentPartnerRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { AsyncThunkAction } from "@reduxjs/toolkit";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 
 interface InvestmentPartnerModelProps {
   investmentPartnerFormData: IInvestmentPartner,
@@ -74,7 +71,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       copiedValue[ev.target.name as keyof IInvestmentPartner] = ev.target.value;
     }
     console.log(copiedValue, props.prelimApplicationId)
-    setValue(ev.target.name, ev.target.value);
     setInvestmentPartnerFormData(copiedValue)
   };
 
@@ -88,31 +84,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
-  };
-
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
-    designation: Yup.string().required("Designation is required"),
-    age: Yup.string().required("Age is required"),
-    qualification: Yup.string().required("Qualification is required"),
-    description: Yup.string().required("Brief details of VC/PE Experience is required"),
-    vcpeExperience: Yup.string().required("VC/PE Experience is required")
-  });
-
-  const {
-    setValue,
-    getValues,
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(validationSchema),
-  });
-
-  const onSubmit = (data: any) => {
-    console.log(data);
-    setInvestmentPartnerFormData(data);
-    handleSubmitForm();
   };
 
   return <Modal
@@ -137,8 +108,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   required
                   id="name"
                   label="Name"
-                  {...register("name")}
-                  error={(errors.name && getValues("name") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.name}
                   variant="standard"
@@ -146,17 +115,12 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
                   sx={{ display: 'flex' }}
                 />
-                <Typography variant="caption" color="error">
-                  <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
-                </Typography>
               </Grid>
               <Grid item xs={3.5}>
                 <TextField
                   required
                   id="designation"
                   label="Designation"
-                  {...register("designation")}
-                  error={(errors.designation && getValues("designation") == '')? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.designation}
                   variant="standard"
@@ -164,9 +128,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
                   sx={{ display: 'flex' }}
                 />
-                <Typography variant="caption" color="error">
-                  <>{(errors.designation && getValues("designation") == '')?errors.designation.message : ''}</>
-                </Typography>
               </Grid>
               <Grid item xs={1}>
                 <TextField
@@ -174,8 +135,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   type="number"
                   id="age"
                   label="Age"
-                  {...register("age")}
-                  error={(errors.age && getValues("age") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.age}
                   variant="standard"
@@ -183,17 +142,12 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
                   sx={{ display: 'flex' }}
                 />
-                <Typography variant="caption" color="error">
-                  <>{(errors.age && getValues("age") == '')?errors.age.message : ''}</>
-                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
                   required
                   id="qualification"
                   label="Qualification"
-                  {...register("qualification")}
-                  error={(errors.qualification && getValues("qualification") =='') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.qualification}
                   variant="standard"
@@ -201,9 +155,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
                   sx={{ display: 'flex' }}
                 />
-                <Typography variant="caption" color="error">
-                  <>{(errors.qualification && getValues("qualification") == '')?errors.qualification.message : ''}</>
-                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{  display: 'flex' }}>
@@ -212,8 +163,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   required
                     labelId="vcpeExperience"
                     id="vcpeExperience"
-                    {...register("vcpeExperience")}
-                    error={(errors.vcpeExperience && getValues("vcpeExperience") =='') ? true : false}
                     // value={String(investmentPartnerFormData.vcpeExperience)}
                     onChange={handleChange}
                     name="vcpeExperience"
@@ -226,9 +175,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     <MenuItem key={"15+ years"} value="15+ years" selected={String(investmentPartnerFormData.vcpeExperience) == "15+ years"}>15+ years</MenuItem>
                   </Select>
                 </FormControl>
-                <Typography variant="caption" color="error">
-                  <>{(errors.vcpeExperience && getValues("vcpeExperience") == '')?errors.vcpeExperience.message : ''}</>
-                </Typography>
 
                 {/*<TextField
                   required
@@ -248,8 +194,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   required
                   id="description"
                   label="Brief details of VC/PE Experience"
-                  {...register("description")}
-                  error={(errors.description && getValues("description") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.description}
                   variant="standard"
@@ -257,12 +201,9 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
                   sx={{ display: 'flex' }}
                 />
-                <Typography variant="caption" color="error">
-                  <>{(errors.description && getValues("description") == '')?errors.description.message : ''}</>
-                </Typography>
               </Grid>
               <Grid item xs={12} >
-                <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+                <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
                   Submit
                 </Button>
               </Grid>

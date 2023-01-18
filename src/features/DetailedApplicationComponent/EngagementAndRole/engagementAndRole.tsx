@@ -16,9 +16,6 @@ import { Controller } from "../../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
 import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
 import { updateStepperIndex } from '../subsections/sideNavBarSlice';
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 
 export const EngagementAndRole = (props: any) => {
     const { id } = useParams()
@@ -85,23 +82,6 @@ export const EngagementAndRole = (props: any) => {
         setEngagementAndRoleRefreshId(uuid());
     }
 
-    const validationSchema = Yup.object().shape({
-        imRoleAndEngagement: Yup.string().required("This value is required")
-    });
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-    });
-
-    const onSubmit = (data: any) => {
-        setFormData(data);
-        handleClick('', "next");
-    };
-
     return (<>
 
         <Grid item xs={12}>
@@ -119,21 +99,13 @@ export const EngagementAndRole = (props: any) => {
                                 required
                                 id="imRoleAndEngagement"
                                 label="Please provide details as per caption"
-                                {...register("imRoleAndEngagement")}
-                                error={errors.imRoleAndEngagement ? true : false}
                                 //defaultValue={formData.imRoleAndEngagement === undefined ? " " : formData["fundLaunchedDate"]}
-                                // value={formData["imRoleAndEngagement"] || ''}
+                                value={formData["imRoleAndEngagement"] || ''}
                                 variant="standard"
-                                // onChange={handleChange}
+                                onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.imRoleAndEngagement ?
-                                <div  style={{ marginTop: '-10px' }}>
-                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                        <>{errors.imRoleAndEngagement?.message}</>
-                                    </Typography>
-                                </div> : <></>}
                         </CardContent>
                     </Card>
                     <div style={{marginTop: "10px"}}>
@@ -177,9 +149,7 @@ export const EngagementAndRole = (props: any) => {
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 <Button
-                                    type="submit"
-                                    onClick={handleSubmit(onSubmit)}
-                                    // onClick={(e) => handleClick(e, "next")}
+                                    onClick={(e) => handleClick(e, "next")}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"
                                     disableElevation

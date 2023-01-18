@@ -16,9 +16,6 @@ import { defaultIDetailedApplication } from "../../detailedApplication/sidbiRefe
 import { Controller } from "../../../lib/api-wrappers/Controller";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import { updateStepperIndex } from '../subsections/sideNavBarSlice';
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 
 export const InvestmentThemeOfFund = (props: any) => {
     const { id } = useParams()
@@ -71,23 +68,6 @@ export const InvestmentThemeOfFund = (props: any) => {
         setInvestmentThemeOfFundRefreshId(uuid());
     }
 
-    const validationSchema = Yup.object().shape({
-        investmentThemeOfFund: Yup.string().required("This value is required")
-    });
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-    });
-
-    const onSubmit = (data: any) => {
-        setFormData(data);
-        handleClick('', "next");
-    };
-
     return (<>
 
         <Grid item xs={12}>
@@ -105,21 +85,13 @@ export const InvestmentThemeOfFund = (props: any) => {
                                 required
                                 id="investmentThemeOfFund"
                                 label="Please provide details as per caption"
-                                {...register("investmentThemeOfFund")}
-                                error={errors.investmentThemeOfFund ? true : false}
                                 //defaultValue={formData.investmentThemeOfFund === undefined ? " " : formData["investmentThemeOfFund"]}
-                                // value={formData["investmentThemeOfFund"] || ''}
+                                value={formData["investmentThemeOfFund"] || ''}
                                 variant="standard"
-                                // onChange={handleChange}
+                                onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.investmentThemeOfFund ?
-                                <div  style={{ marginTop: '-10px' }}>
-                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                        <>{errors.investmentThemeOfFund?.message}</>
-                                    </Typography>
-                                </div> : <></>}
                         </CardContent>
                     </Card>
                     <ListFiles id={`investmentThemeOfFund${id}`} refreshId={investmentThemeOfFundRefreshId} />
@@ -161,8 +133,7 @@ export const InvestmentThemeOfFund = (props: any) => {
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 <Button
-                                    type="submit"
-                                    onClick={handleSubmit(onSubmit)}
+                                    onClick={(e) => handleClick(e, "next")}
                                     // onClick={(e) => handleClick(e, "next")}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"
