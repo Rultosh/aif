@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import eligibilityResultsReducer from '../features/eligibilityResults/eligibilityResultsSice'
 import eligibilityQuestionerReducer from '../features/eligibilityQuesioner/eligibiltyQuestionerSlice'
-import signUpReducer from '../features/signUp/signUpSlice'
+import signupSlice from '../features/signUp/signUpSlice'
 import landingReducer from '../features/landing/landingSlice'
 import fundOverviewDataReducer from '../features/fundOverview/subsections/fundOverviewData/fundOverviewDataSlice'
 import investmentPartnerReducer from '../features/fundOverview/subsections/fundOverviewData/investmentPartner/investmentPartnerSlice'
@@ -35,6 +35,7 @@ import investmentPastSlice from '../features/fundOverview/subsections/fundOvervi
 import sideNavBarSliceReducer from '../features/DetailedApplicationComponent/subsections/sideNavBarSlice'
 import engagementAndRoleSlice from '../features/DetailedApplicationComponent/EngagementAndRole/engagementAndRoleSlice'
 import authenticationSlice from '../components/auth/authenticationSlice'
+import usersSlice from '../features/admin/adminSlice'
 
 const store = configureStore({
   reducer: {
@@ -43,7 +44,7 @@ const store = configureStore({
     eligibilityResults: eligibilityResultsReducer,
     eligibilityQuestioner: eligibilityQuestionerReducer,
     landing: landingReducer,
-    signUp: signUpReducer,
+    signup: signupSlice,
     fundData: fundOverviewDataReducer,
     investmentPartner: investmentPartnerReducer,
     profile: profileReducer,
@@ -73,7 +74,7 @@ const store = configureStore({
     carryDistribution: carryDistributionSlice,
     carryDistributionDetails: carryDistributionDetailsSlice,
     engagementAndRole: engagementAndRoleSlice,
-    
+    users: usersSlice,
   }
 })
 

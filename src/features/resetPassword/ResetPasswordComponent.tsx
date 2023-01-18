@@ -1,7 +1,7 @@
 import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField } from "@mui/material";
 import logo from '../../images/logo.png'
 import { useNavigate } from 'react-router-dom';
-import {  updateFormData } from '../signUp/signUpSlice'
+//import {  updateFormData } from '../signUp/signUpSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,9 +13,9 @@ const ResetPassword = () => {
 
     const navigate = useNavigate()
 
-    const results = useAppSelector(state => state.signUp.formSubmitResponse)
+    //const results = useAppSelector(state => state.signUp.formSubmitResponse)
 
-    const formDataToPublish = useAppSelector(state => state.signUp.formData)
+    //const formDataToPublish = useAppSelector(state => state.signUp.formData)
 
     const dispatch = useAppDispatch()
 
@@ -61,7 +61,7 @@ const ResetPassword = () => {
         setValue(copiedValue);
 
         console.log(obj)
-        dispatch(updateFormData(obj));
+        //dispatch(updateFormData(obj));
     };
 
 

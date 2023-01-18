@@ -11,7 +11,12 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../images/logo.png'
-import {Link,useNavigate} from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { fetchRoleAsync, selectUsers } from '../features/admin/adminSlice'
+import { wrapArgument } from "../lib/api-status/actionWrapper";
+import { useEffect, useState } from "react";
+import uuid from "react-uuid";
+import { useAppSelector, useAppDispatch } from '../app/hooks'
 
 
 
@@ -19,10 +24,13 @@ import {Link,useNavigate} from 'react-router-dom'
 const NavigationBar = (props: any) => {
 
   const navigate = useNavigate();
-
-  const pages = ['Home', 'Workflow', 'Preliminary'];
-  const settings = [ 'Logout'];
-
+  const [actionUid] = useState(uuid())
+  const userPages = ['Home', 'Workflow', 'Preliminary'];
+  const adminPages = ['Home', 'Admin', 'Workflow'];
+  const settings = ['Logout'];
+  const dispatch = useAppDispatch()
+  const usersState = useAppSelector(selectUsers)
+  const[pages , setPages] = useState<string[] | undefined>(undefined);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -37,18 +45,34 @@ const NavigationBar = (props: any) => {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = (ev:any) => {
+  const handleCloseUserMenu = (ev: any) => {
     setAnchorElUser(null);
- };
+  };
 
- const handleLogout = () => {
-  localStorage.removeItem('token');
-  navigate('/login');
- }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  }
+
+
+  useEffect(() => {
+    if (usersState?.role === undefined) {
+      console.log('calling fetchRoleAsync');
+      dispatch(fetchRoleAsync(
+        wrapArgument(actionUid, props.prelimApplicationId)
+      ))
+    }
+
+  }, [])
+
+  useEffect(() => {
+    usersState?.role == 'USERADMIN'? setPages(adminPages) : setPages(userPages)
+  }, [usersState?.role === undefined])
+
 
   return (
-    <AppBar position="static" component='nav' sx={{backgroundColor:'white'}}>
-      <Container  maxWidth="xl">
+    <AppBar position="static" component='nav' sx={{ backgroundColor: 'white' }}>
+      <Container maxWidth="xl">
         <Toolbar disableGutters>
 
           <Box
@@ -70,7 +94,7 @@ const NavigationBar = (props: any) => {
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
-              sx={{ flexWrap: 'nowrap',color:'#363062'}}
+              sx={{ flexWrap: 'nowrap', color: '#363062' }}
             >
               <MenuIcon />
             </IconButton>
@@ -92,15 +116,15 @@ const NavigationBar = (props: any) => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages.map((page) => (
+              {pages!= undefined ? pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center" sx={{color:'#363062',fontWeight: 700,}}>
+                  <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, }}>
                     <Link to={`/${page}`}>
-                    {page}
+                      {page}
                     </Link>
-                    </Typography>
+                  </Typography>
                 </MenuItem>
-              ))}
+              )):<></>}
             </Menu>
           </Box>
           <Typography
@@ -119,33 +143,33 @@ const NavigationBar = (props: any) => {
               textDecoration: 'none',
             }}
           >
-             <Box
-            component="img"
-            sx={{
-              height: 64,
-              display: { xs: 'block', md: 'none' }, mr: 1,
-              
-            }}
-            alt="sidbi_logo"
-            src={logo}
-          />
+            <Box
+              component="img"
+              sx={{
+                height: 64,
+                display: { xs: 'block', md: 'none' }, mr: 1,
+
+              }}
+              alt="sidbi_logo"
+              src={logo}
+            />
           </Typography>
-         
+
 
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
+            {pages!= undefined ? pages.map((page) => (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
-                sx={{ml:'50px', my: 2, color:'#363062', display: 'block', fontSize:'15px', fontWeight:'bold', textTransform:'none'}}
-                
+                sx={{ ml: '50px', my: 2, color: '#363062', display: 'block', fontSize: '15px', fontWeight: 'bold', textTransform: 'none' }}
+
               >
                 <Link to={`/${page}`}>
-                    {page}
-                    </Link>
+                  {page}
+                </Link>
               </Button>
-            ))}
+            )):<></>}
           </Box>
 
           <Box sx={{ flexGrow: 0, display: { xs: 'block' } }}>

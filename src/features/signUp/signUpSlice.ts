@@ -1,90 +1,59 @@
-import axios from 'axios'
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { RootState } from "../../app/store"
+import { ActionWrapper } from "../../lib/api-status/actionWrapper"
+import { getError } from "../../lib/api-status/errorHandler"
+import {IUser, IUserApprove} from "../admin/IUser"
+import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
+import {signupUser} from './signupApi'
+import { ISignup } from "./ISignup"
 
-type signUpFormData = {
-
-    name: string,
-    companyName: string,
-    email: string,
-    phoneNo: string,
-    state: string,
-    title: string,
-    city: string,
-    address: string
-
-}
 type InitialState = {
-
-    formSubmitResponse: boolean
-    loading: boolean
-    error: string
-    formData: any
+  status: IStatus
+  actionStatus: IStatus
 }
 const initialState: InitialState = {
-    formSubmitResponse: false,
-    loading: true,
-    error: '',
-    formData: {} as signUpFormData
-
+  status: {fetchStatus: FetchStatus.IDLE},
+  actionStatus: {fetchStatus: FetchStatus.IDLE}
 }
 
-type resultSchema = {
-  id:string,
-  value:string
-}
-
-// Generates pending, fulfilled and rejected action types
-export const submitForm = createAsyncThunk('signUp/submitForm', (formDataToPublish:any) => {
-
-
-  return fetch('https://vcf-backend.herokuapp.com/api/registeredusers', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formDataToPublish),
-})
-
-})
-
-const signUpSlice = createSlice({
-  name: 'signUpSlice',
-  initialState,
-  reducers: {
-    updateFormData:  (state, action: PayloadAction<resultSchema>) => {
-      
-      state.formData[action.payload.id] = action.payload.value;
-     
-      //state.formdata[action.payload.id] = action.payload.value;
-      //console.log("logging after slice-state - length",state.formdata.length)
-    },
-    resetFormData:  (state) => {
-      console.log("inside reset forms")
-      state.formData = {} as signUpFormData;
-      //state.formData["name"] = "sampath test";
-     
-      //state.formdata[action.payload.id] = action.payload.value;
-      //console.log("logging after slice-state - length",state.formdata.length)
-    }
-  },
-  extraReducers: builder => {
-    builder.addCase(submitForm.pending, state => {
-      state.loading = true
-    })
-    builder.addCase(
-        submitForm.fulfilled,
-      (state, action: PayloadAction<any>) => {
-        console.log("Inside the fulfil case",action)
-        state.loading = false
-        state.formSubmitResponse = action.payload.ok
-        state.error = ''
+export const signupUsersAsync = createAsyncThunk(
+  'signupUsersAsync/create',
+  async (args: ActionWrapper<ISignup>, {rejectWithValue}) => { 
+    console.log("fetchContributorDetailsAsync called...")
+    try {
+      if(args.argument) {
+        const response = await signupUser(args.argument);
+        return response.data;
       }
-    )
-    builder.addCase(submitForm.rejected, (state, action) => {
-      state.loading = false
-      console.log("Inside the error case",action)
-      state.error = action.error.message || 'Something went wrong'
-    })
+    } catch(reason) {
+      console.log(reason)
+      return rejectWithValue(getError(reason));
+    }
   }
-})
+)
 
-export default signUpSlice.reducer
-export const { updateFormData, resetFormData } = signUpSlice.actions
+
+  const signupSlice = createSlice({
+    name: 'signup',
+    initialState,
+    reducers: {
+      
+    },
+    extraReducers: builder => {
+      builder.addCase(signupUsersAsync.pending, state => {
+       
+      })
+      .addCase(
+        signupUsersAsync.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          console.log(action.payload);
+          state.status.fetchStatus = FetchStatus.IDLE;
+        }
+      )
+      .addCase(signupUsersAsync.rejected, (state, action) => {
+       
+      })
+    }
+  })
+export default signupSlice.reducer
+export const selectedSignup = (state: RootState) => state.signup;
