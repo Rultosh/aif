@@ -1,0 +1,26 @@
+import { IEntity } from "../../lib/api-wrappers/IEntity"
+
+export interface ISignup extends IEntity {
+
+  username: string | undefined,
+  companyName: string | undefined,
+  contactPerson: string | undefined,
+  title: string | undefined,
+  phoneNumber: string | undefined,
+  address: string | undefined,
+  city: string | undefined,
+  state: string | undefined,
+}
+
+export const defaultISignup : ISignup = {
+  id : undefined,
+  parentId: undefined,
+  username: undefined,
+  companyName: undefined,
+  contactPerson: undefined,
+  phoneNumber: undefined,
+  state: undefined,
+  title: undefined,
+  city: undefined,
+  address: undefined
+}

@@ -15,6 +15,7 @@ import SelfRating from './features/fundOverview/subsections/selfRating/SelfRatin
 import Declaration from './features/fundOverview/subsections/declaration/Declaration'
 import Preview from './features/fundOverview/subsections/preview/Preview'
 import Home from './features/home/HomeComponent'
+import Admin from './features/admin/AdminComponent'
 import { ProfileNew } from './features/fundOverview/subsections/profile-new/ProfileNew';
 import Workflow from './components/Workflow'
 import DetailedApplication2A from './features/DetailedApplicationComponent/subsections/2A/detailedApplication2A';
@@ -60,6 +61,7 @@ function App() {
       </Header>
       <Routes>
         <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
+        <Route path='/admin' element={<Admin />}></Route>
         <Route path='/login' element={<Landing />}></Route>
         <Route path='/detailed/sidbiReference' element={<SidbiReference />}></Route>
         {/*<Route path='/detailed/sidbiReference/:id' element={<SidbiReference />}></Route>
