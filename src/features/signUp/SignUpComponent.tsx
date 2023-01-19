@@ -123,7 +123,7 @@ const SignUp = () => {
                                             <Box display="flex"
                                                 justifyContent="center"
                                                 alignItems="center">
-                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Alternate Investment Fund</Typography>
+                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Alternative Investment Fund</Typography>
 
                                             </Box>
 
@@ -178,7 +178,7 @@ const SignUp = () => {
                                         sx={{ mt: 3 }}>
                                         <div>
                                             <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Note:</Typography> <br></br>
-                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>1. This registration is only for Alternate Investment Fund (AIF) registered in India. </Typography> <br></br>
+                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>1. This registration is only for Alternative Investment Fund (AIF) registered in India. </Typography> <br></br>
                                             <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>2. Startups are not eligible to apply here.</Typography> <br></br>
                                             <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>3. Use your corporate e-mail address for sign up. A link to set your password will be sent.</Typography> <br></br>
                                             <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>4. Temporary credentials will be active ony for 90 days.</Typography> <br></br>

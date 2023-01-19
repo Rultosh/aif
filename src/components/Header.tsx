@@ -31,7 +31,7 @@ const Header = (props: any) => {
           component="div"
           sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' ,fontWeight:'bold'} }}
         >
-         Alternate Investment Fund
+         Alternative Investment Fund
         </Typography>
         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
           {navItems.map((item) => (

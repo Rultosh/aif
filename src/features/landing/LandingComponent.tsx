@@ -106,7 +106,7 @@ const Landing = () => {
                                             <Box display="flex"
                                                 justifyContent="center"
                                                 alignItems="center">
-                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Alternate Investment Fund</Typography>
+                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Alternative Investment Fund</Typography>
 
                                             </Box>
 
