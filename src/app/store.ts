@@ -36,6 +36,7 @@ import sideNavBarSliceReducer from '../features/DetailedApplicationComponent/sub
 import engagementAndRoleSlice from '../features/DetailedApplicationComponent/EngagementAndRole/engagementAndRoleSlice'
 import authenticationSlice from '../components/auth/authenticationSlice'
 import usersSlice from '../features/admin/adminSlice'
+import forgotPasswordSlice from '../features/forgotPassword/forgotPasswordSlice'
 
 const store = configureStore({
   reducer: {
@@ -75,6 +76,7 @@ const store = configureStore({
     carryDistributionDetails: carryDistributionDetailsSlice,
     engagementAndRole: engagementAndRoleSlice,
     users: usersSlice,
+    forgotPassword: forgotPasswordSlice,
   }
 })
 
