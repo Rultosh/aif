@@ -9,8 +9,9 @@ import loginIconImg from '../../images/aif_login_icon.png'
 import { defaultISignup } from "./ISignup";
 import uuid from "react-uuid";
 import { Controller } from "../../lib/api-wrappers/Controller";
-import {signupUsersAsync} from './signUpSlice'
+import { signupUsersAsync } from './signUpSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
+import { selectedSignup } from './signUpSlice'
 
 
 
@@ -18,18 +19,21 @@ const SignUp = () => {
 
     const { id } = useParams()
     const [formData, setFormData] = useState(defaultISignup);
+    const signupState = useAppSelector(selectedSignup)
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
-    
-  
-   
+    const [showResponse, setShowResponse] = useState(false);
+
+
+
     function handleSubmitForm() {
+        setShowResponse(true)
         dispatch(
             signupUsersAsync(
-              wrapArgument(actionUid, formData)
+                wrapArgument(actionUid, formData)
             )
-          )
+        )
     }
 
 
@@ -39,9 +43,10 @@ const SignUp = () => {
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
         setFormData(copiedValue);
-      };
+    };
 
     const handleReset = () => {
+        setShowResponse(false)
         setFormData(defaultISignup)
     };
 
@@ -52,7 +57,7 @@ const SignUp = () => {
                 <Box sx={{ flexGrow: 1 }}>
                     <Grid container >
                         <Grid item xs={3}>
-                            <Card className="login_card_left" sx={{ display: 'flex', height: '675px',mb:2,  border: 1, borderColor:"#363062",borderTopLeftRadius:'8px',borderBottomLeftRadius:'8px',backgroundColor:"#363062" }}>
+                            <Card className="login_card_left" sx={{ display: 'flex', height: '675px', mb: 2, border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#363062" }}>
 
                                 <CardContent sx={{ flex: 1 }}>
 
@@ -61,7 +66,7 @@ const SignUp = () => {
                                         alignItems="center"
                                         sx={{ mt: 14 }}>
 
-                                        <Toolbar disableGutters sx={{ borderRadius:'18px',justifyContent: "center",backgroundColor:'#ffffff'}}>
+                                        <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
                                             <Box
                                                 component="img"
                                                 sx={{ width: '200px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
@@ -76,12 +81,12 @@ const SignUp = () => {
                                     <Box display="flex"
                                         justifyContent="center"
                                         alignItems="center"
-                                        sx={{ mt: 4,mb:2 }}>
+                                        sx={{ mt: 4, mb: 2 }}>
 
-                                        <Toolbar disableGutters sx={{width:'80px',height:'80px', justifyContent: "center",backgroundColor:'#ffffff', borderRadius:'50px' }}>
+                                        <Toolbar disableGutters sx={{ width: '80px', height: '80px', justifyContent: "center", backgroundColor: '#ffffff', borderRadius: '50px' }}>
                                             <Box
                                                 component="img"
-                                                sx={{  position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                sx={{ position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
                                                 alt="success"
                                                 src={loginIconImg}
                                             />
@@ -94,11 +99,11 @@ const SignUp = () => {
                                         justifyContent="center"
                                         alignItems="center">
 
-                                        <Toolbar disableGutters sx={{ justifyContent: "center" ,color:"#ffffff"}}>
+                                        <Toolbar disableGutters sx={{ justifyContent: "center", color: "#ffffff" }}>
                                             <Box display="flex"
                                                 justifyContent="center"
                                                 alignItems="center">
-                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Alternate Investment Fund</Typography>
+                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Alternate Investment Fund</Typography>
 
                                             </Box>
 
@@ -109,11 +114,11 @@ const SignUp = () => {
                                         justifyContent="center"
                                         alignItems="center">
 
-                                        <Toolbar disableGutters sx={{ justifyContent: "center",color:"#ffffff" }}>
+                                        <Toolbar disableGutters sx={{ justifyContent: "center", color: "#ffffff" }}>
                                             <Box display="flex"
                                                 justifyContent="center"
                                                 alignItems="center">
-                                                <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Application Portal</Typography>
+                                                <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Application Portal</Typography>
 
                                             </Box>
 
@@ -125,17 +130,17 @@ const SignUp = () => {
                             </Card>
                         </Grid>
                         <Grid item xs={9}>
-                            <Card sx={{ display: 'flex', height: '675px',mb:2 }}>
+                            <Card sx={{ display: 'flex', height: '675px', mb: 2 }}>
                                 <CardContent sx={{ flex: 1 }}>
 
 
-                                    <Toolbar disableGutters sx={{ opacity:'0.8',mt:-2,ml:-2,mr:-2,color: 'white', backgroundColor: '#363062', textAlign: "center", justifyContent: "space-around" }}>
+                                    <Toolbar disableGutters sx={{ opacity: '0.8', mt: -2, ml: -2, mr: -2, color: 'white', backgroundColor: '#363062', textAlign: "center", justifyContent: "space-around" }}>
                                         <Grid container xs={12}>
                                             <Grid item xs={11}>
                                                 <Box display="flex"
                                                     justifyContent="center"
                                                     alignItems="center">
-                                                    <Typography sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold'  }}>Sign-Up here</Typography>
+                                                    <Typography sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Sign-Up here</Typography>
 
                                                 </Box>
                                             </Grid>
@@ -204,7 +209,7 @@ const SignUp = () => {
                                             <Grid item xs={6}>
                                                 <TextField
                                                     required
-                                                    type = 'number'
+                                                    type='number'
                                                     id="phoneNumber"
                                                     label="Phone Number"
                                                     value={formData["phoneNumber"] || ''}
@@ -242,7 +247,7 @@ const SignUp = () => {
                                                     sx={{ display: 'flex' }}
                                                 />
                                             </Grid>
-                                           {/*} <Grid item xs={6}>
+                                            {/*} <Grid item xs={6}>
                                                 <TextField
                                                     required
                                                     id="outlined-required"
@@ -263,7 +268,7 @@ const SignUp = () => {
                                                 <Box display="flex"
                                                     justifyContent="center"
                                                     alignItems="center">
-                                                    <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200 ,background:"#363062"}} onClick={handleSubmitForm}>
+                                                    <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, background: "#363062" }} onClick={handleSubmitForm}>
                                                         Sign Up
                                                     </Button>
                                                 </Box>
@@ -273,12 +278,17 @@ const SignUp = () => {
                                                 <Box display="flex"
                                                     justifyContent="center"
                                                     alignItems="center">
-                                                    <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200 ,backgroundColor:'#c27a1b'}} onClick={handleReset}>
+                                                    <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundColor: '#c27a1b' }} onClick={handleReset}>
                                                         Reset
                                                     </Button>
                                                 </Box>
                                             </Grid  >
 
+                                            <Grid item xs={12}>
+                                                <Box sx={{ mt: 2 }}>
+                                                    {showResponse && signupState.response != undefined ? <>{signupState.response}</> : <></>}
+                                                </Box>
+                                            </Grid>
 
                                         </Grid>
 

@@ -9,6 +9,7 @@ import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 
 type InitialState = {
   role: string | undefined,
+  me: IUser,
   users: IUser[],
   response: string | undefined,
   status: IStatus
@@ -16,6 +17,7 @@ type InitialState = {
 }
 const initialState: InitialState = {
   role: undefined,
+  me: {} as IUser,
   users: [],
   response: undefined,
   status: {fetchStatus: FetchStatus.IDLE},
@@ -106,18 +108,19 @@ const usersSlice = createSlice({
      
     })
     .addCase(fetchRoleAsync.pending, state => {
-     
+      state.status.fetchStatus = FetchStatus.DOING;
     })
     .addCase(
       fetchRoleAsync.fulfilled,
       (state, action: PayloadAction<IUser>) => {
         state.role = action.payload.role;
+        state.me = action.payload;
         state.response = undefined;
         state.status.fetchStatus = FetchStatus.IDLE;
       }
     )
     .addCase(fetchRoleAsync.rejected, (state, action) => {
-     
+      state.status.fetchStatus = FetchStatus.FAILED;
     })
   }
 })

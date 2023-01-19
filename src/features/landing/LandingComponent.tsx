@@ -10,6 +10,7 @@ import loginIconImg from '../../images/aif_login_icon.png'
 import { authenticateThunk, defaultLoginRequest, selectAuthenticatedUser } from "../../components/auth/authenticationSlice";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
+import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
 
 
 const Landing = () => {
@@ -53,6 +54,9 @@ const Landing = () => {
             actionId, value
         )));
        // navigate('/home')
+       dispatch(fetchRoleAsync(
+        wrapArgument(actionId, 1)
+      ))
     }
     return (
         <div className="landingComp">

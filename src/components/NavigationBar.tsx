@@ -17,6 +17,7 @@ import { wrapArgument } from "../lib/api-status/actionWrapper";
 import { useEffect, useState } from "react";
 import uuid from "react-uuid";
 import { useAppSelector, useAppDispatch } from '../app/hooks'
+import { FetchStatus } from "../lib/api-status/IStatus";
 
 
 
@@ -30,9 +31,10 @@ const NavigationBar = (props: any) => {
   const settings = ['Logout'];
   const dispatch = useAppDispatch()
   const usersState = useAppSelector(selectUsers)
-  const[pages , setPages] = useState<string[] | undefined>(undefined);
+  const [pages, setPages] = useState<string[] | undefined>(userPages);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const role = usersState?.role;
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -56,18 +58,19 @@ const NavigationBar = (props: any) => {
 
 
   useEffect(() => {
-    if (usersState?.role === undefined) {
       console.log('calling fetchRoleAsync');
       dispatch(fetchRoleAsync(
         wrapArgument(actionUid, props.prelimApplicationId)
       ))
-    }
-
   }, [])
 
+
   useEffect(() => {
-    usersState?.role == 'USERADMIN'? setPages(adminPages) : setPages(userPages)
-  }, [usersState?.role === undefined])
+    if (usersState.status.fetchStatus === FetchStatus.IDLE  && usersState?.role == 'USERADMIN') {
+      setPages(adminPages)
+    }
+  }, [role])
+
 
 
   return (
@@ -116,7 +119,7 @@ const NavigationBar = (props: any) => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages!= undefined ? pages.map((page) => (
+              {pages != undefined ? pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, }}>
                     <Link to={`/${page}`}>
@@ -124,7 +127,7 @@ const NavigationBar = (props: any) => {
                     </Link>
                   </Typography>
                 </MenuItem>
-              )):<></>}
+              )) : <></>}
             </Menu>
           </Box>
           <Typography
@@ -158,7 +161,7 @@ const NavigationBar = (props: any) => {
 
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages!= undefined ? pages.map((page) => (
+            {pages != undefined ? pages.map((page) => (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
@@ -169,7 +172,7 @@ const NavigationBar = (props: any) => {
                   {page}
                 </Link>
               </Button>
-            )):<></>}
+            )) : <></>}
           </Box>
 
           <Box sx={{ flexGrow: 0, display: { xs: 'block' } }}>
