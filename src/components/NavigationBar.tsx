@@ -28,7 +28,7 @@ const NavigationBar = (props: any) => {
   const [actionUid] = useState(uuid())
   const userPages = ['Home', 'Workflow', 'Preliminary'];
   const adminPages = ['Home', 'Admin', 'Workflow'];
-  const settings = ['Logout'];
+  const settings = ['Change Password','Logout'];
   const dispatch = useAppDispatch()
   const usersState = useAppSelector(selectUsers)
   const [pages, setPages] = useState<string[] | undefined>(userPages);
@@ -54,6 +54,15 @@ const NavigationBar = (props: any) => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
+  }
+
+  const handleMeunActions = (action:string) => {
+    if(action =='Logout'){
+      handleLogout()
+    }
+    else{
+      navigate('/changePassword');
+    }
   }
 
 
@@ -199,7 +208,7 @@ const NavigationBar = (props: any) => {
             >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center" onClick={handleLogout}>{setting}</Typography>
+                  <Typography textAlign="center" onClick={() => handleMeunActions(setting)}>{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>

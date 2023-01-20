@@ -9,6 +9,7 @@ import Landing from './features/landing/LandingComponent'
 import SignUp from './features/signUp/SignUpComponent'
 import ResetPassword from './features/resetPassword/ResetPasswordComponent'
 import ForgotPassword from './features/forgotPassword/ForgotPasswordComponent'
+import ChangePassword from './features/changePassword/ChangePasswordComponent'
 import { useAppSelector, useAppDispatch } from './app/hooks'
 import FundOverview from './features/fundOverview/FundOverviewComponent';
 import Fund from './features/fundOverview/Fund'
@@ -70,6 +71,7 @@ function App() {
         <Route path='home' element={
           <PrivateRoute>
             <Home />
+            <ChangePassword />
           </PrivateRoute>
         }></Route>
         <Route path='workflow' element={<Workflow />}></Route>
@@ -78,6 +80,7 @@ function App() {
         <Route path='signUp' element={<SignUp />}></Route>
         <Route path='resetPassword' element={<ResetPassword />}></Route>
         <Route path='setPassword' element={<ForgotPassword />}></Route>
+        <Route path='changePassword' element={<ChangePassword />}></Route>
         <Route path='preliminary' element={<FundOverview />}></Route>
         <Route path='preliminary/:id' element={<FundOverview />}>
           <Route path='fund' element={<Fund />}></Route>

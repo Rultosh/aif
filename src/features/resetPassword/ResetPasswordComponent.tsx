@@ -3,67 +3,45 @@ import logo from '../../images/logo.png'
 import { useNavigate } from 'react-router-dom';
 //import {  updateFormData } from '../signUp/signUpSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import loginIconImg from '../../images/aif_login_icon.png'
+import uuid from "react-uuid";
+import { useEffect, useState } from "react";
+import { wrapArgument } from "../../lib/api-status/actionWrapper";
+import { resetUserPasswordAsync, selectedforgotPassword } from '../forgotPassword/forgotPasswordSlice'
+import {  defaultIResetPassword } from './IResetPassword'
 
 
 
 const ResetPassword = () => {
 
     const navigate = useNavigate()
-
-    //const results = useAppSelector(state => state.signUp.formSubmitResponse)
-
-    //const formDataToPublish = useAppSelector(state => state.signUp.formData)
-
+    const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
-
+    const [formData, setFormData] = useState(defaultIResetPassword);
+    const state = useAppSelector(selectedforgotPassword)
     let emailSent = false;
 
-
-    const initialState = {
-        'address': "",
-        'companyName': "",
-        'name': "",
-        'email': "",
-        "state": "",
-        "phoneNo": "",
-        "title": "",
-        "city": ""
-
-    };
-
-    //const initialState = {} as any;
-
-    const [value, setValue] = useState(initialState);
-
-
-    type resultSchema = {
-        id: string,
-        value: string
-    }
-
+    
 
 
     function handleSubmitForm() {
         emailSent = true
+        dispatch(
+            resetUserPasswordAsync(
+                wrapArgument(actionUid, formData)
+            )
+        )
     }
 
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
-        console.log('checking state value', value)
-        //const ev = (e.target as HTMLInputElement);
-        const obj: resultSchema = { id: ev.target.id, value: ev.target.value }
-        let copiedValue = { ...value };
-        copiedValue[ev.target.id as keyof typeof initialState] = ev.target.value;
-        setValue(copiedValue);
-
-        console.log(obj)
-        //dispatch(updateFormData(obj));
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        setFormData(copiedValue);
     };
-
 
 
     return (
@@ -176,10 +154,9 @@ const ResetPassword = () => {
                                                 <Grid item xs={12}>
                                                     <TextField
                                                         required
-                                                        id="email"
+                                                        id="username"
                                                         label="Email"
-                                                        defaultValue={value["email"]}
-                                                        value={value["email"]}
+                                                        value={formData["username"]}
                                                         onChange={handleChange}
                                                         sx={{ display: 'flex' }}
                                                     />
@@ -211,7 +188,7 @@ const ResetPassword = () => {
                                                         </Button>
                                                     </Box>
                                                 </Grid  >
-
+                                                {state.response_resetPassword?<Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}> {state.response_resetPassword} </Typography>:<></>}
                                             </Grid> : <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>Passwor reset email has been sent to your email id!</Typography>
                                         }
                                     </Box>

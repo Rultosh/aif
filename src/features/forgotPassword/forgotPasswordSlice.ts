@@ -3,16 +3,22 @@ import { RootState } from "../../app/store"
 import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
 import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
-import { setPassword } from './forgotPasswordApi'
+import { setPassword, resetForgotPassword, changePassword } from './forgotPasswordApi'
 import { IForgotPassword } from "./IForgotPassword"
+import { IResetPassword } from "../resetPassword/IResetPassword"
+import {IChangePassword} from '../changePassword/IChangePassword'
 
 type InitialState = {
   response: string | undefined,
-  status: IStatus
+  response_resetPassword: string | undefined,
+  response_changePassword: string | undefined,
+  status: IStatus,
   actionStatus: IStatus
 }
 const initialState: InitialState = {
   response: undefined,
+  response_resetPassword: undefined,
+  response_changePassword: undefined,
   status: { fetchStatus: FetchStatus.IDLE },
   actionStatus: { fetchStatus: FetchStatus.IDLE }
 }
@@ -24,6 +30,39 @@ export const setUserPasswordAsync = createAsyncThunk(
     try {
       if (args.argument) {
         const response = await setPassword(args.argument);
+        return response.data;
+      }
+    } catch (reason) {
+      console.log(reason)
+      return rejectWithValue(getError(reason));
+    }
+  }
+)
+
+
+export const resetUserPasswordAsync = createAsyncThunk(
+  'resetUserPasswordAsync/create',
+  async (args: ActionWrapper<IResetPassword>, { rejectWithValue }) => {
+    console.log("setUserPasswordAsync called...")
+    try {
+      if (args.argument) {
+        const response = await resetForgotPassword(args.argument);
+        return response.data;
+      }
+    } catch (reason) {
+      console.log(reason)
+      return rejectWithValue(getError(reason));
+    }
+  }
+)
+
+export const changeUserPasswordAsync = createAsyncThunk(
+  'changeUserPasswordAsync/create',
+  async (args: ActionWrapper<IChangePassword>, { rejectWithValue }) => {
+    console.log("setUserPasswordAsync called...")
+    try {
+      if (args.argument) {
+        const response = await changePassword(args.argument);
         return response.data;
       }
     } catch (reason) {
@@ -55,6 +94,35 @@ const forgotPasswordSlice = createSlice({
       .addCase(setUserPasswordAsync.rejected, (state, action) => {
         state.response = 'Error in signup';
       })
+      .addCase(resetUserPasswordAsync.pending, state => {
+
+      })
+        .addCase(
+          resetUserPasswordAsync.fulfilled,
+          (state, action: PayloadAction<string>) => {
+            console.log(action.payload);
+            state.response_resetPassword = action.payload;
+            state.status.fetchStatus = FetchStatus.IDLE;
+          }
+        )
+        .addCase(resetUserPasswordAsync.rejected, (state, action) => {
+          state.response_resetPassword = 'Error/ User not found Contact support';
+        })
+        .addCase(changeUserPasswordAsync.pending, state => {
+
+        })
+          .addCase(
+            changeUserPasswordAsync.fulfilled,
+            (state, action: PayloadAction<string>) => {
+              console.log(action.payload);
+              state.response_changePassword = action.payload;
+              state.status.fetchStatus = FetchStatus.IDLE;
+            }
+          )
+          .addCase(changeUserPasswordAsync.rejected, (state, action) => {
+            state.response_changePassword = 'Error. Contact support';
+          })
+        
   }
 })
 export default forgotPasswordSlice.reducer
