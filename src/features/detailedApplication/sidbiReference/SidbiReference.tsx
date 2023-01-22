@@ -75,20 +75,20 @@ export const SidbiReference = () => {
                 <CardContent sx={{ flex: 1 }}>
                   {/* <TextField
                     required
-                    id="sidbiRefeferenceNumber"
+                    id="sidbiReferenceNumber"
                     label="Reference No."
-                    {...register("sidbiRefeferenceNumber")}
-                    error={errors.sidbiRefeferenceNumber ? true : false}
-                    // value={formData.sidbiRefeferenceNumber || ''}
+                    {...register("sidbiReferenceNumber")}
+                    error={errors.sidbiReferenceNumber ? true : false}
+                    // value={formData.sidbiReferenceNumber || ''}
                     variant="standard"
                     // onChange={handleChange}
                     sx={{ display: 'flex', ml: 2, mb: -3 }}
                   />
                   <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                      <>{errors.sidbiRefeferenceNumber?.message}</>
+                      <>{errors.sidbiReferenceNumber?.message}</>
                   </Typography> */}
                   <div>Reference Number:</div>
-                  <div style={{fontWeight: "bold", marginTop: "20px"}}>{formData.sidbiRefeferenceNumber || ''}</div>
+                  <div style={{fontWeight: "bold", marginTop: "20px"}}>{formData.sidbiReferenceNumber || ''}</div>
                 </CardContent>
               </Card>
             </Grid>

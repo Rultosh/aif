@@ -210,7 +210,7 @@ export const Home = () => {
                                             <a href={`/Detailed/${row.id}/SidbiReference`}>{row.id}</a>
                                         </TableCell>
                                         <TableCell align="center">Sample Contact</TableCell>
-                                        <TableCell align="center">{String(row.sidbiRefeferenceNumber)}</TableCell>
+                                        <TableCell align="center">{String(row.sidbiReferenceNumber)}</TableCell>
                                     </TableRow>
                                 }) : <></>
                             }

@@ -51,9 +51,9 @@ export const SidbiReference = () => {
       <div style={{ margin: "10px", color: "red" }}>{controller.error(0, state)}</div> : <></>}
     <><TextField
       required
-      id="sidbiRefeferenceNumber"
+      id="sidbiReferenceNumber"
       label="Reference No."
-      value={formData["sidbiRefeferenceNumber"]}
+      value={formData["sidbiReferenceNumber"]}
       variant="standard"
       onChange={handleChange}
       sx={{ display: 'flex', ml: 2 }} />
