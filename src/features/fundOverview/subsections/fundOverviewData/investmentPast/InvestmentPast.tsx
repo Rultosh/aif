@@ -55,7 +55,13 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
         setOpen(false)
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
-    const tableHeaders = ["Name Of Company", "Sector", "Amount Invested(INR Crore)", "Date Of Investment", "Action"]
+    const tableHeaders = [
+        "Name Of Company", 
+        "Sector", 
+        "Amount Invested(INR Crore)", 
+        "Date Of Investment", 
+        "Brief Profile",
+        "Action"]
 
     let headerComponent = []
 

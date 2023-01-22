@@ -576,6 +576,58 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 inputProps={{ min: 0, max: 9999, step: 1 }}
                                             />
                                         </Grid>
+                                        <Grid item xs={12}>
+                                            <Typography variant="subtitle2" sx={{ mt: 5, flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Target Corpus (Green Shoe)</Typography>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <TextField
+                                                required
+                                                type="number"
+                                                id="sdGreenShoeTargetCorpusDomestic"
+                                                label="Domestic"
+                                                value={prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic || ''}
+                                                onChange={handleChange}
+                                                variant="standard"
+                                                sx={{ display: 'flex', ml: 2 }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <TextField
+                                                required
+                                                type="number"
+                                                id="sdGreenShoeTargetCorpusOverseas"
+                                                label="Overseas, if any"
+                                                value={prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas || ''}
+                                                onChange={handleChange}
+                                                variant="standard"
+                                                sx={{ display: 'flex' }}
+                                                onKeyUp={(e) => {
+                                                    if ((e.target as HTMLInputElement).value.length > 4) {
+                                                        (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
+                                                    }
+                                                }}
+                                                inputProps={{ min: 0, max: 9999, step: 1 }}
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={4}>
+                                            <TextField
+                                                required
+                                                type="number"
+                                                id="sdGreenShoeTotalTargetCorpus"
+                                                label="Total Target Corpus (INR Crore)"
+                                                value={prelimApplicationFormData.sdGreenShoeTotalTargetCorpus || ''}
+                                                onChange={handleChange}
+                                                variant="standard"
+                                                sx={{ display: 'flex', mr: 2 }}
+                                                onKeyUp={(e) => {
+                                                    if ((e.target as HTMLInputElement).value.length > 4) {
+                                                        (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
+                                                    }
+                                                }}
+                                                inputProps={{ min: 0, max: 9999, step: 1 }}
+                                            />
+                                        </Grid>
                                         <Grid item xs={9}>
                                             <Typography variant="subtitle2" sx={{ mt: 5, flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>First Closing</Typography>
 

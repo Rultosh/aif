@@ -5,6 +5,7 @@ export interface IInvestmentPast {
     sector: String | undefined,
     amountInvested : Number | undefined,
     dateOfInvestment : String | undefined,
+    briefProfile: String | undefined
 }
 
 export const defaultInvestmentPast : IInvestmentPast = {
@@ -14,4 +15,5 @@ export const defaultInvestmentPast : IInvestmentPast = {
     sector: undefined,
     amountInvested: undefined,
     dateOfInvestment: undefined,
+    briefProfile: undefined
 }  

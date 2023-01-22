@@ -68,7 +68,17 @@ export const Home = () => {
         if (newData) setFormData(newData)
     }, [stateDetailsApplication['applications']])*/
 
-    const tableHeaders = ["Fund Name", "Contact Person", "Status", "Application Date", "Target Corpus", "Contribution Sought", "Download", "Query Resolution", "Workflow State"]
+    const tableHeaders = [
+        "Fund Name", 
+        "Contact Person", 
+        "Status", 
+        "Preliminary Application Date", 
+        "Detailed Application Date", 
+        "Target Corpus", 
+        "Contribution Sought", 
+        "Download", 
+        "Query Resolution", 
+        "Workflow State"]
 
     let headerComponent = []
 
@@ -149,6 +159,7 @@ export const Home = () => {
                                         </TableCell>}
                                         <TableCell align="center">{row.investmentManager}</TableCell>
                                         <TableCell align="center">{String(getStatusDescription(row.stage, row.status))}</TableCell>
+                                        <TableCell align="center">{row.detailedApplicationCreatedOn}</TableCell>
                                         <TableCell align="center">{row.createdOn}</TableCell>
                                         <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
                                         <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>

@@ -151,7 +151,6 @@ export const InvestmentResponsibleAsNonLeadModel = (props: InvestmentResponsible
               <Grid item xs={4.5}>
                 <TextField
                   required
-                  type="number"
                   id="exitOrWriteOff"
                   label="Exit or writeoff"
                   value={investmentResponsibleAsNonLead.exitOrWriteOff}

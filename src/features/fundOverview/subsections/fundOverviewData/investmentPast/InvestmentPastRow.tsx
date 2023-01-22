@@ -37,6 +37,7 @@ export const InvestmentPastRow = (props: InvestmentPastRowPros) => {
     <TableCell align="center">{props.row.sector}</TableCell>
     <TableCell align="center">{String(props.row.amountInvested)}</TableCell>
     <TableCell align="center">{String(props.row.dateOfInvestment)}</TableCell>
+    <TableCell align="center">{String(props.row.briefProfile)}</TableCell>
     <TableCell align="center">
       <Edit onClick={handleOpen}/>&nbsp;
       <Delete onClick={handleDelete}></Delete>
