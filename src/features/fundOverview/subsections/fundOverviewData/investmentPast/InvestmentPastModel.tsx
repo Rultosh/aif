@@ -142,6 +142,18 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   sx={{ display: 'flex' }}
                 />
               </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  required
+                  id="briefProfile"
+                  label="Brief Profile"
+                  value={investmentPastFormData.briefProfile}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+              </Grid>
               <Grid item xs={4.5}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} >
                   <Stack spacing={3}>

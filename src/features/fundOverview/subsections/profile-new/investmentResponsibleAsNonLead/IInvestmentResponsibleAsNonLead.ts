@@ -4,7 +4,7 @@ export interface IInvestmentResponsibleAsNonLead {
     nameOfCompany: string | undefined,
     amountInvested: number | undefined,
     dateOfInvestment: string | undefined,
-    exitOrWriteOff: number | undefined,
+    exitOrWriteOff: string | undefined,
     dateofExitorWriteOff: string | undefined,
     comment: string | undefined
 }

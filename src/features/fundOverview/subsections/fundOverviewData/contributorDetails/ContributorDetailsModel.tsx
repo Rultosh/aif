@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent,  FormControlLabel, Grid, Modal, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent,  FormControl,  FormControlLabel, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
 import { createContributorDetailsAsync, updateContributorDetailsAsync } from './contributorDetailsSlice'
 import { useAppDispatch } from '../../../../../app/hooks'
@@ -47,11 +47,11 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
   const handleChange = (ev: any) => {
     ev.preventDefault();
-    console.log('handle change', ev.target.id, ev.target.value);
+    console.log('handle change', ev, ev.target.id, ev.target.value);
 
     let copiedValue: IContributorDetails = { ...contributorDetailsFormData };
 
-    copiedValue[ev.target.id as keyof IContributorDetails] =
+    copiedValue[(ev.target.id ? ev.target.id : ev.target.name) as keyof IContributorDetails] =
       ev.target.id !== undefined ? ev.target.value : ev.target.value
 
     console.log(copiedValue, props.prelimApplicationId)
@@ -83,12 +83,12 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
           <CardContent sx={{ flex: 1 }}>
             <Grid container spacing={2} >
-              <Grid item xs={9}>
+              <Grid item xs={12}>
                 <Box sx={{ display: 'inline-flex' }}>
                   <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details of Contributor to the Fund</Typography>
                 </Box>
               </Grid>
-              <Grid item xs={4.5}>
+              <Grid item xs={4}>
                 <TextField
                   required
                   id="name"
@@ -101,7 +101,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   sx={{ display: 'flex' }}
                 />
               </Grid>
-              <Grid item xs={3.5}>
+              <Grid item xs={4}>
                 <TextField
                   required
                   type='number'
@@ -115,7 +115,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   sx={{ display: 'flex' }}
                 />
               </Grid>
-              <Grid item xs={1}>
+              <Grid item xs={4}>
                 <TextField
                   type="number"
                   required
@@ -128,6 +128,24 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
                   sx={{ display: 'flex' }}
                 />
+              </Grid>
+              <Grid item xs={4.5}>
+                <FormControl variant="standard" sx={{ display: 'flex' }}>
+                  <InputLabel id="demo-simple-select-standard-label">Type</InputLabel>
+                  <Select
+                    key="contributionType"
+                    labelId="contributionType"
+                    id="contributionType"
+                    value={contributorDetailsFormData["contributionType"] || ""}
+                    onChange={handleChange}
+                    name="contributionType"
+                    defaultValue={contributorDetailsFormData["contributionType"] === undefined ? " " : contributorDetailsFormData["contributionType"]}
+                  >
+
+                    <MenuItem key={"Foreign"} value={"Foreign"}>Foreign</MenuItem>
+                    <MenuItem key={"Domestic"} value={"Domestic"}>Domestic</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} >
                 <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >

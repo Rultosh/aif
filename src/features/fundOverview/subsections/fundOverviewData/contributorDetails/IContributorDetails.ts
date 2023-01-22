@@ -3,7 +3,8 @@ export interface IContributorDetails {
     prelimApplicationId: Number | undefined,
     name: String | undefined,
     amount: String | undefined,
-    percentOfCorpus:String | undefined
+    percentOfCorpus:String | undefined,
+    contributionType: String | undefined
 }
 
 export const defaultContributorDetails : IContributorDetails = {
@@ -11,6 +12,7 @@ export const defaultContributorDetails : IContributorDetails = {
     prelimApplicationId: undefined,
     name: undefined,
     amount: undefined,
-    percentOfCorpus: undefined
+    percentOfCorpus: undefined,
+    contributionType: undefined
 
 }  

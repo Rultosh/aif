@@ -16,6 +16,7 @@ import { defaultIDetailedApplication } from "../../detailedApplication/sidbiRefe
 import { Controller } from "../../../lib/api-wrappers/Controller";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import { updateStepperIndex } from '../subsections/sideNavBarSlice';
+import { Link } from 'react-router-dom';
 
 export const InvestmentThemeOfFund = (props: any) => {
     const { id } = useParams()
@@ -76,7 +77,7 @@ export const InvestmentThemeOfFund = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2, mt: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Investment Theme of theFund</Typography>
+                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Investment Theme of the Fund</Typography>
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2 }}>Please provide detailed investment theme of the fund. Role of the Fund Manager in achieving Investment theme of the Fund</Typography>
                     <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
@@ -96,7 +97,8 @@ export const InvestmentThemeOfFund = (props: any) => {
                     </Card>
                     <ListFiles id={`investmentThemeOfFund${id}`} refreshId={investmentThemeOfFundRefreshId} />
                     <Button
-                        onClick={(e) => handleClick(e, "previous")}
+                        component={Link} 
+                        to="#"
                         variant="outlined"
                         disableElevation
                         sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >

@@ -104,12 +104,14 @@ export const DetailedApplication2J = (props: any) => {
                         <Grid item xs={4}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
+                                href="/templates/Fundname_Annexure I.doc"
                                 startIcon={<FileDownloadIcon />}
                                 variant="contained"
                                 disableElevation
                                 sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
                                 Download Annexure - I
                             </Button>
+                            {/* <Button href="/templates/SASF_Fund Track Record Template.xlsx">Download Template</Button> */}
                         </Grid>
                         <Grid item xs={4}>
                             <DocumentUpload id={`uploadAnnexure1${parentId}`} onSuccess={uploadAnnexure1Success}>
@@ -137,6 +139,7 @@ export const DetailedApplication2J = (props: any) => {
                         <Grid item xs={4}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
+                                href="/templates/Fundname_Annexure II.zip"
                                 startIcon={<FileDownloadIcon />}
                                 variant="contained"
                                 disableElevation
@@ -173,6 +176,7 @@ export const DetailedApplication2J = (props: any) => {
                         <Grid item xs={4}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
+                                href="/templates/Annexure III_SIDBI KYC.zip"
                                 startIcon={<FileDownloadIcon />}
                                 variant="contained"
                                 disableElevation

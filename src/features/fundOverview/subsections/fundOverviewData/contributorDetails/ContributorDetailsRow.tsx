@@ -35,6 +35,7 @@ export const ContributorDetailsRow = (props: ContributorDetailsRowPros) => {
     </TableCell>
     <TableCell align="center">{String(props.row.amount)}</TableCell>
     <TableCell align="center">{String(props.row.percentOfCorpus)}</TableCell>
+    <TableCell align="center">{String(props.row.contributionType)}</TableCell>
     <TableCell align="center">
       <Edit onClick={handleOpen}/>&nbsp;
       <Delete onClick={handleDelete}></Delete>

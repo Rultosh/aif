@@ -3,7 +3,7 @@ import { InputLabel, Card, CardContent, Typography, Grid, Accordion, AccordionSu
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useParams } from "react-router-dom";
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
@@ -131,7 +131,10 @@ export const DetailedApplication2A = () => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={2}>
-                                    <Button sx={{ background: "#363062", color: "white" }} >Click here</Button>
+                                    <Button 
+                                        href="/templates/SIDBI ASF-FFS Detailed Application.pdf"
+                                        sx={{ background: "#363062", color: "white" 
+                                    }} >Click here</Button>
                                 </Grid>
                                 <Grid item xs={10}>
                                     <Box sx={{ justifyContent: "center", ml: -6, mt: 1 }}>

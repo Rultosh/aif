@@ -173,7 +173,7 @@ export const Fund = () => {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Box sx={{ backgroundColor: "#f2f2f2" }}>
-                                    <div style={{display: "inline", padding: "10px"}}><a href="">Download Template</a></div>
+                                    <div style={{display: "inline", padding: "10px"}}><a href="/templates/SASF_Fund Track Record Template.xlsx">Download Template</a></div>
                                     <div style={{display: "inline", padding: "10px"}}><UploadComponents id={`pastInvestmentTrackRecord${id}`}></UploadComponents></div>
                                 </Box>
                             </AccordionDetails>
