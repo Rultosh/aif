@@ -71,7 +71,6 @@ function App() {
         <Route path='home' element={
           <PrivateRoute>
             <Home />
-            <ChangePassword />
           </PrivateRoute>
         }></Route>
         <Route path='workflow' element={<Workflow />}></Route>

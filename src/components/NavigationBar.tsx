@@ -177,7 +177,7 @@ const NavigationBar = (props: any) => {
                 sx={{ ml: '50px', my: 2, color: '#363062', display: 'block', fontSize: '15px', fontWeight: 'bold', textTransform: 'none' }}
 
               >
-                <Link to={`/${page}`}>
+                <Link to={`/${page}`} style = {{cursor:'pointer'}}>
                   {page}
                 </Link>
               </Button>

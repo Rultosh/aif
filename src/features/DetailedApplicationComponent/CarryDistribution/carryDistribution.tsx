@@ -23,6 +23,7 @@ import { wrapArgument } from "../../../lib/api-status/actionWrapper";
 import { createApplicationAsync } from "../../../../src/features/fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
 import { selectedDetailedApplications, detailedApplicationThunk } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
 import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
+import { selectUsers } from '../../admin/adminSlice'
 
 export const CarryDistribution = (props: any) => {
 
@@ -43,6 +44,7 @@ export const CarryDistribution = (props: any) => {
     const detailedController = new Controller(actionId, detailedApplicationThunk);
     const [prilimFormData, setPrilimFormData] = useState(defaultIDetailedApplication);
     const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
+    const usersState = useAppSelector(selectUsers)
 
     //const prelimApplicationId = detailedApplicationState.
 
@@ -951,7 +953,7 @@ export const CarryDistribution = (props: any) => {
                                     disableElevation
                                     sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
                                     Submit
-                                </Button> :
+                                </Button> : usersState.role == 'ADMIN'?
 
                                     <>
                                         <Button color='success' id='approve' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
@@ -963,7 +965,7 @@ export const CarryDistribution = (props: any) => {
                                         <Button color='error' id='reject' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                             Reject
                                         </Button>
-                                    </>}
+                                    </>: <></>}
                             </Box>
                         </Grid>
                     </Grid>

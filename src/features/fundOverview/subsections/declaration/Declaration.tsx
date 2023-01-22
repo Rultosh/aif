@@ -36,7 +36,7 @@ export const Declaration = () => {
         if (navTo === 'previous') {
             navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/selfRating`)
         } else {
-            navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/declaration`)
+            navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
         }
     }
 
@@ -115,7 +115,7 @@ export const Declaration = () => {
                     Save
                 </Button>
 
-                <Button disabled={!agreed} endIcon={<ArrowRightIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                <Button onClick={(e) => handleClick(e, "next")} disabled={!agreed} endIcon={<ArrowRightIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Preview
                 </Button>
 
