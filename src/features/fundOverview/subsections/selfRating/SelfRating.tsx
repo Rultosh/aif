@@ -11,6 +11,7 @@ import { selectSelfRatings, fetchSelfRatingAsync, createSelfRatingAsync, updateS
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
+import { selectUsers } from '../../../admin/adminSlice'
 
 
 
@@ -28,7 +29,7 @@ export const SelfRating = () => {
     const [selfRatingValue, setSelfRatingValue] = useState<ISelfRating>(selfRatingState.selfRatings);
     const [scoreBoard, setScoreBoard] = useState({} as any);
     const [score, setScore] = useState('0');
-
+    const usersState = useAppSelector(selectUsers)
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
@@ -117,8 +118,8 @@ export const SelfRating = () => {
         setSelfRatingValue(copiedValue);
     };
 
-    function getValue(key:string) : string {
-        if(selfRatingValue && selfRatingValue[key as keyof ISelfRating]) {
+    function getValue(key: string): string {
+        if (selfRatingValue && selfRatingValue[key as keyof ISelfRating]) {
             return String(selfRatingValue[key as keyof ISelfRating]);
         }
         else {
@@ -154,7 +155,7 @@ export const SelfRating = () => {
                                             >
                                                 {selfQuestions[i].options.map((val, index) => (
                                                     <Grid item xs={selfQuestions[idxVal].size}>
-                                                        <FormControlLabel onChange={() => calculateScore(selfQuestions[i], val, idxVal)} 
+                                                        <FormControlLabel onChange={() => calculateScore(selfQuestions[i], val, idxVal)}
                                                             value={val} control={<Radio />}
                                                             label={val} />
                                                     </Grid>
@@ -166,20 +167,20 @@ export const SelfRating = () => {
                                             <Grid item xs={12}>
                                                 <TextField
                                                     required
-                                                    id={"q" + (i + 1).toString()+"Comments"}
+                                                    id={"q" + (i + 1).toString() + "Comments"}
                                                     label="Comments if any"
                                                     //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
                                                     //value={selfRatingValue["q" + (i + 1).toString()+"Comments" as key of  as keyof ISelfRating]] || ''}
-                                                    value={getValue("q" + (i + 1).toString()+"Comments")|| ''}
-                                                    
+                                                    value={getValue("q" + (i + 1).toString() + "Comments") || ''}
+
                                                     variant="standard"
-                                                    onChange={(e) => handleChange(e, (i + 1).toString()+"Comments")}
+                                                    onChange={(e) => handleChange(e, (i + 1).toString() + "Comments")}
 
                                                     sx={{ display: 'flex', ml: 2 }}
                                                 />
                                             </Grid>
                                         </Grid>
-                                        
+
                                     </Box>
                                 </Grid>
                             </Grid>
@@ -198,10 +199,14 @@ export const SelfRating = () => {
                         <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Self Rating</Typography>
                     </Grid>
                     <Grid item xs={1}>
-                        <Box sx={{ position: 'fixed', backgroundColor: '#D586F7' }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column-reverse', flexWrap: 'wrap', justifyContent: 'center', alignContent: 'flex-end', }}>
-                                <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Score:{selfRatingValue.score || 0}</Typography>
-                            </Box></Box></Grid>
+                        {['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '') ?
+                            <Box sx={{ position: 'fixed', backgroundColor: '#D586F7' }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column-reverse', flexWrap: 'wrap', justifyContent: 'center', alignContent: 'flex-end', }}>
+                                    <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Score:{selfRatingValue.score || 0}</Typography>
+                                </Box>
+                            </Box>:<></>
+                            }
+                    </Grid>
                 </Grid>
 
                 {selfRatingQuestionComponents}

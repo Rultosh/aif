@@ -2,7 +2,7 @@ import { Card, CardContent, Typography, Grid, Box, Button, Modal, TextField, Sta
 import { useEffect, useState } from "react"
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import { createInvestmentResponsibleAsLeadAsync, updateInvestmentResponsibleAsLeadAsync } from "./investmentResponsibleAsLeadSlice";
-import { IInvestmentResponsibleAsLead } from "./IInvestmentResponsibleAsLead";
+import { IInvestmentResponsibleAsLead, defaultIIInvestmentResponsibleAsLead } from "./IInvestmentResponsibleAsLead";
 import uuid from "react-uuid";
 import { useAppDispatch } from "../../../../../app/hooks";
 import { useParams } from "react-router-dom";
@@ -33,6 +33,7 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
   const dispatch = useAppDispatch();
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
+    setInvestmentResponsibleAsLead(defaultIIInvestmentResponsibleAsLead)
     setOpen(false);
     props.onClose(false);
   }

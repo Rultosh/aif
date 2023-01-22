@@ -2,7 +2,7 @@ import { Card, CardContent, Typography, Grid, Box, Button, Modal, TextField } fr
 import { useEffect, useState } from "react"
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import { createCompanyContactDetailsAsync, updateCompanyContactDetailsAsync } from "./companyContactDetailsSlice";
-import { ICompanyContactDetails } from "./ICompanyContactDetails";
+import { ICompanyContactDetails, defaultIICompanyContactDetails } from "./ICompanyContactDetails";
 import uuid from "react-uuid";
 import { useAppDispatch } from "../../../../../app/hooks";
 import { useParams } from "react-router-dom";
@@ -31,6 +31,7 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
   const dispatch = useAppDispatch();
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
+    setCompanyContactDetails(defaultIICompanyContactDetails)
     setOpen(false);
     props.onClose(false);
   }

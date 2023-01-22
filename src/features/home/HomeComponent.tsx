@@ -38,14 +38,14 @@ export const Home = () => {
         )))
     }, [prelimApplications.prelimApplication])
 
-
+/*
     useEffect(() => {
         if (id && Number(id)) {
           if (!state[0]?.data[id]) {
             controller.read({ ...formData, id: Number(id) });
           }
         }
-      }, [])
+      }, [])*/
     
     //   useEffect(() => {
     //     let newData = state[0]?.data[Number(id)];

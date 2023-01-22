@@ -187,7 +187,7 @@ export const Preview = () => {
 
                 {!(statusPrelims == 'SUBMITTED') ? <Button color='success' id='submit' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Submit
-                </Button> : usersState.role == 'ADMIN'? <>
+                </Button> :  ['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '') ? <>
                     <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Approve
                     </Button>
