@@ -15,6 +15,7 @@ import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import DocumentChip from "../../../../components/DocumentChip";
 import client from '../../../../app/api'
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { selectUsers } from '../../../admin/adminSlice'
 // import { useForm } from "react-hook-form";
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import * as Yup from "yup";
@@ -33,6 +34,7 @@ export const Preview = () => {
     //const [statusPrelims, setStatusPrelims] = useState<String | undefined>(undefined);
     const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
     const [actionUid] = useState(uuid());
+    const usersState = useAppSelector(selectUsers)
 
     /*const validationSchema = Yup.object().shape({
         previewComments: Yup.string().required("Comments is required"),
@@ -185,7 +187,7 @@ export const Preview = () => {
 
                 {!(statusPrelims == 'SUBMITTED') ? <Button color='success' id='submit' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Submit
-                </Button> : <>
+                </Button> : usersState.role == 'ADMIN'? <>
                     <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Approve
                     </Button>
@@ -195,7 +197,7 @@ export const Preview = () => {
                     <Button color='error' id='reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Reject
                     </Button>
-                </>}
+                </>:<></>}
 
 
 
