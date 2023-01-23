@@ -75,7 +75,7 @@ const NavigationBar = (props: any) => {
 
 
   useEffect(() => {
-    if (usersState.status.fetchStatus === FetchStatus.IDLE  && usersState?.role == 'USERADMIN') {
+    if (usersState.status.fetchStatus === FetchStatus.IDLE  && ['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '')) {
       setPages(adminPages)
     }
   }, [role])
