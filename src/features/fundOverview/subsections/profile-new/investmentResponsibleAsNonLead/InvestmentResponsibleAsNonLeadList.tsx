@@ -6,7 +6,7 @@ import { getAllInvestmentResponsibleAsNonLeadsAsnyc, selectInvestmentResponsible
 
 import uuid from "react-uuid";
 import { useEffect, useState } from 'react';
-import { Box, Button, Card, CardContent, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { FetchStatus } from '../../../../../lib/api-status/IStatus';
 import { defaultIIInvestmentResponsibleAsNonLead, IInvestmentResponsibleAsNonLead } from './IInvestmentResponsibleAsNonLead';
 import { InvestmentResponsibleAsNonLeadModel } from './InvestmentResponsibleAsNonLeadModel';
@@ -22,6 +22,16 @@ export const InvestmentResponsibleAsNonLeadList = (props: InvestmentResponsibleA
 
     const dispatch = useAppDispatch();
     const [open, setOpen] = useState(false);
+    const tableHeaders = ["Name of company", "Amount invested", "Date of investment", "Exited/Write off", "Date of exit", "Comment", "Action"]
+
+    let headerComponent = []
+
+    for (let i = 0; i < tableHeaders.length; i++) {
+        headerComponent.push(
+            <React.Fragment >
+                <TableCell align="center" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
+            </React.Fragment>)
+    }
 
     function openModel() {
         setOpen(true);
@@ -56,17 +66,29 @@ export const InvestmentResponsibleAsNonLeadList = (props: InvestmentResponsibleA
         <CardContent>
             <Grid container spacing={2} >
                 <Grid item xs={12}>
-                <Typography variant="subtitle2" color='#363062' sx={{ flex: 1, mb: 1 }}>Investments responsible for (as Non Lead)</Typography>
+                    <Typography variant="subtitle2" color='#363062' sx={{ flex: 1, mb: 1 }}>Investments responsible for (as Non Lead)</Typography>
                 </Grid>
                 <Grid item xs={12}>
-                {investmentsAsNonLead.data[String(props.teamMemberId)] ?
-                    investmentsAsNonLead.data[String(props.teamMemberId)]?.investmentsAsNonLead?.map((investment: IInvestmentResponsibleAsNonLead) => {
-                        return (<InvestmentResponsibleAsNonLeadRow investmentResponsibleAsNonLead={investment} />)
-                    }) : <>No row to display</>} </Grid>
+                    <TableContainer component={Paper}  >
+                        <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                            <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
+                                <TableRow>
+                                    {headerComponent}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {investmentsAsNonLead.data[String(props.teamMemberId)] ?
+                                    investmentsAsNonLead.data[String(props.teamMemberId)]?.investmentsAsNonLead?.map((investment: IInvestmentResponsibleAsNonLead) => {
+                                        return (<InvestmentResponsibleAsNonLeadRow investmentResponsibleAsNonLead={investment} />)
+                                    }) : <>No row to display</>}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Grid>
                 <Grid item xs={12}>
-                <Button onClick={openModel} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                    Add
-                </Button></Grid>
+                    <Button onClick={openModel} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Add
+                    </Button></Grid>
                 <InvestmentResponsibleAsNonLeadModel
                     investmentResponsibleAsNonLead={{ ...defaultIIInvestmentResponsibleAsNonLead, teamMemberId: Number(props.teamMemberId) }}
                     open={open}
