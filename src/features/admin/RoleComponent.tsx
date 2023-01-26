@@ -53,11 +53,12 @@ const RoleComponent = (props: any) => {
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+        className= "special_modal2"
     >
 
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-                <Card sx={{ display: 'flex', }}>
+                <Card sx={{ display: 'flex',  background: '#f2f2f2'}}>
 
                     <CardContent sx={{ flex: 1 }}>
                         <Grid container spacing={2} >

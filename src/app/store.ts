@@ -10,7 +10,7 @@ import declarationReducer from '../features/fundOverview/subsections/declaration
 import selfRatingReducer from '../features/fundOverview/subsections/selfRating/selfRatingSlice'
 import prelimApplicationDataSlice from '../features/fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice'
 import investmentPartnerSlice from '../features/fundOverview/subsections/fundOverviewData/investmentPartner/investmentPartnerSlice'
-import homeReducer from '../features/home/homeSlice'
+import queryResolutionSlice from '../features/home/queryResolutionSlice'
 import teamMemberSlice from '../features/fundOverview/subsections/profile-new/teamMember/teamMemberSlice'
 import investmentResponsibleAsLeadSlice from '../features/fundOverview/subsections/profile-new/investmentResponsibleAsLead/investmentResponsibleAsLeadSlice'
 import investmentResponsibleAsNonLeadSlice from '../features/fundOverview/subsections/profile-new/investmentResponsibleAsNonLead/investmentResponsibleAsNonLeadSlice'
@@ -41,7 +41,7 @@ import forgotPasswordSlice from '../features/forgotPassword/forgotPasswordSlice'
 const store = configureStore({
   reducer: {
     auth: authenticationSlice,
-    home: homeReducer,
+    queryResolution: queryResolutionSlice,
     eligibilityResults: eligibilityResultsReducer,
     eligibilityQuestioner: eligibilityQuestionerReducer,
     landing: landingReducer,

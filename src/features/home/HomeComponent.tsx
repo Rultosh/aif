@@ -11,13 +11,15 @@ import uuid from "react-uuid";
 import { FetchStatus } from '../../lib/api-status/IStatus';
 import { Controller } from "../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from "../detailedApplication/sidbiReference/detailedApplicationSlice";
-import { defaultIDetailedApplication} from "../detailedApplication/sidbiReference/IDetailedApplication";
+import { defaultIDetailedApplication } from "../detailedApplication/sidbiReference/IDetailedApplication";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import MailIcon from '@mui/icons-material/Mail';
+import QueryResolutionModal from './QueryResolutionModal'
 
 export const Home = () => {
 
     //const { id } = useParams()
-    const id =1;
+    const id = 1;
     const [formData, setFormData] = useState(defaultIDetailedApplication);
     // const [detailedApplications, setDetailedApplications] = useState([] as any);
     const [actionId] = useState(uuid())
@@ -26,11 +28,20 @@ export const Home = () => {
     const state = useAppSelector(selectedDetailedApplications);
     const dispatch = useAppDispatch();
     const prelimApplications = useAppSelector(selectPrelimApplication);
+    const [openQueryModal, setOpenQueryModal] = useState(false);
+    const [selectedRow , setSelectedRow] = useState({} as any);
 
     const [actionUid] = useState(uuid());
     const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 5 } as IPageInfo)
 
+    function openModel(row:any) {
+        setSelectedRow(row)
+        setOpenQueryModal(true);
+    }
 
+    function closeModel() {
+        setOpenQueryModal(false);
+    }
     useEffect(() => {
         console.log('here')
         dispatch(getPrelimApplicationList(wrapArgument(
@@ -38,46 +49,18 @@ export const Home = () => {
         )))
     }, [prelimApplications.prelimApplication])
 
-/*
-    useEffect(() => {
-        if (id && Number(id)) {
-          if (!state[0]?.data[id]) {
-            controller.read({ ...formData, id: Number(id) });
-          }
-        }
-      }, [])*/
-    
-    //   useEffect(() => {
-    //     let newData = state[0]?.data[Number(id)];
-    //     if (newData) {
-    //         setFormData(newData)
-    //         setDetailedApplications(newData)
-    //     }
-    //   }, [state[0]?.data])
 
-   /* useEffect(() => {
-        
-            if (!stateDetailsApplication.applications) {
-                controller.read({ ...formData });
-            }
-        
-    }, [])
-
-   /* useEffect(() => {
-        let newData = stateDetailsApplication['applications'];
-        if (newData) setFormData(newData)
-    }, [stateDetailsApplication['applications']])*/
 
     const tableHeaders = [
-        "Fund Name", 
-        "Contact Person", 
-        "Status", 
-        "Preliminary Application Date", 
-        "Detailed Application Date", 
-        "Target Corpus", 
-        "Contribution Sought", 
-        "Download", 
-        "Query Resolution", 
+        "Fund Name",
+        "Contact Person",
+        "Status",
+        "Preliminary Application Date",
+        "Detailed Application Date",
+        "Target Corpus",
+        "Contribution Sought",
+        "Download",
+        "Query Resolution",
         "Workflow State"]
 
     let headerComponent = []
@@ -116,11 +99,14 @@ export const Home = () => {
         )))
     }
 
-    const getStatusDescription = (stage : String | undefined, status : String | undefined) => {
+    
 
-        const stageDescription = stage === "PRELIM"?"Preliminary application":"Detailed application";
 
-        switch(status) {
+    const getStatusDescription = (stage: String | undefined, status: String | undefined) => {
+
+        const stageDescription = stage === "PRELIM" ? "Preliminary application" : "Detailed application";
+
+        switch (status) {
             case "CREATED":
                 return "Pending submission - " + stageDescription;
             case "SUBMITTED":
@@ -138,7 +124,7 @@ export const Home = () => {
     }
 
     return (
-        <div className="homeComp" style={{height:670}}>
+        <div className="homeComp" style={{ height: 670 }}>
             <NavigationBar></NavigationBar>
             {prelimApplications.allStatus.fetchStatus === FetchStatus.IDLE ? <div >
                 <TableContainer component={Paper}  >
@@ -152,9 +138,9 @@ export const Home = () => {
                             {
                                 prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
                                     return <TableRow key={`${row.nameOfTheFund}`}>
-                                        {row.stage === "PRELIM"?<TableCell align="center" component="th" scope="row">
+                                        {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
                                             <a href={`/preliminary/${row.id}/fund`}>{row.nameOfTheFund}</a>
-                                        </TableCell>:<TableCell align="center" component="th" scope="row">
+                                        </TableCell> : <TableCell align="center" component="th" scope="row">
                                             <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a>
                                         </TableCell>}
                                         <TableCell align="center">{row.investmentManager}</TableCell>
@@ -163,7 +149,7 @@ export const Home = () => {
                                         <TableCell align="center">{row.createdOn}</TableCell>
                                         <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
                                         <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>
-                                        {row.stage === "PRELIM"?<TableCell align="center" component="th" scope="row">
+                                        {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
                                             <Tooltip title="Download">
                                                 <IconButton>
                                                     <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview`)} />
@@ -174,7 +160,7 @@ export const Home = () => {
                                                     <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip`)} />
                                                 </IconButton>
                                             </Tooltip>
-                                        </TableCell>:<TableCell align="center" component="th" scope="row">
+                                        </TableCell> : <TableCell align="center" component="th" scope="row">
                                             <Tooltip title="Download">
                                                 <IconButton>
                                                     <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview`)} />
@@ -186,53 +172,37 @@ export const Home = () => {
                                                 </IconButton>
                                             </Tooltip>
                                         </TableCell>}
+                                        <TableCell align="center"><MailIcon onClick={() => openModel(row)} ></MailIcon></TableCell>
                                         <TableCell align="center"></TableCell>
-                                        <TableCell align="center"></TableCell>
+                                       
                                     </TableRow>
                                 }) : <></>
                             }
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <Grid container sx={{flexDirection:'row',justifyContent :'center'}}>
+                <Grid container sx={{ flexDirection: 'row', justifyContent: 'center' }}>
                     <Grid item xs={4}>
-                <Box >
-                    {pageInfo.pageNumber > 0 ? <Button variant='outlined' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
-                    {prelimApplications.prelimApplications.length >= 5 ? <Button variant='outlined' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
-                </Box>
+                        <Box >
+                            {pageInfo.pageNumber > 0 ? <Button variant='outlined' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
+                            {prelimApplications.prelimApplications.length >= 5 ? <Button variant='outlined' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
+                        </Box>
+                    </Grid>
                 </Grid>
-                </Grid>
-                
-            </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div> }
 
-            {/* {state[0]?.status[actionId]?.actionStatus.fetchStatus === FetchStatus.IDLE ? <div >
-                <TableContainer component={Paper}  >
-                    <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
-                        <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
-                            <TableRow>
-                                {detailedHeaderComponent}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {
-                                detailedApplications ? detailedApplications.map((row : IDetailedApplication) => {
-                                    return <TableRow key={`${row.id}`}>
-                                        <TableCell align="center" component="th" scope="row">
-                                            <a href={`/Detailed/${row.id}/SidbiReference`}>{row.id}</a>
-                                        </TableCell>
-                                        <TableCell align="center">Sample Contact</TableCell>
-                                        <TableCell align="center">{String(row.sidbiReferenceNumber)}</TableCell>
-                                    </TableRow>
-                                }) : <></>
-                            }
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <div style={{ float: 'right' }}>
-                    {pageInfo.pageNumber > 0 ? <Button variant='outlined' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
-                    {prelimApplications.prelimApplications.length >= 5 ? <Button variant='outlined' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
-                </div>
-            </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>} */}
+                {openQueryModal ? <QueryResolutionModal
+                                        isActive = {openQueryModal}
+                                        open={() => openModel(selectedRow)}
+                                        close={closeModel}
+                                        prelimDetails = {selectedRow}
+                                        ></QueryResolutionModal>
+                                            //investmentAssociateFormData={row}
+                                            
+                                            //prelimApplicationId={props.row.prelimApplicationId} />
+                                            : <></>}
+
+            </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
+
         </div>
     )
 }

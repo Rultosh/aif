@@ -57,4 +57,7 @@ code {
     monospace;
 }
 
+.special_modal {
+  background-color: transparent !important;
+}
 
