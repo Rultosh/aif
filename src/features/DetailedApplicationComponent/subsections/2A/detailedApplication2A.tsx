@@ -328,7 +328,7 @@ export const DetailedApplication2A = () => {
                             <TextField
                                 required
                                 id="provisionOfFundSetup"
-                                label="7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?."
+                                label=""
                                 //defaultValue={formData.provisionOfFundSetup === undefined ? " " : formData["provisionOfFundSetup"]}
                                 value={formData["provisionOfFundSetup"] || ''}
                                 variant="standard"

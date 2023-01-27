@@ -96,14 +96,14 @@ export const InvestmentThemeOfFund = (props: any) => {
                         </CardContent>
                     </Card>
                     <ListFiles id={`investmentThemeOfFund${id}`} refreshId={investmentThemeOfFundRefreshId} />
-                    <Button
+                    {/*<Button
                         component={Link} 
                         to="#"
                         variant="outlined"
                         disableElevation
                         sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >
                         Download
-                    </Button>
+    </Button>*/}
                     <DocumentUpload id={`investmentThemeOfFund${id}`} onSuccess={investmentThemeOfFundSuccess}>
                         <Button
                             // onClick={(e) => handleClick(e, "previous")}

@@ -112,13 +112,13 @@ export const EngagementAndRole = (props: any) => {
                     <ListFiles 
                         id={`engagementAndRole${id}`} refreshId={engagementAndRoleRefreshId}/>
                     </div>
-                    <Button
+                    {/*<Button
                         onClick={(e) => handleClick(e, "previous")}
                         variant="outlined"
                         disableElevation
                         sx={{ textTransform: 'none', mt: 9, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >
                         Download
-                    </Button>
+    </Button>*/}
                     <DocumentUpload id={`engagementAndRole${id}`} onSuccess={engagementAndRoleSuccess}>
                     <Button
                         // onClick={(e) => handleClick(e, "previous")}
