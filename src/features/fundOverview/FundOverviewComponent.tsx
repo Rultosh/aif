@@ -18,6 +18,7 @@ export const FundOverview = () => {
     const { id } = useParams();
     const usersState = useAppSelector(selectUsers)
     const prelimApplicationState = useAppSelector(selectPrelimApplication);
+    const statusPrelims = prelimApplicationState.prelimApplication.status || '';
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -50,6 +51,9 @@ export const FundOverview = () => {
         };
 
     const isUserPermittedToView = () => {
+        if (usersState.role == 'USER' && !(['SUBMITTED' ,'APPROVED'].includes(statusPrelims.toString()))){
+            return true;
+        }
         return false
     };
 

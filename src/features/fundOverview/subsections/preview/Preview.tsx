@@ -180,8 +180,8 @@ export const Preview = () => {
                     </CardContent>
                 </Card>
 
-
-                <Button onClick={(e) => handleClick(e, "previous")} startIcon={<ArrowLeftIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                
+                <Button disabled={(statusPrelims == 'SUBMITTED') || usersState.role == 'ADMIN'} onClick={(e) => handleClick(e, "previous")} startIcon={<ArrowLeftIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Declaration
                 </Button>
 
