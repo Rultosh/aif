@@ -53,8 +53,9 @@ const signupSlice = createSlice({
           state.status.fetchStatus = FetchStatus.IDLE;
         }
       )
-      .addCase(signupUsersAsync.rejected, (state, action) => {
-        state.response = 'Error in signup';
+      .addCase(signupUsersAsync.rejected, (state, action:any) => {
+        state.response = action.payload?.message;
+        state.status.fetchStatus = FetchStatus.FAILED;
       })
   }
 })

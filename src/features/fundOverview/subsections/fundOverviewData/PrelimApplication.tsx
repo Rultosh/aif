@@ -421,9 +421,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                 name="dealSubsector"
                             >
 
-                                {prelimApplicationFormData.dealSector && 
-                                    (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)]  && 
-                                    (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)].values.map((item : string) => {
+                                {prelimApplicationFormData.dealSector &&
+                                    (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)] &&
+                                    (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)].values.map((item: string) => {
                                         return <MenuItem key={item} value={item} selected={String(prelimApplicationFormData.dealSubsector || '') === item}>{item}</MenuItem>
                                     })}
                             </Select>
@@ -461,49 +461,6 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             <Card sx={{ display: 'flex', }}>
                                 <CardContent sx={{ flex: 1 }}>
                                     <Grid container spacing={2} >
-                                        <Grid item xs={12}>
-                                            <Box sx={{ display: 'inline-flex' }}>
-                                                <UploadIcon />
-                                                <Typography
-                                                    variant="subtitle1"
-                                                    sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>
-                                                    Supporting Documents
-                                                    <span style={{ fontWeight: "normal" }}>
-                                                        (Max. file size 5 MB each)</span> </Typography>
-                                            </Box>
-                                        </Grid>
-                                        {Number(prelimAppicationId) ?
-                                            <Grid item xs={12}>
-                                                <Box sx={{ display: 'flex' }}>
-                                                    <div style={{ margin: '5px' }}>
-                                                        <DocumentChip
-                                                            label="Pvt. Placement Memorandum"
-                                                            id={`sdPvtPlacementMemorandum${prelimAppicationId}`} />
-                                                    </div>
-                                                    <div style={{ margin: '5px' }}>
-                                                        <DocumentChip
-                                                            label="IM Agreement"
-                                                            id={`sdImAgreement${prelimAppicationId}`} />
-                                                    </div>
-                                                    <div style={{ margin: '5px' }}>
-                                                        <DocumentChip
-                                                            label="Trust Deed"
-                                                            id={`sdTrustDeal${prelimAppicationId}`} />
-                                                    </div>
-                                                    <div style={{ margin: '5px' }}>
-                                                        <DocumentChip
-                                                            label="SEBI Certificate"
-                                                            id={`sdSEBICertificate${prelimAppicationId}`} />
-                                                        {/* <DocumentChip 
-                                                        label="SEBI Certificate" 
-                                                        id="sdSEBICertificate"
-                                                        onSuccess={handleDocumentUpload}
-                                                        onDelete={handleDocumentDelete}
-                                                        url={prelimApplicationFormData.sdSEBICertificate} /> */}
-                                                        {/* <Chip label="SEBI Certificate" size="medium" sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} /> */}
-                                                    </div>
-                                                </Box>
-                                            </Grid> : <Grid item xs={12}>Please save the form to upload documents</Grid>}
                                         <Grid item xs={12}>
                                             <Grid item xs={4}>
                                                 <TextField
@@ -712,6 +669,56 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 </Button>
                                             </Box>
                                         </Grid  >
+                                    </Grid>
+                                </CardContent>
+                            </Card>
+                            <Card sx={{ display: 'flex', }}>
+                                <CardContent sx={{ flex: 1 }}>
+                                    <Grid container spacing={2} >
+                                        <Grid item xs={12}>
+                                            <Box sx={{ display: 'inline-flex' }}>
+                                                <UploadIcon />
+                                                <Typography
+                                                    variant="subtitle1"
+                                                    sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>
+                                                    Supporting Documents
+                                                    <span style={{ fontWeight: "normal" }}>
+                                                        (Max. file size 5 MB each)</span> </Typography>
+                                            </Box>
+                                            {Number(prelimAppicationId) ?
+                                                <Grid item xs={12}>
+                                                    <Box sx={{ display: 'flex' }}>
+                                                        <div style={{ margin: '5px' }}>
+                                                            <DocumentChip
+                                                                label="Pvt. Placement Memorandum"
+                                                                id={`sdPvtPlacementMemorandum${prelimAppicationId}`} />
+                                                        </div>
+                                                        <div style={{ margin: '5px' }}>
+                                                            <DocumentChip
+                                                                label="IM Agreement"
+                                                                id={`sdImAgreement${prelimAppicationId}`} />
+                                                        </div>
+                                                        <div style={{ margin: '5px' }}>
+                                                            <DocumentChip
+                                                                label="Trust Deed"
+                                                                id={`sdTrustDeal${prelimAppicationId}`} />
+                                                        </div>
+                                                        <div style={{ margin: '5px' }}>
+                                                            <DocumentChip
+                                                                label="SEBI Certificate"
+                                                                id={`sdSEBICertificate${prelimAppicationId}`} />
+                                                            {/* <DocumentChip 
+                                                        label="SEBI Certificate" 
+                                                        id="sdSEBICertificate"
+                                                        onSuccess={handleDocumentUpload}
+                                                        onDelete={handleDocumentDelete}
+                                                        url={prelimApplicationFormData.sdSEBICertificate} /> */}
+                                                            {/* <Chip label="SEBI Certificate" size="medium" sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} /> */}
+                                                        </div>
+                                                    </Box>
+                                                </Grid> : <Grid item xs={12}>Please save the form to upload documents</Grid>}
+
+                                        </Grid>
                                     </Grid>
                                 </CardContent>
                             </Card>

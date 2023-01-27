@@ -1,4 +1,4 @@
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal } from "@mui/material";
 import logo from '../../images/logo.png'
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -12,6 +12,7 @@ import { Controller } from "../../lib/api-wrappers/Controller";
 import { signupUsersAsync } from './signUpSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { selectedSignup } from './signUpSlice'
+import {ModalComponent} from '../../components/ModalComponent'
 
 
 
@@ -50,6 +51,11 @@ const SignUp = () => {
         setFormData(defaultISignup)
     };
 
+
+    const handleClose= () => {
+        setShowResponse(false)
+        //setFormData(defaultISignup)
+    };
 
     return (
         <div >
@@ -103,7 +109,7 @@ const SignUp = () => {
                                             <Box display="flex"
                                                 justifyContent="center"
                                                 alignItems="center">
-                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Alternative Investment Fund</Typography>
+                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Alternative Investment Fund</Typography>
 
                                             </Box>
 
@@ -287,6 +293,16 @@ const SignUp = () => {
                                             <Grid item xs={12}>
                                                 <Box sx={{ mt: 2 }}>
                                                     {showResponse && signupState.response != undefined ? <>{signupState.response}</> : <></>}
+                                                    <ModalComponent
+                                                        open={showResponse}
+                                                        close={handleClose}
+                                                        aria-labelledby="modal-modal-title"
+                                                        aria-describedby="modal-modal-description"
+                                                        className="special_modal"
+                                                        msg = {signupState.response}
+                                                        status = {signupState.status.fetchStatus}
+                                                    >
+                                                    </ModalComponent>
                                                 </Box>
                                             </Grid>
 
@@ -312,53 +328,7 @@ const SignUp = () => {
 
                     </Grid>
                 </Box></Container>
-            {/*} <Container sx={{ mt: '90px', }}>
-                <Grid >
-               
-                    <CardActionArea component="a" disableRipple >
-                    <Grid item  sm={3} >
-                        <Card sx={{ display: 'flex' }}>
-                            <CardContent sx={{ flex: 1 }}>
-                                {"card1"}
-                                <Box display="flex"
-                                    justifyContent="center"
-                                    alignItems="center">
-                                   
-                                </Box>
-                            </CardContent>
 
-                        </Card>
-                        </Grid>
-                        <Grid item  sm={3} >
-                        <Card sx={{ display: 'flex' }}>
-                            <CardContent sx={{ flex: 1 }}>
-                                {"card2"}
-                                <Box display="flex"
-                                    justifyContent="center"
-                                    alignItems="center">
-                                   
-                                </Box>
-                            </CardContent>
-
-                        </Card>
-                        </Grid>
-                        <Grid item  sm={3} >
-                        <Card sx={{ display: 'flex' }}>
-                            <CardContent sx={{ flex: 1 }}>
-                                {"card3"}
-                                <Box display="flex"
-                                    justifyContent="center"
-                                    alignItems="center">
-                                   
-                                </Box>
-                            </CardContent>
-
-                        </Card>
-                        </Grid>
-
-                    </CardActionArea>
-                </Grid>
-    </Container>*/}
         </div>
 
     )

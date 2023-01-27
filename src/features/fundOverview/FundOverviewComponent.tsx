@@ -8,12 +8,17 @@ import decImg from '../../images/declaration.png'
 import selfRatingImg from '../../images/rating.png'
 import profileImg from '../../images/profile.png'
 import IconButton from '@mui/material/IconButton';
+import { selectUsers } from '../admin/adminSlice'
+import { useAppSelector, useAppDispatch } from '../../app/hooks'
+import { selectPrelimApplication } from "../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
 
 
 export const FundOverview = () => {
-    const navigate = useNavigate();
 
     const { id } = useParams();
+    const usersState = useAppSelector(selectUsers)
+    const prelimApplicationState = useAppSelector(selectPrelimApplication);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!id) {
@@ -44,15 +49,19 @@ export const FundOverview = () => {
             setExpanded(isExpanded ? panel : false);
         };
 
+    const isUserPermittedToView = () => {
+        return false
+    };
+
 
     return (
         <div className="homeComp">
-            
+
             <NavigationBar></NavigationBar>
             <div >
                 <Container maxWidth={false} sx={{ mt: '40px' }} >
                     <div>
-                        <h2 style={{color: "gray"}}>Preliminary Application Process</h2>
+                        <h2 style={{ color: "gray" }}>Preliminary Application Process</h2>
                         <span>
                             Note: <a target="_blank" rel="noopener" href='/templates/SIDBI ASF-Preliminary Application.pdf'>Click</a> here, to view the Preliminary Application format to assess the data required for submission
                         </span>
@@ -60,93 +69,120 @@ export const FundOverview = () => {
                     </div>
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container spacing={2}>
-                            <Grid item xs={2}>
-                                <Card sx={{ display: 'flex' }}>
-                                    <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                        <IconButton onClick={() => navigate("fund")}>
-                                            <CardMedia
-                                                component="img"
-                                                width="20"
-                                                //height="80"
-                                                image={fundImg}
-                                                alt="test-img"
-                                            />
-
-                                        </IconButton>
-
-                                        <Typography textAlign="center" sx={{ color: 'red', fontWeight: 700 }}>
-                                            <Link to="fund" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                Fund Overview
-                                            </Link>
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                                <Divider />
-                                {id?.toString() !='NEW' ? <>
+                            {isUserPermittedToView() ?
+                                <Grid item xs={2}>
                                     <Card sx={{ display: 'flex' }}>
                                         <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                            <IconButton onClick={() => navigate("Profile")}>
+                                            <IconButton onClick={() => navigate("fund")}>
                                                 <CardMedia
                                                     component="img"
                                                     width="20"
                                                     //height="80"
-                                                    image={profileImg}
+                                                    image={fundImg}
                                                     alt="test-img"
                                                 />
 
                                             </IconButton>
 
-                                            <Typography textAlign="center" sx={{ fontWeight: 700 }}>
-                                                <Link to="Profile" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                    Profile
+                                            <Typography textAlign="center" sx={{ color: 'red', fontWeight: 700 }}>
+                                                <Link to="fund" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                    Fund Overview
                                                 </Link>
                                             </Typography>
                                         </CardContent>
                                     </Card>
                                     <Divider />
-                                    <Card sx={{ display: 'flex' }}>
-                                        <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                            <IconButton onClick={() => navigate("selfRating")}>
-                                                <CardMedia
-                                                    component="img"
-                                                    width="20"
-                                                    //height="80"
-                                                    image={selfRatingImg}
-                                                    alt="test-img"
-                                                />
+                                    {id?.toString() != 'NEW' ? <>
+                                        <Card sx={{ display: 'flex' }}>
+                                            <CardContent sx={{ flex: 1, alignContent: 'center' }} >
+                                                <IconButton onClick={() => navigate("Profile")}>
+                                                    <CardMedia
+                                                        component="img"
+                                                        width="20"
+                                                        //height="80"
+                                                        image={profileImg}
+                                                        alt="test-img"
+                                                    />
 
-                                            </IconButton>
+                                                </IconButton>
 
-                                            <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
-                                                <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                    Self Rating
-                                                </Link>
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                    <Divider />
-                                    <Card sx={{ display: 'flex'}}>
-                                        <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                            <IconButton onClick={() => navigate("Declaration")}>
-                                                <CardMedia
-                                                    component="img"
-                                                    width="20"
-                                                    //height="80"
-                                                    image={decImg}
-                                                    alt="test-img"
-                                                />
+                                                <Typography textAlign="center" sx={{ fontWeight: 700 }}>
+                                                    <Link to="Profile" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                        Profile
+                                                    </Link>
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                        <Divider />
+                                        <Card sx={{ display: 'flex' }}>
+                                            <CardContent sx={{ flex: 1, alignContent: 'center' }} >
+                                                <IconButton onClick={() => navigate("selfRating")}>
+                                                    <CardMedia
+                                                        component="img"
+                                                        width="20"
+                                                        //height="80"
+                                                        image={selfRatingImg}
+                                                        alt="test-img"
+                                                    />
 
-                                            </IconButton>
+                                                </IconButton>
 
-                                            <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
-                                                <Link to="declaration" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                    Declaration
-                                                </Link>
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                    <Divider />
-                                    <Card sx={{ display: 'flex', mb: 2  }}>
+                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
+                                                    <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                        Self Rating
+                                                    </Link>
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                        <Divider />
+                                        <Card sx={{ display: 'flex' }}>
+                                            <CardContent sx={{ flex: 1, alignContent: 'center' }} >
+                                                <IconButton onClick={() => navigate("Declaration")}>
+                                                    <CardMedia
+                                                        component="img"
+                                                        width="20"
+                                                        //height="80"
+                                                        image={decImg}
+                                                        alt="test-img"
+                                                    />
+
+                                                </IconButton>
+
+                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
+                                                    <Link to="declaration" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                        Declaration
+                                                    </Link>
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                        <Divider />
+                                        <Card sx={{ display: 'flex', mb: 2 }}>
+                                            <CardContent sx={{ flex: 1, alignContent: 'center' }} >
+                                                <IconButton onClick={() => navigate("preview")}>
+                                                    <CardMedia
+                                                        component="img"
+                                                        width="20"
+                                                        //height="80"
+                                                        image={selfRatingImg}
+                                                        alt="test-img"
+                                                    />
+
+                                                </IconButton>
+
+                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
+                                                    <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                        Preview
+                                                    </Link>
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                        <Divider />
+                                    </>
+                                        : null}
+                                </Grid>
+                                :
+                                <Grid item xs={2}>
+                                    <Card sx={{ display: 'flex', mb: 2 }}>
                                         <CardContent sx={{ flex: 1, alignContent: 'center' }} >
                                             <IconButton onClick={() => navigate("preview")}>
                                                 <CardMedia
@@ -166,10 +202,8 @@ export const FundOverview = () => {
                                             </Typography>
                                         </CardContent>
                                     </Card>
-                                    <Divider />
-                                </>
-                                    : null}
-                            </Grid>
+                                </Grid>
+                            }
                             <Grid item xs={10}>
                                 <Outlet />
 

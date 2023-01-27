@@ -15,6 +15,8 @@ import { defaultIDetailedApplication } from "../detailedApplication/sidbiReferen
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import MailIcon from '@mui/icons-material/Mail';
 import QueryResolutionModal from './QueryResolutionModal'
+import orengeLogo from '../../images/Orange2.png'
+import { selectUsers } from '../admin/adminSlice'
 
 export const Home = () => {
 
@@ -29,12 +31,12 @@ export const Home = () => {
     const dispatch = useAppDispatch();
     const prelimApplications = useAppSelector(selectPrelimApplication);
     const [openQueryModal, setOpenQueryModal] = useState(false);
-    const [selectedRow , setSelectedRow] = useState({} as any);
-
+    const [selectedRow, setSelectedRow] = useState({} as any);
+    const usersState = useAppSelector(selectUsers)
     const [actionUid] = useState(uuid());
     const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 5 } as IPageInfo)
 
-    function openModel(row:any) {
+    function openModel(row: any) {
         setSelectedRow(row)
         setOpenQueryModal(true);
     }
@@ -99,8 +101,13 @@ export const Home = () => {
         )))
     }
 
-    
-
+const getPath = ( status: String | undefined) => {
+    if (usersState.role == 'ADMIN'){
+        return 'preview'
+    }
+    let path = (status && ['SUBMITTED', 'APPROVED'].includes(status.toString())) ? 'preview' : 'fund'
+    return path;
+}
 
     const getStatusDescription = (stage: String | undefined, status: String | undefined) => {
 
@@ -139,7 +146,7 @@ export const Home = () => {
                                 prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
                                     return <TableRow key={`${row.nameOfTheFund}`}>
                                         {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
-                                            <a href={`/preliminary/${row.id}/fund`}>{row.nameOfTheFund}</a>
+                                            <a href={`/preliminary/${row.id}/${String(getPath(row.status))}`}>{row.nameOfTheFund}</a>
                                         </TableCell> : <TableCell align="center" component="th" scope="row">
                                             <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a>
                                         </TableCell>}
@@ -173,8 +180,29 @@ export const Home = () => {
                                             </Tooltip>
                                         </TableCell>}
                                         <TableCell align="center"><MailIcon onClick={() => openModel(row)} ></MailIcon></TableCell>
-                                        <TableCell align="center"></TableCell>
-                                       
+                                        <TableCell align="center">
+                                            <Grid container xs={12}>
+                                                <Box
+                                                    component="img"
+                                                    sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                    alt="success"
+                                                    src={orengeLogo}
+                                                />
+                                                <Box
+                                                    component="img"
+                                                    sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                    alt="success"
+                                                    src={orengeLogo}
+                                                />
+                                                <Box
+                                                    component="img"
+                                                    sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                    alt="success"
+                                                    src={orengeLogo}
+                                                />
+                                            </Grid>
+                                        </TableCell>
+
                                     </TableRow>
                                 }) : <></>
                             }
@@ -191,15 +219,15 @@ export const Home = () => {
                 </Grid>
 
                 {openQueryModal ? <QueryResolutionModal
-                                        isActive = {openQueryModal}
-                                        open={() => openModel(selectedRow)}
-                                        close={closeModel}
-                                        prelimDetails = {selectedRow}
-                                        ></QueryResolutionModal>
-                                            //investmentAssociateFormData={row}
-                                            
-                                            //prelimApplicationId={props.row.prelimApplicationId} />
-                                            : <></>}
+                    isActive={openQueryModal}
+                    open={() => openModel(selectedRow)}
+                    close={closeModel}
+                    prelimDetails={selectedRow}
+                ></QueryResolutionModal>
+                    //investmentAssociateFormData={row}
+
+                    //prelimApplicationId={props.row.prelimApplicationId} />
+                    : <></>}
 
             </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
 
