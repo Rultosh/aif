@@ -199,7 +199,7 @@ export const DetailedApplication2B = (props: any) => {
                                 <Grid item xs={9} sx={{ mt: 2 }}>
 
                                     <InputLabel variant="standard" sx={{ ml: 2 }}>
-                                        <DocumentUpload id={`firstClosing${props.parentId}`}
+                                        <DocumentUpload id={`firstClosing${parentId}`}
                                             onSuccess={firstClosingSuccess}>
                                             <FileUploadIcon onClick={handleOnClickUpload} >
                                             </FileUploadIcon>
@@ -209,7 +209,7 @@ export const DetailedApplication2B = (props: any) => {
                                 <Grid item xs={3}>
                                     <Box>
                                         <ListFiles
-                                            id={`firstClosing${props.parentId}`}
+                                            id={`firstClosing${parentId}`}
                                             refreshId={firstClosingUid} />
                                     </Box>
                                 </Grid>
