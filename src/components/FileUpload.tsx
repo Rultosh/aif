@@ -11,6 +11,7 @@ export interface FileUploadProps {
   open: boolean;
   setOpen: any;
   onSuccess: (id: String, url: String) => void;
+  signed: boolean | undefined
 }
 
 interface IFileUploadInfo {
@@ -43,6 +44,7 @@ export default function FileUpload(props: FileUploadProps) {
     FileUploadService.upload(
       props.id,
       fileInfo.file,
+      props.signed,
       (event: any) => {
         let uploadProgress = Math.round((100 * event.loaded) / event.total);
         setProgress(progress)

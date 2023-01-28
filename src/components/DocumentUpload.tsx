@@ -5,6 +5,7 @@ interface DocumentChipProps {
   id: String,
   onSuccess: (id: String, url: String) => void | undefined,
   children: ReactElement | undefined
+  signed?: boolean | undefined
 }
 
 export default function DocumentChip(props: DocumentChipProps) {
@@ -19,6 +20,7 @@ export default function DocumentChip(props: DocumentChipProps) {
       onSuccess={(id: String, url: String) => {
         props.onSuccess(props.id, url);
       }}
+      signed={props.signed}
       open={open} setOpen={setOpen}></FileUpload>
   </>
   )

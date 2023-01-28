@@ -151,12 +151,14 @@ export const Preview = () => {
                             <div style={{ margin: '5px' }}>
                                 <DocumentChip
                                     label="Upload Digitally Signed Application"
-                                    id={''} />
+                                    id={`DigitallySignedApplication${id}`} 
+                                    signed={true}
+                                    />
                             </div>
                             <div style={{ margin: '5px' }}>
                                 <DocumentChip
                                     label="Upload Digital Certificates"
-                                    id={''} />
+                                    id={`DigitalCertificate${id}`} />
                             </div>
                             <div style={{ margin: '5px' }}>
                                 <DocumentChip
