@@ -158,7 +158,7 @@ export const DetailedApplication2C = (props: any) => {
                             </Grid>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`detailedApplicationDetailedProfile${formData.id}`}></UploadComponents>
+                                    <UploadComponents id={`detailedApplicationDetailedProfile${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
                         </CardContent>
@@ -185,7 +185,7 @@ export const DetailedApplication2C = (props: any) => {
                             </Grid>
                             <Grid item xs={3}>
                                 <div style={{ margin: "15px" }}>
-                                    <UploadComponents id={`profileLocRenum${formData.id}`}></UploadComponents>
+                                    <UploadComponents id={`profileLocRenum${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>
                         </CardContent>

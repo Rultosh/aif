@@ -10,6 +10,7 @@ import uuid from "react-uuid";
 interface DocumentChipProps {
   id: String
   label: String
+  signed?: boolean | undefined
 }
 
 export default function DocumentChip(props: DocumentChipProps) {
@@ -21,7 +22,7 @@ export default function DocumentChip(props: DocumentChipProps) {
     setRefreshId(uuid())
   }
 
-  return (<DocumentUpload id={props.id} onSuccess={onUploadSuccess}>
+  return (<DocumentUpload id={props.id} onSuccess={onUploadSuccess} signed={props.signed}>
       <div>
         <Chip
           icon={<Upload />}

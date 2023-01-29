@@ -159,23 +159,23 @@ const getPath = ( status: String | undefined) => {
                                         {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
                                             <Tooltip title="Download">
                                                 <IconButton>
-                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview`)} />
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
                                                 </IconButton>
                                             </Tooltip>
                                             <Tooltip title="Download All">
                                                 <IconButton>
-                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip`)} />
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)} />
                                                 </IconButton>
                                             </Tooltip>
                                         </TableCell> : <TableCell align="center" component="th" scope="row">
                                             <Tooltip title="Download">
                                                 <IconButton>
-                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview`)} />
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
                                                 </IconButton>
                                             </Tooltip>
                                             <Tooltip title="Download All">
                                                 <IconButton>
-                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip`)} />
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadAsZip?access_token=${localStorage.getItem('token')}`)} />
                                                 </IconButton>
                                             </Tooltip>
                                         </TableCell>}

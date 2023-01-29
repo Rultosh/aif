@@ -1,13 +1,19 @@
 import api from "../app/fileServerApi";
 
 class FileUploadService {
-  upload(bucket, file, onUploadProgress) {
+  upload(bucket, file, signed, onUploadProgress) {
     let formData = new FormData();
+
+    let url = `files/${bucket}`;
+
+    if(signed) {
+      url += "?signed=true"
+    }
 
     formData.append("file", file);
     return api({
       method: 'post',
-      url: `/files/${bucket}`,
+      url: url,
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
