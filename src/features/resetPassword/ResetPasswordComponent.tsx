@@ -162,14 +162,14 @@ const ResetPassword = () => {
                                                     />
                                                 </Grid>
 
-                                                <Grid item xs={6}>
+                                                {/* <Grid item xs={6}>
                                                     <TextField
                                                         required
                                                         id="outlined-required"
                                                         label="Captcha"
                                                         sx={{ display: 'flex' }}
                                                     />
-                                                </Grid>
+                                                </Grid> */}
                                                 <Grid item xs={6}>
                                                     <TextField
                                                         required
