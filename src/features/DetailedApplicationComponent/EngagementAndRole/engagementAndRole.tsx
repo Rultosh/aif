@@ -18,8 +18,9 @@ import { defaultIDetailedApplication } from "../../detailedApplication/sidbiRefe
 import { updateStepperIndex } from '../subsections/sideNavBarSlice';
 
 export const EngagementAndRole = (props: any) => {
-    const { id } = useParams()
-    const [parentId] = useState(Number(id))
+
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication);
     const actionId = useState(uuid());
     const controller = new Controller(actionId, detailedApplicationThunk);
@@ -29,29 +30,19 @@ export const EngagementAndRole = (props: any) => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(updateStepperIndex(3))        
-        if (parentId) {
-
-            if (!state[parentId]?.data[0]) {
-                setFormData({ ...formData, parentId: parentId })
-                controller.all({ ...formData, parentId: parentId });
-            }
+        dispatch(updateStepperIndex(3))
+      if (parentId && Number(parentId)) {
+        if (!state[0]?.data[parentId]) {
+          controller.fetch({ ...formData, parentId: Number(parentId) });
         }
+      }
     }, [])
-
+  
     useEffect(() => {
-        dispatch(updateStepperIndex(3))        
-        if (id && state[parentId]?.data) {
-            Object.keys(state[parentId]?.data).map((key) => {
-                let value = state[parentId]?.data[key]
-                if (value && value.id) {
-                    setFormData(value);
-                } else {
-                    setFormData({ ...formData, parentId: parentId })
-                }
-            });
-        }
-    }, [state[parentId]?.data])
+        dispatch(updateStepperIndex(3))
+      let newData = state[0]?.data[Number(parentId)];
+      if (newData) setFormData(newData)
+    }, [state[0]?.data])
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -69,10 +60,10 @@ export const EngagementAndRole = (props: any) => {
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/carryDistribution`);
+            navigate(`/Detailed/${parentId}/carryDistribution`);
         }
         else {
-            navigate(`/Detailed/${id}/InvestmentThemeOfFund`);
+            navigate(`/Detailed/${parentId}/InvestmentThemeOfFund`);
         }
     }
 
@@ -110,7 +101,7 @@ export const EngagementAndRole = (props: any) => {
                     </Card>
                     <div style={{marginTop: "10px"}}>
                     <ListFiles 
-                        id={`engagementAndRole${id}`} refreshId={engagementAndRoleRefreshId}/>
+                        id={`engagementAndRole${parentId}`} refreshId={engagementAndRoleRefreshId}/>
                     </div>
                     {/*<Button
                         onClick={(e) => handleClick(e, "previous")}
@@ -119,7 +110,7 @@ export const EngagementAndRole = (props: any) => {
                         sx={{ textTransform: 'none', mt: 9, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >
                         Download
     </Button>*/}
-                    <DocumentUpload id={`engagementAndRole${id}`} onSuccess={engagementAndRoleSuccess}>
+                    <DocumentUpload id={`engagementAndRole${parentId}`} onSuccess={engagementAndRoleSuccess}>
                     <Button
                         // onClick={(e) => handleClick(e, "previous")}
                         variant="outlined"

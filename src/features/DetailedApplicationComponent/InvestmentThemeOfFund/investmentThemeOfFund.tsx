@@ -19,7 +19,9 @@ import { updateStepperIndex } from '../subsections/sideNavBarSlice';
 import { Link } from 'react-router-dom';
 
 export const InvestmentThemeOfFund = (props: any) => {
-    const { id } = useParams()
+
+    const params = useParams()
+    const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication);
     const [actionId] = useState(uuid())
     const controller = new Controller(actionId, detailedApplicationThunk);
@@ -29,16 +31,16 @@ export const InvestmentThemeOfFund = (props: any) => {
   
     useEffect(() => {
         dispatch(updateStepperIndex(2))
-      if (id && Number(id)) {
-        if (!state[0]?.data[id]) {
-          controller.fetch({ ...formData, id: Number(id) });
+      if (parentId && Number(parentId)) {
+        if (!state[0]?.data[parentId]) {
+          controller.fetch({ ...formData, parentId: Number(parentId) });
         }
       }
     }, [])
   
     useEffect(() => {
         dispatch(updateStepperIndex(2))
-      let newData = state[0]?.data[Number(id)];
+      let newData = state[0]?.data[Number(parentId)];
       if (newData) setFormData(newData)
     }, [state[0]?.data])
   
@@ -57,10 +59,10 @@ export const InvestmentThemeOfFund = (props: any) => {
     const handleClick = (ev: any, navTo: string) => {
         handleSave()
         if (navTo === 'next') {
-            navigate(`/Detailed/${id}/EngagementAndRole`);
+            navigate(`/Detailed/${parentId}/EngagementAndRole`);
         }
         else {
-            navigate(`/Detailed/${id}/detailed2K`);
+            navigate(`/Detailed/${parentId}/detailed2K`);
         }
     }
 
@@ -95,7 +97,7 @@ export const InvestmentThemeOfFund = (props: any) => {
                             />
                         </CardContent>
                     </Card>
-                    <ListFiles id={`investmentThemeOfFund${id}`} refreshId={investmentThemeOfFundRefreshId} />
+                    <ListFiles id={`investmentThemeOfFund${parentId}`} refreshId={investmentThemeOfFundRefreshId} />
                     {/*<Button
                         component={Link} 
                         to="#"
@@ -104,7 +106,7 @@ export const InvestmentThemeOfFund = (props: any) => {
                         sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '90px', backgroundColor: 'white', color: 'black', borderColor: 'black' }} >
                         Download
     </Button>*/}
-                    <DocumentUpload id={`investmentThemeOfFund${id}`} onSuccess={investmentThemeOfFundSuccess}>
+                    <DocumentUpload id={`investmentThemeOfFund${parentId}`} onSuccess={investmentThemeOfFundSuccess}>
                         <Button
                             // onClick={(e) => handleClick(e, "previous")}
                             variant="outlined"
