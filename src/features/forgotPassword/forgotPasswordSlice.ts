@@ -91,8 +91,9 @@ const forgotPasswordSlice = createSlice({
           state.status.fetchStatus = FetchStatus.IDLE;
         }
       )
-      .addCase(setUserPasswordAsync.rejected, (state, action) => {
-        state.response = 'Error in signup';
+      .addCase(setUserPasswordAsync.rejected, (state, action:any) => {
+        state.response = action.payload?.message;
+        state.status.fetchStatus = FetchStatus.FAILED;
       })
       .addCase(resetUserPasswordAsync.pending, state => {
 
@@ -105,8 +106,9 @@ const forgotPasswordSlice = createSlice({
             state.status.fetchStatus = FetchStatus.IDLE;
           }
         )
-        .addCase(resetUserPasswordAsync.rejected, (state, action) => {
-          state.response_resetPassword = 'Error/ User not found Contact support';
+        .addCase(resetUserPasswordAsync.rejected, (state, action:any) => {
+          state.response_resetPassword = action.payload?.message;
+          state.status.fetchStatus = FetchStatus.FAILED;
         })
         .addCase(changeUserPasswordAsync.pending, state => {
 
@@ -119,8 +121,9 @@ const forgotPasswordSlice = createSlice({
               state.status.fetchStatus = FetchStatus.IDLE;
             }
           )
-          .addCase(changeUserPasswordAsync.rejected, (state, action) => {
-            state.response_changePassword = 'Error. Contact support';
+          .addCase(changeUserPasswordAsync.rejected, (state, action:any) => {
+            state.response_changePassword = action.payload?.message;
+            state.status.fetchStatus = FetchStatus.FAILED;
           })
         
   }

@@ -11,12 +11,16 @@ import uuid from "react-uuid";
 import { FetchStatus } from '../../lib/api-status/IStatus';
 import { Controller } from "../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from "../detailedApplication/sidbiReference/detailedApplicationSlice";
-import { defaultIDetailedApplication } from "../detailedApplication/sidbiReference/IDetailedApplication";
+import { defaultIDetailedApplication, IDetailedApplication } from "../detailedApplication/sidbiReference/IDetailedApplication";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import MailIcon from '@mui/icons-material/Mail';
 import QueryResolutionModal from './QueryResolutionModal'
-import orengeLogo from '../../images/Orange2.png'
+import orengeImg from '../../images/Orange.png'
+import greenImg from '../../images/Green.png'
+import redImg from '../../images/red.png'
+import greyImg from '../../images/grey.png'
 import { selectUsers } from '../admin/adminSlice'
+import { IPrelimApplicationData } from '../fundOverview/subsections/fundOverviewData/IPrelimApplicationData';
 
 export const Home = () => {
 
@@ -101,13 +105,27 @@ export const Home = () => {
         )))
     }
 
-const getPath = ( status: String | undefined) => {
-    if (usersState.role == 'ADMIN'){
-        return 'preview'
+    const getStatusImg = (row: IPrelimApplicationData) => {
+        if (row.status == 'REJECTED') {
+            return redImg
+        }
+        else if (row.status == 'CREATED') {
+            return orengeImg
+        }
+        else if (row.status == 'REVISE' && row.status == 'SUBMITTED') {
+            return orengeImg
+        }
+        else if (row.status == 'APPROVED') {
+            return greenImg
+        }
     }
-    let path = (status && ['SUBMITTED', 'APPROVED'].includes(status.toString())) ? 'preview' : 'fund'
-    return path;
-}
+    const getPath = (status: String | undefined) => {
+        if (usersState.role == 'ADMIN') {
+            return 'preview'
+        }
+        let path = (status && ['SUBMITTED', 'APPROVED'].includes(status.toString())) ? 'preview' : 'fund'
+        return path;
+    }
 
     const getStatusDescription = (stage: String | undefined, status: String | undefined) => {
 
@@ -181,25 +199,24 @@ const getPath = ( status: String | undefined) => {
                                         </TableCell>}
                                         <TableCell align="center"><MailIcon onClick={() => openModel(row)} ></MailIcon></TableCell>
                                         <TableCell align="center">
-                                            <Grid container xs={12}>
+                                            <Grid container xs={12} spacing={0.5}>
+                                                <Grid item >
                                                 <Box
                                                     component="img"
                                                     sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
                                                     alt="success"
-                                                    src={orengeLogo}
-                                                />
-                                                <Box
+                                                    src={row.stage == 'PRELIM' ? getStatusImg(row) : greenImg}
+                                                /> 
+                                                </Grid> 
+                                                <Grid item >
+                                                {row.stage != 'PRELIM' ? <Box
                                                     component="img"
                                                     sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
                                                     alt="success"
-                                                    src={orengeLogo}
-                                                />
-                                                <Box
-                                                    component="img"
-                                                    sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                    alt="success"
-                                                    src={orengeLogo}
-                                                />
+                                                    src={getStatusImg(row)}
+                                                /> : <></>}
+                                                </Grid>
+
                                             </Grid>
                                         </TableCell>
 

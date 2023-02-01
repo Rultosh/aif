@@ -162,15 +162,7 @@ const ResetPassword = () => {
                                                     />
                                                 </Grid>
 
-                                                {/* <Grid item xs={6}>
-                                                    <TextField
-                                                        required
-                                                        id="outlined-required"
-                                                        label="Captcha"
-                                                        sx={{ display: 'flex' }}
-                                                    />
-                                                </Grid> */}
-                                                <Grid item xs={6}>
+                                                {/*<Grid item xs={6}>
                                                     <TextField
                                                         required
                                                         id="outlined-required"
@@ -178,6 +170,14 @@ const ResetPassword = () => {
                                                         sx={{ display: 'flex' }}
                                                     />
                                                 </Grid>
+                                                <Grid item xs={6}>
+                                                    <TextField
+                                                        required
+                                                        id="outlined-required"
+                                                        label="Captcha"
+                                                        sx={{ display: 'flex' }}
+                                                    />
+                                        </Grid>*/}
 
                                                 <Grid item xs={12} >
                                                     <Box display="flex"
@@ -189,10 +189,10 @@ const ResetPassword = () => {
                                                     </Box>
                                                 </Grid  >
                                                 {state.response_resetPassword?<Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}> {state.response_resetPassword} </Typography>:<></>}
-                                            </Grid> : <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>Passwor reset email has been sent to your email id!</Typography>
+                                            </Grid> : <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>Password reset email has been sent to your email id!</Typography>
                                         }
                                     </Box>
-                                    <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, emailus at vcfapplication@sidbi.in</Typography>
+                                    <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, email us at vcfapplication@sidbi.in</Typography>
                                 </CardContent>
                                 {/*<CardFooter>
                                     <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, emailus at vcfapplication@sidbi.in</Typography>

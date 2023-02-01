@@ -9,8 +9,9 @@ import { useSearchParams } from "react-router-dom";
 import uuid from "react-uuid";
 import { useEffect, useState } from "react";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
-import { setUserPasswordAsync } from './forgotPasswordSlice'
+import { setUserPasswordAsync, selectedforgotPassword } from './forgotPasswordSlice'
 import { defaultIForgotPassword } from './IForgotPassword'
+import {ModalComponent} from '../../components/ModalComponent'
 
 
 
@@ -22,7 +23,9 @@ const ForgotPassword = () => {
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const [formData, setFormData] = useState(defaultIForgotPassword);
+    const state = useAppSelector(selectedforgotPassword)
     let emailSent = false;
+    const [showResponse, setShowResponse] = useState(false);
 
 
     useEffect(() => {
@@ -33,6 +36,7 @@ const ForgotPassword = () => {
 
     function handleSubmitForm() {
         emailSent = true
+        setShowResponse(true)
         dispatch(
             setUserPasswordAsync(
                 wrapArgument(actionUid, formData)
@@ -49,7 +53,10 @@ const ForgotPassword = () => {
         setFormData(copiedValue);
     };
 
-
+    const handleClose= () => {
+        setShowResponse(false)
+        //setFormData(defaultISignup)
+    };
 
     return (
         <div >
@@ -153,7 +160,7 @@ const ForgotPassword = () => {
                                         alignItems="center"
                                         sx={{ mt: 3 }}>
 
-                                        <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Forgot your password?</Typography> <br></br>
+                                        <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Set your password here</Typography> <br></br>
 
                                         {!emailSent ?
                                             <Grid container spacing={2} >
@@ -193,9 +200,26 @@ const ForgotPassword = () => {
                                                     </Box>
                                                 </Grid  >
 
+                                                <Grid item xs={12}>
+                                                    <Box sx={{ mt: 2 }}>
+                                                        {showResponse && state.response != undefined ? <>{state.response}</> : <></>}
+                                                        <ModalComponent
+                                                            open={showResponse}
+                                                            close={handleClose}
+                                                            aria-labelledby="modal-modal-title"
+                                                            aria-describedby="modal-modal-description"
+                                                            className="special_modal"
+                                                            msg={state.response}
+                                                            status={state.status.fetchStatus}
+                                                        >
+                                                        </ModalComponent>
+                                                    </Box>
+                                                </Grid>
+
                                             </Grid> : <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>Passwor reset email has been sent to your email id!</Typography>
                                         }
                                     </Box>
+
                                     <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, email us at vcfapplication@sidbi.in</Typography>
                                 </CardContent>
 

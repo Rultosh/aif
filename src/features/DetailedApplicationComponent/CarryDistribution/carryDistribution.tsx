@@ -31,6 +31,7 @@ export const CarryDistribution = (props: any) => {
     const params = useParams()
     const parentId = Number(params.id)
     const [formData, setFormData] = useState(defaultICarryDistribution);
+    const [newformDataDetails, setNewFormDataDetails] = useState(defaultICarryDistributionDetails);
     const [actionId] = useState(uuid());
     const controller = new Controller(actionId, carryDistributionThunk);
     const state = useAppSelector(selectCarryDistribution);
@@ -129,6 +130,14 @@ export const CarryDistribution = (props: any) => {
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
         setFormData(copiedValue);
+    };
+
+    const handleNewChange = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...newformDataDetails }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof newformDataDetails] = ev.target.value;
+        setNewFormDataDetails(copiedValue);
     };
 
     const handleChangeCarryDetails = (ev: any, id_key: any) => {
@@ -755,17 +764,30 @@ export const CarryDistribution = (props: any) => {
                             </Grid> */}
 
                             <Grid container spacing={6} >
-                                <Grid item xs={6}></Grid>
+                                <Grid item xs={6}>
+                                <TextField
+                                        required
+                                        type="number"
+                                        id="distribution"
+                                        label=""
+                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                        value={newformDataDetails["distribution"]}
+                                        variant="standard"
+                                        onChange={handleNewChange}
+
+                                        sx={{ display: 'flex', mt: 2 }}
+                                    />
+                                </Grid>
                                 <Grid item xs={2.5}>
                                     <TextField
                                         required
                                         type="number"
-                                        id="carry2"
+                                        id="percent"
                                         label="%"
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        // value={formData["fundLaunchedDate"]}
+                                        value={newformDataDetails["percent"]}
                                         variant="standard"
-                                        // onChange={handleChange}
+                                        onChange={handleNewChange}
 
                                         sx={{ display: 'flex', mb: 2 }}
                                     />
@@ -775,12 +797,12 @@ export const CarryDistribution = (props: any) => {
                                     <TextField
                                         required
                                         type="number"
-                                        id="outOfRs2"
+                                        id="carryOutOfCrore"
                                         label="%"
                                         //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        // value={formData["fundLaunchedDate"]}
+                                        value={newformDataDetails["carryOutOfCrore"]}
                                         variant="standard"
-                                        // onChange={handleChange}
+                                        onChange={handleNewChange}
 
                                         sx={{ display: 'flex', mb: 2 }}
                                     />
