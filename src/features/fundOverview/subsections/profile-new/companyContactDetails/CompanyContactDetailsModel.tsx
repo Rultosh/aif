@@ -31,7 +31,7 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
   const dispatch = useAppDispatch();
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setCompanyContactDetails(defaultIICompanyContactDetails)
+    setCompanyContactDetails(props.companyContactDetails)
     setOpen(false);
     props.onClose(false);
   }

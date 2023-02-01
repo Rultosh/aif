@@ -16,16 +16,13 @@ interface InvestmentResponsibleAsLeadRowProps {
 export const InvestmentResponsibleAsLeadRow = (props: InvestmentResponsibleAsLeadRowProps) => {
   const [actionUid] = useState(uuid());
   const dispatch = useAppDispatch();
-  const [investmentResponsibleAsLead, setTeamMember] = useState(props.investmentResponsibleAsLead)
-
- 
-  console.log("investmentResponsibleAsLead")
+  
 
   function handleDelete() {
     dispatch(
       deleteInvestmentResponsibleAsLeadAsync(
         wrapArgument(
-          actionUid, investmentResponsibleAsLead
+          actionUid, props.investmentResponsibleAsLead
         )
       )
     )
@@ -38,15 +35,15 @@ export const InvestmentResponsibleAsLeadRow = (props: InvestmentResponsibleAsLea
   }
 
   return (
-    <TableRow key={investmentResponsibleAsLead.id}>
+    <TableRow key={props.investmentResponsibleAsLead.id}>
       <TableCell align="center" component="th" scope="row">
-        {investmentResponsibleAsLead.nameOfCompany}
+        {props.investmentResponsibleAsLead.nameOfCompany}
       </TableCell>
-      <TableCell align="center">{investmentResponsibleAsLead.amountInvested}</TableCell>
-      <TableCell align="center">{investmentResponsibleAsLead.dateOfInvestment}</TableCell>
-      <TableCell align="center">{investmentResponsibleAsLead.exitOrWriteOff}</TableCell>
-      <TableCell align="center">{investmentResponsibleAsLead.dateofExitorWriteOff}</TableCell>
-      <TableCell align="center">{investmentResponsibleAsLead.comment}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsLead.amountInvested}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsLead.dateOfInvestment}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsLead.exitOrWriteOff}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsLead.dateofExitorWriteOff}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsLead.comment}</TableCell>
       <TableCell align="center">
         <Edit onClick={handleOpen} />&nbsp;
         <Delete onClick={handleDelete}></Delete>
@@ -54,7 +51,7 @@ export const InvestmentResponsibleAsLeadRow = (props: InvestmentResponsibleAsLea
     
     
   <InvestmentResponsibleAsLeadModel
-    investmentResponsibleAsLead={investmentResponsibleAsLead}
+    investmentResponsibleAsLead={props.investmentResponsibleAsLead}
     open={open}
     onClose={setOpen} />
     </TableRow>)

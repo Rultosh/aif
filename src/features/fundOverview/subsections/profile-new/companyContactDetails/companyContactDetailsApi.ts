@@ -8,25 +8,25 @@ export function getAllCompanyContactDetails(teamMemberId:Number | undefined) {
   });
 }
 
-export function createCompanyContactDetails(investment:ICompanyContactDetails) {
+export function createCompanyContactDetails(companyDetails:ICompanyContactDetails) {
   return api({
     method: 'post',
-    data: investment,
-    url: `api/teamMembers/${investment.teamMemberId}/companyContactDetails`
+    data: companyDetails,
+    url: `api/teamMembers/${companyDetails.teamMemberId}/companyContactDetails`
   });
 }
 
-export function updateCompanyContactDetails(investment:ICompanyContactDetails) {
+export function updateCompanyContactDetails(companyDetails:ICompanyContactDetails) {
   return api({
     method: 'patch',
-    data: investment,
-    url: `api/teamMembers/${investment.teamMemberId}/companyContactDetails/${investment.id}`
+    data: companyDetails,
+    url: `api/teamMembers/${companyDetails.teamMemberId}/companyContactDetails/${companyDetails.id}`
   });
 }
 
-export function deleteCompanyContactDetails(investment:ICompanyContactDetails) {
+export function deleteCompanyContactDetails(companyDetails:ICompanyContactDetails) {
   return api({
     method: 'delete',
-    url: `api/teamMembers/${investment.teamMemberId}/companyContactDetails/${investment.id}`
+    url: `api/teamMembers/${companyDetails.teamMemberId}/companyContactDetails/${companyDetails.id}`
   });
 }

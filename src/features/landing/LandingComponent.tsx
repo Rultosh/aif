@@ -207,7 +207,7 @@ const Landing = () => {
                                             <Box display="flex"
                                                 justifyContent="center"
                                                 alignItems="center">
-                                                <Button variant="contained" disableElevation sx={{ mt:2,textTransform: 'none', width: 200,background:"#363062"}} onClick={isUserValid}>
+                                                <Button type="submit" variant="contained" disableElevation sx={{ mt:2,textTransform: 'none', width: 200,background:"#363062"}} onClick={isUserValid}>
                                                     Sign In
                                                 </Button>
                                             </Box>

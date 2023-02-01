@@ -33,7 +33,7 @@ export const InvestmentResponsibleAsNonLeadModel = (props: InvestmentResponsible
   const dispatch = useAppDispatch();
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setInvestmentResponsibleAsNonLead(defaultIIInvestmentResponsibleAsNonLead)
+    setInvestmentResponsibleAsNonLead(props.investmentResponsibleAsNonLead)
     setOpen(false);
     props.onClose(false);
   }

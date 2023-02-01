@@ -110,9 +110,9 @@ export const Home = () => {
             return redImg
         }
         else if (row.status == 'CREATED') {
-            return orengeImg
+            return greyImg
         }
-        else if (row.status == 'REVISE' && row.status == 'SUBMITTED') {
+        else if (row.status == 'REVISE' || row.status == 'SUBMITTED') {
             return orengeImg
         }
         else if (row.status == 'APPROVED') {
@@ -201,7 +201,7 @@ export const Home = () => {
                                         <TableCell align="center">
                                             <Grid container xs={12} spacing={0.5}>
                                                 <Grid item >
-                                                    <Tooltip title={"Preliminary application - " + row.status}>
+                                                    <Tooltip title={row.stage == 'PRELIM' ? "Preliminary application - " + row.status : "Preliminary application - APPROVED"}>
                                                         <Box
                                                             component="img"
                                                             sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}

@@ -30,7 +30,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
   const [open, setOpen] = useState(props.open);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setIndependentReference(defaultIIIndependentReferences)
+    setIndependentReference(props.independentReference)
     setOpen(false);
     props.onClose(false);
   }

@@ -16,17 +16,14 @@ interface CompanyContactDetailsRowProps {
 export const CompanyContactDetailsRow = (props: CompanyContactDetailsRowProps) => {
   const [actionUid] = useState(uuid());
   const dispatch = useAppDispatch();
-  const [companyContactDetails, setTeamMember] = useState(props.companyContactDetails)
+  
 
-
-
-  console.log("companyContactDetails")
 
   function handleDelete() {
     dispatch(
       deleteCompanyContactDetailsAsync(
         wrapArgument(
-          actionUid, companyContactDetails
+          actionUid, props.companyContactDetails
         )
       )
     )
@@ -39,23 +36,23 @@ export const CompanyContactDetailsRow = (props: CompanyContactDetailsRowProps) =
   }
 
   return (
-  <TableRow key={companyContactDetails.id}>
+  <TableRow key={props.companyContactDetails.id}>
     <TableCell align="center" component="th" scope="row">
-      {companyContactDetails.nameOfCompany}
+      {props.companyContactDetails.nameOfCompany}
     </TableCell>
-    <TableCell align="center">{companyContactDetails.nameOfPromoter}</TableCell>
-    <TableCell align="center">{companyContactDetails.address}</TableCell>
-    <TableCell align="center">{companyContactDetails.telephoneNo}</TableCell>
-    <TableCell align="center">{companyContactDetails.mobileNo}</TableCell>
-    <TableCell align="center">{companyContactDetails.email}</TableCell>
-    <TableCell align="center">{companyContactDetails.alternateEmail}</TableCell>
-    <TableCell align="center">{companyContactDetails.yearOfInvestment}</TableCell>
+    <TableCell align="center">{props.companyContactDetails.nameOfPromoter}</TableCell>
+    <TableCell align="center">{props.companyContactDetails.address}</TableCell>
+    <TableCell align="center">{props.companyContactDetails.telephoneNo}</TableCell>
+    <TableCell align="center">{props.companyContactDetails.mobileNo}</TableCell>
+    <TableCell align="center">{props.companyContactDetails.email}</TableCell>
+    <TableCell align="center">{props.companyContactDetails.alternateEmail}</TableCell>
+    <TableCell align="center">{props.companyContactDetails.yearOfInvestment}</TableCell>
     <TableCell align="center">
       <Edit onClick={handleOpen} />&nbsp;
       <Delete onClick={handleDelete}></Delete>
     </TableCell>
     <CompanyContactDetailsModel
-      companyContactDetails={companyContactDetails}
+      companyContactDetails={props.companyContactDetails}
       open={open}
       onClose={setOpen} />
   </TableRow>)

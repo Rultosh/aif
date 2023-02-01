@@ -16,17 +16,12 @@ interface InvestmentResponsibleAsNonLeadRowProps {
 export const InvestmentResponsibleAsNonLeadRow = (props: InvestmentResponsibleAsNonLeadRowProps) => {
   const [actionUid] = useState(uuid());
   const dispatch = useAppDispatch();
-  const [investmentResponsibleAsNonLead, setTeamMember] = useState(props.investmentResponsibleAsNonLead)
-
-
-
-  console.log("investmentResponsibleAsNonLead")
 
   function handleDelete() {
     dispatch(
       deleteInvestmentResponsibleAsNonLeadAsync(
         wrapArgument(
-          actionUid, investmentResponsibleAsNonLead
+          actionUid, props.investmentResponsibleAsNonLead
         )
       )
     )
@@ -39,21 +34,21 @@ export const InvestmentResponsibleAsNonLeadRow = (props: InvestmentResponsibleAs
   }
 
   return (
-    <TableRow key={investmentResponsibleAsNonLead.id}>
+    <TableRow key={props.investmentResponsibleAsNonLead.id}>
       <TableCell align="center" component="th" scope="row">
-        {investmentResponsibleAsNonLead.nameOfCompany}
+        {props.investmentResponsibleAsNonLead.nameOfCompany}
       </TableCell>
-      <TableCell align="center">{investmentResponsibleAsNonLead.amountInvested}</TableCell>
-      <TableCell align="center">{investmentResponsibleAsNonLead.dateOfInvestment}</TableCell>
-      <TableCell align="center">{investmentResponsibleAsNonLead.exitOrWriteOff}</TableCell>
-      <TableCell align="center">{investmentResponsibleAsNonLead.dateofExitorWriteOff}</TableCell>
-      <TableCell align="center">{investmentResponsibleAsNonLead.comment}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsNonLead.amountInvested}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsNonLead.dateOfInvestment}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsNonLead.exitOrWriteOff}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsNonLead.dateofExitorWriteOff}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsNonLead.comment}</TableCell>
       <TableCell align="center">
         <Edit onClick={handleOpen} />&nbsp;
         <Delete onClick={handleDelete}></Delete>
       </TableCell>
   <InvestmentResponsibleAsNonLeadModel
-    investmentResponsibleAsNonLead={investmentResponsibleAsNonLead}
+    investmentResponsibleAsNonLead={props.investmentResponsibleAsNonLead}
     open={open}
     onClose={setOpen} />
     </TableRow>)
