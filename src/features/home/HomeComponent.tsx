@@ -201,21 +201,26 @@ export const Home = () => {
                                         <TableCell align="center">
                                             <Grid container xs={12} spacing={0.5}>
                                                 <Grid item >
-                                                <Box
-                                                    component="img"
-                                                    sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                    alt="success"
-                                                    src={row.stage == 'PRELIM' ? getStatusImg(row) : greenImg}
-                                                /> 
-                                                </Grid> 
-                                                <Grid item >
-                                                {row.stage != 'PRELIM' ? <Box
-                                                    component="img"
-                                                    sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                    alt="success"
-                                                    src={getStatusImg(row)}
-                                                /> : <></>}
+                                                    <Tooltip title={"Preliminary application - " + row.status}>
+                                                        <Box
+                                                            component="img"
+                                                            sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                            alt="success"
+                                                            src={row.stage == 'PRELIM' ? getStatusImg(row) : greenImg}
+                                                        />
+                                                    </Tooltip>
                                                 </Grid>
+                                                {row.stage == 'DETAILED' ? 
+                                                <Grid item >
+                                                    <Tooltip title={"Detailed application - " + row.status}>
+                                                        <Box
+                                                            component="img"
+                                                            sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                            alt="success"
+                                                            src={getStatusImg(row)}
+                                                        />
+                                                    </Tooltip>
+                                                </Grid> : <></>}
 
                                             </Grid>
                                         </TableCell>
