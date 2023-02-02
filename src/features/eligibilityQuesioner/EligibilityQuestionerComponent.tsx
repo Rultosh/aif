@@ -158,7 +158,7 @@ const EligibilityQuestioner = () => {
                                     >
 
                                         <MenuItem key={"Fund of funds"} value={0}>Fund of funds</MenuItem>
-                                        <MenuItem key={"Asipre for Start-ups"} value={1}>Asipre for Start-ups</MenuItem>
+                                        <MenuItem key={"Aspire for Start-ups"} value={1}>Aspire for Start-ups</MenuItem>
                                         <MenuItem key={"UP Start-up Fund"} value={2}>UP Start-up Fund</MenuItem>
                                     </Select>
                                 </FormControl>

@@ -5,6 +5,10 @@ import { useAppDispatch } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultContributorDetails, IContributorDetails } from "./IContributorDetails";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+
 
 interface ContrinutorDetailsModelProps {
   contributorDetailsFormData: IContributorDetails,
@@ -55,6 +59,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
       ev.target.id !== undefined ? ev.target.value : ev.target.value
 
     console.log(copiedValue, props.prelimApplicationId)
+    setValue(ev.target.name, ev.target.value);
 
     setContributorDetailsFormData(copiedValue)
   };
@@ -69,6 +74,36 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+  };
+  
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    amount: Yup.string().required("Amount is required"),
+    percentOfCorpus: Yup.string().required("Percent Of Corpus is required"),
+    contributionType: Yup.string().required("Contribution Type is required"),
+  });
+
+  const {
+    setValue,
+    getValues,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    setContributorDetailsFormData(data);
+    // setContributorDetailsFormData({ id: 0, prelimApplicationId: props.prelimApplicationId, name: data.name, amount: data.amount, percentOfCorpus: data.age });
+    // setContributorDetailsFormData({ ...props.contributorDetailsFormData, amount: data.amount});
+    // // setContributorDetailsFormData({ ...props.contributorDetailsFormData, age: data.age});
+    //   setContributorDetailsFormData({ ...props.contributorDetailsFormData, percentOfCorpus: data.age});
+    // setContributorDetailsFormData({ ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId });
+    handleSubmitForm();
+    // setPrelimApplicationFormData(data);
+    // savePrelimApplicationForm(data);
   };
 
   return <Modal
@@ -95,11 +130,16 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   label="Name"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={contributorDetailsFormData.name}
+                  {...register("name")}
+                  error={(errors.name && getValues("name") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                    <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4}>
                 <TextField
@@ -109,11 +149,16 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   label="Amount"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={contributorDetailsFormData.amount}
+                  {...register("amount")}
+                  error={(errors.amount && getValues("amount") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.amount && getValues("amount") == '')?errors.amount.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4}>
                 <TextField
@@ -123,11 +168,16 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   label="% of Corpus"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={contributorDetailsFormData.percentOfCorpus}
+                  {...register("percentOfCorpus")}
+                  error={(errors.percentOfCorpus && getValues("percentOfCorpus") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                    <>{(errors.percentOfCorpus && getValues("percentOfCorpus") == '')?errors.percentOfCorpus.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
@@ -137,6 +187,8 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                     labelId="contributionType"
                     id="contributionType"
                     value={contributorDetailsFormData["contributionType"] || ""}
+                    {...register("contributionType")}
+                    error={(errors.contributionType && getValues("contributionType") =='') ? true : false}
                     onChange={handleChange}
                     name="contributionType"
                     defaultValue={contributorDetailsFormData["contributionType"] === undefined ? " " : contributorDetailsFormData["contributionType"]}
@@ -146,9 +198,12 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                     <MenuItem key={"Domestic"} value={"Domestic"}>Domestic</MenuItem>
                   </Select>
                 </FormControl>
+                <Typography variant="caption" color="error">
+                  <>{(errors.contributionType && getValues("contributionType") == '')?errors.contributionType.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={12} >
-                <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+                <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
                   Submit
                 </Button>
               </Grid>

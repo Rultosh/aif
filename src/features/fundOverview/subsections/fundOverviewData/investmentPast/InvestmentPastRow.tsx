@@ -8,6 +8,7 @@ import { deleteInvestmentPastAsync } from './investmentPastSlice'
 import uuid from "react-uuid";
 import { useAppDispatch } from '../../../../../app/hooks'
 import { InvestmentPastModel } from './InvestmentPastModel'
+import Moment from 'moment';
 
 interface InvestmentPastRowPros {
   row: IInvestmentPast
@@ -36,7 +37,7 @@ export const InvestmentPastRow = (props: InvestmentPastRowPros) => {
     </TableCell>
     <TableCell align="center">{props.row.sector}</TableCell>
     <TableCell align="center">{String(props.row.amountInvested)}</TableCell>
-    <TableCell align="center">{String(props.row.dateOfInvestment)}</TableCell>
+    <TableCell align="center">{Moment(String(props.row.dateOfInvestment)).format("DD/MM/YYYY")}</TableCell>
     <TableCell align="center">{String(props.row.briefProfile)}</TableCell>
     <TableCell align="center">
       <Edit onClick={handleOpen}/>&nbsp;

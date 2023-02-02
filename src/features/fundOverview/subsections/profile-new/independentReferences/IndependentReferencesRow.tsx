@@ -65,8 +65,10 @@ export const IndependentReferencesRow = (props: IndependentReferencesRowProps) =
           <ErrorIcon />
         </IconButton>
       </Tooltip>:<></>}
+      <div style={{ display: 'flex' }}>
         <Edit onClick={handleOpen} />&nbsp;
         <Delete onClick={handleDelete}></Delete>
+      </div>
       </TableCell>
     </TableRow>
       <IndependentReferencesModel

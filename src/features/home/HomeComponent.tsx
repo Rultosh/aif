@@ -21,6 +21,7 @@ import redImg from '../../images/red.png'
 import greyImg from '../../images/grey.png'
 import { selectUsers } from '../admin/adminSlice'
 import { IPrelimApplicationData } from '../fundOverview/subsections/fundOverviewData/IPrelimApplicationData';
+import Moment from 'moment';
 
 export const Home = () => {
 
@@ -171,7 +172,7 @@ export const Home = () => {
                                         <TableCell align="center">{row.investmentManager}</TableCell>
                                         <TableCell align="center">{String(getStatusDescription(row.stage, row.status))}</TableCell>
                                         <TableCell align="center">{row.detailedApplicationCreatedOn}</TableCell>
-                                        <TableCell align="center">{row.createdOn}</TableCell>
+                                        <TableCell align="center">{Moment(String(row.createdOn)).format("DD/MM/YYYY")}</TableCell>
                                         <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
                                         <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>
                                         {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">

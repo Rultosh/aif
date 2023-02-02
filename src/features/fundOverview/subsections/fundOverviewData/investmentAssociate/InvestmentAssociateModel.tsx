@@ -5,6 +5,9 @@ import { useAppDispatch } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultInvestmentAssociate, IInvestmentAssociate } from "./IInvestmentAssociate";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 interface InvestmentAssociateModelProps {
   investmentAssociateFormData: IInvestmentAssociate,
@@ -60,7 +63,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
 
     console.log(copiedValue, props.prelimApplicationId)
-
+    setValue(ev.target.name, ev.target.value);
     setInvestmentAssociateFormData(copiedValue)
   };
 
@@ -74,6 +77,31 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+  };
+  
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    designation: Yup.string().required("Designation is required"),
+    age: Yup.string().required("Age is required"),
+    qualification: Yup.string().required("Qualification is required"),
+    investmentExperience: Yup.string().required("Investment Experience is required"),
+    description: Yup.string().required("Description is required")
+  });
+
+  const {
+    setValue,
+    getValues,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    setInvestmentAssociateFormData(data);
+    handleSubmitForm();
   };
 
   return <Modal
@@ -100,11 +128,16 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   label="Name"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.name}
+                  {...register("name")}
+                  error={(errors.name && getValues("name") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={3.5}>
                 <TextField
@@ -113,11 +146,16 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   label="Designation"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.designation}
+                  {...register("designation")}
+                  error={(errors.designation && getValues("designation") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.designation && getValues("designation") == '')?errors.designation.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={1}>
                 <TextField
@@ -127,11 +165,16 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   label="Age"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.age}
+                  {...register("age")}
+                  error={(errors.age && getValues("age") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.age && getValues("age") == '')?errors.age.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
@@ -140,12 +183,17 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   label="Qualification"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.qualification}
+                  {...register("qualification")}
+                  error={(errors.qualification && getValues("qualification") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
                   name="qualification"
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.qualification && getValues("qualification") == '')?errors.qualification.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
@@ -153,7 +201,9 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   <Select
                     labelId="investmentExperience"
                     id="investmentExperience"
-                    value={String(investmentAssociateFormData.investmentExperience)}
+                    value={investmentAssociateFormData["investmentExperience"] || ''}
+                    {...register("investmentExperience")}
+                    error={(errors.investmentExperience && getValues("investmentExperience") == '') ? true : false}
                     onChange={handleChange}
                     name="investmentExperience"
                     // defaultValue={investmentAssociateFormData["investmentExperience"] === undefined ? " " : investmentAssociateFormData["investmentExperience"]}
@@ -165,6 +215,10 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                     <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
                   </Select>
                 </FormControl>
+                <Typography variant="caption" color="error">
+                  <>{(errors.investmentExperience && getValues("investmentExperience") == '')? errors.investmentExperience.message : ''}</>
+                </Typography>
+
                 {/*<TextField
                   required
                   type="number"
@@ -185,14 +239,19 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   label="Brief details of VC/PE Experience"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.description}
+                  {...register("description")}
+                  error={(errors.description && getValues("description") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.description && getValues("description") == '')?errors.description.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={12} >
-                <Button color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} onClick={handleSubmitForm} >
+              <Button type="submit" color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} onClick={handleSubmit(onSubmit)} >
                   Submit
                 </Button>
               </Grid>

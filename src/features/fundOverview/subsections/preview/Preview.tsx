@@ -16,9 +16,9 @@ import DocumentChip from "../../../../components/DocumentChip";
 import client from '../../../../app/api'
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { selectUsers } from '../../../admin/adminSlice'
-// import { useForm } from "react-hook-form";
-// import { yupResolver } from "@hookform/resolvers/yup";
-// import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const Preview = () => {
 
@@ -49,6 +49,7 @@ export const Preview = () => {
     const handleChange = (ev: any) => {
         ev.preventDefault();
         console.log('handle change', ev, ev.target.id, ev.target.value);
+        setValue(ev.target.id, ev.target.value);
         setCommentPreview(ev.target.value)
     };
 
@@ -83,6 +84,28 @@ export const Preview = () => {
         );
         navigate('/home')
     }
+
+    const validationSchema = Yup.object().shape({
+        previewComments: Yup.string().required("Comment is required")
+    });
+
+    const {
+        control,
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        formState: { errors },
+    } = useForm({
+    resolver: yupResolver(validationSchema),
+    });
+
+    const onSubmit = (data: any, e: any) => {
+        console.log(data);
+        setCommentPreview(data);
+        // setInvestmentResponsibleAsLead({ ...teamMember, prelimApplicationId: Number(id) })
+        handleClickSave(e);
+    };
 
     return (
         <Card sx={{ display: 'flex', mb: 2 }}>
@@ -137,7 +160,7 @@ export const Preview = () => {
                                     size="medium"
                                     component="a"
                                     href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
-                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': {backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
                             </div>
                             <div style={{ margin: '5px' }}>
                                 <Chip
@@ -146,7 +169,7 @@ export const Preview = () => {
                                     size="medium"
                                     component="a"
                                     href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
-                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': {backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
                             </div>
                             <div style={{ margin: '5px' }}>
                                 <DocumentChip
@@ -173,12 +196,15 @@ export const Preview = () => {
                             //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                             //value={formData["commitmentReceived"] || ''}
                             variant="standard"
+                            {...register("previewComments")}
+                            error={(errors.previewComments && getValues("previewComments") == '') ? true : false}
                             onChange={handleChange}
 
                             sx={{ display: 'flex', }}
                         />
-
-
+                        <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                          <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
+                        </Typography>
                     </CardContent>
                 </Card>
 
@@ -187,7 +213,7 @@ export const Preview = () => {
                     Declaration
                 </Button>
 
-                {(!(statusPrelims == 'SUBMITTED') && usersState.role == 'USER') ? <Button color='success' id='submit' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                {(!(statusPrelims == 'SUBMITTED') && usersState.role == 'USER') ? <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Submit
                 </Button> :  ( ['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '') && statusPrelims == 'SUBMITTED')? <>
                     <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >

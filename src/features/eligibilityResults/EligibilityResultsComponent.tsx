@@ -27,6 +27,11 @@ const EligibilityResults = () => {
 
     }, [])
 
+    let resultTextSuccess = {
+        "Fund of funds": ["Fund of Funds"],
+        "Asipre for Start-ups": ["Asipre for Start-ups"],
+        "UP Start-up Fund": ["UP Start-up Fund"]
+    }
 
     let resultText = {
         "Fund of funds": ["SIDBI's Fund of Funds for Startups (FFS) is intended to support AIFs to invest in startups.", "Based on Your size and/or structure, you do not meet the minimum eligible requirement for contribution under FFS."],
@@ -68,7 +73,7 @@ const EligibilityResults = () => {
                                         {isEligible ?
                                             <div>
                                                 <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Congratulations!</Typography>
-                                                <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Based on your size and structure you may be eligible for applying for contribution through SIDBI's Fund of Funds</Typography>
+                                                <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Based on your size and structure you may be eligible for applying for contribution through SIDBI's {resultTextSuccess[scheme as keyof typeof resultTextSuccess][0]}</Typography>
                                                 <Typography sx={{ flex: 1, ml: '10px', mb: '50px', textAlign: "center" }}>Please <a href="/" style={{ color: 'blue' }}>Login</a>/
                                                     <a href="/" style={{ color: 'blue' }}>Sign-up</a> to be directed to the application</Typography>
                                             </div>

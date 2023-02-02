@@ -8,6 +8,7 @@ import { wrapArgument } from '../../../../../lib/api-status/actionWrapper'
 import { IInvestmentResponsibleAsLead } from './IInvestmentResponsibleAsLead'
 import { InvestmentResponsibleAsLeadModel } from './InvestmentResponsibleAsLeadModel';
 import { deleteInvestmentResponsibleAsLeadAsync } from './investmentResponsibleAsLeadSlice';
+import Moment from 'moment';
 
 interface InvestmentResponsibleAsLeadRowProps {
   investmentResponsibleAsLead: IInvestmentResponsibleAsLead
@@ -40,13 +41,15 @@ export const InvestmentResponsibleAsLeadRow = (props: InvestmentResponsibleAsLea
         {props.investmentResponsibleAsLead.nameOfCompany}
       </TableCell>
       <TableCell align="center">{props.investmentResponsibleAsLead.amountInvested}</TableCell>
-      <TableCell align="center">{props.investmentResponsibleAsLead.dateOfInvestment}</TableCell>
+      <TableCell align="center">{Moment(props.investmentResponsibleAsLead.dateOfInvestment).format("DD/MM/YYYY")}</TableCell>
       <TableCell align="center">{props.investmentResponsibleAsLead.exitOrWriteOff}</TableCell>
-      <TableCell align="center">{props.investmentResponsibleAsLead.dateofExitorWriteOff}</TableCell>
+      <TableCell align="center">{Moment(props.investmentResponsibleAsLead.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
       <TableCell align="center">{props.investmentResponsibleAsLead.comment}</TableCell>
       <TableCell align="center">
-        <Edit onClick={handleOpen} />&nbsp;
-        <Delete onClick={handleDelete}></Delete>
+        <div style={{ display: 'flex' }}>
+          <Edit onClick={handleOpen} />&nbsp;
+          <Delete onClick={handleDelete}></Delete>
+        </div>
       </TableCell>
     
     
