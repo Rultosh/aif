@@ -11,7 +11,7 @@ export const questions = {
       },
       {
         "id": 3,
-        "text":"Startup as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)" 
+        "text":"Does your Fund hae a strategy to invest in Startups*? <br> <br>*Startup as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)" 
       },
       {
         "id": 4,

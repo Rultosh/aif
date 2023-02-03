@@ -232,10 +232,10 @@ export const Home = () => {
                     </Table>
                 </TableContainer>
                 <Grid container sx={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <Grid item xs={4}>
+                    <Grid item xs={2}>
                         <Box >
-                            {pageInfo.pageNumber > 0 ? <Button variant='outlined' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
-                            {prelimApplications.prelimApplications.length >= 5 ? <Button variant='outlined' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
+                            {pageInfo.pageNumber > 0 ? <Button variant='contained' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
+                            {prelimApplications.prelimApplications.length >= 5 ? <Button variant='contained' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
                         </Box>
                     </Grid>
                 </Grid>
