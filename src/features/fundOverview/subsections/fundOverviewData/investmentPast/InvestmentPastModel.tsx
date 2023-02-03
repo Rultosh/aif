@@ -7,6 +7,10 @@ import uuid from "react-uuid";
 import { defaultInvestmentPast, IInvestmentPast } from "./IInvestmentPast";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+
 
 interface InvestmentPastModelProps {
   investmentPastFormData: IInvestmentPast,
@@ -69,7 +73,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       ev.target.id !== undefined ? ev.target.value : ev.target.value
 
     console.log(copiedValue, props.prelimApplicationId)
-
+    setValue(ev.target.name, ev.target.value);
     setinvestmentPastFormData(copiedValue)
   };
 
@@ -83,6 +87,31 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+  };
+
+  const validationSchema = Yup.object().shape({
+    nameOfCompany: Yup.string().required("Name of Company is required"),
+    sector: Yup.string().required("Sector is required"),
+    amountInvested: Yup.string().required("Amount Invested is required"),
+    briefProfile: Yup.string().required("Brief Profile is required"),
+    dateOfInvestment: Yup.string().required("Date of Investment is required"),
+  });
+
+  const {
+    control,
+    getValues,
+    setValue,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    setinvestmentPastFormData(data);
+    handleSubmitForm();
   };
 
   return <Modal
@@ -109,11 +138,16 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   label="Name Of Company"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.nameOfCompany}
+                  {...register("nameOfCompany")}
+                  error={(errors.nameOfCompany && getValues("nameOfCompany") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.nameOfCompany && getValues("nameOfCompany") == '')?errors.nameOfCompany.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={3.5}>
                 <TextField
@@ -122,11 +156,16 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   label="Sector"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.sector}
+                  {...register("sector")}
+                  error={(errors.sector && getValues("sector") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.sector && getValues("sector") == '')?errors.sector.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4}>
                 <TextField
@@ -136,11 +175,16 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   label="Amount Invested"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.amountInvested}
+                  {...register("amountInvested")}
+                  error={(errors.amountInvested && getValues("amountInvested") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.amountInvested && getValues("amountInvested") == '')?errors.amountInvested.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4}>
                 <TextField
@@ -148,32 +192,51 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   id="briefProfile"
                   label="Brief Profile"
                   value={investmentPastFormData.briefProfile}
+                  {...register("briefProfile")}
+                  error={(errors.briefProfile && getValues("briefProfile") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.briefProfile && getValues("briefProfile") == '')?errors.briefProfile.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} >
                   <Stack spacing={3}>
-                    <DesktopDatePicker
-                      disableFuture={true}
-                      label="Date Of Investment"
-                      value={investmentPastFormData.dateOfInvestment || null}
-                      // minDate={Today.toString()}
-                      onChange={(newValue) => {
-                        setDateValue("dateOfInvestment", newValue);
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
-
+                    <Controller
+                      name="dateOfInvestment"
+                      control={control}
+                      defaultValue={null}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error, invalid }
+                      }) => (
+                        // console.log(invalid),
+                        (<DesktopDatePicker
+                          inputFormat='DD/MM/YYYY'
+                          disableFuture={true}
+                          label="Date Of Investment"
+                          value={investmentPastFormData.dateOfInvestment || null}
+                          // minDate={Today.toString()}
+                          onChange={(newValue) => {
+                            setValue('dateOfInvestment', newValue);
+                            setDateValue("dateOfInvestment", newValue);
+                          }}
+                          renderInput={(params) => <TextField
+                            helperText={(invalid && getValues("dateOfInvestment") == null) ? <Typography variant="caption" {...register('dateOfInvestment')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                        />
+                        )
+                      )}
                     />
                   </Stack>
                 </LocalizationProvider>
               </Grid>
 
               <Grid item xs={12} >
-                <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+                <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
                   Submit
                 </Button>
               </Grid>

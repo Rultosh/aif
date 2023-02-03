@@ -14,6 +14,7 @@ import { CompanyContactDetailsList } from '../companyContactDetails/CompanyConta
 import { IndependentReferencesRow } from '../independentReferences/IndependentReferencesRow'
 import { IndependentReferencesList } from '../independentReferences/IndependentReferencesList'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Moment from 'moment';
 
 interface TeamMemberRowProps {
   teamMember: ITeamMember
@@ -71,7 +72,7 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
           <Grid item xs={12}>
             <Box sx={{ width: 'auto' }}>
               <TableContainer component={Paper}  >
-                <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                <Table sx={{ mt: 1, mb: 1 }} aria-label="customized table">
                   <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                     <TableRow>
                       {headerComponent}
@@ -82,8 +83,8 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
                       <TableCell align="center" component="th" scope="row">
                         {teamMember.name}
                       </TableCell>
-                      <TableCell align="center">{teamMember.dob}</TableCell>
-                      <TableCell align="center">{teamMember.dateofJoiningAMC}</TableCell>
+                      <TableCell align="center">{Moment(teamMember.dob).format("DD/MM/YYYY")}</TableCell>
+                      <TableCell align="center">{Moment(teamMember.dateofJoiningAMC).format("DD/MM/YYYY")}</TableCell>
                       <TableCell align="center">{teamMember.location}</TableCell>
                       <TableCell align="center">{teamMember.education}</TableCell>
                       <TableCell align="center">{teamMember.yearsOfRelevantExp}</TableCell>
@@ -92,8 +93,10 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
                       <TableCell align="center">{teamMember.memberOfInvesteeCommitte}</TableCell>
                       <TableCell align="center">{teamMember.directorship}</TableCell>
                       <TableCell align="center">
-                        <Edit onClick={handleOpen} />&nbsp;
-                        <Delete onClick={handleDelete}></Delete>
+                        <div style={{ display: 'flex' }}>
+                          <Edit onClick={handleOpen} />&nbsp;
+                          <Delete onClick={handleDelete}></Delete>
+                        </div>
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -107,7 +110,7 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
                         <ExpandMoreIcon sx={{ color: 'black', backgroundColor: 'white' }} />
                     </Box>
                 </Grid>
-                {show ? <div>
+                {show ? <>
           <Grid item xs={12}>
             <Box sx={{ mt: 2, mb: 2 }}>
               <InvestmentResponsibleAsLeadList teamMemberId={teamMember.id} />
@@ -130,7 +133,7 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
             <Box sx={{ mt: 2, mb: 2 }}>
               <IndependentReferencesList parentId={teamMember.id} />
             </Box>
-          </Grid> </div>:null}
+          </Grid> </>:null}
 
 
         </Grid>

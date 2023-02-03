@@ -165,7 +165,7 @@ const Landing = () => {
                                                 defaultValue={value.username === undefined ? "" : value.username}
                                                 value={value.username}
                                                 onChange={handleChange}
-                                                sx={{ display: 'flex', mb: 2 }}
+                                                sx={{ display: 'flex', mb: 4 }}
                                             />
                                         </Grid>
                                         <Grid item xs={12} >
@@ -204,17 +204,15 @@ const Landing = () => {
                                             />
                                             </Grid> */}
                                         <Grid item xs={12} >
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Button type="submit" variant="contained" disableElevation sx={{ mt:2,textTransform: 'none', width: 200,background:"#363062"}} onClick={isUserValid}>
+                                            <Box display="flex">
+                                                <Button type="submit" variant="contained" disableElevation sx={{ mt:4,textTransform: 'none', width: 200,backgroundImage: 'linear-gradient(#878ADD, #505282)', borderRadius: '10px', fontWeight: 600}} onClick={isUserValid}>
                                                     Sign In
                                                 </Button>
                                             </Box>
                                         </Grid  >
 
                                     </Box>
-                                    <Typography sx={{ flex: 1, mb: "2px", textAlign: "center" }}>To reset your password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
+                                    <Typography sx={{ flex: 1, mt:2, mb: "2px" }}>To reset your password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
 
                                 </CardContent>
                                 
@@ -254,7 +252,7 @@ const Landing = () => {
                                         <Toolbar disableGutters sx={{ justifyContent: "center" }}>
                                             <Box
                                                 component="img"
-                                                sx={{ width: '250px', height: '150px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                sx={{ width: '220px', height: '120px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
                                                 alt="success"
                                                 src={azadiLogo}
                                             />
@@ -272,7 +270,7 @@ const Landing = () => {
                                             <Box display="flex"
                                                 justifyContent="center"
                                                 alignItems="center">
-                                                <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200 ,background:"#c27a1b"}} onClick={submitOnCheckEligibility} >
+                                                <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200 ,backgroundImage: 'linear-gradient(#EC8D1C, #844F10)', borderRadius: '10px', fontWeight: 600 }} onClick={submitOnCheckEligibility} >
                                                     Check Eligibility
                                                 </Button>
                                             </Box>

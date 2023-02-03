@@ -69,8 +69,9 @@ export const InvestmentResponsibleAsLeadList = (props: InvestmentResponsibleAsLe
                     <Typography variant="subtitle2" color='#363062' sx={{ flex: 1, mb: 1 }}>Investments responsible for (as Lead)</Typography>
                 </Grid>
                 <Grid item xs={12}>
+                    <Box sx={{ width: 'auto' }}>
                         <TableContainer component={Paper}  >
-                            <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                            <Table sx={{ mt: 1, mb: 1 }} aria-label="customized table">
                                 <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                                     <TableRow>
                                         {headerComponent}
@@ -85,7 +86,7 @@ export const InvestmentResponsibleAsLeadList = (props: InvestmentResponsibleAsLe
                             </Table>
 
                         </TableContainer>
-                    
+                    </Box>                    
                 </Grid>
                 <Grid item xs={12}>
                     <Button onClick={openModel} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >

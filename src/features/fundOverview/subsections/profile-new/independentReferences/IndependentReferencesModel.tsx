@@ -4,6 +4,9 @@ import { defaultIIIndependentReferences, IIndependentReferences } from "./IIndep
 import { Controller } from "../../../../../lib/api-wrappers/Controller";
 import { selectIndependentReferences } from "./independentReferencesSlice";
 import { Card, CardContent, Typography, Grid, Box, Button, Modal, TextField } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -41,7 +44,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
     let copiedValue = { ...independentReference };
     copiedValue[ev.target.id as keyof IIndependentReferences]
       = ev.target.id ? ev.target.value : ev.target.value;
-      
+      setValue(ev.target.id, ev.target.value);
     setIndependentReference(copiedValue);
   };
 
@@ -76,6 +79,59 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
       handleClose()
     }
   }, [props.sharedController.isActionCompleted(props.independentReference.parentId, state)])
+  
+  const validationSchema = Yup.object().shape({
+    nameOfCompany: Yup.string().required("Name Of Company is required"),
+    designation: Yup.string().required("Designation is required"),
+    organisation: Yup.string().required("Organisation is required"),
+    telephoneNo: Yup.string().required("Telephone No is required"),
+    mobileNo: Yup.string().required("Mobile No is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
+      const PhoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change This Regex Based On Requirement
+      const IsValidPhone = PhoneRegex.test(value);
+      if (!IsValidPhone) {
+        return false;
+      }
+      return true;
+    }),
+    email: Yup.string().required("Email is required").test("test-name", "Enter a valid Email", function (value: any) {
+      const EmailRegex =
+        /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+      const IsValidEmail = EmailRegex.test(value);
+      if (!IsValidEmail) {
+        return false;
+      }
+      return true;
+    }),
+    alternateEmail: Yup.string().required("Alternate Email is required").test("test-name", "Enter a valid Email", function (value: any) {
+      const EmailRegex =
+        /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+      const IsValidEmail = EmailRegex.test(value);
+      if (!IsValidEmail) {
+        return false;
+      }
+      return true;
+    })
+  });
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    setIndependentReference(data);
+    // setInvestmentResponsibleAsLead({ ...teamMember, prelimApplicationId: Number(id) })
+    handleSubmitForm();
+  };
 
   return <Modal
     open={open}
@@ -100,11 +156,16 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     id="nameOfCompany"
                     label="Name of company"
                     value={independentReference.nameOfCompany}
+                    {...register("nameOfCompany")}
+                    error={(errors.nameOfCompany && getValues("nameOfCompany") == '') ? true : false}
                     variant="standard"
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
                   />
+                  <Typography variant="caption" color="error">
+                    <>{(errors.nameOfCompany && getValues("nameOfCompany") == '') ? errors.nameOfCompany.message : ''}</>
+                  </Typography>
                 </Grid>
                 <Grid item xs={3.5}>
                   <TextField
@@ -112,11 +173,16 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     id="designation"
                     label="Designation"
                     value={independentReference.designation}
+                    {...register("designation")}
+                    error={(errors.designation && getValues("designation") == '') ? true : false}
                     variant="standard"
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
                   />
+                  <Typography variant="caption" color="error">
+                    <>{(errors.designation && getValues("designation") == '') ? errors.designation.message : ''}</>
+                  </Typography>
                 </Grid>
                 <Grid item xs={3.5}>
                   <TextField
@@ -124,11 +190,16 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     id="organisation"
                     label="Organisation"
                     value={independentReference.organisation}
+                    {...register("organisation")}
+                    error={(errors.organisation && getValues("organisation") == '') ? true : false}
                     variant="standard"
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
                   />
+                  <Typography variant="caption" color="error">
+                    <>{(errors.organisation && getValues("organisation") == '') ? errors.organisation.message : ''}</>
+                  </Typography>
                 </Grid>
                 <Grid item xs={4.5}>
                   <TextField
@@ -136,23 +207,35 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     id="telephoneNo"
                     label="Telephone No."
                     value={independentReference.telephoneNo}
+                    {...register("telephoneNo")}
+                    error={(errors.telephoneNo) ? true : false}
                     variant="standard"
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
+                    inputProps={{ maxLength: 10 }}
                   />
+                  <Typography variant="caption" color="error">
+                    <>{(errors.telephoneNo) ? errors.telephoneNo.message : ''}</>
+                  </Typography>
                 </Grid>
                 <Grid item xs={4.5}>
                   <TextField
                     required
                     id="mobileNo"
                     value={independentReference.mobileNo}
+                    {...register("mobileNo")}
+                    error={(errors.mobileNo) ? true : false}
                     label="Mobile No"
                     variant="standard"
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
+                    inputProps={{ maxLength: 10 }}
                   />
+                  <Typography variant="caption" color="error">
+                    <>{(errors.mobileNo) ? errors.mobileNo.message : ''}</>
+                  </Typography>
                 </Grid>
                 <Grid item xs={4.5}>
                   <TextField
@@ -160,11 +243,16 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     id="email"
                     label="Email"
                     value={independentReference.email}
+                    {...register("email")}
+                    error={(errors.email) ? true : false}
                     variant="standard"
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
                   />
+                  <Typography variant="caption" color="error">
+                    <>{(errors.email) ? errors.email.message : ''}</>
+                  </Typography>
                 </Grid>
                 <Grid item xs={4.5}>
                   <TextField
@@ -172,16 +260,21 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     id="alternateEmail"
                     label="Alternate Email"
                     value={independentReference.alternateEmail}
+                    {...register("alternateEmail")}
+                    error={(errors.alternateEmail && getValues("alternateEmail") == '') ? true : false}
                     variant="standard"
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
                   />
+                  <Typography variant="caption" color="error">
+                    <>{(errors.alternateEmail && getValues("alternateEmail") == '') ? errors.alternateEmail.message : ''}</>
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} >
                   <div style={{ color: "red", margin: "10px" }}>{props.sharedController.error(props.independentReference.parentId, state)}</div>
                   <Button 
-                    onClick={handleSubmitForm}
+                    onClick={handleSubmit(onSubmit)}
                     color='success' 
                     variant="contained" disableElevation sx={{ textTransform: 'none' }} >
                     Submit

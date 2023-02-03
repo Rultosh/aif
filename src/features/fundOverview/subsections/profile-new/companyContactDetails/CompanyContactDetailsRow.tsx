@@ -48,8 +48,10 @@ export const CompanyContactDetailsRow = (props: CompanyContactDetailsRowProps) =
     <TableCell align="center">{props.companyContactDetails.alternateEmail}</TableCell>
     <TableCell align="center">{props.companyContactDetails.yearOfInvestment}</TableCell>
     <TableCell align="center">
-      <Edit onClick={handleOpen} />&nbsp;
-      <Delete onClick={handleDelete}></Delete>
+      <div style={{ display: 'flex' }}>
+        <Edit onClick={handleOpen} />&nbsp;
+        <Delete onClick={handleDelete}></Delete>
+      </div>
     </TableCell>
     <CompanyContactDetailsModel
       companyContactDetails={props.companyContactDetails}

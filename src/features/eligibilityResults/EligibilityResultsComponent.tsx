@@ -27,6 +27,11 @@ const EligibilityResults = () => {
 
     }, [])
 
+    let resultTextSuccess = {
+        "Fund of funds": ["Fund of Funds"],
+        "Asipre for Start-ups": ["Asipre for Start-ups"],
+        "UP Start-up Fund": ["UP Start-up Fund"]
+    }
 
     let resultText = {
         "Fund of funds": ["SIDBI's Fund of Funds for Startups (FFS) is intended to support AIFs to invest in startups.", "Based on Your size and/or structure, you do not meet the minimum eligible requirement for contribution under FFS."],

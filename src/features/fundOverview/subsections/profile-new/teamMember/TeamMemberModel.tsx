@@ -9,6 +9,11 @@ import { useParams } from "react-router-dom";
 import { Today } from "@mui/icons-material";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import FormHelperText from '@mui/material/FormHelperText';
+
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -49,7 +54,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
     } else {
       copiedValue[ev.target.name as keyof ITeamMember] = ev.target.value;
     }
-    
+    setValue(ev.target.name, ev.target.value);
     setTeamMember(copiedValue);
   };
 
@@ -92,6 +97,36 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
 
     handleClose();
   }
+  
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    dob: Yup.string().required("Date of Birth is required").nullable(),
+    dateofJoiningAMC: Yup.string().required("Date of Joining is required").nullable(),
+    location: Yup.string().required("Location is required"),
+    yearsOfRelevantExp: Yup.string().required("Years Of Relevant Experience is required").nullable(),
+    prevProfessionalExp: Yup.string().required("Previous Professional Experience is required"),
+    education: Yup.string().required("Education is required"),
+    keyPerson: Yup.string().required("Key Person is required").nullable(),
+    directorship: Yup.string().required("Directorship Held is required").nullable()
+  });
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    setTeamMember(data);
+    setTeamMember({ ...teamMember, prelimApplicationId: Number(id) })
+    handleSubmitForm();
+  };
 
   return <Modal
     open={open}
@@ -117,11 +152,16 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                   label="Name"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={teamMember.name}
+                  {...register("name")}
+                  error={(errors.name && getValues("name") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
+                </Typography>
               </Grid>
               {/*<Grid item xs={2.5}>
                 <TextField
@@ -154,16 +194,30 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
               <Grid item xs={2.25}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} >
                   <Stack spacing={3}>
-                    <DesktopDatePicker
-                      disableFuture={true}
-                      label="Date Of Birth"
-                      value={teamMember.dob || null}
-                      // minDate={Today.toString()}
-                      onChange={(newValue) => {
-                        setDateValue("dob", newValue);
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
-
+                    <Controller
+                      name="dob"
+                      control={control}
+                      defaultValue={null}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error, invalid }
+                      }) => (
+                        // console.log(invalid),
+                        (<DesktopDatePicker
+                          inputFormat='DD/MM/YYYY'
+                          disableFuture={true}
+                          label="Date Of Birth"
+                          value={teamMember.dob || null}
+                          // minDate={Today.toString()}
+                          onChange={(newValue) => {
+                            setValue('dob', newValue);
+                            setDateValue("dob", newValue);
+                          }}
+                          renderInput={(params) => <TextField
+                            helperText={(invalid && getValues("dob") == null) ? <Typography variant="caption" {...register('dob')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                        />
+                        )
+                      )}
                     />
                   </Stack>
                 </LocalizationProvider>
@@ -171,16 +225,30 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
               <Grid item xs={2.25}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} >
                   <Stack spacing={3}>
-                    <DesktopDatePicker
-                      disableFuture={true}
-                      label="Date Of Joining AMC/IM"
-                      value={teamMember.dateofJoiningAMC || null}
-                      minDate={Today.toString()}
-                      onChange={(newValue) => {
-                        setDateValue("dateofJoiningAMC", newValue);
-                      }}
-                      renderInput={(params) => <TextField {...params} />}
-
+                    <Controller
+                      name="dateofJoiningAMC"
+                      control={control}
+                      defaultValue={null}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error, invalid }
+                      }) => (
+                        // console.log(invalid),
+                        (<DesktopDatePicker
+                          inputFormat='DD/MM/YYYY'
+                          disableFuture={true}
+                          label="Date Of Joining AMC/IM"
+                          value={teamMember.dateofJoiningAMC || null}
+                          minDate={Today.toString()}
+                          onChange={(newValue) => {
+                            setValue('dateofJoiningAMC', newValue);
+                            setDateValue("dateofJoiningAMC", newValue);
+                          }}
+                          renderInput={(params) => <TextField
+                            helperText={(invalid && getValues("dateofJoiningAMC") == null) ? <Typography variant="caption" {...register('dateofJoiningAMC')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                        />
+                        )
+                      )}
                     />
                   </Stack>
                 </LocalizationProvider>
@@ -191,6 +259,8 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                   id="location"
                   label="Location"
                   value={teamMember.location}
+                  {...register("location")}
+                  error={(errors.location && getValues("location") == '') ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   variant="standard"
@@ -198,23 +268,48 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.location && getValues("location") == '')?errors.location.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
                   <InputLabel id="demo-simple-select-standard-label">Years of Relevent Experience</InputLabel>
-                  <Select
-                    labelId="yearsOfRelevantExp"
-                    id="yearsOfRelevantExp"
-                    value={String(teamMember.yearsOfRelevantExp)}
-                    onChange={handleChange}
+                  <Controller
                     name="yearsOfRelevantExp"
-                  >
+                    control={control}
+                    defaultValue={null}
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error, invalid }
+                    }) => (
+                      console.log(invalid && (getValues("yearsOfRelevantExp") || '')),
+                      (
+                        <>
+                          <Select
+                            labelId="yearsOfRelevantExp"
+                            id="yearsOfRelevantExp"
+                            // value={String(teamMember.yearsOfRelevantExp)}
+                            onChange={handleChange}
+                            name="yearsOfRelevantExp"
+                            defaultValue={teamMember["yearsOfRelevantExp"] === undefined ? " " : teamMember["yearsOfRelevantExp"]}
+                            error={invalid && ((getValues("yearsOfRelevantExp") || '') == '') ? true : false}
+                          >
 
-                    <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>
-                    <MenuItem key={"5-10 years"} value={"5-10 years"}>5-10 years</MenuItem>
-                    <MenuItem key={"10-15 years"} value={"10-15 years"}>10-15 years</MenuItem>
-                    <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
-                  </Select>
+                            <MenuItem key={"0-5 years"} value={"0-5 years"} selected={teamMember["yearsOfRelevantExp"] == "0-5 years"}>0-5 years</MenuItem>
+                            <MenuItem key={"5-10 years"} value={"5-10 years"} selected={teamMember["yearsOfRelevantExp"] == "5-10 years"}>5-10 years</MenuItem>
+                            <MenuItem key={"10-15 years"} value={"10-15 years"} selected={teamMember["yearsOfRelevantExp"] == "10-15 years"}>10-15 years</MenuItem>
+                            <MenuItem key={"15+ years"} value={"15+ years"} selected={teamMember["yearsOfRelevantExp"] == "15+ years"}>15+ years</MenuItem>
+                          </Select>
+                          {invalid && ((getValues("yearsOfRelevantExp") || '') == '') ? <FormHelperText>
+                            <Typography variant="caption" color="error" sx={{ ml: '10px' }}>
+                              <>{errors.yearsOfRelevantExp?.message}</>
+                            </Typography>
+                          </FormHelperText> : <></>}
+                        </>
+                      )
+                    )}
+                  />
                 </FormControl>                
               </Grid>
               <Grid item xs={4.5}>
@@ -224,11 +319,16 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                   id="prevProfessionalExp"
                   label="Previous Professional Experience"
                   value={teamMember.prevProfessionalExp}
+                  {...register("prevProfessionalExp")}
+                  error={(errors.prevProfessionalExp && getValues("prevProfessionalExp") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.prevProfessionalExp && getValues("prevProfessionalExp") == '')?errors.prevProfessionalExp.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
@@ -236,43 +336,90 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                   id="education"
                   label="Education"
                   value={teamMember.education}
+                  {...register("education")}
+                  error={(errors.education && getValues("education") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
                   sx={{ display: 'flex' }}
                 />
+                <Typography variant="caption" color="error">
+                  <>{(errors.education && getValues("education") == '')?errors.education.message : ''}</>
+                </Typography> 
               </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
                   <InputLabel id="demo-simple-select-standard-label">Key Person</InputLabel>
-                  <Select
-                    labelId="keyPerson"
-                    id="keyPerson"
-                    value={teamMember["keyPerson"]}
-                    onChange={handleChange}
+                  <Controller
                     name="keyPerson"
-                    defaultValue={teamMember["keyPerson"] === undefined ? " " : teamMember["keyPerson"]}
-                  >
-
-                    <MenuItem key={"Yes"} value={"Yes"}>Yes</MenuItem>
-                    <MenuItem key={"No"} value={"No"}>No</MenuItem>
-                  </Select>
+                    control={control}
+                    defaultValue={null}
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error, invalid }
+                    }) => (
+                      console.log(invalid && (getValues("keyPerson") || '')),
+                      (
+                        <>
+                          <Select
+                            labelId="keyPerson"
+                            id="keyPerson"
+                            // value={teamMember["keyPerson"]}
+                            onChange={handleChange}
+                            name="keyPerson"
+                            defaultValue={teamMember["keyPerson"] === undefined ? " " : teamMember["keyPerson"]}
+                            error={invalid && ((getValues("keyPerson") || '') == '') ? true : false}
+                          >
+        
+                            <MenuItem key={"Yes"} value={"Yes"} selected={teamMember["keyPerson"] == "Yes"}>Yes</MenuItem>
+                            <MenuItem key={"No"} value={"No"} selected={teamMember["keyPerson"] == "No"}>No</MenuItem>
+                          </Select>
+                          {invalid && ((getValues("keyPerson") || '') == '') ? <FormHelperText>
+                            <Typography variant="caption" color="error" sx={{ ml: '10px' }}>
+                              <>{errors.keyPerson?.message}</>
+                            </Typography>
+                          </FormHelperText> : <></>}
+                        </>
+                      )
+                    )}
+                  />
                 </FormControl>
                 </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
                   <InputLabel id="demo-simple-select-standard-label">Directorship Held</InputLabel>
-                  <Select 
-                    labelId="directorship"
-                    id="directorship"
-                    value={teamMember["directorship"]}
-                    onChange={handleChange}
+                  <Controller
                     name="directorship"
-                    defaultValue={teamMember["directorship"] === undefined ? " " : teamMember["directorship"]}
-                  >
+                    control={control}
+                    defaultValue={null}
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error, invalid }
+                    }) => (
+                      console.log(invalid && (getValues("directorship") || '')),
+                      (
+                        <>
+                          <Select
+                            labelId="directorship"
+                            id="directorship"
+                            // value={teamMember["directorship"]}
+                            onChange={handleChange}
+                            name="directorship"
+                            defaultValue={teamMember["directorship"] === undefined ? " " : teamMember["directorship"]}
+                            error={invalid && ((getValues("directorship") || '') == '') ? true : false}
+                          >
 
-                    <MenuItem key={"Yes"} value={"Yes"} selected={teamMember["directorship"] == "Yes"}>Yes</MenuItem>
-                    <MenuItem key={"No"} value={"No"} selected={teamMember["directorship"] == "No"}>No</MenuItem>
-                  </Select>
+                            <MenuItem key={"Yes"} value={"Yes"} selected={teamMember["directorship"] == "Yes"}>Yes</MenuItem>
+                            <MenuItem key={"No"} value={"No"} selected={teamMember["directorship"] == "No"}>No</MenuItem>
+                          </Select>
+                          {invalid && ((getValues("directorship") || '') == '') ? <FormHelperText>
+                            <Typography variant="caption" color="error" sx={{ ml: '10px' }}>
+                              <>{errors.directorship?.message}</>
+                            </Typography>
+                          </FormHelperText> : <></>}
+                        </>
+                      )
+                    )}
+                  />
                 </FormControl>
               </Grid>
               <Grid item xs={4.5}>
@@ -289,7 +436,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                 /> */}
               </Grid>
               <Grid item xs={12} >
-                <Button onClick={handleSubmitForm} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+                <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
                   Submit
                 </Button>
               </Grid>
