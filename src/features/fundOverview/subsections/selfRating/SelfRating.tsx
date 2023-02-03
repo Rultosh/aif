@@ -12,6 +12,9 @@ import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import { selectUsers } from '../../../admin/adminSlice'
+// import { useForm } from "react-hook-form";
+// import { yupResolver } from "@hookform/resolvers/yup";
+// import * as Yup from "yup";
 
 
 
@@ -115,6 +118,7 @@ export const SelfRating = () => {
         let copiedValue = { ...selfRatingValue };
         let key = "q" + idx;
         copiedValue[key as keyof ISelfRating] = e.target.value as any;
+        // setValue(e.target.id, e.target.value);
         setSelfRatingValue(copiedValue);
     };
 
@@ -131,6 +135,28 @@ export const SelfRating = () => {
 
     let selfQuestions = questions.selfRatingQuestions
 
+
+    // const validationSchema = Yup.object().shape({
+    //     comments: Yup.string().required("Comments is required")
+    //   });
+    
+    //   const {
+    //     control,
+    //     register,
+    //     handleSubmit,
+    //     getValues,
+    //     setValue,
+    //     reset,
+    //     formState: { errors },
+    //   } = useForm({
+    //     resolver: yupResolver(validationSchema),
+    //   });
+    
+    //   const onSubmit = (data: any) => {
+    //     console.log(data);
+    //     handleClickSave();
+    //   };
+    
     for (let i = 0; i < selfQuestions.length; i++) {
         let qes = selfQuestions[i].id.toString().concat('. ', selfQuestions[i].text);
         let idxVal = i;
@@ -169,6 +195,8 @@ export const SelfRating = () => {
                                                     required
                                                     id={"q" + (i + 1).toString() + "Comments"}
                                                     label="Comments if any"
+                                                    // {...register("comments")}
+                                                    // error={(errors.comments && getValues("comments") == '') ? true : false}
                                                     //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
                                                     //value={selfRatingValue["q" + (i + 1).toString()+"Comments" as key of  as keyof ISelfRating]] || ''}
                                                     value={getValue("q" + (i + 1).toString() + "Comments") || ''}
@@ -178,6 +206,9 @@ export const SelfRating = () => {
 
                                                     sx={{ display: 'flex', ml: 2 }}
                                                 />
+                                                {/* <Typography variant="caption" color="error">
+                                                  <>{(errors.comments && getValues("comments") == '') ? errors.comments.message : ''}</>
+                                                </Typography> */}
                                             </Grid>
                                         </Grid>
 
@@ -221,6 +252,7 @@ export const SelfRating = () => {
                 <Button
                     color='success'
                     onClick={handleClickSave}
+                    // onClick={handleSubmit(onSubmit)}
                     variant="contained"
                     disableElevation
                     sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >

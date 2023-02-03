@@ -66,6 +66,7 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
   useEffect(() => {
     console.log(investmentResponsibleAsLead.teamMemberId);
     if (props.open) handleOpen();
+    reset(props.investmentResponsibleAsLead);
   }, [props.open])
 
   function handleSubmitForm() {
@@ -106,6 +107,7 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
     handleSubmit,
     getValues,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),

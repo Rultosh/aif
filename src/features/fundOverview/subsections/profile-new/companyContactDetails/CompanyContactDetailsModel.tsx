@@ -55,6 +55,7 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
   useEffect(() => {
     console.log(investmentResponsibleAsLead.teamMemberId);
     if(props.open) handleOpen();
+    reset(props.companyContactDetails);
   }, [props.open]) 
 
   function handleSubmitForm() {
@@ -129,6 +130,7 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
     handleSubmit,
     getValues,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),

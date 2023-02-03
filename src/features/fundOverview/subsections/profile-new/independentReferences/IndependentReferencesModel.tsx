@@ -39,6 +39,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
   }
   const [independentReference, setIndependentReference]
     = useState(props.independentReference)
+  // const [telephoneTextfield, setTelephoneTextfield] = useState('')
 
   const handleChange = (ev: any) => {
     let copiedValue = { ...independentReference };
@@ -75,6 +76,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
   }
 
   useEffect(() => {
+    reset(props.independentReference);
     if (props.sharedController.isActionCompleted(props.independentReference.parentId, state)) {
       handleClose()
     }
@@ -84,7 +86,14 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
     nameOfCompany: Yup.string().required("Name Of Company is required"),
     designation: Yup.string().required("Designation is required"),
     organisation: Yup.string().required("Organisation is required"),
-    telephoneNo: Yup.string().required("Telephone No is required"),
+    telephoneNo: Yup.string().required("Telephone No is required").test("test-name", "Enter a valid Telephone No", function (value: any) {
+      const PhoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change This Regex Based On Requirement
+      const IsValidPhone = PhoneRegex.test(value);
+      if (!IsValidPhone) {
+        return false;
+      }
+      return true;
+    }).nullable(),
     mobileNo: Yup.string().required("Mobile No is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
       const PhoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change This Regex Based On Requirement
       const IsValidPhone = PhoneRegex.test(value);
@@ -121,6 +130,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
     handleSubmit,
     getValues,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -128,7 +138,8 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
 
   const onSubmit = (data: any) => {
     console.log(data);
-    setIndependentReference(data);
+    // setIndependentReference({...independentReference, telephoneNo: telephoneTextfield});
+    // setIndependentReference(data);
     // setInvestmentResponsibleAsLead({ ...teamMember, prelimApplicationId: Number(id) })
     handleSubmitForm();
   };
@@ -206,11 +217,17 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     required
                     id="telephoneNo"
                     label="Telephone No."
-                    value={independentReference.telephoneNo}
                     {...register("telephoneNo")}
                     error={(errors.telephoneNo) ? true : false}
                     variant="standard"
+                    value={independentReference.telephoneNo}
                     onChange={handleChange}
+                    // onChange={(ev) => {
+                      // setValue(ev.target.id, ev.target.value);
+                      // setTelephoneTextfield(ev.target.value);
+                      // handleChange(e);
+                      // validMobileNo('errors.'+ e.target.id, e.target.value);
+                    // }}
 
                     sx={{ display: 'flex' }}
                     inputProps={{ maxLength: 10 }}
@@ -261,14 +278,14 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     label="Alternate Email"
                     value={independentReference.alternateEmail}
                     {...register("alternateEmail")}
-                    error={(errors.alternateEmail && getValues("alternateEmail") == '') ? true : false}
+                    error={(errors.alternateEmail) ? true : false}
                     variant="standard"
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
                   />
                   <Typography variant="caption" color="error">
-                    <>{(errors.alternateEmail && getValues("alternateEmail") == '') ? errors.alternateEmail.message : ''}</>
+                    <>{(errors.alternateEmail) ? errors.alternateEmail.message : ''}</>
                   </Typography>
                 </Grid>
                 <Grid item xs={12} >

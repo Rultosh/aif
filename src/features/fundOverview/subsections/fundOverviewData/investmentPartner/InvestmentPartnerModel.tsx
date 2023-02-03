@@ -59,6 +59,9 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
   useEffect(() => {
     setInvestmentPartnerFormData({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
+
+    reset(props.investmentPartnerFormData);
+
     console.log({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
   }, [])
 
@@ -104,6 +107,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     setValue,
     getValues,
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -216,7 +220,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   required
                     labelId="vcpeExperience"
                     id="vcpeExperience"
-                    // value={String(investmentPartnerFormData.vcpeExperience)}
+                    value={investmentPartnerFormData.vcpeExperience || ''}
                     {...register("vcpeExperience")}
                     error={(errors.vcpeExperience && getValues("vcpeExperience") =='') ? true : false}
                     onChange={handleChange}

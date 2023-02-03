@@ -47,7 +47,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         console.log('useEffect', prelimAppicationId, prelimApplicationState.prelimApplication)
         setPrelimApplicationFormData(prelimApplicationState.prelimApplication)
 
-        // setValue(ev.target.id,ev.target.value);
+        reset(prelimApplicationState.prelimApplication);
 
         setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id))
     }, [prelimApplicationState.prelimApplication, prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
@@ -162,7 +162,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         // aifCategory: Yup.string(),
         dateOfFilingWithSEBI: Yup.string().required("This value is required").nullable(),
         // dealSector: Yup.string(),
-        dealSubsector: Yup.string().required("Deal Sub Sector is required"),
+        // dealSubsector: Yup.string().required("Deal Sub Sector is required"),
         nameOfTrustee: Yup.string().required("Name of Trustee is required"),
         contributionSought: Yup.string().required("Contribution Sought is required"),
         termOfFund: Yup.string().required("Term of Fund is required"),
@@ -191,17 +191,21 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         handleSubmit,
         getValues,
         setValue,
+        reset,
         formState: { errors },
     } = useForm({
         resolver: yupResolver(validationSchema),
         // defaultValues: prelimApplicationFormData
     });
 
+    console.log(prelimApplicationFormData);
     const onSubmit = (data: any) => {
         console.log(data);
         // setPrelimApplicationFormData(data);
         savePrelimApplicationForm();
     };
+    
+    console.log(getValues());
 
     if (prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
         return (

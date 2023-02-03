@@ -46,6 +46,9 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
   useEffect(() => {
     setContributorDetailsFormData({ ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId })
+
+    reset(props.contributorDetailsFormData);
+
     console.log({ ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId })
   }, [])
 
@@ -87,6 +90,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     setValue,
     getValues,
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm({
