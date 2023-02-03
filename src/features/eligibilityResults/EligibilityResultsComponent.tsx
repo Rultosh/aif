@@ -30,7 +30,7 @@ const EligibilityResults = () => {
 
     let resultText = {
         "Fund of funds": ["SIDBI's Fund of Funds for Startups (FFS) is intended to support AIFs to invest in startups.", "Based on Your size and/or structure, you do not meet the minimum eligible requirement for contribution under FFS."],
-        "Asipre for Start-ups": ["SIDBI’s ASPIRE fund is intended to support AIFs to invest in MSME.","Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under ASPIRE fund scheme."],
+        "Aspire for Start-ups": ["SIDBI’s ASPIRE fund is intended to support AIFs to invest in MSME.","Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under ASPIRE fund scheme."],
         "UP Start-up Fund": ["SIDBI’s UP Startup fund is intended to support AIFs to invest in startups.","Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under UP Startup fund scheme."]
     }
 
@@ -68,7 +68,7 @@ const EligibilityResults = () => {
                                         {isEligible ?
                                             <div>
                                                 <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Congratulations!</Typography>
-                                                <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Based on your size and structure you may be eligible for applying for contribution through SIDBI's Fund of Funds</Typography>
+                                                <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Based on your size and structure you may be eligible for applying for contribution through SIDBI's {scheme}</Typography>
                                                 <Typography sx={{ flex: 1, ml: '10px', mb: '50px', textAlign: "center" }}>Please <a href="/" style={{ color: 'blue' }}>Login</a>/
                                                     <a href="/" style={{ color: 'blue' }}>Sign-up</a> to be directed to the application</Typography>
                                             </div>

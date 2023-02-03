@@ -30,7 +30,7 @@ export const questions = {
         "text":"Do all the Key members are legally eligible to be a Director or in a Managerial position under Indian law? (i.e., not barred to be a Director or in a Managerial position under Indian Law) <br> <br> Key member is defined as Director, Sponsor and Senior Personnel of the Fund." 
       }
     ],
-    "Asipre for Start-ups":[
+    "Aspire for Start-ups":[
       {
         "id": 1,
         "text":"Are you a Category I or II Alternative Investment Funds (AIF) registered with Securities and Exchange Board of India (SEBI) or have applied for the same with SEBI?" 
