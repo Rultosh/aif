@@ -913,8 +913,8 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                             <DocumentChip
                                                                 label="Pvt. Placement Memorandum"
                                                                 id={`sdPvtPlacementMemorandum${prelimAppicationId}`} /> 
-                                                            </Grid>
-                                                            <Grid item xs={3} justifyContent="center" alignItems="center">
+                                                        </Grid>
+                                                        <Grid item xs={3} justifyContent="center" alignItems="center">
                                                             <DocumentChip
                                                                 label="IM Agreement"
                                                                 id={`sdImAgreement${prelimAppicationId}`} />
