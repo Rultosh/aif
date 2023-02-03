@@ -45,6 +45,9 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
   useEffect(() => {
     setInvestmentAssociateFormData({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
+
+    reset(props.investmentAssociateFormData);
+
     console.log({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
   }, [])
 
@@ -92,6 +95,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     setValue,
     getValues,
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm({

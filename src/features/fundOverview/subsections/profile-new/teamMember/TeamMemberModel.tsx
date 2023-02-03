@@ -73,6 +73,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
     if (!teamMember.prelimApplicationId && id) {
       setTeamMember({ ...teamMember, prelimApplicationId: Number(id) })
     }
+    reset(props.teamMember)
   }, [props.open])
 
   function handleSubmitForm() {
@@ -116,6 +117,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
     handleSubmit,
     getValues,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -123,11 +125,11 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
 
   const onSubmit = (data: any) => {
     console.log(data);
-    setTeamMember(data);
-    setTeamMember({ ...teamMember, prelimApplicationId: Number(id) })
+    // setTeamMember(data);
+    // setTeamMember({ ...teamMember, prelimApplicationId: Number(id) })
     handleSubmitForm();
   };
-
+console.log(teamMember)
   return <Modal
     open={open}
     onClose={handleClose}
@@ -208,13 +210,13 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                           disableFuture={true}
                           label="Date Of Birth"
                           value={teamMember.dob || null}
-                          // minDate={Today.toString()}
+                          minDate={Today.toString()}
                           onChange={(newValue) => {
                             setValue('dob', newValue);
                             setDateValue("dob", newValue);
                           }}
                           renderInput={(params) => <TextField
-                            helperText={(invalid && getValues("dob") == null) ? <Typography variant="caption" {...register('dob')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                            helperText={(invalid && getValues("dob") == null && (teamMember.dob || '') == '') ? <Typography variant="caption" {...register('dob')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
                         />
                         )
                       )}
@@ -245,7 +247,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                             setDateValue("dateofJoiningAMC", newValue);
                           }}
                           renderInput={(params) => <TextField
-                            helperText={(invalid && getValues("dateofJoiningAMC") == null) ? <Typography variant="caption" {...register('dateofJoiningAMC')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                            helperText={(invalid && getValues("dateofJoiningAMC") == null && (teamMember.dateofJoiningAMC || '') == '') ? <Typography variant="caption" {...register('dateofJoiningAMC')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
                         />
                         )
                       )}
@@ -289,19 +291,19 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                           <Select
                             labelId="yearsOfRelevantExp"
                             id="yearsOfRelevantExp"
-                            // value={String(teamMember.yearsOfRelevantExp)}
+                            value={teamMember.yearsOfRelevantExp || ''}
                             onChange={handleChange}
                             name="yearsOfRelevantExp"
-                            defaultValue={teamMember["yearsOfRelevantExp"] === undefined ? " " : teamMember["yearsOfRelevantExp"]}
-                            error={invalid && ((getValues("yearsOfRelevantExp") || '') == '') ? true : false}
+                            // defaultValue={teamMember["yearsOfRelevantExp"] === undefined ? " " : teamMember["yearsOfRelevantExp"]}
+                            error={invalid && (getValues("yearsOfRelevantExp") == null) ? true : false}
                           >
 
-                            <MenuItem key={"0-5 years"} value={"0-5 years"} selected={teamMember["yearsOfRelevantExp"] == "0-5 years"}>0-5 years</MenuItem>
-                            <MenuItem key={"5-10 years"} value={"5-10 years"} selected={teamMember["yearsOfRelevantExp"] == "5-10 years"}>5-10 years</MenuItem>
-                            <MenuItem key={"10-15 years"} value={"10-15 years"} selected={teamMember["yearsOfRelevantExp"] == "10-15 years"}>10-15 years</MenuItem>
-                            <MenuItem key={"15+ years"} value={"15+ years"} selected={teamMember["yearsOfRelevantExp"] == "15+ years"}>15+ years</MenuItem>
+                            <MenuItem key={"0-5 years"} value={"0-5 years"} selected={teamMember.yearsOfRelevantExp == "0-5 years"}>0-5 years</MenuItem>
+                            <MenuItem key={"5-10 years"} value={"5-10 years"} selected={teamMember.yearsOfRelevantExp == "5-10 years"}>5-10 years</MenuItem>
+                            <MenuItem key={"10-15 years"} value={"10-15 years"} selected={teamMember.yearsOfRelevantExp == "10-15 years"}>10-15 years</MenuItem>
+                            <MenuItem key={"15+ years"} value={"15+ years"} selected={teamMember.yearsOfRelevantExp == "15+ years"}>15+ years</MenuItem>
                           </Select>
-                          {invalid && ((getValues("yearsOfRelevantExp") || '') == '') ? <FormHelperText>
+                          {invalid && (getValues("yearsOfRelevantExp") == null) ? <FormHelperText>
                             <Typography variant="caption" color="error" sx={{ ml: '10px' }}>
                               <>{errors.yearsOfRelevantExp?.message}</>
                             </Typography>
@@ -363,17 +365,17 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                           <Select
                             labelId="keyPerson"
                             id="keyPerson"
-                            // value={teamMember["keyPerson"]}
+                            value={teamMember.keyPerson || ''}
                             onChange={handleChange}
                             name="keyPerson"
-                            defaultValue={teamMember["keyPerson"] === undefined ? " " : teamMember["keyPerson"]}
-                            error={invalid && ((getValues("keyPerson") || '') == '') ? true : false}
+                            // defaultValue={teamMember["keyPerson"] === undefined ? " " : teamMember["keyPerson"]}
+                            error={invalid && (getValues("keyPerson") == null) ? true : false}
                           >
         
-                            <MenuItem key={"Yes"} value={"Yes"} selected={teamMember["keyPerson"] == "Yes"}>Yes</MenuItem>
-                            <MenuItem key={"No"} value={"No"} selected={teamMember["keyPerson"] == "No"}>No</MenuItem>
+                            <MenuItem key={"Yes"} value={"Yes"} selected={teamMember.keyPerson == "Yes"}>Yes</MenuItem>
+                            <MenuItem key={"No"} value={"No"} selected={teamMember.keyPerson == "No"}>No</MenuItem>
                           </Select>
-                          {invalid && ((getValues("keyPerson") || '') == '') ? <FormHelperText>
+                          {invalid && (getValues("keyPerson") == null) ? <FormHelperText>
                             <Typography variant="caption" color="error" sx={{ ml: '10px' }}>
                               <>{errors.keyPerson?.message}</>
                             </Typography>
@@ -401,17 +403,17 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
                           <Select
                             labelId="directorship"
                             id="directorship"
-                            // value={teamMember["directorship"]}
+                            value={teamMember.directorship}
                             onChange={handleChange}
                             name="directorship"
-                            defaultValue={teamMember["directorship"] === undefined ? " " : teamMember["directorship"]}
-                            error={invalid && ((getValues("directorship") || '') == '') ? true : false}
+                            // defaultValue={teamMember["directorship"] === undefined ? " " : teamMember["directorship"]}
+                            error={invalid && (getValues("directorship") == null) ? true : false}
                           >
 
-                            <MenuItem key={"Yes"} value={"Yes"} selected={teamMember["directorship"] == "Yes"}>Yes</MenuItem>
-                            <MenuItem key={"No"} value={"No"} selected={teamMember["directorship"] == "No"}>No</MenuItem>
+                            <MenuItem key={"Yes"} value={"Yes"} selected={teamMember.directorship == "Yes"}>Yes</MenuItem>
+                            <MenuItem key={"No"} value={"No"} selected={teamMember.directorship == "No"}>No</MenuItem>
                           </Select>
-                          {invalid && ((getValues("directorship") || '') == '') ? <FormHelperText>
+                          {invalid && (getValues("directorship") == null) ? <FormHelperText>
                             <Typography variant="caption" color="error" sx={{ ml: '10px' }}>
                               <>{errors.directorship?.message}</>
                             </Typography>

@@ -57,6 +57,9 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
 
   useEffect(() => {
     setinvestmentPastFormData({ ...props.investmentPastFormData, prelimApplicationId: props.prelimApplicationId })
+
+    reset(props.investmentPastFormData);
+
     console.log({ ...props.investmentPastFormData, prelimApplicationId: props.prelimApplicationId })
   }, [])
 
@@ -102,6 +105,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     getValues,
     setValue,
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm({
