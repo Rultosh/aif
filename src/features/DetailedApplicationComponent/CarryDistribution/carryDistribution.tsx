@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, FormControlLabel, Switch, FormControl, InputLabel } from "@mui/material";
+import { Card, CardContent, IconButton, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, ListItem, ListItemIcon, ListItemText, Toolbar, TextField, FormControlLabel, Switch, FormControl, InputLabel } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
@@ -24,6 +24,7 @@ import { createApplicationAsync } from "../../../../src/features/fundOverview/su
 import { selectedDetailedApplications, detailedApplicationThunk } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
 import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
 import { selectUsers } from '../../admin/adminSlice'
+import AddIcon from '@mui/icons-material/Add';
 
 export const CarryDistribution = (props: any) => {
 
@@ -37,7 +38,7 @@ export const CarryDistribution = (props: any) => {
     const state = useAppSelector(selectCarryDistribution);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const [formDataDetailsList, setFormDataDetailsList] = useState({} as any);
+    const [formDataDetailsList, setFormDataDetailsList] = useState([] as any);
     const [formDataDetails, setFormDataDetails] = useState(defaultICarryDistributionDetails);
     const detailsController = new Controller(actionId, carryDistributionDetailsThunk);
     const detailsState = useAppSelector(selectCarryDistributionDetails);
@@ -100,7 +101,8 @@ export const CarryDistribution = (props: any) => {
         if (detailsState[parentId]?.data != undefined && (Object.keys(detailsState[parentId]?.data).length > 0) && props.isCrtStateToUpdate(detailsState[parentId]?.data, defaultICarryDistributionDetails)) {
             let newData = detailsState[parentId]?.data;
             if (newData) {
-                setFormDataDetailsList(newData)
+                checkAndUpdate(newData)
+                //setFormDataDetailsList(newData)
             }
         }
     }, [detailsState[parentId]?.data])
@@ -124,6 +126,16 @@ export const CarryDistribution = (props: any) => {
         if (newData) setPrilimFormData(newData)
     }, [detailedApplicationState[0]?.data])
 
+    const checkAndUpdate = (data:any) => {
+        let outData = [] as any;
+        Object.keys(data).map((d:any) => {
+            if (props.isCrtStateToUpdate(data[d], defaultICarryDistributionDetails)){
+                outData.push(data[d])
+            }
+        })
+        setFormDataDetailsList(outData)
+    }
+    
     const handleChange = (ev: any) => {
         ev.preventDefault();
         let copiedValue = { ...formData }
@@ -137,6 +149,7 @@ export const CarryDistribution = (props: any) => {
         let copiedValue = { ...newformDataDetails }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof newformDataDetails] = ev.target.value;
+        copiedValue.parentId = parentId;
         setNewFormDataDetails(copiedValue);
     };
 
@@ -152,11 +165,19 @@ export const CarryDistribution = (props: any) => {
         setFormDataDetailsList(copiedValue);
     };
 
-    const handleSave = () => {
-        controller.save(formData);
+    const handleSaveDetails = () => {
         for (let i = 0; i < Object.keys(formDataDetailsList).length; i++) {
             detailsController.save(formDataDetailsList[Object.keys(formDataDetailsList)[i]]);
         }
+        if (newformDataDetails.parentId != undefined) {
+            detailsController.save(newformDataDetails);
+        }
+        setNewFormDataDetails(defaultICarryDistributionDetails);
+    }
+
+    const handleSave = () => {
+        controller.save(formData);
+        handleSaveDetails()
 
     }
 
@@ -217,7 +238,7 @@ export const CarryDistribution = (props: any) => {
     let carryDetailsComponent = []
     if (formDataDetailsList != undefined) {
         let keysArr = Object.keys(formDataDetailsList)
-        for (let i = 0; i < keysArr.length; i++) {
+        for (let i = 0; i < keysArr.length ; i++) {
             carryDetailsComponent.push(
                 <React.Fragment >
                     <Grid container spacing={6} >
@@ -294,7 +315,7 @@ export const CarryDistribution = (props: any) => {
                                         variant="standard"
                                         onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2, mb: 2}}
+                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
                                 </Grid>
                                 <Grid item xs={3}>
@@ -380,7 +401,7 @@ export const CarryDistribution = (props: any) => {
 
                                         sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
-                                        {/*}
+                                    {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, mt: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Profit to investors(%)</InputLabel>
 
@@ -693,122 +714,58 @@ export const CarryDistribution = (props: any) => {
                                 </Grid>
                             </Grid>
                             {carryDetailsComponent}
-                            {/*<Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <TextField
-                                        required
-                                        id="distributionofCarry"
-                                        label="8."
-                                        {...register("distributionofCarry")}
-                                        error={errors.distributionofCarry ? true : false}
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        //value={formData["fundLaunchedDate"]}
-                                        variant="standard"
-                                        // onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
-                                    />
-                                    {errors.distributionofCarry ?
-                                        <div  style={{ marginTop: '-10px' }}>
-                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                                <>{errors.distributionofCarry?.message}</>
-                                            </Typography>
-                                        </div> : <></>}
+                            {detailsState[parentId]?.status[actionId]?.actionStatus.fetchStatus == 'idle' ?
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            required
+                                            id="distribution"
+                                            label=""
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={newformDataDetails["distribution"]}
+                                            variant="standard"
+                                            onChange={handleNewChange}
+
+                                            sx={{ display: 'flex', mt: 2, ml: 2 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={2.5}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="percent"
+                                            label="%"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={newformDataDetails["percent"]}
+                                            variant="standard"
+                                            onChange={handleNewChange}
+
+                                            sx={{ display: 'flex', mb: 2 }}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={2.5}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="carryOutOfCrore"
+                                            label="%"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={newformDataDetails["carryOutOfCrore"]}
+                                            variant="standard"
+                                            onChange={handleNewChange}
+
+                                            sx={{ display: 'flex', mb: 2 }}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={1} >
+                                        <AddIcon className="add_icon" sx={{ mt: 3, hover: 'blue' }} onClick={handleSaveDetails}></AddIcon>
+                                    </Grid>
+
                                 </Grid>
-                                <Grid item xs={2.5}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="carry1"
-                                        label="%"
-                                        {...register("carry1")}
-                                        error={errors.carry1 ? true : false}
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        //value={formData["fundLaunchedDate"]}
-                                        variant="standard"
-                                        // onChange={handleChange}
-
-                                        sx={{ display: 'flex', mb: 2 }}
-                                    />
-                                    {errors.carry1 ?
-                                        <div  style={{ marginTop: '-10px' }}>
-                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                                <>{errors.carry1?.message}</>
-                                            </Typography>
-                                        </div> : <></>}
-                                </Grid>
-
-                                <Grid item xs={2.5}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="outOfRs1"
-                                        label="%"
-                                        {...register("outOfRs")}
-                                        error={errors.outOfRs1 ? true : false}
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        //value={formData["fundLaunchedDate"]}
-                                        variant="standard"
-                                        // onChange={handleChange}
-
-                                        sx={{ display: 'flex', mb: 2 }}
-                                    />
-                                    {errors.outOfRs1 ?
-                                        <div  style={{ marginTop: '-10px' }}>
-                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                                <>{errors.outOfRs1?.message}</>
-                                            </Typography>
-                                        </div> : <></>}
-                                </Grid>
-
-                            </Grid> */}
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                <TextField
-                                        required
-                                        type="number"
-                                        id="distribution"
-                                        label=""
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={newformDataDetails["distribution"]}
-                                        variant="standard"
-                                        onChange={handleNewChange}
-
-                                        sx={{ display: 'flex', mt: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={2.5}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="percent"
-                                        label="%"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={newformDataDetails["percent"]}
-                                        variant="standard"
-                                        onChange={handleNewChange}
-
-                                        sx={{ display: 'flex', mb: 2 }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={2.5}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="carryOutOfCrore"
-                                        label="%"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={newformDataDetails["carryOutOfCrore"]}
-                                        variant="standard"
-                                        onChange={handleNewChange}
-
-                                        sx={{ display: 'flex', mb: 2 }}
-                                    />
-                                </Grid>
-
-                            </Grid>
+                                : <></>}
 
                         </CardContent>
                     </Card>
@@ -829,10 +786,10 @@ export const CarryDistribution = (props: any) => {
 
                                             </Grid>
                                             <Grid item xs={3}>
-                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Download unsigned document</Typography>
+                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Download unsigned document</Typography>
                                             </Grid>
                                             <Grid item xs={3}>
-                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Upload signed document</Typography>
+                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Upload signed document</Typography>
                                             </Grid>
                                         </Grid>
                                     </Toolbar>
@@ -923,7 +880,7 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Divider sx={{ mt: 2 }} />
 
-                                    
+
                                 </CardContent>
                             </Card>
                         </CardContent>
@@ -969,13 +926,13 @@ export const CarryDistribution = (props: any) => {
                                     // onClick={handleClickSubmit}
                                     onClick={handleClickSubmit}
                                     //endIcon={<ArrowRightIcon />}
-                                    id = 'submit'
+                                    id='submit'
                                     color='success'
                                     variant="contained"
                                     disableElevation
                                     sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
                                     Submit
-                                </Button> : ['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '')?
+                                </Button> : ['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') ?
 
                                     <>
                                         <Button color='success' id='approve' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
@@ -987,7 +944,7 @@ export const CarryDistribution = (props: any) => {
                                         <Button color='error' id='reject' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                             Reject
                                         </Button>
-                                    </>: <></>}
+                                    </> : <></>}
                             </Box>
                         </Grid>
                     </Grid>

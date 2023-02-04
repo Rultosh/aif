@@ -61,3 +61,8 @@ code {
   background-color: transparent !important;
 }
 
+.add_icon:hover {
+  background-color: #7cfa97;
+  
+}
+
