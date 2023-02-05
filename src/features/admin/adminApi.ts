@@ -4,7 +4,7 @@ import { IUser } from "./IUser";
 export function fetchUsers() {
   return api({
     method: 'get',
-    url: `api/users`
+    url: `useradmin/users`
   });
 }
 
