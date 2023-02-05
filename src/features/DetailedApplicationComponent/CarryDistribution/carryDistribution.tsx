@@ -14,7 +14,7 @@ import uuid from "react-uuid";
 import { useParams } from "react-router-dom";
 import { defaultICarryDistribution, ICarryDistribution } from "./ICarryDistribution";
 import { carryDistributionThunk, selectCarryDistribution } from "./carryDistributionSlice";
-import { defaultICarryDistributionDetails } from "./ICarryDistributionDetails";
+import { defaultICarryDistributionDetails, ICarryDistributionDetails } from "./ICarryDistributionDetails";
 import { carryDistributionDetailsThunk, selectCarryDistributionDetails } from "./carryDistributionDetailsSlice";
 import UploadComponents from "../subsections/uploadComponents";
 import React, * as Rect from 'react'
@@ -25,6 +25,7 @@ import { selectedDetailedApplications, detailedApplicationThunk } from "../../de
 import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
 import { selectUsers } from '../../admin/adminSlice'
 import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 
 export const CarryDistribution = (props: any) => {
 
@@ -47,6 +48,7 @@ export const CarryDistribution = (props: any) => {
     const [prilimFormData, setPrilimFormData] = useState(defaultIDetailedApplication);
     const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
     const usersState = useAppSelector(selectUsers)
+    const [deleteClicked, setDeleteClicked] = useState(false);
 
     //const prelimApplicationId = detailedApplicationState.
 
@@ -86,6 +88,12 @@ export const CarryDistribution = (props: any) => {
         }
     }, [])
 
+    /*useEffect(() => {
+        if (parentId) {
+                detailsController.all({ ...defaultICarryDistributionDetails, parentId: parentId });
+        }
+    }, [deleteClicked])*/
+
     useEffect(() => {
         if (detailsState[parentId]?.data && Object.keys(detailsState[parentId]?.data).length > 0 && props.isCrtStateToUpdate(detailsState[parentId]?.data, defaultICarryDistributionDetails)) {
             Object.keys(detailsState[parentId]?.data).map((key) => {
@@ -104,6 +112,9 @@ export const CarryDistribution = (props: any) => {
                 checkAndUpdate(newData)
                 //setFormDataDetailsList(newData)
             }
+        }
+        else if(detailsState[parentId]?.data != undefined &&  Object.keys(detailsState[parentId]?.data).length == 0){
+            setFormDataDetailsList([] as any)
         }
     }, [detailsState[parentId]?.data])
 
@@ -126,16 +137,16 @@ export const CarryDistribution = (props: any) => {
         if (newData) setPrilimFormData(newData)
     }, [detailedApplicationState[0]?.data])
 
-    const checkAndUpdate = (data:any) => {
+    const checkAndUpdate = (data: any) => {
         let outData = [] as any;
-        Object.keys(data).map((d:any) => {
-            if (props.isCrtStateToUpdate(data[d], defaultICarryDistributionDetails)){
+        Object.keys(data).map((d: any) => {
+            if (props.isCrtStateToUpdate(data[d], defaultICarryDistributionDetails)) {
                 outData.push(data[d])
             }
         })
         setFormDataDetailsList(outData)
     }
-    
+
     const handleChange = (ev: any) => {
         ev.preventDefault();
         let copiedValue = { ...formData }
@@ -173,6 +184,12 @@ export const CarryDistribution = (props: any) => {
             detailsController.save(newformDataDetails);
         }
         setNewFormDataDetails(defaultICarryDistributionDetails);
+    }
+
+    const handleDeleteDetails = (ev: any, data: ICarryDistributionDetails) => {
+        if (data.id != undefined && data.parentId) {
+            detailsController.delete(data);
+        }
     }
 
     const handleSave = () => {
@@ -238,7 +255,7 @@ export const CarryDistribution = (props: any) => {
     let carryDetailsComponent = []
     if (formDataDetailsList != undefined) {
         let keysArr = Object.keys(formDataDetailsList)
-        for (let i = 0; i < keysArr.length ; i++) {
+        for (let i = 0; i < keysArr.length; i++) {
             carryDetailsComponent.push(
                 <React.Fragment >
                     <Grid container spacing={6} >
@@ -258,13 +275,13 @@ export const CarryDistribution = (props: any) => {
                         <Grid item xs={2.5}>
                             <TextField
                                 required
-                                //type="number"
+                                type="number"
                                 id="percent"
-                                label="%"
+                                label=""
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                 value={formDataDetailsList[keysArr[i]]["percent"] || ''}
                                 variant="standard"
-                                //onChange={handleChangeCarryDetails}
+                                onChange={(e) => handleChangeCarryDetails(e, keysArr[i])}
 
                                 sx={{ display: 'flex' }}
                             />
@@ -273,19 +290,35 @@ export const CarryDistribution = (props: any) => {
                         <Grid item xs={2.5}>
                             <TextField
                                 required
-                                //type="number"
+                                type="number"
                                 id="carryOutOfCrore"
                                 label=""
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                 value={formDataDetailsList[keysArr[i]]["carryOutOfCrore"] || ''}
                                 variant="standard"
-                                // onChange={handleChangeCarryDetails}
+                                onChange={(e) => handleChangeCarryDetails(e, keysArr[i])}
 
                                 sx={{ display: 'flex' }}
                             />
                         </Grid>
 
+                        <Grid item xs={1} >
+                            <IconButton onClick={(e) => handleDeleteDetails(e, formDataDetailsList[keysArr[i]])}>
+                            <CloseIcon className="remove_icon" sx={{  hover: 'blue' }} ></CloseIcon>
+                            </IconButton>
+                            {/*<Button
+                                //onClick={(e) => handleClickSave(e, "previous")}
+                                onClick={(e) => handleDeleteDetails(e, formDataDetailsList[keysArr[i]])}
+                                startIcon={<ArrowLeftIcon />}
+                                variant="contained"
+                                disableElevation
+                                sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                Back
+            </Button>*/}
+                        </Grid>
+
                     </Grid>
+                    <br></br>
                 </React.Fragment>)
         }
     }
@@ -761,7 +794,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
 
                                     <Grid item xs={1} >
-                                        <AddIcon className="add_icon" sx={{ mt: 3, hover: 'blue' }} onClick={handleSaveDetails}></AddIcon>
+                                    <IconButton onClick={handleSaveDetails}>
+                                        <AddIcon className="add_icon" sx={{ mt: 2, hover: 'blue' }} ></AddIcon>
+                                        </IconButton>
                                     </Grid>
 
                                 </Grid>
