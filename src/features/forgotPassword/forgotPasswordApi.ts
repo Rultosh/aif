@@ -2,10 +2,12 @@ import api from "../../app/api";
 import { IForgotPassword } from "./IForgotPassword";
 import {  IResetPassword } from "../resetPassword/IResetPassword"
 import {IChangePassword} from '../changePassword/IChangePassword'
+import encrypt from "../../components/auth/encrypt";
 
 
 
 export function setPassword(passwordDetails:IForgotPassword) {
+  passwordDetails.password = encrypt(passwordDetails.password);
   return api({
     method: 'post',
     data: passwordDetails,
@@ -22,6 +24,7 @@ export function resetForgotPassword(email:IResetPassword) {
 }
 
 export function changePassword(passwordDetails:IChangePassword) {
+  passwordDetails.password = encrypt(passwordDetails.password);
   return api({
     method: 'post',
     data: passwordDetails,
