@@ -44,18 +44,18 @@ import { PrivateRoute } from './components/auth/PrivateRoute';
 function App() {
 
   const userLogged = useAppSelector(state => state.landing.validUser);//false;
-  const checkIsCorrectStateToUpdate = (data: any, keyObj:any) => {
+  const checkIsCorrectStateToUpdate = (data: any, keyObj: any) => {
     let tempVal = false
     let keys = Object.keys(keyObj);
-    let checkData = (data && typeof(data[Object.keys(data)[0]]) === 'object' )? data[Object.keys(data)[0]] : data
+    let checkData = (data && typeof (data[Object.keys(data)[0]]) === 'object') ? data[Object.keys(data)[0]] : data
     keys.forEach((key) => {
-        
-        if (key != 'id'  && key != 'parentId' && checkData.hasOwnProperty(key)){
-            tempVal =  true;
-        }
+
+      if (key != 'id' && key != 'parentId' && checkData.hasOwnProperty(key)) {
+        tempVal = true;
+      }
     });
     return tempVal
-}
+  }
 
   return (
     <div className="App"  >
@@ -65,58 +65,230 @@ function App() {
         <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
         <Route path='/admin' element={<Admin />}></Route>
         <Route path='/login' element={<Landing />}></Route>
-        <Route path='/detailed/sidbiReference' element={<SidbiReference />}></Route>
-        {/*<Route path='/detailed/sidbiReference/:id' element={<SidbiReference />}></Route>
-        <Route path='/detailed/featureOfFunds/:id' element={<FeatureOfFunds />}></Route>*/}
-        <Route path='home' element={
-          <PrivateRoute>
-            <Home />
-          </PrivateRoute>
-        }></Route>
-        <Route path='workflow' element={
-           <PrivateRoute><Workflow /></PrivateRoute>
-        }></Route>
         <Route path='eligibilityQuestioner' element={<EligibilityQuestioner />}></Route>
         <Route path='eligibilityResults' element={<EligibilityResults />}></Route>
         <Route path='signUp' element={<SignUp />}></Route>
         <Route path='resetPassword' element={<ResetPassword />}></Route>
         <Route path='setPassword' element={<ForgotPassword />}></Route>
-        <Route path='changePassword' element={
-        <PrivateRoute><ChangePassword /></PrivateRoute>}></Route>
-        <Route path='preliminary' element={
-        <PrivateRoute><FundOverview /></PrivateRoute>}></Route>
-        <Route path='preliminary/:id' element={
-        <PrivateRoute><FundOverview /></PrivateRoute>}>
-          <Route path='fund' element={<Fund />}></Route>
-          {/* <Route path='fund' element={<Fund />}></Route> */}
-          <Route path='profile' element={<ProfileNew />}></Route>
-          <Route path='selfRating' element={<SelfRating />}></Route>
-          <Route path='declaration' element={<Declaration />}></Route>
-          <Route path='preview' element={<Preview />}></Route>
-        </Route>
-        <Route path='Detailed' element={<DetailedApplicationComponent />}></Route>
-        <Route path='Detailed/:id' element={<DetailedApplicationComponent />}>
-          <Route path='detailed2A' element={<DetailedApplication2A />}></Route>
-          <Route path='detailed2B' element={<DetailedApplication2B isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2C' element={<DetailedApplication2C isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2D' element={<DetailedApplication2D isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2E' element={<DetailedApplication2E isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2F' element={<DetailedApplication2F isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2G' element={<DetailedApplication2G isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2H' element={<DetailedApplication2H isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2I' element={<DetailedApplication2I isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2J' element={<DetailedApplication2J isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='detailed2K' element={<DetailedApplication2K isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='InvestmentThemeOfFund' element={<InvestmentThemeOfFund isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='EngagementAndRole' element={<EngagementAndRole isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          <Route path='SidbiReference' element={<SidbiReference />}></Route>
-          {/*<Route path='PrelimApp' element={<PrelimApp />}></Route>*/}
-          <Route path='carryDistribution' element={<CarryDistribution isCrtStateToUpdate={checkIsCorrectStateToUpdate}/>}></Route>
-          
-        </Route>
-       
-      </Routes>
 
+        <Route path='/detailed/sidbiReference'
+          element={
+            <PrivateRoute>
+              <SidbiReference />
+            </PrivateRoute>
+          }>
+        </Route>
+
+        <Route path='home'
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }>
+        </Route>
+
+        <Route path='workflow' element={
+          <PrivateRoute>
+            <Workflow />
+          </PrivateRoute>
+        }>
+        </Route>
+
+        <Route path='changePassword'
+          element={
+            <PrivateRoute>
+              <ChangePassword />
+            </PrivateRoute>
+          }>
+        </Route>
+
+        <Route path='preliminary'
+          element={
+            <PrivateRoute>
+              <FundOverview />
+            </PrivateRoute>
+          }>
+        </Route>
+
+        <Route path='preliminary/:id'
+          element={
+            <PrivateRoute>
+              <FundOverview />
+            </PrivateRoute>
+          }>
+
+          <Route path='fund'
+            element={
+              <PrivateRoute>
+                <Fund />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='profile'
+            element={
+              <PrivateRoute>
+                <ProfileNew />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='selfRating'
+            element={
+              <PrivateRoute>
+                <SelfRating />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='declaration'
+            element={
+              <PrivateRoute>
+                <Declaration />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='preview'
+            element={
+              <PrivateRoute>
+                <Preview />
+              </PrivateRoute>
+            }>
+          </Route>
+
+        </Route>
+
+        <Route path='Detailed' element={<DetailedApplicationComponent />}></Route>
+
+        <Route path='Detailed/:id'
+          element={
+            <PrivateRoute>
+              <DetailedApplicationComponent />
+            </PrivateRoute>
+          }>
+
+          <Route path='detailed2A'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2A />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2B'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2B isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2C'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2C isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2D'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2D isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2E'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2E isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2F'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2F isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2G'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2G isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2H'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2H isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2I'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2I isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2J'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2J isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='detailed2K'
+            element={
+              <PrivateRoute>
+                <DetailedApplication2K isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='InvestmentThemeOfFund'
+            element={
+              <PrivateRoute>
+                <InvestmentThemeOfFund isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='EngagementAndRole'
+            element={
+              <PrivateRoute>
+                <EngagementAndRole isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='SidbiReference'
+            element={
+              <PrivateRoute>
+                <SidbiReference />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='carryDistribution'
+            element={
+              <PrivateRoute>
+                <CarryDistribution isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+              </PrivateRoute>
+            }>
+          </Route>
+        </Route>
+      </Routes>
     </div>
   );
 }
