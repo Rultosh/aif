@@ -47,7 +47,7 @@ function App() {
   const checkIsCorrectStateToUpdate = (data: any, keyObj:any) => {
     let tempVal = false
     let keys = Object.keys(keyObj);
-    let checkData = data ? data[Object.keys(data)[0]] : data
+    let checkData = (data && typeof(data[Object.keys(data)[0]]) === 'object' )? data[Object.keys(data)[0]] : data
     keys.forEach((key) => {
         
         if (key != 'id'  && key != 'parentId' && checkData.hasOwnProperty(key)){
@@ -73,15 +73,20 @@ function App() {
             <Home />
           </PrivateRoute>
         }></Route>
-        <Route path='workflow' element={<Workflow />}></Route>
+        <Route path='workflow' element={
+           <PrivateRoute><Workflow /></PrivateRoute>
+        }></Route>
         <Route path='eligibilityQuestioner' element={<EligibilityQuestioner />}></Route>
         <Route path='eligibilityResults' element={<EligibilityResults />}></Route>
         <Route path='signUp' element={<SignUp />}></Route>
         <Route path='resetPassword' element={<ResetPassword />}></Route>
         <Route path='setPassword' element={<ForgotPassword />}></Route>
-        <Route path='changePassword' element={<ChangePassword />}></Route>
-        <Route path='preliminary' element={<FundOverview />}></Route>
-        <Route path='preliminary/:id' element={<FundOverview />}>
+        <Route path='changePassword' element={
+        <PrivateRoute><ChangePassword /></PrivateRoute>}></Route>
+        <Route path='preliminary' element={
+        <PrivateRoute><FundOverview /></PrivateRoute>}></Route>
+        <Route path='preliminary/:id' element={
+        <PrivateRoute><FundOverview /></PrivateRoute>}>
           <Route path='fund' element={<Fund />}></Route>
           {/* <Route path='fund' element={<Fund />}></Route> */}
           <Route path='profile' element={<ProfileNew />}></Route>
