@@ -11,23 +11,19 @@ import { authenticateThunk, defaultLoginRequest, selectAuthenticatedUser } from 
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
-
+import {ModalComponent} from '../../components/ModalComponent'
 
 const Landing = () => {
 
     const [open, setOpen] = useState(true);
-    //const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
-    const auth = useAppSelector(selectAuthenticatedUser)
-
+    const state = useAppSelector(selectAuthenticatedUser)
+    const [showResponse, setShowResponse] = useState(false);
     const initialState = defaultLoginRequest
-
     const [value, setValue] = useState(initialState);
     const errorMsg = useAppSelector(state => state.landing.error);
     const isValidUser = useAppSelector(state => state.landing.validUser);
-
     const [actionId] = useState(uuid());
 
     useEffect(() => {
@@ -36,11 +32,24 @@ const Landing = () => {
         if(localStorage.getItem('token')) navigate('/home')
     })
 
+    useEffect(() => {
+        if (state.response !== undefined){
+            setShowResponse(true)
+        } else{
+            setShowResponse(false)
+        }
+    },[state.response])
+
     const handleChange = (ev: any) => {
         ev.preventDefault();
         let copiedValue = { ...value };
         copiedValue[ev.target.id as keyof typeof initialState] = ev.target.value;
         setValue(copiedValue);
+    };
+
+    const handleClose= () => {
+        setShowResponse(false)
+        //setFormData(defaultISignup)
     };
 
  
@@ -280,6 +289,21 @@ const Landing = () => {
                                 </CardContent>
 
                             </Card>
+                            <Grid item xs={12}>
+                                                    <Box sx={{ mt: 2 }}>
+                                                        {showResponse && state.response != undefined ? <>{state.response}</> : <></>}
+                                                        <ModalComponent
+                                                            open={showResponse}
+                                                            close={handleClose}
+                                                            aria-labelledby="modal-modal-title"
+                                                            aria-describedby="modal-modal-description"
+                                                            className="special_modal"
+                                                            msg={state.response}
+                                                            status={state.status.fetchStatus}
+                                                        >
+                                                        </ModalComponent>
+                                                    </Box>
+                                                </Grid>
                         </Grid>
                     </Grid>
                 </Box></Container>

@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { changeUserPasswordAsync, selectedforgotPassword } from '../forgotPassword/forgotPasswordSlice'
 import { defaultIChangePassword } from './IChangePassword'
-
+import {ModalComponent} from '../../components/ModalComponent'
 
 
 const ChangePassword = () => {
@@ -21,12 +21,12 @@ const ChangePassword = () => {
     const dispatch = useAppDispatch()
     const [formData, setFormData] = useState(defaultIChangePassword);
     const state = useAppSelector(selectedforgotPassword)
-
+    const [showResponse, setShowResponse] = useState(false);
 
 
 
     function handleSubmitForm() {
-
+        setShowResponse(true)
         dispatch(
             changeUserPasswordAsync(
                 wrapArgument(actionUid, formData)
@@ -43,7 +43,9 @@ const ChangePassword = () => {
         setFormData(copiedValue);
     };
 
-
+    const handleClose= () => {
+        setShowResponse(false)
+    };
 
     return (
         <div >
@@ -199,8 +201,24 @@ const ChangePassword = () => {
                                                 </Box>
                                             </Grid  >
 
+                                            <Grid item xs={12}>
+                                                    <Box sx={{ mt: 2 }}>
+                                                        {showResponse && state.response_changePassword != undefined ? <>{state.response_changePassword}</> : <></>}
+                                                        <ModalComponent
+                                                            open={showResponse}
+                                                            close={handleClose}
+                                                            aria-labelledby="modal-modal-title"
+                                                            aria-describedby="modal-modal-description"
+                                                            className="special_modal"
+                                                            msg={state.response_changePassword}
+                                                            status={state.status.fetchStatus}
+                                                        >
+                                                        </ModalComponent>
+                                                    </Box>
+                                                </Grid>
+
                                         </Grid>
-                                        {state.response_changePassword?<Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}> {state.response_changePassword} </Typography>:<></>}
+                                        
                                     </Box>
                                     <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, email us at vcfapplication@sidbi.in</Typography>
                                 </CardContent>

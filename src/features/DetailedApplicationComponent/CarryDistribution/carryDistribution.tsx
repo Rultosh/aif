@@ -198,29 +198,49 @@ export const CarryDistribution = (props: any) => {
 
     }
 
+    //sum of 1 to 5
     const getAmount = () => {
         let sum = (Number(formData?.capitalAmount) || 0) + (Number(formData?.hurdleAmount) || 0) + (Number(formData.catchupAmount) || 0) + (Number(formData.profitAmount) || 0) + (Number(formData.carryAmount || 0))
         console.log(sum)
         return sum
     }
 
+    //sum of 1 to 5 balance
     const getBalanceAmount = () => {
         let sum = (Number(formData?.capitalBalance) || 0) + (Number(formData?.hurdleBalance) || 0) + (Number(formData.catchupBalance) || 0) + (Number(formData.profitBalance) || 0) + (Number(formData.carryBalance || 0))
         console.log(sum)
         return sum
     }
 
-    const getDisAmount = () => {
+    //profit of investor
+    const getProfitOfInvestors = () => {
         let sum = ((Number(formData?.hurdleAmount) || 0) + (Number(formData.profitAmount) || 0))
         console.log(sum)
         return sum
     }
 
-    const getDisBalanceAmount = () => {
+    //profit of investor balance
+    const getBalanceProfitOfInvestors = () => {
         let sum = ((Number(formData?.hurdleBalance) || 0) + (Number(formData.profitBalance) || 0))
         console.log(sum)
         return sum
     }
+
+        //Distribution Amouunt
+        const getDisAmount = () => {
+            let sum = ((Number(formData?.catchupAmount) || 0) + (Number(formData.carryAmount) || 0))
+            console.log(sum)
+            return sum
+        }
+    
+        //Balance Distribution Amouunt
+        const getDisBalanceAmount = () => {
+            let sum = ((Number(formData?.catchupBalance) || 0) + (Number(formData.carryBalance) || 0))
+            console.log(sum)
+            return sum
+        }
+
+    
 
 
     const handleClickSave = (ev: any, navTo: string) => {
@@ -722,11 +742,11 @@ export const CarryDistribution = (props: any) => {
                             <Grid container spacing={6} >
                                 <Grid item xs={6}></Grid>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Total</Typography>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + getDisAmount()}</Typography>
+                                    
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + (getProfitOfInvestors() + getDisAmount())}</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getDisBalanceAmount()}</Typography>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getBalanceProfitOfInvestors() + getDisBalanceAmount()}</Typography>
                                 </Grid>
 
                             </Grid>
@@ -783,7 +803,7 @@ export const CarryDistribution = (props: any) => {
                                             required
                                             type="number"
                                             id="carryOutOfCrore"
-                                            label="%"
+                                            label=" "
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={newformDataDetails["carryOutOfCrore"]}
                                             variant="standard"

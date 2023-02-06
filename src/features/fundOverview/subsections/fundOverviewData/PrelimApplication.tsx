@@ -772,7 +772,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                             <FormControlLabel sx={{ mt: 5 }} control={<
                                                 Switch checked={!!prelimApplicationFormData.firstClosing}
                                                 onChange={handleToggle} />}
-                                                label={prelimApplicationFormData.firstClosing ? "Yes" : "No"} />
+                                                label={prelimApplicationFormData.firstClosing ? "No" : "Yes"} />
                                         </Grid>
                                         <Grid item xs={3}>
                                             <TextField
