@@ -17,6 +17,9 @@ import UploadComponents from '../uploadComponents'
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileUpload from "../../../../components/FileUpload";
 import SaveIcon from '@mui/icons-material/Save';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const DetailedApplication2E = (props: any) => {
 
@@ -59,11 +62,18 @@ export const DetailedApplication2E = (props: any) => {
         }
     }, [state[parentId]?.data])
 
+    useEffect(() => {
+        if(formData.id != undefined){
+            reset(formData);
+        }
+    }, [formData])
+
     const handleChange = (ev: any) => {
         ev.preventDefault();
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
+        setValue(ev.target.name, ev.target.value);
         setFormData(copiedValue);
     };
 
@@ -82,6 +92,33 @@ export const DetailedApplication2E = (props: any) => {
         }
     }
 
+    const validationSchema = Yup.object().shape({
+        listOfExternalFirms: Yup.string().required("List Of External Firms is required"),
+        monitoringPractices: Yup.string().required("Monitoring Practices is required"),
+        imValueAdd: Yup.string().required("Please describe how the investment manager(s) add value / propose to add value to the investments is required")
+    });
+
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleSave();
+    };
+
+    const onSubmitNext = (data: any) => {
+        setFormData(data);
+        handleClick('', "next")
+    };
+
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -98,7 +135,8 @@ export const DetailedApplication2E = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                onClick={handleSave}
+                                type="submit"
+                                onClick={handleSubmit(onSubmit)}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -120,6 +158,8 @@ export const DetailedApplication2E = (props: any) => {
                                 required
                                 id="listOfExternalFirms"
                                 //label="26. List of external firms (legal, technical, financial / accounting etc.) who are assisting / would be assisting the Investment Manager in the due diligence process."
+                                {...register("listOfExternalFirms")}
+                                error={errors.listOfExternalFirms && getValues("listOfExternalFirms") == '' ? true : false}
                                 //defaultValue={formDatalistOfExternalFirms === undefined ? " " : formData["listOfExternalFirms"]}
                                value={formData["listOfExternalFirms"] || ''}
                                 variant="standard"
@@ -127,6 +167,12 @@ export const DetailedApplication2E = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.listOfExternalFirms && getValues("listOfExternalFirms") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.listOfExternalFirms?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -138,6 +184,8 @@ export const DetailedApplication2E = (props: any) => {
                                 required
                                 id="monitoringPractices"
                                 //label="27. List the activities involved in monitoring and follow-up of investments? How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same."
+                                {...register("monitoringPractices")}
+                                error={errors.monitoringPractices && getValues("monitoringPractices") == '' ? true : false}
                                 //defaultValue={formDatamonitoringPractices === undefined ? " " : formData["monitoringPractices"]}
                                value={formData["monitoringPractices"] || ''}
                                 variant="standard"
@@ -145,6 +193,12 @@ export const DetailedApplication2E = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.monitoringPractices && getValues("monitoringPractices") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.monitoringPractices?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -155,6 +209,8 @@ export const DetailedApplication2E = (props: any) => {
                                 required
                                 id="imValueAdd"
                                 label="28. Please describe how the investment manager(s) add value / propose to add value to the investments."
+                                {...register("imValueAdd")}
+                                error={errors.imValueAdd && getValues("imValueAdd") == '' ? true : false}
                                 //defaultValue={formDataimValueAdd === undefined ? " " : formData["imValueAdd"]}
                                value={formData["imValueAdd"] || ''}
                                 variant="standard"
@@ -162,6 +218,12 @@ export const DetailedApplication2E = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.imValueAdd && getValues("imValueAdd") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.imValueAdd?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -212,7 +274,7 @@ export const DetailedApplication2E = (props: any) => {
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 <Button
-                                    onClick={(e) => handleClick(e, "next")}
+                                    onClick={handleSubmit(onSubmitNext)}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"
                                     disableElevation

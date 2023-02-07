@@ -14,6 +14,9 @@ import { Controller } from "../../../../lib/api-wrappers/Controller";
 import { defaultIDetailedApplication2I, IDetailedApplication2I } from "./IDetailedApplication2I";
 import { detailedApplication2IThunk, selectDetailedApplication2I } from "./detailedApplication2ISlice";
 import SaveIcon from '@mui/icons-material/Save';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const DetailedApplication2I = (props: any) => {
  
@@ -69,6 +72,7 @@ export const DetailedApplication2I = (props: any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
+        setValue(ev.target.name, ev.target.value);
         setFormData(copiedValue);
     };
 
@@ -87,6 +91,37 @@ export const DetailedApplication2I = (props: any) => {
         }
     }
 
+    const validationSchema = Yup.object().shape({
+        sebiCompliance: Yup.string().required("Compliance is required")
+    });
+
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    useEffect(() => {
+        if(formData.id != undefined){
+            reset(formData);
+        }
+    }, [formData])
+
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleSave();
+    };
+
+    const onSubmitNext = (data: any) => {
+        setFormData(data);
+        handleClick('', "next")
+    };
+
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -103,7 +138,8 @@ export const DetailedApplication2I = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                onClick={handleSave}
+                                type="submit"
+                                onClick={handleSubmit(onSubmit)}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -189,7 +225,7 @@ export const DetailedApplication2I = (props: any) => {
                     </Card>
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>51. Compliance certificate on SEBI's VCF/AIF Regulations, if applicable. If not applicable, please give reasons, if any.</Typography>
-                    <FormControlLabel sx={{ mt: 2, mb: 2, ml: 2 }} control={<Switch checked={formData.sebiComplianceAvailable} onChange={handleToggle} />} label="Yes" />
+                    <FormControlLabel sx={{ mt: 2, mb: 2, ml: 2 }} control={<Switch checked={formData.sebiComplianceAvailable} onChange={handleToggle} />} label={!formData.sebiComplianceAvailable? "No" : "Yes"} />
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
                             {!formData.sebiComplianceAvailable ?
@@ -197,6 +233,8 @@ export const DetailedApplication2I = (props: any) => {
                                     required
                                     id="sebiCompliance"
                                     label='If No, reasons therefore'
+                                    {...register("sebiCompliance")}
+                                    error={errors.sebiCompliance && getValues("sebiCompliance") == '' ? true : false}
                                     // defaultValue={formData.reason === undefined ? " " : formData["reason"]}
                                     value={formData["sebiCompliance"] || ''}
                                     variant="standard"
@@ -209,6 +247,12 @@ export const DetailedApplication2I = (props: any) => {
                                         <UploadComponents id={`sebiComplianceCertificate${parentId}`}></UploadComponents>
                                     </div>
                                 </Grid>}
+                            {errors.sebiCompliance && getValues("sebiCompliance") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.sebiCompliance?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent></Card>
                     <Divider sx={{ mt: 2 }} />
 
@@ -241,29 +285,29 @@ export const DetailedApplication2I = (props: any) => {
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`balanceSheetY1${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`balanceSheetY2${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`balanceSheetY3${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                             </Grid>
@@ -275,29 +319,29 @@ export const DetailedApplication2I = (props: any) => {
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`incomeAndExpenditureY1${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`incomeAndExpenditureY2${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`incomeAndExpenditureY3${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                             </Grid>
@@ -309,29 +353,29 @@ export const DetailedApplication2I = (props: any) => {
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`truesteeCompanyY1${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`truesteeCompanyY2${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`truesteeCompanyY3${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                             </Grid>
@@ -343,29 +387,29 @@ export const DetailedApplication2I = (props: any) => {
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`assetManagementCmpY1${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`assetManagementCmpY2${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`assetManagementCmpY3${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                             </Grid>
@@ -376,29 +420,29 @@ export const DetailedApplication2I = (props: any) => {
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`priorAndPresentFundyY1${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`priorAndPresentFundyY2${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                        <Grid item xs={3}>
+                                        {/* <Grid item xs={3}> */}
                                             <div style={{ margin: "15px" }}>
                                                 <UploadComponents id={`priorAndPresentFundyY3${parentId}`}></UploadComponents>
                                             </div>
-                                        </Grid>
+                                        {/* </Grid> */}
                                     </Box>
                                 </Grid>
                             </Grid>
@@ -430,7 +474,7 @@ export const DetailedApplication2I = (props: any) => {
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 <Button
-                                    onClick={(e) => handleClick(e, "next")}
+                                    onClick={handleSubmit(onSubmitNext)}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"
                                     disableElevation
