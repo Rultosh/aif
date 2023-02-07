@@ -62,7 +62,11 @@ code {
 }
 
 .add_icon:hover {
-  background-color: #7cfa97;
-  
+  background-color: #7cfa97; 
+  cursor:'pointer';
 }
 
+.remove_icon:hover {
+  background-color: #f12d2d; 
+  cursor:'pointer';
+}

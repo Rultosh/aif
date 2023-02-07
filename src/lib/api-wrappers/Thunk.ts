@@ -281,8 +281,9 @@ export class Thunk<T extends IEntity> {
         let input = action.meta.arg;
         state[this.getParentId(input.argument)]
           .status[input.trackingid].actionStatus.fetchStatus = FetchStatus.IDLE;
-        state[this.getParentId(input.argument)]
-          .data[this.getId(input.argument)] = undefined;
+        delete state[this.getParentId(input.argument)].data[this.getId(input.argument)]
+        /*state[this.getParentId(input.argument)]
+          .data[this.getId(input.argument)] = undefined;*/
       })
       .addCase(this.deleteAsync.rejected, (state, action) => {
         let input = action.meta.arg;

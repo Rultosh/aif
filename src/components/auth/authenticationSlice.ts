@@ -3,12 +3,19 @@ import { RootState } from "../../app/store"
 import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
 import { authenticate } from "./authenticationApi"
+import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 
 type InitialState = {
-    token: String | undefined
+    token: String | undefined,
+    response: string | undefined,
+    status: IStatus,
+    actionStatus: IStatus
 }
 const initialState: InitialState = {
-    token: undefined
+    token: undefined,
+    response: undefined,
+    status: { fetchStatus: FetchStatus.IDLE },
+    actionStatus: { fetchStatus: FetchStatus.IDLE }
 }
 
 export interface ILoginRequest {
@@ -57,11 +64,13 @@ const authticationSlice = createSlice({
         console.log(action.payload);
         state.token = action.payload.currentUser;
         console.log(JSON.stringify(state));
+        state.response = undefined;
         localStorage.setItem('token', String(state.token));
       }
     )
-    .addCase(authenticateThunk.rejected, (state, action) => {
-     
+    .addCase(authenticateThunk.rejected, (state, action: any) => {
+      state.response = action.payload?.message;
+      state.status.fetchStatus = FetchStatus.FAILED;
     })
   }
 })
