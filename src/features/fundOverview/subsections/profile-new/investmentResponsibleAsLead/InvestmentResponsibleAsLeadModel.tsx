@@ -42,7 +42,7 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
     props.onClose(false);
   }
   const [investmentResponsibleAsLead, setInvestmentResponsibleAsLead] = useState(props.investmentResponsibleAsLead)
-
+console.log(investmentResponsibleAsLead);
   const handleChange = (ev: any) => {
     ev.preventDefault();
     let copiedValue = { ...investmentResponsibleAsLead };
@@ -268,6 +268,7 @@ export const InvestmentResponsibleAsLeadModel = (props: InvestmentResponsibleAsL
                           value={investmentResponsibleAsLead.dateofExitorWriteOff || null}
                           // minDate={Today.toString()}
                           onChange={(newValue) => {
+                            console.log(newValue);
                             setValue('dateofExitorWriteOff', newValue);
                             setDateValue("dateofExitorWriteOff", newValue);
                           }}

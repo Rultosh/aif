@@ -104,6 +104,7 @@ export const DetailedApplication2K = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
+                                disabled={!agreed}
                                 onClick={handleSave}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
@@ -126,9 +127,9 @@ export const DetailedApplication2K = (props: any) => {
                             <Divider />
                             <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>3.  I / We also confirm that I/none of the Sponsors / promoters or directors or partners have at any time declared themselves as insolvent;</Typography>
                             <Divider />
-                            <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>4.  I / We have no objection if SIDBI furnishes the information submitted by me/us to other banks /FIs/CIBIL/RBI/any other agency may be deemed fit in connection with considaration of my.our application for capital Commitment to the proposed venture capital fund.</Typography>
+                            <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>4.  I / We have no objection if SIDBI furnishes the information submitted by me/us to other banks /FIs/CIBIL/RBI/any other agency as may be deemed fit in connection with consideration of my/ our application for capital Commitment to the proposed venture capital fund.</Typography>
                             <Divider />
-                            <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>5.  I / We have no objection if SIDBI and/or its representatives making necessary enquiries/verification (incuding in CIBIL or any other credit information agencies database) while considering my/our application for capital contribution. I / We undertake to furnish all other information that may be by SIDBI in connection with my/ our application for capital Commitment.</Typography>
+                            <Typography variant="body2" sx={{ flex: 1, mt: 2, mb: 2 }}>5.  I / We have no objection to SIDBI and/or its representatives making necessary enquiries/verification (including in CIBIL or any other credit information agencies database) while considering my/ our application for capital contribution. I / We undertake to furnish all other information that may be required by SIDBI in connection with my/ our application for capital commitment.</Typography>
                             <Divider />
                             <FormGroup>
                                 {/*<FormControlLabel sx={{ mt: 2 }} control={<Checkbox checked={agreed} onChange={handleChange} />} label={<Typography sx={{ flex: 1, fontWeight: 'bold' }}>I Accept the condition</Typography>} /> */}
@@ -164,7 +165,7 @@ export const DetailedApplication2K = (props: any) => {
 
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                                <Button
+                                <Button disabled={!agreed}
                                     onClick={(e) => handleClick(e, "next")}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"

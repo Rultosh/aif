@@ -134,7 +134,7 @@ export const DetailedApplication2J = (props: any) => {
                         </Grid>
                     </Grid>
                     <Divider sx={{ mt: 2 }} />
-                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>54. Whether provision of the connected lending by the select all-India Financial Institutions (Fls) of RBI vide letter dated December 21, 2002 attracted, (Annexure II).</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>54. Whether provision of the connected lending by the select all-India Financial Institutions (Fls) of RBI vide letter dated December 21, 2002 attracted? (Annexure II).</Typography>
                     <Grid container xs={12}>
                         <Grid item xs={4}>
                             <Button
@@ -143,7 +143,7 @@ export const DetailedApplication2J = (props: any) => {
                                 startIcon={<FileDownloadIcon />}
                                 variant="contained"
                                 disableElevation
-                                sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
+                                sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px' }} >
                                 Download Annexure - II
                             </Button>
 
@@ -180,7 +180,7 @@ export const DetailedApplication2J = (props: any) => {
                                 startIcon={<FileDownloadIcon />}
                                 variant="contained"
                                 disableElevation
-                                sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
+                                sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px' }} >
                                 Download Annexure - III
                             </Button>
                         </Grid>

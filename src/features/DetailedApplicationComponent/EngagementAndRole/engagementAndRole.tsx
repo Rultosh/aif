@@ -16,6 +16,9 @@ import { Controller } from "../../../lib/api-wrappers/Controller";
 import { detailedApplicationThunk, selectedDetailedApplications } from "../../detailedApplication/sidbiReference/detailedApplicationSlice";
 import { defaultIDetailedApplication } from "../../detailedApplication/sidbiReference/IDetailedApplication";
 import { updateStepperIndex } from '../subsections/sideNavBarSlice';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const EngagementAndRole = (props: any) => {
 
@@ -49,6 +52,7 @@ export const EngagementAndRole = (props: any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
+        setValue(ev.target.name, ev.target.value);
         setFormData(copiedValue);
     };
 
@@ -73,6 +77,32 @@ export const EngagementAndRole = (props: any) => {
         setEngagementAndRoleRefreshId(uuid());
     }
 
+    const validationSchema = Yup.object().shape({
+        imRoleAndEngagement: Yup.string().required("This value is required")
+    });
+
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    useEffect(() => {
+        if(formData.id != undefined){
+            reset(formData);
+        }
+    }, [formData])
+
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleClick('', "next");
+    };
+
     return (<>
 
         <Grid item xs={12}>
@@ -81,7 +111,7 @@ export const EngagementAndRole = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2, mt: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed engagement and role IM with the portfolio companies</Typography>
+                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Engagement And Role Of IM With The Portfolio Companies</Typography>
 
                     <Divider sx={{ mt: 2 }} />
                     <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
@@ -90,6 +120,8 @@ export const EngagementAndRole = (props: any) => {
                                 required
                                 id="imRoleAndEngagement"
                                 label="Please provide details as per caption"
+                                {...register("imRoleAndEngagement")}
+                                error={errors.imRoleAndEngagement && getValues("imRoleAndEngagement") == '' ? true : false}
                                 //defaultValue={formData.imRoleAndEngagement === undefined ? " " : formData["fundLaunchedDate"]}
                                 value={formData["imRoleAndEngagement"] || ''}
                                 variant="standard"
@@ -97,6 +129,12 @@ export const EngagementAndRole = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.imRoleAndEngagement && getValues("imRoleAndEngagement") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.imRoleAndEngagement?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
                     <div style={{marginTop: "10px"}}>
@@ -140,7 +178,7 @@ export const EngagementAndRole = (props: any) => {
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 <Button
-                                    onClick={(e) => handleClick(e, "next")}
+                                    onClick={handleSubmit(onSubmit)}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"
                                     disableElevation
