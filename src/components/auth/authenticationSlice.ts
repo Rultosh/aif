@@ -69,7 +69,9 @@ const authticationSlice = createSlice({
       }
     )
     .addCase(authenticateThunk.rejected, (state, action: any) => {
-      state.response = action.payload?.message;
+      let errStr = "unknown error. please contact support"
+      const errOut = "Invalid Username / Password entered. Try again!"
+      state.response = action.payload?.message ? action.payload?.message.toLowerCase() == errStr ? errOut : action.payload?.message: "Error Contact Support";
       state.status.fetchStatus = FetchStatus.FAILED;
     })
   }
