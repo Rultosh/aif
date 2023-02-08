@@ -12,6 +12,7 @@ import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
 import { ModalComponent } from '../../components/ModalComponent'
+import {CheckAuth} from '../../app/api';
 
 const Landing = () => {
 
@@ -30,6 +31,10 @@ const Landing = () => {
         // console.log(auth.token);
         // if(auth.token) navigate('/home')
         if (localStorage.getItem('token')) navigate('/home')
+    })
+
+    useEffect(() => {
+        CheckAuth.resetToAuthorized();
     })
 
     useEffect(() => {
@@ -68,9 +73,9 @@ const Landing = () => {
             actionId, value
         )));
         // navigate('/home')
-        dispatch(fetchRoleAsync(
+        /*dispatch(fetchRoleAsync(
             wrapArgument(actionId, 1)
-        ))
+        ))*/
     }
     return (
         <div className="landingComp">

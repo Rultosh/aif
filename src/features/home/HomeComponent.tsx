@@ -22,8 +22,10 @@ import greyImg from '../../images/grey.png'
 import { selectUsers } from '../admin/adminSlice'
 import { IPrelimApplicationData } from '../fundOverview/subsections/fundOverviewData/IPrelimApplicationData';
 import Moment from 'moment';
+import {CheckAuth} from '../../app/api';
+import { useNavigate } from 'react-router-dom';
 
-export const Home = () => {
+export const Home = (pros:any) => {
 
     //const { id } = useParams()
     const id = 1;
@@ -40,6 +42,7 @@ export const Home = () => {
     const usersState = useAppSelector(selectUsers)
     const [actionUid] = useState(uuid());
     const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 5 } as IPageInfo)
+    const navigate = useNavigate()
 
     function openModel(row: any) {
         setSelectedRow(row)
@@ -56,7 +59,12 @@ export const Home = () => {
         )))
     }, [prelimApplications.prelimApplication])
 
-
+    useEffect(() => {
+        console.log("checking homeunauth",CheckAuth.isUnauthorized)
+        if(CheckAuth.isUnauthorized){
+            navigate('/login')
+        }
+    })
 
     const tableHeaders = [
         "Fund Name",

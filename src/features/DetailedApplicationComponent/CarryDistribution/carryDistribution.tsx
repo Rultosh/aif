@@ -52,7 +52,12 @@ export const CarryDistribution = (props: any) => {
 
     //const prelimApplicationId = detailedApplicationState.
 
-
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
 
     useEffect(() => {
         dispatch(updateStepperIndex(4))

@@ -6,7 +6,7 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { useState, useEffect } from "react"
 
-export const ProfileNew = () => {
+export const ProfileNew = (props:any) => {
   const { id } = useParams();
   const navigate = useNavigate()
 
@@ -17,6 +17,12 @@ export const ProfileNew = () => {
       navigate(`/preliminary/${id}/selfRating`)
     }
   }
+
+  useEffect(() => {
+    if(props.checkUnAuth){
+        navigate('/login')
+    }
+})
 
   useEffect(() => {
     window.scrollTo(0, 0)

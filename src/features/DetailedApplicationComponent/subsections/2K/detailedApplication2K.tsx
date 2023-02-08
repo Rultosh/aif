@@ -30,7 +30,12 @@ export const DetailedApplication2K = (props: any) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
     useEffect(() => {
         dispatch(updateNavIndex(10))
         dispatch(updateStepperIndex(1))

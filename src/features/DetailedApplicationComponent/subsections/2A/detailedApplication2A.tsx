@@ -16,7 +16,7 @@ import { updateNavIndex, updateStepperIndex } from '../sideNavBarSlice'
 import Textarea from '@mui/joy/Textarea';
 import SaveIcon from '@mui/icons-material/Save';
 
-export const DetailedApplication2A = () => {
+export const DetailedApplication2A = (props:any) => {
 
     const { id } = useParams()
     const [parentId] = useState(Number(id))
@@ -40,6 +40,12 @@ export const DetailedApplication2A = () => {
         }
     }, [])
 
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
     useEffect(() => {
         dispatch(updateNavIndex(0))
         dispatch(updateStepperIndex(1))

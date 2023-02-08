@@ -39,6 +39,13 @@ export const DetailedApplication2I = (props: any) => {
     const handleOnClickUpload = () => {
         setOpen(true)
     }
+
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
     useEffect(() => {
         dispatch(updateNavIndex(8))
         if (parentId) {

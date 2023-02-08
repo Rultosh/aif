@@ -28,7 +28,12 @@ export const DetailedApplication2H = (props:any) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
        
 
     useEffect(() => {

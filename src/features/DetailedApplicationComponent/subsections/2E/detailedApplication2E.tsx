@@ -35,6 +35,13 @@ export const DetailedApplication2E = (props: any) => {
     }
 
     useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
+
+    useEffect(() => {
         dispatch(updateNavIndex(4))
         if (parentId) {
 

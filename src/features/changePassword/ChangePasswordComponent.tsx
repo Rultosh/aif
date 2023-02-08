@@ -14,7 +14,7 @@ import { defaultIChangePassword } from './IChangePassword'
 import {ModalComponent} from '../../components/ModalComponent'
 
 
-const ChangePassword = () => {
+const ChangePassword = (props:any) => {
 
     const navigate = useNavigate()
     const [actionUid] = useState(uuid())
@@ -23,7 +23,11 @@ const ChangePassword = () => {
     const state = useAppSelector(selectedforgotPassword)
     const [showResponse, setShowResponse] = useState(false);
 
-
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
 
     function handleSubmitForm() {
         setShowResponse(true)

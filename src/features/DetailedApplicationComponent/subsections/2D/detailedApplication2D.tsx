@@ -27,6 +27,11 @@ export const DetailedApplication2D = (props: any) => {
     const [open, setOpen] = useState(false);
     const dispatch = useAppDispatch();
 
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
     
     useEffect(() => {
         dispatch(updateNavIndex(3))

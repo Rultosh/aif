@@ -29,6 +29,13 @@ export const EngagementAndRole = (props: any) => {
     const [open, setOpen] = useState(false);
     const dispatch = useAppDispatch();
 
+
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
     useEffect(() => {
         dispatch(updateStepperIndex(3))
       if (parentId && Number(parentId)) {
