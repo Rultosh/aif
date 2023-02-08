@@ -40,7 +40,7 @@ import { SidbiReference } from './features/detailedApplication/sidbiReference/Si
 import { FeatureOfFunds } from './features/detailedApplication/featureOfFunds/featureOfFunds_dep';
 import { PrivateRoute } from './components/auth/PrivateRoute';
 import { AdminRoute } from './components/auth/AdminRoute';
-
+import { UserAdminRoute } from './components/auth/UserAdminRoute';
 
 function App() {
 
@@ -65,7 +65,7 @@ function App() {
       <Routes>
         <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
         <Route path='/admin' element={
-            <AdminRoute> <Admin /> </AdminRoute>
+            <UserAdminRoute> <Admin /> </UserAdminRoute>
           }></Route>
         <Route path='/login' element={<Landing />}></Route>
         <Route path='eligibilityQuestioner' element={<EligibilityQuestioner />}></Route>
