@@ -353,7 +353,7 @@ export const CarryDistribution = (props: any) => {
 
                     <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Illustration of carry distribution of the Fund</Typography>
 
-                    <Divider sx={{ mt: 2 }} />
+                    <Divider sx={{ mt: 2 }} />{usersState.role == 'USER' ? <>
                     <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
                             <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>Carry Distribution</Typography>
@@ -824,7 +824,7 @@ export const CarryDistribution = (props: any) => {
 
                         </CardContent>
                     </Card>
-
+                    
                     <Divider sx={{ mt: 2 }} />
 
                     <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
@@ -939,7 +939,7 @@ export const CarryDistribution = (props: any) => {
                                 </CardContent>
                             </Card>
                         </CardContent>
-                    </Card>
+                    </Card> </>: <></>}
                     <Grid container xs={12}>
                         <Grid item xs={12}>
                             <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
@@ -964,6 +964,7 @@ export const CarryDistribution = (props: any) => {
                                 startIcon={<ArrowLeftIcon />}
                                 variant="contained"
                                 disableElevation
+                                disabled= {!(usersState.role == 'USER')}
                                 sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                 Back
                             </Button>
