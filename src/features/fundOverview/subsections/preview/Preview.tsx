@@ -20,7 +20,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-export const Preview = () => {
+export const Preview = (props:any) => {
 
     const { id } = useParams();
 
@@ -43,6 +43,11 @@ export const Preview = () => {
     const { register, handleSubmit, formState: { errors },} = useForm({
         resolver: yupResolver(validationSchema),
         });*/
+    useEffect(() => {
+        if (props.checkUnAuth) {
+            navigate('/login')
+        }
+    })
 
 
 

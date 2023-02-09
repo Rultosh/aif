@@ -53,7 +53,12 @@ export const CarryDistribution = (props: any) => {
 
     //const prelimApplicationId = detailedApplicationState.
 
-
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
 
     useEffect(() => {
         dispatch(updateStepperIndex(4))
@@ -199,29 +204,49 @@ export const CarryDistribution = (props: any) => {
 
     }
 
+    //sum of 1 to 5
     const getAmount = () => {
         let sum = (Number(formData?.capitalAmount) || 0) + (Number(formData?.hurdleAmount) || 0) + (Number(formData.catchupAmount) || 0) + (Number(formData.profitAmount) || 0) + (Number(formData.carryAmount || 0))
         console.log(sum)
         return sum
     }
 
+    //sum of 1 to 5 balance
     const getBalanceAmount = () => {
         let sum = (Number(formData?.capitalBalance) || 0) + (Number(formData?.hurdleBalance) || 0) + (Number(formData.catchupBalance) || 0) + (Number(formData.profitBalance) || 0) + (Number(formData.carryBalance || 0))
         console.log(sum)
         return sum
     }
 
-    const getDisAmount = () => {
+    //profit of investor
+    const getProfitOfInvestors = () => {
         let sum = ((Number(formData?.hurdleAmount) || 0) + (Number(formData.profitAmount) || 0))
         console.log(sum)
         return sum
     }
 
-    const getDisBalanceAmount = () => {
+    //profit of investor balance
+    const getBalanceProfitOfInvestors = () => {
         let sum = ((Number(formData?.hurdleBalance) || 0) + (Number(formData.profitBalance) || 0))
         console.log(sum)
         return sum
     }
+
+        //Distribution Amouunt
+        const getDisAmount = () => {
+            let sum = ((Number(formData?.catchupAmount) || 0) + (Number(formData.carryAmount) || 0))
+            console.log(sum)
+            return sum
+        }
+    
+        //Balance Distribution Amouunt
+        const getDisBalanceAmount = () => {
+            let sum = ((Number(formData?.catchupBalance) || 0) + (Number(formData.carryBalance) || 0))
+            console.log(sum)
+            return sum
+        }
+
+    
 
 
     const handleClickSave = (ev: any, navTo: string) => {
@@ -334,7 +359,7 @@ export const CarryDistribution = (props: any) => {
 
                     <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Illustration of carry distribution of the Fund</Typography>
 
-                    <Divider sx={{ mt: 2 }} />
+                    <Divider sx={{ mt: 2 }} />{usersState.role == 'USER' ? <>
                     <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
                             <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>Carry Distribution</Typography>
@@ -723,11 +748,11 @@ export const CarryDistribution = (props: any) => {
                             <Grid container spacing={6} >
                                 <Grid item xs={6}></Grid>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Total</Typography>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + getDisAmount()}</Typography>
+                                    
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + (getProfitOfInvestors() + getDisAmount())}</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getDisBalanceAmount()}</Typography>
+                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getBalanceProfitOfInvestors() + getDisBalanceAmount()}</Typography>
                                 </Grid>
 
                             </Grid>
@@ -761,7 +786,7 @@ export const CarryDistribution = (props: any) => {
                                             variant="standard"
                                             onChange={handleNewChange}
 
-                                            sx={{ display: 'flex', ml: 2 }}
+                                            sx={{ display: 'flex', mt: 2, ml: 2 }}
                                         />
                                     </Grid>
                                     <Grid item xs={2.5}>
@@ -769,7 +794,7 @@ export const CarryDistribution = (props: any) => {
                                             required
                                             type="number"
                                             id="percent"
-                                            label=""
+                                            label="%"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={newformDataDetails["percent"]}
                                             variant="standard"
@@ -787,7 +812,7 @@ export const CarryDistribution = (props: any) => {
                                             required
                                             type="number"
                                             id="carryOutOfCrore"
-                                            label=""
+                                            label=" "
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={newformDataDetails["carryOutOfCrore"]}
                                             variant="standard"
@@ -808,7 +833,7 @@ export const CarryDistribution = (props: any) => {
 
                         </CardContent>
                     </Card>
-
+                    
                     <Divider sx={{ mt: 2 }} />
 
                     <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
@@ -843,11 +868,11 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                {/* <Grid item xs={3}> */}
+                                                <Grid item xs={3}>
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryDetailedApplication${parentId}`}></UploadComponents>
                                                     </div>
-                                                {/* </Grid> */}
+                                                </Grid>
                                             </Box>
                                         </Grid>
                                     </Grid>
@@ -865,11 +890,11 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                {/* <Grid item xs={3}> */}
+                                                <Grid item xs={3}>
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryInvestmentThemeOfFund${parentId}`}></UploadComponents>
                                                     </div>
-                                                {/* </Grid> */}
+                                                </Grid>
                                             </Box>
                                         </Grid>
                                     </Grid>
@@ -887,11 +912,11 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                {/* <Grid item xs={3}> */}
+                                                <Grid item xs={3}>
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryDetailedEngagement${parentId}`}></UploadComponents>
                                                     </div>
-                                                {/* </Grid> */}
+                                                </Grid>
                                             </Box>
                                         </Grid>
                                     </Grid>
@@ -909,11 +934,11 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                {/* <Grid item xs={3}> */}
+                                                <Grid item xs={3}>
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryIllustration${parentId}`}></UploadComponents>
                                                     </div>
-                                                {/* </Grid> */}
+                                                </Grid>
                                             </Box>
                                         </Grid>
                                     </Grid>
@@ -923,7 +948,7 @@ export const CarryDistribution = (props: any) => {
                                 </CardContent>
                             </Card>
                         </CardContent>
-                    </Card>
+                    </Card> </>: <></>}
                     <Grid container xs={12}>
                         <Grid item xs={12}>
                             <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
@@ -948,6 +973,7 @@ export const CarryDistribution = (props: any) => {
                                 startIcon={<ArrowLeftIcon />}
                                 variant="contained"
                                 disableElevation
+                                disabled= {!(usersState.role == 'USER')}
                                 sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                 Back
                             </Button>

@@ -1,11 +1,19 @@
 import { Container, CardActionArea, Card, CardMedia } from "@mui/material";
 import workflowImg from '../images/workflow.png'
 import NavigationBar from './NavigationBar'
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react"
 
 
+const Workflow = (props:any) => {
 
-const Workflow = () => {
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
     
     return (
         <div>

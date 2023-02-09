@@ -13,13 +13,19 @@ import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { selectPrelimApplication } from "../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
 
 
-export const FundOverview = () => {
+export const FundOverview = (props:any) => {
 
     const { id } = useParams();
     const usersState = useAppSelector(selectUsers)
     const prelimApplicationState = useAppSelector(selectPrelimApplication);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
 
     useEffect(() => {
         if (!id) {

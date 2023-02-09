@@ -44,7 +44,12 @@ export const DetailedApplication2B = (props: any) => {
         setFirstClosingUid(uuid());
     }
 
-
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
 
     const tableHeaders = ["File Name", "Action"]
 
@@ -56,8 +61,12 @@ export const DetailedApplication2B = (props: any) => {
                 <TableCell align="center" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
             </React.Fragment>)
     }
-    let rows = ["Data1", "Data2"]
 
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
 
     useEffect(() => {
         //isValidToUpdate = false

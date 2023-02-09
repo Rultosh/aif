@@ -27,6 +27,7 @@ const Admin = (props: any) => {
     const [open, setOpen] = Rect.useState(false);
     const handleClose = () => setOpen(false);
     const [selectedRow , setSelectedRow] = useState({} as IUser);
+    const navigate = useNavigate();
 
     function handleOpen(row:IUser)
     {
@@ -34,6 +35,11 @@ const Admin = (props: any) => {
         setOpen(true);
     }
 
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
 
     useEffect(() => {
         console.log('calling fetchUsersAsync');
