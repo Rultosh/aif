@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-export const DetailedApplication2A = () => {
+export const DetailedApplication2A = (props:any) => {
 
     const { id } = useParams()
     const [parentId] = useState(Number(id))
@@ -45,6 +45,12 @@ export const DetailedApplication2A = () => {
         console.log(formData);
     }, [])
 
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
     useEffect(() => {
         dispatch(updateNavIndex(0))
         dispatch(updateStepperIndex(1))

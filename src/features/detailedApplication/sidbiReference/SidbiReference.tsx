@@ -11,7 +11,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import { updateStepperIndex}from '../../DetailedApplicationComponent/subsections/sideNavBarSlice'
 
-export const SidbiReference = () => {
+export const SidbiReference = (props:any) => {
   const { id } = useParams()
   const [formData, setFormData] = useState(defaultIDetailedApplication);
   const [actionId] = useState(uuid())
@@ -19,6 +19,12 @@ export const SidbiReference = () => {
   const state = useAppSelector(selectedDetailedApplications);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if(props.checkUnAuth){
+        navigate('/login')
+    }
+})
 
   useEffect(() => {
     dispatch(updateStepperIndex(0))

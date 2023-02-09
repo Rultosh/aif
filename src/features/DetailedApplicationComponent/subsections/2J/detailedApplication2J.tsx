@@ -25,6 +25,12 @@ export const DetailedApplication2J = (props: any) => {
     const [agreed, setAgreed] = useState(false);
     const dispatch = useAppDispatch();
 
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
 
     useEffect(() => {
         dispatch(updateNavIndex(9))

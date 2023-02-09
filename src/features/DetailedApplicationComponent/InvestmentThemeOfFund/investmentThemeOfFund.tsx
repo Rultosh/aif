@@ -33,6 +33,12 @@ export const InvestmentThemeOfFund = (props: any) => {
     const dispatch = useAppDispatch();
   
     useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
+    useEffect(() => {
         dispatch(updateStepperIndex(2))
       if (parentId && Number(parentId)) {
         if (!state[0]?.data[parentId]) {

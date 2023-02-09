@@ -39,7 +39,9 @@ import DetailedApplicationComponent from './features/DetailedApplicationComponen
 import { SidbiReference } from './features/detailedApplication/sidbiReference/SidbiReference';
 import { FeatureOfFunds } from './features/detailedApplication/featureOfFunds/featureOfFunds_dep';
 import { PrivateRoute } from './components/auth/PrivateRoute';
-
+import { AdminRoute } from './components/auth/AdminRoute';
+import { UserAdminRoute } from './components/auth/UserAdminRoute';
+import {CheckAuth} from '../src/app/api';
 
 function App() {
 
@@ -63,7 +65,9 @@ function App() {
       </Header>
       <Routes>
         <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
-        <Route path='/admin' element={<Admin />}></Route>
+        <Route path='/admin' element={
+            <UserAdminRoute> <Admin checkUnAuth={CheckAuth.isUnauthorized}/> </UserAdminRoute>
+          }></Route>
         <Route path='/login' element={<Landing />}></Route>
         <Route path='eligibilityQuestioner' element={<EligibilityQuestioner />}></Route>
         <Route path='eligibilityResults' element={<EligibilityResults />}></Route>
@@ -74,7 +78,7 @@ function App() {
         <Route path='/detailed/sidbiReference'
           element={
             <PrivateRoute>
-              <SidbiReference />
+              <SidbiReference checkUnAuth={CheckAuth.isUnauthorized}/>
             </PrivateRoute>
           }>
         </Route>
@@ -82,14 +86,14 @@ function App() {
         <Route path='home'
           element={
             <PrivateRoute>
-              <Home />
+              <Home checkUnAuth={CheckAuth.isUnauthorized}/>
             </PrivateRoute>
           }>
         </Route>
 
         <Route path='workflow' element={
           <PrivateRoute>
-            <Workflow />
+            <Workflow checkUnAuth={CheckAuth.isUnauthorized}/>
           </PrivateRoute>
         }>
         </Route>
@@ -97,7 +101,7 @@ function App() {
         <Route path='changePassword'
           element={
             <PrivateRoute>
-              <ChangePassword />
+              <ChangePassword checkUnAuth={CheckAuth.isUnauthorized}/>
             </PrivateRoute>
           }>
         </Route>
@@ -105,7 +109,7 @@ function App() {
         <Route path='preliminary'
           element={
             <PrivateRoute>
-              <FundOverview />
+              <FundOverview checkUnAuth={CheckAuth.isUnauthorized}/>
             </PrivateRoute>
           }>
         </Route>
@@ -113,14 +117,14 @@ function App() {
         <Route path='preliminary/:id'
           element={
             <PrivateRoute>
-              <FundOverview />
+              <FundOverview checkUnAuth={CheckAuth.isUnauthorized}/>
             </PrivateRoute>
           }>
 
           <Route path='fund'
             element={
               <PrivateRoute>
-                <Fund />
+                <Fund checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -128,7 +132,7 @@ function App() {
           <Route path='profile'
             element={
               <PrivateRoute>
-                <ProfileNew />
+                <ProfileNew checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -136,7 +140,7 @@ function App() {
           <Route path='selfRating'
             element={
               <PrivateRoute>
-                <SelfRating />
+                <SelfRating checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -144,7 +148,7 @@ function App() {
           <Route path='declaration'
             element={
               <PrivateRoute>
-                <Declaration />
+                <Declaration checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -152,7 +156,7 @@ function App() {
           <Route path='preview'
             element={
               <PrivateRoute>
-                <Preview />
+                <Preview checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -171,7 +175,7 @@ function App() {
           <Route path='detailed2A'
             element={
               <PrivateRoute>
-                <DetailedApplication2A />
+                <DetailedApplication2A checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -179,7 +183,7 @@ function App() {
           <Route path='detailed2B'
             element={
               <PrivateRoute>
-                <DetailedApplication2B isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2B isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -187,7 +191,7 @@ function App() {
           <Route path='detailed2C'
             element={
               <PrivateRoute>
-                <DetailedApplication2C isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2C isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -195,7 +199,7 @@ function App() {
           <Route path='detailed2D'
             element={
               <PrivateRoute>
-                <DetailedApplication2D isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2D isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -203,7 +207,7 @@ function App() {
           <Route path='detailed2E'
             element={
               <PrivateRoute>
-                <DetailedApplication2E isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2E isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -211,7 +215,7 @@ function App() {
           <Route path='detailed2F'
             element={
               <PrivateRoute>
-                <DetailedApplication2F isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2F isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -219,7 +223,7 @@ function App() {
           <Route path='detailed2G'
             element={
               <PrivateRoute>
-                <DetailedApplication2G isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2G isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -227,7 +231,7 @@ function App() {
           <Route path='detailed2H'
             element={
               <PrivateRoute>
-                <DetailedApplication2H isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2H isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -235,7 +239,7 @@ function App() {
           <Route path='detailed2I'
             element={
               <PrivateRoute>
-                <DetailedApplication2I isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2I isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -243,7 +247,7 @@ function App() {
           <Route path='detailed2J'
             element={
               <PrivateRoute>
-                <DetailedApplication2J isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2J isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -251,7 +255,7 @@ function App() {
           <Route path='detailed2K'
             element={
               <PrivateRoute>
-                <DetailedApplication2K isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <DetailedApplication2K isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -259,7 +263,7 @@ function App() {
           <Route path='InvestmentThemeOfFund'
             element={
               <PrivateRoute>
-                <InvestmentThemeOfFund isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <InvestmentThemeOfFund isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -267,7 +271,7 @@ function App() {
           <Route path='EngagementAndRole'
             element={
               <PrivateRoute>
-                <EngagementAndRole isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <EngagementAndRole isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -275,7 +279,7 @@ function App() {
           <Route path='SidbiReference'
             element={
               <PrivateRoute>
-                <SidbiReference />
+                <SidbiReference checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>
@@ -283,7 +287,7 @@ function App() {
           <Route path='carryDistribution'
             element={
               <PrivateRoute>
-                <CarryDistribution isCrtStateToUpdate={checkIsCorrectStateToUpdate} />
+                <CarryDistribution isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized}/>
               </PrivateRoute>
             }>
           </Route>

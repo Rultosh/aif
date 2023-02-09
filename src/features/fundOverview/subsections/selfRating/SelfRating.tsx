@@ -22,7 +22,7 @@ type InitialState = {
     selfRatingData: any
 }
 
-export const SelfRating = () => {
+export const SelfRating = (props:any) => {
 
     const { id } = useParams();
     const [actionUid] = useState(uuid());
@@ -36,7 +36,12 @@ export const SelfRating = () => {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
-
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
     useEffect(() => {
         dispatch(
             fetchSelfRatingAsync(

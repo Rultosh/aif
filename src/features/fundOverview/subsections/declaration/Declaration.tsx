@@ -14,7 +14,7 @@ import { defaultIPrelimApplicationData } from "../fundOverviewData/IPrelimApplic
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
 
-export const Declaration = () => {
+export const Declaration = (props:any) => {
 
     const { id } = useParams();
 
@@ -40,6 +40,12 @@ export const Declaration = () => {
         }
     }
 
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
+    
     useEffect(() => {
         window.scrollTo(0, 0)
         if(!prelimApplicationState.prelimApplication.id && id) {

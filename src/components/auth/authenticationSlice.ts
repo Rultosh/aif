@@ -60,8 +60,11 @@ const authticationSlice = createSlice({
         localStorage.setItem('token', String(state.token));
       }
     )
-    .addCase(authenticateThunk.rejected, (state, action) => {
-     
+    .addCase(authenticateThunk.rejected, (state, action: any) => {
+      let errStr = "unknown error. please contact support"
+      const errOut = "Invalid Username / Password entered. Try again!"
+      state.response = action.payload?.message ? action.payload?.message.toLowerCase() == errStr ? errOut : action.payload?.message: "Error Contact Support";
+      state.status.fetchStatus = FetchStatus.FAILED;
     })
   }
 })
