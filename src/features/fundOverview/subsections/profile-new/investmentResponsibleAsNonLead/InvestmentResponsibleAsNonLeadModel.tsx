@@ -97,6 +97,7 @@ export const InvestmentResponsibleAsNonLeadModel = (props: InvestmentResponsible
     dateOfInvestment: Yup.string().required("Date of Investment is required").nullable(),
     exitOrWriteOff: Yup.string().required("Exit Or Writeoff is required"),
     dateofExitorWriteOff: Yup.string().required("Date of Exit Or Writeoff is required").nullable(),
+    irrPercent: Yup.string().required("IRR % is required"),
     comment: Yup.string().required("Comment is required")
   });
 
@@ -255,6 +256,24 @@ export const InvestmentResponsibleAsNonLeadModel = (props: InvestmentResponsible
                     />
                   </Stack>
                 </LocalizationProvider>
+              </Grid>
+              <Grid item xs={4.5}>
+                <TextField
+                  required
+                  id="irrPercent"
+                  label="IRR %"
+                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+                  value={investmentResponsibleAsNonLead.irrPercent}
+                  {...register("irrPercent")}
+                  error={(errors.irrPercent && getValues("irrPercent") == '') ? true : false}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+                <Typography variant="caption" color="error">
+                  <>{(errors.irrPercent && getValues("irrPercent") == '') ? errors.irrPercent.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField

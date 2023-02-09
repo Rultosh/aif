@@ -1,4 +1,4 @@
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import logo from '../../images/logo.png'
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -13,7 +13,9 @@ import { signupUsersAsync } from './signUpSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { selectedSignup } from './signUpSlice'
 import {ModalComponent} from '../../components/ModalComponent'
+import { state, city } from "./stateAndCity";
 
+import { getError } from "../../lib/api-status/errorHandler"
 
 
 const SignUp = () => {
@@ -25,27 +27,52 @@ const SignUp = () => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
     const [showResponse, setShowResponse] = useState(false);
+    const [formDataEmail, setFormDataEmail] = useState(false);
 
 
 
     function handleSubmitForm() {
-        setShowResponse(true)
-        dispatch(
-            signupUsersAsync(
-                wrapArgument(actionUid, formData)
+        console.log(formData)
+        // if(formDataEmail == true) {
+            setShowResponse(true)
+            dispatch(
+                signupUsersAsync(
+                    wrapArgument(actionUid, formData)
+                )
             )
-        )
+        // } else {
+        //     getError({"fetchStatus":"failed","responseCode":"400","message":"Invalid request content."});
+        // }
     }
 
 
     const handleChange = (ev: any) => {
-        ev.preventDefault();
-        let copiedValue = { ...formData }
-        let key = ev.target.id ? ev.target.id : ev.target.name;
-        copiedValue[key as keyof typeof formData] = ev.target.value;
-        setFormData(copiedValue);
+        
+        if(ev.target.id == 'username'){
+            if(ev.target.value != '' && ((ev.target.value.substring(ev.target.value.indexOf('@')) != '@gmail.com') && (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoo.com') && (ev.target.value.substring(ev.target.value.indexOf('@')) != '@rediffmail.com') && (ev.target.value.substring(ev.target.value.indexOf('@')) != '@hotmail.com') && (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoomail.com'))){
+                setFormDataEmail(true);
+                ev.preventDefault();
+                let copiedValue = { ...formData }
+                let key = ev.target.id ? ev.target.id : ev.target.name;
+                copiedValue[key as keyof typeof formData] = ev.target.value;
+                setFormData(copiedValue);
+            } else {
+                setFormDataEmail(false);
+                ev.preventDefault();
+                let copiedValue = { ...formData }
+                let key = ev.target.id ? ev.target.id : ev.target.name;
+                copiedValue[key as keyof typeof formData] = undefined;
+                setFormData(copiedValue);
+            }
+        } else {
+            ev.preventDefault();
+            let copiedValue = { ...formData }
+            let key = ev.target.id ? ev.target.id : ev.target.name;
+            copiedValue[key as keyof typeof formData] = ev.target.value;
+            setFormData(copiedValue);
+        }
     };
-
+console.log(formDataEmail);
     const handleReset = () => {
         setShowResponse(false)
         setFormData(defaultISignup)
@@ -197,7 +224,7 @@ const SignUp = () => {
                                                     required
                                                     id="username"
                                                     label="Email"
-                                                    value={formData["username"] || ''}
+                                                    // value={formData["username"] || ''}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
                                                 />
@@ -224,24 +251,74 @@ const SignUp = () => {
                                                 />
                                             </Grid>
                                             <Grid item xs={6}>
-                                                <TextField
+                                                {/* <TextField
                                                     required
                                                     id="state"
                                                     label="State"
                                                     value={formData["state"] || ''}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
-                                                />
+                                                /> */}
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="demo-simple-select-state">State</InputLabel>
+                                                    <Select
+                                                        key="state"
+                                                        required
+                                                        labelId="demo-simple-select-state"
+                                                        id="state"
+                                                        name="state"
+                                                        label="State"
+                                                        // value={formData["state"] || ''}
+                                                        onChange={handleChange}
+                                                    >
+                                                        {
+                                                            state.categoryData.map((item: any) => {
+                                                                // console.log('CB', props.propertyValue, item.id, props.propertyValue === item.id);
+                                                                return <MenuItem 
+                                                                value={item.ID}
+                                                                // selected={formData["state"] === item.ID} 
+                                                                >
+                                                                    {item.VALUE}
+                                                                </MenuItem>
+                                                            })
+                                                        }
+                                                    </Select>
+                                                </FormControl>
                                             </Grid>
                                             <Grid item xs={6}>
-                                                <TextField
+                                                {/* <TextField
                                                     required
                                                     id="city"
                                                     label="City"
                                                     value={formData["city"] || ''}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
-                                                />
+                                                /> */}
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="demo-simple-select-city">City</InputLabel>
+                                                    <Select
+                                                        key="city"
+                                                        required
+                                                        labelId="demo-simple-select-city"
+                                                        id="city"
+                                                        name="city"
+                                                        label="City"
+                                                        // value={formData["city"] || ''}
+                                                        onChange={handleChange}
+                                                    >
+                                                        {
+                                                            city.categoryData.map((item: any) => {
+                                                                // console.log('CB', props.propertyValue, item.id, props.propertyValue === item.id);
+                                                                return <MenuItem 
+                                                                value={item.ID}
+                                                                // selected={formData["city"] === item.ID} 
+                                                                >
+                                                                    {item.VALUE}
+                                                                </MenuItem>
+                                                            })
+                                                        }
+                                                    </Select>
+                                                </FormControl>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <TextField

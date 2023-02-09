@@ -44,6 +44,7 @@ export const InvestmentResponsibleAsLeadRow = (props: InvestmentResponsibleAsLea
       <TableCell align="center">{Moment(props.investmentResponsibleAsLead.dateOfInvestment).format("DD/MM/YYYY")}</TableCell>
       <TableCell align="center">{props.investmentResponsibleAsLead.exitOrWriteOff}</TableCell>
       <TableCell align="center">{Moment(props.investmentResponsibleAsLead.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsLead.irrPercent}</TableCell>
       <TableCell align="center">{props.investmentResponsibleAsLead.comment}</TableCell>
       <TableCell align="center">
         <div style={{ display: 'flex' }}>

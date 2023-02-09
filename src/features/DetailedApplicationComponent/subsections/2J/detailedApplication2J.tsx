@@ -208,7 +208,7 @@ export const DetailedApplication2J = (props: any) => {
                     <Divider sx={{ mt: 2 }} />
                     <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>56. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM</Typography>
                     <Grid container xs={12}>
-                        <Grid item xs={4}>
+                        {/* <Grid item xs={4}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
                                 startIcon={<FileDownloadIcon />}
@@ -217,7 +217,7 @@ export const DetailedApplication2J = (props: any) => {
                                 sx={{ backgroundColor: '#363062', textTransform: 'none', mt: 3, mb: 3, ml: 2, width: '70%', height: '30px' }} >
                                 Download
                             </Button>
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={4}>
                         <DocumentUpload id={`uploadResolution${parentId}`}
                                 onSuccess={uploadResolutionSuccess}>
