@@ -868,11 +868,11 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                <Grid item xs={3}>
+                                                {/* <Grid item xs={3}> */}
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryDetailedApplication${parentId}`}></UploadComponents>
                                                     </div>
-                                                </Grid>
+                                                {/* </Grid> */}
                                             </Box>
                                         </Grid>
                                     </Grid>
@@ -890,11 +890,11 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                <Grid item xs={3}>
+                                                {/* <Grid item xs={3}> */}
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryInvestmentThemeOfFund${parentId}`}></UploadComponents>
                                                     </div>
-                                                </Grid>
+                                                {/* </Grid> */}
                                             </Box>
                                         </Grid>
                                     </Grid>
@@ -912,11 +912,11 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                <Grid item xs={3}>
+                                                {/* <Grid item xs={3}> */}
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryDetailedEngagement${parentId}`}></UploadComponents>
                                                     </div>
-                                                </Grid>
+                                                {/* </Grid> */}
                                             </Box>
                                         </Grid>
                                     </Grid>
@@ -934,11 +934,11 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                <Grid item xs={3}>
+                                                {/* <Grid item xs={3}> */}
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryIllustration${parentId}`}></UploadComponents>
                                                     </div>
-                                                </Grid>
+                                                {/* </Grid> */}
                                             </Box>
                                         </Grid>
                                     </Grid>
