@@ -34,7 +34,8 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
     const [actionUid] = useState(uuid())
     const contributorDetailsState = useAppSelector(selectContributorDetails)
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false);    
+    let totalAmountwithstate = 0;
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
@@ -69,7 +70,7 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
         <Box >
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 <Grid item xs={11.5}>
-                    <Box >
+                    <Box>
                         <TableContainer component={Paper}  >
                             <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
                                 <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
@@ -79,11 +80,31 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
                                 </TableHead>
                                 {contributorDetailsState.status.fetchStatus == FetchStatus.IDLE && contributorDetailsState.actionStatus.fetchStatus == FetchStatus.IDLE?
                                 <TableBody>
+                                    <>
                                     {contributorDetailsState.contributorDetails && contributorDetailsState.contributorDetails.length > 0?
                                         contributorDetailsState.contributorDetails.map((row: IContributorDetails) => (
                                             <ContributorDetailsRow row={row}/>
                                     )):<TableRow><TableCell colSpan={7}>Now rows to display.</TableCell></TableRow>
                                     }
+                                    
+                                    {contributorDetailsState.contributorDetails && contributorDetailsState.contributorDetails.length > 0?
+                                    <>{
+                                        contributorDetailsState.contributorDetails.map((row: IContributorDetails) => {
+                                            if(row.amount != undefined){
+                                                var rowAmount = String(row.amount);
+                                                totalAmountwithstate = parseInt(rowAmount) + totalAmountwithstate;
+                                            }
+                                        })
+                                       }
+                                       <TableRow>
+                                            <TableCell align="center" component="th" scope="row" sx={{ fontWeight: 700 }}>
+                                            Total Amount Contributed
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ fontWeight: 700 }}>{totalAmountwithstate}</TableCell>
+                                        </TableRow>
+                                        </>:<></>
+                                    }
+                                    </>
                                 </TableBody>:<TableBody>
                                     <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
                                 </TableBody>}

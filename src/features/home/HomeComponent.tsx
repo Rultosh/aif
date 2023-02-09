@@ -14,7 +14,9 @@ import { detailedApplicationThunk, selectedDetailedApplications } from "../detai
 import { defaultIDetailedApplication, IDetailedApplication } from "../detailedApplication/sidbiReference/IDetailedApplication";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import MailIcon from '@mui/icons-material/Mail';
+import HistoryIcon from '@mui/icons-material/History';
 import QueryResolutionModal from './QueryResolutionModal'
+import HistoryModal from './HistoryModal'
 import orengeImg from '../../images/Orange.png'
 import greenImg from '../../images/Green.png'
 import redImg from '../../images/red.png'
@@ -22,6 +24,7 @@ import greyImg from '../../images/grey.png'
 import { selectUsers } from '../admin/adminSlice'
 import { IPrelimApplicationData } from '../fundOverview/subsections/fundOverviewData/IPrelimApplicationData';
 import Moment from 'moment';
+import { fetchHistoryAsync, selecthistory } from './historySlice';
 import {CheckAuth} from '../../app/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -37,11 +40,14 @@ export const Home = (pros:any) => {
     const state = useAppSelector(selectedDetailedApplications);
     const dispatch = useAppDispatch();
     const prelimApplications = useAppSelector(selectPrelimApplication);
+    const applicationHistory = useAppSelector(selecthistory);
     const [openQueryModal, setOpenQueryModal] = useState(false);
+    const [openHistoryModal, setOpenHistoryModal] = useState(false);
     const [selectedRow, setSelectedRow] = useState({} as any);
     const usersState = useAppSelector(selectUsers)
     const [actionUid] = useState(uuid());
     const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 5 } as IPageInfo)
+    const [selectedRowHistory, setSelectedRowHistory] = useState(0);
     const navigate = useNavigate()
 
     function openModel(row: any) {
@@ -49,9 +55,22 @@ export const Home = (pros:any) => {
         setOpenQueryModal(true);
     }
 
+    function openModelHistory(row: any) {
+        setSelectedRowHistory(row.id)
+        setOpenHistoryModal(true);
+        dispatch(fetchHistoryAsync(wrapArgument(
+            actionUid, String(row.id)
+        )))
+    }
+
     function closeModel() {
         setOpenQueryModal(false);
     }
+
+    function closeModelHistory() {
+        setOpenHistoryModal(false);
+    }
+
     useEffect(() => {
         console.log('here')
         dispatch(getPrelimApplicationList(wrapArgument(
@@ -59,6 +78,14 @@ export const Home = (pros:any) => {
         )))
     }, [prelimApplications.prelimApplication])
 
+//     useEffect(() => {
+//         console.log('here')
+//         dispatch(fetchHistoryAsync(wrapArgument(
+//             actionUid, selectedRow
+//         )))
+//     }, [applicationHistory.history])
+
+// console.log(applicationHistory.history)
     useEffect(() => {
         console.log("checking homeunauth",CheckAuth.isUnauthorized)
         if(CheckAuth.isUnauthorized){
@@ -76,6 +103,7 @@ export const Home = (pros:any) => {
         "Contribution Sought",
         "Download",
         "Query Resolution",
+        "History",
         "Workflow State"]
 
     let headerComponent = []
@@ -207,6 +235,7 @@ export const Home = (pros:any) => {
                                             </Tooltip>
                                         </TableCell>}
                                         <TableCell align="center"><MailIcon onClick={() => openModel(row)} ></MailIcon></TableCell>
+                                        <TableCell align="center"><HistoryIcon onClick={() => openModelHistory(row)} ></HistoryIcon></TableCell>
                                         <TableCell align="center">
                                             <Grid container xs={12} spacing={0.5}>
                                                 <Grid item >
@@ -255,6 +284,17 @@ export const Home = (pros:any) => {
                     close={closeModel}
                     prelimDetails={selectedRow}
                 ></QueryResolutionModal>
+                    //investmentAssociateFormData={row}
+
+                    //prelimApplicationId={props.row.prelimApplicationId} />
+                    : <></>}
+
+                {openHistoryModal ? <HistoryModal
+                    isActive={openHistoryModal}
+                    open={() => openModelHistory(selectedRow)}
+                    close={closeModelHistory}
+                    prelimDetails={selectedRow}
+                ></HistoryModal>
                     //investmentAssociateFormData={row}
 
                     //prelimApplicationId={props.row.prelimApplicationId} />

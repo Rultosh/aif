@@ -108,6 +108,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
     prevProfessionalExp: Yup.string().required("Previous Professional Experience is required"),
     education: Yup.string().required("Education is required"),
     keyPerson: Yup.string().required("Key Person is required").nullable(),
+    memberOfInvesteeCommitte: Yup.string().required("Member Of Investee Committe is required"),
     directorship: Yup.string().required("Directorship Held is required").nullable()
   });
 
@@ -386,6 +387,23 @@ console.log(teamMember)
                   />
                 </FormControl>
                 </Grid>
+              <Grid item xs={4.5}>
+                <TextField
+                  required
+                  id="memberOfInvesteeCommitte"
+                  label="Member Of Investee Committe"
+                  value={teamMember.memberOfInvesteeCommitte}
+                  {...register("memberOfInvesteeCommitte")}
+                  error={(errors.memberOfInvesteeCommitte && getValues("memberOfInvesteeCommitte") == '') ? true : false}
+                  variant="standard"
+                  onChange={handleChange}
+
+                  sx={{ display: 'flex' }}
+                />
+                <Typography variant="caption" color="error">
+                  <>{(errors.memberOfInvesteeCommitte && getValues("memberOfInvesteeCommitte") == '')?errors.memberOfInvesteeCommitte.message : ''}</>
+                </Typography>
+              </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
                   <InputLabel id="demo-simple-select-standard-label">Directorship Held</InputLabel>
