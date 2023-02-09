@@ -102,7 +102,7 @@ export const Preview = (props:any) => {
         setValue,
         formState: { errors },
     } = useForm({
-        resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema),
     });
 
     const onSubmit = (data: any, e: any) => {
@@ -133,7 +133,7 @@ export const Preview = (props:any) => {
                                     src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`} 
                                     width="800px" 
                                     height="2100px" /> */}
-                                <iframe src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`}
+                                <iframe src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`} 
                                     width="100%"
                                     height="600"></iframe>
                             </CardContent>
@@ -165,7 +165,7 @@ export const Preview = (props:any) => {
                                     size="medium"
                                     component="a"
                                     href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
-                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': { backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': {backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
                             </div>
                             <div style={{ margin: '5px' }}>
                                 <Chip
@@ -174,14 +174,14 @@ export const Preview = (props:any) => {
                                     size="medium"
                                     component="a"
                                     href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
-                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': { backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': {backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
                             </div>
                             <div style={{ margin: '5px' }}>
                                 <DocumentChip
                                     label="Upload Digitally Signed Application"
-                                    id={`DigitallySignedApplication${id}`}
+                                    id={`DigitallySignedApplication${id}`} 
                                     signed={true}
-                                />
+                                    />
                             </div>
                             <div style={{ margin: '5px' }}>
                                 <DocumentChip
@@ -208,19 +208,19 @@ export const Preview = (props:any) => {
                             sx={{ display: 'flex', }}
                         />
                         <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                            <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
+                          <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
                         </Typography>
                     </CardContent>
                 </Card>
 
-
+                
                 <Button disabled={(statusPrelims == 'SUBMITTED') || usersState.role == 'ADMIN'} onClick={(e) => handleClick(e, "previous")} startIcon={<ArrowLeftIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Declaration
                 </Button>
 
                 {(!(statusPrelims == 'SUBMITTED') && usersState.role == 'USER') ? <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                     Submit
-                </Button> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && statusPrelims == 'SUBMITTED') ? <>
+                </Button> :  ( ['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '') && statusPrelims == 'SUBMITTED')? <>
                     <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Approve
                     </Button>
@@ -230,7 +230,7 @@ export const Preview = (props:any) => {
                     <Button color='error' id='reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Reject
                     </Button>
-                </> : <></>}
+                </>:<></>}
 
 
 

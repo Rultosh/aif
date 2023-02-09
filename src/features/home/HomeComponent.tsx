@@ -78,14 +78,6 @@ export const Home = (pros:any) => {
         )))
     }, [prelimApplications.prelimApplication])
 
-//     useEffect(() => {
-//         console.log('here')
-//         dispatch(fetchHistoryAsync(wrapArgument(
-//             actionUid, selectedRow
-//         )))
-//     }, [applicationHistory.history])
-
-// console.log(applicationHistory.history)
     useEffect(() => {
         console.log("checking homeunauth",CheckAuth.isUnauthorized)
         if(CheckAuth.isUnauthorized){

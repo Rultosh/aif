@@ -24,7 +24,9 @@ export function resetForgotPassword(email:IResetPassword) {
 }
 
 export function changePassword(passwordDetails:IChangePassword) {
+  passwordDetails.oldPassword = encrypt(passwordDetails.oldPassword);
   passwordDetails.password = encrypt(passwordDetails.password);
+  passwordDetails.matchingPassword = encrypt(passwordDetails.matchingPassword);
   return api({
     method: 'post',
     data: passwordDetails,
