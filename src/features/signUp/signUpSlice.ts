@@ -54,7 +54,10 @@ const signupSlice = createSlice({
         }
       )
       .addCase(signupUsersAsync.rejected, (state, action:any) => {
-        state.response = action.payload?.message;
+        //state.response = action.payload?.message;
+        let errStr = "conflict"
+        const errOut = "User already registed with the given Email. Try with different Email."
+        state.response = action.payload?.message ? action.payload?.message.toLowerCase() == errStr ? errOut : action.payload?.message: "Error Contact Support";
         state.status.fetchStatus = FetchStatus.FAILED;
       })
   }

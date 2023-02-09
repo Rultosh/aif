@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { FetchStatus } from "../../lib/api-status/IStatus";
 import UploadComponents from "../DetailedApplicationComponent/subsections/uploadComponents";
 
-export const Fund = () => {
+export const Fund = (props:any) => {
 
     const { id } = useParams();
     const dispatch = useAppDispatch();
@@ -25,6 +25,12 @@ export const Fund = () => {
     const handleApplicationIdCreation = (value: String | undefined) => {
         if (value) setPrelimApplicationId(String(value));
     }
+
+    useEffect(() => {
+        if(props.checkUnAuth){
+            navigate('/login')
+        }
+    })
 
     // useEffect(() => {
     //     dispatch(clearPrelimApplication);

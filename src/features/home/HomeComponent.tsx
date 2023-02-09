@@ -25,8 +25,10 @@ import { selectUsers } from '../admin/adminSlice'
 import { IPrelimApplicationData } from '../fundOverview/subsections/fundOverviewData/IPrelimApplicationData';
 import Moment from 'moment';
 import { fetchHistoryAsync, selecthistory } from './historySlice';
+import {CheckAuth} from '../../app/api';
+import { useNavigate } from 'react-router-dom';
 
-export const Home = () => {
+export const Home = (pros:any) => {
 
     //const { id } = useParams()
     const id = 1;
@@ -46,6 +48,7 @@ export const Home = () => {
     const [actionUid] = useState(uuid());
     const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 5 } as IPageInfo)
     const [selectedRowHistory, setSelectedRowHistory] = useState(0);
+    const navigate = useNavigate()
 
     function openModel(row: any) {
         setSelectedRow(row)
@@ -83,6 +86,12 @@ export const Home = () => {
 //     }, [applicationHistory.history])
 
 // console.log(applicationHistory.history)
+    useEffect(() => {
+        console.log("checking homeunauth",CheckAuth.isUnauthorized)
+        if(CheckAuth.isUnauthorized){
+            navigate('/login')
+        }
+    })
 
     const tableHeaders = [
         "Fund Name",
