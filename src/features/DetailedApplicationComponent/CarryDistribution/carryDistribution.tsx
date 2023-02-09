@@ -863,7 +863,7 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                <FileDownloadIcon />
+                                            <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
                                             </Box>
                                         </Grid>
                                         <Grid item xs={3}>
@@ -885,7 +885,7 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                <FileDownloadIcon />
+                                            <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadInvestmentThemeOfFundPreview?access_token=${localStorage.getItem('token')}`)} />
                                             </Box>
                                         </Grid>
                                         <Grid item xs={3}>
@@ -907,7 +907,7 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                <FileDownloadIcon />
+                                            <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadEngagementAndRolePreview?access_token=${localStorage.getItem('token')}`)} />
                                             </Box>
                                         </Grid>
                                         <Grid item xs={3}>
@@ -929,7 +929,7 @@ export const CarryDistribution = (props: any) => {
                                         </Grid>
                                         <Grid item xs={3}>
                                             <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                <FileDownloadIcon />
+                                            <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadCarryDistributionPreview?access_token=${localStorage.getItem('token')}`)} />
                                             </Box>
                                         </Grid>
                                         <Grid item xs={3}>
