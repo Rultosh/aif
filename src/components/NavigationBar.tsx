@@ -35,7 +35,6 @@ const NavigationBar = (props: any) => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const role = usersState?.role;
-  const userName = usersState?.me?.contactPerson;
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -82,43 +81,6 @@ const NavigationBar = (props: any) => {
   }, [role])
 
 
-  function stringToColor(string: string) {
-    let hash = 0;
-    let i;
-  
-    /* eslint-disable no-bitwise */
-    for (i = 0; i < string.length; i += 1) {
-      hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-  
-    let color = '#';
-  
-    for (i = 0; i < 3; i += 1) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += `00${value.toString(16)}`.slice(-2);
-    }
-    /* eslint-enable no-bitwise */
-  
-    return color;
-  }
-
-  function getInitials(name:string){
-    let nameArr = name.split(' ')
-    if (nameArr.length > 1){
-      return nameArr[0][0]+nameArr[1][0]
-    }
-    return nameArr[0][0]
-  }
-  
-  function stringAvatar() {
-    let name = userName || "";
-    return {
-      sx: {
-        bgcolor: stringToColor(name),
-      },
-      children: getInitials(name),
-    };
-  }
 
   return (
     <AppBar position="static" component='nav' sx={{ backgroundColor: 'white' }}>
@@ -223,9 +185,9 @@ const NavigationBar = (props: any) => {
           </Box>
 
           <Box sx={{ flexGrow: 0, display: { xs: 'block' } }}>
-            <Tooltip title={userName}>
+            <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar {...stringAvatar()} />
+                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu

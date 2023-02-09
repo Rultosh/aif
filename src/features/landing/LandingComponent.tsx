@@ -17,14 +17,18 @@ import {CheckAuth} from '../../app/api';
 const Landing = () => {
 
     const [open, setOpen] = useState(true);
+    //const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
-    const state = useAppSelector(selectAuthenticatedUser)
-    const [showResponse, setShowResponse] = useState(false);
+    const auth = useAppSelector(selectAuthenticatedUser)
+
     const initialState = defaultLoginRequest
+
     const [value, setValue] = useState(initialState);
     const errorMsg = useAppSelector(state => state.landing.error);
     const isValidUser = useAppSelector(state => state.landing.validUser);
+
     const [actionId] = useState(uuid());
 
     useEffect(() => {

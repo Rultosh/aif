@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, Modal, TextField } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button, Modal, TextField, Stack } from "@mui/material";
 import { useEffect, useState } from "react"
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import { createCompanyContactDetailsAsync, updateCompanyContactDetailsAsync } from "./companyContactDetailsSlice";
@@ -9,6 +9,8 @@ import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -50,6 +52,15 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
     }
     setValue(ev.target.id, ev.target.value);
     setCompanyContactDetails(copiedValue);
+  };
+console.log(investmentResponsibleAsLead);
+
+  const setDateValue = (key: String, value: any) => {
+    let copiedValue: ICompanyContactDetails = { ...investmentResponsibleAsLead };
+
+    copiedValue[key as keyof ICompanyContactDetails] = value.$y;
+
+    setCompanyContactDetails(copiedValue)
   };
 
   useEffect(() => {
@@ -297,7 +308,7 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
                </Typography>
               </Grid>
               <Grid item xs={4.5}>
-                <TextField
+                {/* <TextField
                   required
                   type="number"
                   id="yearOfInvestment"
@@ -311,11 +322,46 @@ export const CompanyContactDetailsModel = (props: CompanyContactDetailsModelProp
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
-                />
+                /> */}
+                 <LocalizationProvider dateAdapter={AdapterDayjs} >
+                  <Stack spacing={3}>
+                    <Controller
+                      name="yearOfInvestment"
+                      control={control}
+                      defaultValue={null}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error, invalid }
+                      }) => (
+                        // console.log(invalid),
+                        (<DesktopDatePicker
+                          views={["year"]}
+                          // disableFuture={true}
+                          label="Year of investment"
+                          value={investmentResponsibleAsLead.yearOfInvestment+'-08-18T21:00:00'}
+                          // value={investmentResponsibleAsLead.yearOfInvestment || null}
+                          // minDate={Today.toString()}
+                          onChange={(newValue) => {
+                            // console.log(newValue.$y);
+                            // setValue('yearOfInvestment', newValue);
+                            // console.log(getValues());
+                            let copiedValue = { ...investmentResponsibleAsLead };
+                            // copiedValue['yearOfInvestment'] = newValue;
+                            setValue('yearOfInvestment', newValue);
+                            setDateValue("yearOfInvestment", newValue);
+                            // setCompanyContactDetails(copiedValue);
+                          }}
+                          renderInput={(params) => <TextField
+                            helperText={(invalid && getValues("yearOfInvestment") == null && (investmentResponsibleAsLead.yearOfInvestment || '') == '') ? <Typography variant="caption" {...register('yearOfInvestment')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                        />
+                        )
+                      )}
+                    />
+                  </Stack>
+                </LocalizationProvider>
                 <Typography variant="caption" color="error">
                 <>{(errors.yearOfInvestment && getValues("yearOfInvestment") == '') ? errors.yearOfInvestment.message : ''}</>
               </Typography>
-
               </Grid>
               <Grid item xs={4.5}>
                 {/* <TextField

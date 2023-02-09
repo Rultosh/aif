@@ -25,8 +25,8 @@ export const UploadComponents = (props: UploadComponentProps) => {
                 <FileUploadIcon>
                 </FileUploadIcon>
             </DocumentUpload>
-            <ListFiles id={props.id} refreshId={refreshId}/>
         </Box>
+            <ListFiles id={props.id} refreshId={refreshId}/>
     </>
     );
 }

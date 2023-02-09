@@ -33,7 +33,7 @@ const StyledList = styled(List)({
 });
 
 
-let liItems = ["2A. Key Features of the Fund", "2B. Details of Fund Raising", "2C. Investment, divestment &other matters", "2D. Deal Flow", "2E. Due Deligance, Documentation and Monitoring", "2F. MIS and Communication to Contriutors", "2G. Investment Manager", "2H. Past Fund(s) managed by the Investment Manager", "2I. Fund Related Documnets", "2J. KYC Details and Undertakings", "2K. Declaration"]
+let liItems = ["2A. Key Features of the Fund", "2B. Details of Fund Raising", "2C. Investment, divestment &other matters", "2D. Deal Flow", "2E. Due Diligence, Documentation and Monitoring", "2F. MIS and Communication to Contributors", "2G. Investment Manager", "2H. Past Fund(s) managed by the Investment Manager", "2I. Fund Related Documnets", "2J. KYC Details and Undertakings", "2K. Declaration"]
 let navLiItems = ["detailed2A", "detailed2B", "detailed2C", "detailed2D", "detailed2E", "detailed2F", "detailed2G", "detailed2H", "detailed2I", "detailed2J", "detailed2K"]
 
 

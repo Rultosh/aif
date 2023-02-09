@@ -20,6 +20,9 @@ import React, * as Rect from 'react'
 import FileUpload from "../../../../components/FileUpload";
 import UploadComponents from '../uploadComponents'
 import SaveIcon from '@mui/icons-material/Save';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const DetailedApplication2C = (props: any) => {
 
@@ -75,6 +78,7 @@ export const DetailedApplication2C = (props: any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
+        setValue(ev.target.name, ev.target.value);
         setFormData(copiedValue);
     };
 
@@ -94,6 +98,47 @@ export const DetailedApplication2C = (props: any) => {
         }
     }
 
+    const validationSchema = Yup.object().shape({
+        approvers: Yup.string().required("Approvers is required"),
+        nominatinPolicy: Yup.string().required("Nominatin Policy is required"),
+        investmentStrategy: Yup.string().required("Investment Strategy is required"),
+        grossReturnObjective: Yup.string().required("Gross Return Objective is required"),
+        targetSizePercentage: Yup.string().required("Target Size Percentage is required"),
+        targetNumberOfInvestmentPlanned: Yup.string().required("Target Number Of Investment Planned is required"),
+        avgHoldingPeriod: Yup.string().required("Average Holding Period is required"),
+        exitStrategy: Yup.string().required("Exit Strategy is required"),
+        controlsAndRights: Yup.string().required("Controls And Rights is required"),
+        managementReplacements: Yup.string().required("Management Replacements is required"),
+        investmentRollover: Yup.string().required("Investment Rollover is required")
+    });
+
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    useEffect(() => {
+        if(formData.id != undefined){
+            reset(formData);
+        }
+    }, [formData])
+    
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleSave();
+    };
+
+    const onSubmitNext = (data: any) => {
+        setFormData(data);
+        handleClick('', "next")
+    };
+
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -109,7 +154,8 @@ export const DetailedApplication2C = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                onClick={handleSave}
+                                type="submit"
+                                onClick={handleSubmit(onSubmit)}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -126,10 +172,13 @@ export const DetailedApplication2C = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
+                            <Typography variant="body2" sx={{ flex: 1, color: '#363062', ml: 2, mb: 1 }} >16. Who approves investment and divestment decisions? Please give details of the process of evaluation of the deals and approvals / investments/ exits thereafter.</Typography>
                             <TextField
                                 required
                                 id="approvers"
-                                label="16. Who approves investment and divestment decisions? Please give details of the process of evaluation of the deals and approvals / investments/exits thereafter."
+                                // label="16. Who approves investment and divestment decisions? Please give details of the process of evaluation of the deals and approvals / investments/ exits thereafter."
+                                {...register("approvers")}
+                                error={errors.approvers && getValues("approvers") == '' ? true : false}
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                value={formData["approvers"] || ''}
                                 variant="standard"
@@ -137,6 +186,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.approvers && getValues("approvers") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.approvers?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -147,6 +202,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="nominatinPolicy"
                                 //label="17. Please provide policy for nomination of representatives on any of the Committees and furnish details of the composition of the Investment Committee (IC), reporting relationships between the IC and the Investment Manager."
+                                {...register("nominatinPolicy")}
+                                error={errors.nominatinPolicy && getValues("nominatinPolicy") == '' ? true : false}
                                 //defaultValue={formData.nominatinPolicy === undefined ? " " : formData["nominatinPolicy"]}
                                value={formData["nominatinPolicy"] || ''}
                                 variant="standard"
@@ -154,6 +211,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.nominatinPolicy && getValues("nominatinPolicy") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.nominatinPolicy?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -207,6 +270,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="investmentStrategy"
                                 //label="20. What is your investment strategy and what is its basis? What are the focus investment sectors for the fund? How does the investment strategy compare to the past fund strategies (if applicable)? Explain the reason for any significant change in your strategy. Are there any sectors or types of transactions/situations you would not invest in? If yes, please give details and reasons for the same"
+                                {...register("investmentStrategy")}
+                                error={errors.investmentStrategy && getValues("investmentStrategy") == '' ? true : false}
                                 //defaultValue={formData.investmentStrategy === undefined ? " " : formData["investmentStrategy"]}
                                value={formData["investmentStrategy"] || ''}
                                 variant="standard"
@@ -214,6 +279,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.investmentStrategy && getValues("investmentStrategy") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.investmentStrategy?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -225,6 +296,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="grossReturnObjective"
                                 label="Gross return objective of the overall fund"
+                                {...register("grossReturnObjective")}
+                                error={errors.grossReturnObjective && getValues("grossReturnObjective") == '' ? true : false}
                                 //defaultValue={formData.grossReturnObjective === undefined ? " " : formData["grossReturnObjective"]}
                                value={formData["grossReturnObjective"] || ''}
                                 variant="standard"
@@ -232,6 +305,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.grossReturnObjective && getValues("grossReturnObjective") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.grossReturnObjective?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -241,6 +320,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="targetSizePercentage"
                                 label="Target investment size and percentage stake"
+                                {...register("targetSizePercentage")}
+                                error={errors.targetSizePercentage && getValues("targetSizePercentage") == '' ? true : false}
                                 //defaultValue={formData.targetSizePercentage === undefined ? " " : formData["targetSizePercentage"]}
                                value={formData["targetSizePercentage"] || ''}
                                 variant="standard"
@@ -248,6 +329,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.targetSizePercentage && getValues("targetSizePercentage") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.targetSizePercentage?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -257,6 +344,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="targetNumberOfInvestmentPlanned"
                                 label="Target number of investments planned"
+                                {...register("targetNumberOfInvestmentPlanned")}
+                                error={errors.targetNumberOfInvestmentPlanned && getValues("targetNumberOfInvestmentPlanned") == '' ? true : false}
                                 //defaultValue={formData.targetNumberOfInvestmentPlanned === undefined ? " " : formData["targetNumberOfInvestmentPlanned"]}
                                value={formData["targetNumberOfInvestmentPlanned"] || ''}
                                 variant="standard"
@@ -264,6 +353,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.targetNumberOfInvestmentPlanned && getValues("targetNumberOfInvestmentPlanned") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.targetNumberOfInvestmentPlanned?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -273,6 +368,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="avgHoldingPeriod"
                                 label="Average holding period for a typical investment"
+                                {...register("avgHoldingPeriod")}
+                                error={errors.avgHoldingPeriod && getValues("avgHoldingPeriod") == '' ? true : false}
                                 //defaultValue={formData.avgHoldingPeriod === undefined ? " " : formData["avgHoldingPeriod"]}
                                value={formData["avgHoldingPeriod"] || ''}
                                 variant="standard"
@@ -280,6 +377,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.avgHoldingPeriod && getValues("avgHoldingPeriod") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.avgHoldingPeriod?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -289,6 +392,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="exitStrategy"
                                 label="Exit strategy"
+                                {...register("exitStrategy")}
+                                error={errors.exitStrategy && getValues("exitStrategy") == '' ? true : false}
                                 //defaultValue={formData.exitStrategy === undefined ? " " : formData["exitStrategy"]}
                                value={formData["exitStrategy"] || ''}
                                 variant="standard"
@@ -296,6 +401,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.exitStrategy && getValues("exitStrategy") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.exitStrategy?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -306,6 +417,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="controlsAndRights"
                                 //label='22. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.'
+                                {...register("controlsAndRights")}
+                                error={errors.controlsAndRights && getValues("controlsAndRights") == '' ? true : false}
                                 //defaultValue={formData.controlsAndRights === undefined ? " " : formData["controlsAndRights"]}
                                value={formData["controlsAndRights"] || ''}
                                 variant="standard"
@@ -313,6 +426,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.controlsAndRights && getValues("controlsAndRights") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.controlsAndRights?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -323,6 +442,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="managementReplacements"
                                 //label='23. In how many cases in your previous fund(s), were you active in replacing the management team when it was needed? How successful was the fund in doing so?'
+                                {...register("managementReplacements")}
+                                error={errors.managementReplacements && getValues("managementReplacements") == '' ? true : false}
                                 //defaultValue={formData.managementReplacements === undefined ? " " : formData["managementReplacements"]}
                                value={formData["managementReplacements"] || ''}
                                 variant="standard"
@@ -330,6 +451,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.managementReplacements && getValues("managementReplacements") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.managementReplacements?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -339,6 +466,8 @@ export const DetailedApplication2C = (props: any) => {
                                 required
                                 id="investmentRollover"
                                 label='24. Have you had any investments rolled over from previous fund(s)? Please give details'
+                                {...register("investmentRollover")}
+                                error={errors.investmentRollover && getValues("investmentRollover") == '' ? true : false}
                                 //defaultValue={formData.investmentRollover === undefined ? " " : formData["investmentRollover"]}
                                value={formData["investmentRollover"] || ''}
                                 variant="standard"
@@ -346,6 +475,12 @@ export const DetailedApplication2C = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.investmentRollover && getValues("investmentRollover") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.investmentRollover?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -369,7 +504,7 @@ export const DetailedApplication2C = (props: any) => {
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 <Button
-                                    onClick={(e) => handleClick(e, "next")}
+                                    onClick={handleSubmit(onSubmitNext)}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"
                                     disableElevation

@@ -3,19 +3,12 @@ import { RootState } from "../../app/store"
 import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
 import { authenticate } from "./authenticationApi"
-import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 
 type InitialState = {
-    token: String | undefined,
-    response: string | undefined,
-    status: IStatus,
-    actionStatus: IStatus
+    token: String | undefined
 }
 const initialState: InitialState = {
-    token: undefined,
-    response: undefined,
-    status: { fetchStatus: FetchStatus.IDLE },
-    actionStatus: { fetchStatus: FetchStatus.IDLE }
+    token: undefined
 }
 
 export interface ILoginRequest {
@@ -64,7 +57,6 @@ const authticationSlice = createSlice({
         console.log(action.payload);
         state.token = action.payload.currentUser;
         console.log(JSON.stringify(state));
-        state.response = undefined;
         localStorage.setItem('token', String(state.token));
       }
     )

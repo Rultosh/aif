@@ -15,6 +15,9 @@ import SideNavBar from '../SideNavBar'
 import { updateNavIndex, updateStepperIndex } from '../sideNavBarSlice'
 import Textarea from '@mui/joy/Textarea';
 import SaveIcon from '@mui/icons-material/Save';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const DetailedApplication2A = (props:any) => {
 
@@ -27,7 +30,8 @@ export const DetailedApplication2A = (props:any) => {
     const state = useAppSelector(selectFeatureOfFunds);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-
+// console.log(defaultIFeaturesOfFunds);
+// console.log(formData);
     useEffect(() => {
         dispatch(updateNavIndex(0))
         dispatch(updateStepperIndex(1))
@@ -38,6 +42,7 @@ export const DetailedApplication2A = (props:any) => {
                 controller.all({ ...formData, parentId: parentId });
             }
         }
+        console.log(formData);
     }, [])
 
     useEffect(() => {
@@ -53,6 +58,7 @@ export const DetailedApplication2A = (props:any) => {
             Object.keys(state[parentId]?.data).map((key) => {
                 let value = state[parentId]?.data[key]
                 if (value && value.id) {
+                    console.log(value);
                     setFormData(value);
                     setFeatureOfFundId(value.id);
                 } else {
@@ -67,6 +73,7 @@ export const DetailedApplication2A = (props:any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
+        setValue(ev.target.name, ev.target.value);
         setFormData(copiedValue);
     };
 
@@ -89,6 +96,50 @@ export const DetailedApplication2A = (props:any) => {
 
     let listItem = ['Please upload the files following convention as "FundName_Documentname_Date" for file (Include date in filename if relevent to the document) ', "Please fill up / answer all the points to the extent possible.", "Receipt of the information does not in any way bind / commits SIDBI to sanction assistance to the VC / PE fund, which will be considered on the merits of the case.", "If any of the points are covered in the Private Placement Memorandum (PPM), then please give reference to the relevant paragraph / page number of the PPM.", "Please upload the copy of supporting documents. Please ensure any single file is not more than 5MB.", "If there are more than one document against a specific question, please zip the relevant documents and upload the zipped file.", "Answers may be specific. Please avoid vague answers."];
 
+    const validationSchema = Yup.object().shape({
+        domesticAmount1: Yup.string().required("Domestic is required"),
+        internationalAmount1: Yup.string().required("International is required"),
+        totalAmount1: Yup.string().required("Total is required"),
+        domesticAmount2: Yup.string().required("Domestic is required"),
+        internationalAmount2: Yup.string().required("International is required"),
+        totalAmount2: Yup.string().required("Total is required"),
+        detailOfFundLife: Yup.string().required("Detail of Fund Life is required"),
+        investmentPeriod: Yup.string().required("Investment Period is required"),
+        targetReturnOfTheFund: Yup.string().required("Target Return Of The Fund is required"),
+        hurdleRate: Yup.string().required("Hurdle Rate is required"),
+        managementFee: Yup.string().required("Management Fee is required"),
+        provisionOfFundSetup: Yup.string().required("Provision Of Fund Setup is required"),
+        fundOnlyPrimaryInvestment: Yup.string().required("Fund Only Primary Investment is required"),
+        detailsOfExistingFund: Yup.string().required("Details Of Existing Fund is required")
+    });
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        getValues,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    useEffect(() => {
+        if(formData.id != undefined){
+            reset(formData);
+        }
+    }, [formData])
+
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleSave();
+    };
+
+    const onSubmitNext = (data: any) => {
+        setFormData(data);
+        handleClick('', "next")
+    };
+
     return (<>
         {controller.isActionError(parentId, state) ?
             <div style={{ margin: "10px", color: "red" }}>{controller.error(parentId, state)}</div> : <></>}
@@ -107,7 +158,8 @@ export const DetailedApplication2A = (props:any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                onClick={handleSave}
+                                type="submit"
+                                onClick={handleSubmit(onSubmit)}
                                 // onClick={handleSave}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
@@ -178,6 +230,8 @@ export const DetailedApplication2A = (props:any) => {
                                         required
                                         id="domesticAmount1"
                                         label="Response to question is required "
+                                        {...register("domesticAmount1")}
+                                        error={errors.domesticAmount1 && getValues("domesticAmount1") == '' ? true : false}
                                         //defaultValue={formData.domesticAmount1 === undefined ? " " : formData["domesticAmount1"]}
                                         value={formData["domesticAmount1"] || ''}
                                         variant="standard"
@@ -185,66 +239,94 @@ export const DetailedApplication2A = (props:any) => {
 
                                         sx={{ display: 'flex', mb: 2 }}
                                     />
+                                    <Typography variant="caption" color="error">
+                                        <>{errors.domesticAmount1 && getValues("domesticAmount1") == ''? errors.domesticAmount1.message : ''}</>
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
                                         required
                                         id="internationalAmount1"
                                         label="Response to question is required"
+                                        {...register("internationalAmount1")}
+                                        error={errors.internationalAmount1 && getValues("internationalAmount1") == '' ? true : false}
                                         //defaultValue={formData.internationalAmount1 === undefined ? " " : formData["internationalAmount1"]}
                                         value={formData["internationalAmount1"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
                                         sx={{ display: 'flex', mb: 2, ml: 2 }}
                                     />
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.internationalAmount1 && getValues("internationalAmount1") == ''? errors.internationalAmount1.message : ''}</>
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
                                         required
                                         id="totalAmount1"
                                         label="Response to question is required"
+                                        {...register("totalAmount1")}
+                                        error={errors.totalAmount1 && getValues("totalAmount1") == '' ? true : false}
                                         //defaultValue={formData.totalAmount1 === undefined ? " " : formData["totalAmount1"]}
                                         value={formData["totalAmount1"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
                                         sx={{ display: 'flex', mb: 2, ml: 2 }}
                                     />
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.totalAmount1 && getValues("totalAmount1") == ''? errors.totalAmount1.message : ''}</>
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
                                         required
                                         id="domesticAmount2"
                                         label="Green shoe Response to question is required"
+                                        {...register("domesticAmount2")}
+                                        error={errors.domesticAmount2 && getValues("domesticAmount2") == '' ? true : false}
                                         //defaultValue={formData.domesticAmount2 === undefined ? " " : formData["domesticAmount2"]}
                                         value={formData["domesticAmount2"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
                                         sx={{ display: 'flex', mb: 2 }}
                                     />
+                                    <Typography variant="caption" color="error">
+                                        <>{errors.domesticAmount2 && getValues("domesticAmount2") == ''? errors.domesticAmount2.message : ''}</>
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
                                         required
                                         id="internationalAmount2"
                                         label="Green shoe Response to question is required"
+                                        {...register("internationalAmount2")}
+                                        error={errors.internationalAmount2 && getValues("internationalAmount2") == '' ? true : false}
                                         //defaultValue={formData.internationalAmount2 === undefined ? " " : formData["internationalAmount2"]}
                                         value={formData["internationalAmount2"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
                                         sx={{ display: 'flex', mb: 2, ml: 2 }}
                                     />
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.internationalAmount2 && getValues("internationalAmount2") == ''? errors.internationalAmount2.message : ''}</>
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={4}>
                                     <TextField
                                         required
                                         id="totalAmount2"
                                         label="Green shoe Response to question is required"
+                                        {...register("totalAmount2")}
+                                        error={errors.totalAmount2 && getValues("totalAmount2") == '' ? true : false}
                                         //defaultValue={formData.totalAmount2 === undefined ? " " : formData["totalAmount2"]}
                                         value={formData["totalAmount2"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
                                         sx={{ display: 'flex', mb: 2, ml: 2 }}
                                     />
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.totalAmount2 && getValues("totalAmount2") == ''? errors.totalAmount2.message : ''}</>
+                                    </Typography>
                                 </Grid>
                             </Grid>
                         </CardContent>
@@ -255,13 +337,18 @@ export const DetailedApplication2A = (props:any) => {
                             <TextField
                                 required
                                 id="detailOfFundLife"
-                                label="2. Details of fund life answer and provision for extension."
+                                label="2. Details of fund life and provisions for extension."
+                                {...register("detailOfFundLife")}
+                                error={errors.detailOfFundLife && getValues("detailOfFundLife") == '' ? true : false}
                                 //defaultValue={formData.detailOfFundLife === undefined ? " " : formData["detailOfFundLife"]}
                                 value={formData["detailOfFundLife"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
                                 sx={{ display: 'flex', ml: 2 }}
                             />
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{errors.detailOfFundLife && getValues("detailOfFundLife") == ''? errors.detailOfFundLife.message : ''}</>
+                            </Typography>
                         </CardContent>
                     </Card>
 
@@ -271,12 +358,17 @@ export const DetailedApplication2A = (props:any) => {
                                 required
                                 id="investmentPeriod"
                                 label="3. Investment Period / commitment period."
+                                {...register("investmentPeriod")}
+                                error={errors.investmentPeriod && getValues("investmentPeriod") == '' ? true : false}
                                 //defaultValue={formData.investmentPeriod === undefined ? " " : formData["investmentPeriod"]}
                                 value={formData["investmentPeriod"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
                                 sx={{ display: 'flex', ml: 2 }}
                             />
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{errors.investmentPeriod && getValues("investmentPeriod") == ''? errors.investmentPeriod.message : ''}</>
+                            </Typography>
                         </CardContent>
                     </Card>
 
@@ -286,6 +378,8 @@ export const DetailedApplication2A = (props:any) => {
                                 required
                                 id="targetReturnOfTheFund"
                                 label="4. Target return for the fund."
+                                {...register("targetReturnOfTheFund")}
+                                error={errors.targetReturnOfTheFund && getValues("targetReturnOfTheFund") == '' ? true : false}
                                 //defaultValue={formData.targetReturnOfTheFund === undefined ? " " : formData["targetReturnOfTheFund"]}
                                 value={formData["targetReturnOfTheFund"] || ''}
                                 variant="standard"
@@ -293,6 +387,9 @@ export const DetailedApplication2A = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2 }}
                             />
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{errors.targetReturnOfTheFund && getValues("targetReturnOfTheFund") == ''? errors.targetReturnOfTheFund.message : ''}</>
+                            </Typography>
                         </CardContent>
                     </Card>
 
@@ -302,6 +399,8 @@ export const DetailedApplication2A = (props:any) => {
                                 required
                                 id="hurdleRate"
                                 label="5. Hurdle Rate & carried interest with basis / justification for the same."
+                                {...register("hurdleRate")}
+                                error={errors.hurdleRate && getValues("hurdleRate") == '' ? true : false}
                                 //defaultValue={formData.hurdleRate === undefined ? " " : formData["hurdleRate"]}
                                 value={formData["hurdleRate"] || ''}
                                 variant="standard"
@@ -309,6 +408,9 @@ export const DetailedApplication2A = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2 }}
                             />
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{errors.hurdleRate && getValues("hurdleRate") == ''? errors.hurdleRate.message : ''}</>
+                            </Typography>
                         </CardContent>
                     </Card>
 
@@ -318,6 +420,8 @@ export const DetailedApplication2A = (props:any) => {
                                 required
                                 id="managementFee"
                                 label="6. Management fee and trusteeship fee with basis / justification for the same."
+                                {...register("managementFee")}
+                                error={errors.managementFee && getValues("managementFee") == '' ? true : false}
                                 //defaultValue={formData.managementFee === undefined ? " " : formData["managementFee"]}
                                 value={formData["managementFee"] || ''}
                                 variant="standard"
@@ -325,15 +429,20 @@ export const DetailedApplication2A = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2 }}
                             />
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{errors.managementFee && getValues("managementFee") == ''? errors.managementFee.message : ''}</>
+                            </Typography>
                         </CardContent>
                     </Card>
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >7. Provisions relating to fund set up and costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM.Fund?.</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >7. Provisions relating to fund set up costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM/Fund?.</Typography>
                             <TextField
                                 required
                                 id="provisionOfFundSetup"
+                                {...register("provisionOfFundSetup")}
+                                error={errors.provisionOfFundSetup && getValues("provisionOfFundSetup") == '' ? true : false}
                                 label=""
                                 //defaultValue={formData.provisionOfFundSetup === undefined ? " " : formData["provisionOfFundSetup"]}
                                 value={formData["provisionOfFundSetup"] || ''}
@@ -342,6 +451,9 @@ export const DetailedApplication2A = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2 }}
                             />
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{errors.provisionOfFundSetup && getValues("provisionOfFundSetup") == ''? errors.provisionOfFundSetup.message : ''}</>
+                            </Typography>
                         </CardContent>
                     </Card>
 
@@ -352,6 +464,8 @@ export const DetailedApplication2A = (props:any) => {
                                 required
                                 id="fundOnlyPrimaryInvestment"
                                 //label="8. Whether the Fund will make primary investment only i.e. the funds shall be utilized by the investee company only for its growth plans?"
+                                {...register("fundOnlyPrimaryInvestment")}
+                                error={errors.fundOnlyPrimaryInvestment && getValues("fundOnlyPrimaryInvestment") == '' ? true : false}
                                 //defaultValue={formData.fundOnlyPrimaryInvestment === undefined ? " " : formData["fundOnlyPrimaryInvestment"]}
                                 value={formData["fundOnlyPrimaryInvestment"] || ''}
                                 variant="standard"
@@ -359,15 +473,20 @@ export const DetailedApplication2A = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2 }}
                             />
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{errors.fundOnlyPrimaryInvestment && getValues("fundOnlyPrimaryInvestment") == ''? errors.fundOnlyPrimaryInvestment.message : ''}</>
+                            </Typography>
                         </CardContent>
                     </Card>
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >9. Details of existing investment made from the proposed fund (including warehouse investment), if any. What is the current pipeline of deals under considertaion? Give details and timeline for investment.</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >9. Details of existing investment made from the proposed fund (including warehouse investment), if any. What is the current pipeline of deals under consideration? Give details and timeline for investment.</Typography>
                             <TextField
                                 required
                                 id="detailsOfExistingFund"
+                                {...register("detailsOfExistingFund")}
+                                error={errors.detailsOfExistingFund && getValues("detailsOfExistingFund") == '' ? true : false}
                                 //label="9. Details of existing investment made from the proposed fund (including warehouse investment), if any. What is the current pipeline of deals under considertaion? Give details and timeline for investment."
                                 //defaultValue={formData.detailsOfExistingFund === undefined ? " " : formData["detailsOfExistingFund"]}
                                 value={formData["detailsOfExistingFund"] || ''}
@@ -375,6 +494,9 @@ export const DetailedApplication2A = (props:any) => {
                                 onChange={handleChange}
                                 sx={{ display: 'flex', ml: 2 }}
                             />
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{errors.detailsOfExistingFund && getValues("detailsOfExistingFund") == ''? errors.detailsOfExistingFund.message : ''}</>
+                            </Typography>
                         </CardContent>
                     </Card>
                     <Grid container xs={12}>
@@ -397,7 +519,7 @@ export const DetailedApplication2A = (props:any) => {
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                     <Button
-                                        onClick={(e) => handleClick(e, "next")}
+                                        onClick={handleSubmit(onSubmitNext)}
                                         endIcon={<ArrowRightIcon />}
                                         variant="contained"
                                         disableElevation

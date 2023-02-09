@@ -70,7 +70,7 @@ function ColorlibStepIcon(props: StepIconProps) {
         </ColorlibStepIconRoot>
     );
 }
-const steps = ['Preliminary Application', 'Detailed Application', 'Investment Theme of Fund', 'Detailed Engagement And Role of IM with Portfolio Companies', 'Illustration of carry distribution of Fund'];
+const steps = ['Preliminary Application', 'Detailed Application', 'Investment Theme of Fund', 'Detailed Engagement And Role of IM with Portfolio Companies', 'Illustration of carry distribution of the Fund'];
 
 
 

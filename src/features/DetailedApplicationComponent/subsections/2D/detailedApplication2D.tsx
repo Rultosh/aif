@@ -14,6 +14,9 @@ import { defaultIDetailedApplication2D, IDetailedApplication2D } from "./IDetail
 import { detailedApplication2DThunk, selectDetailedApplication2D } from "./detailedApplication2DSlice";
 import {updateNavIndex}from '../sideNavBarSlice'
 import SaveIcon from '@mui/icons-material/Save';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 export const DetailedApplication2D = (props: any) => {
 
@@ -63,6 +66,7 @@ export const DetailedApplication2D = (props: any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
+        setValue(ev.target.name, ev.target.value);
         setFormData(copiedValue);
     };
 
@@ -81,6 +85,40 @@ export const DetailedApplication2D = (props: any) => {
         }
     }
 
+    const validationSchema = Yup.object().shape({
+        numberOfDealsEvaluated: Yup.string().required("Total number of business plans / deals evaluated since fund inception is required"),
+        sourcingBreakUps: Yup.string().required("Break-up of sourcing of the deals - investment banks, sponsor network, direct etc is required"),
+        businessPlanBreakUps: Yup.string().required("Break-up of business plans / deals industry / sector-wise and stage-wise is required"),
+        conversionRation: Yup.string().required("Conversion Ration is required")
+    });
+
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+    });
+
+    useEffect(() => {
+        if(formData.id != undefined){
+            reset(formData);
+        }
+    }, [formData])
+
+    const onSubmit = (data: any) => {
+        setFormData(data);
+        handleSave();
+    };
+
+    const onSubmitNext = (data: any) => {
+        setFormData(data);
+        handleClick('', "next")
+    };
+
     return (<>
         <SideNavBar></SideNavBar>
         <Grid item xs={9}>
@@ -97,7 +135,8 @@ export const DetailedApplication2D = (props: any) => {
                                 <SaveIcon  ></SaveIcon>
     </IconButton>*/}
                             <Button
-                                onClick={handleSave}
+                                type="submit"
+                                onClick={handleSubmit(onSubmit)}
                                 endIcon={<SaveIcon />}
                                 variant="contained"
                                 disableElevation
@@ -119,6 +158,8 @@ export const DetailedApplication2D = (props: any) => {
                                 required
                                 id="numberOfDealsEvaluated"
                                 label="A. Total number of business plans / deals evaluated since fund inception"
+                                {...register("numberOfDealsEvaluated")}
+                                error={errors.numberOfDealsEvaluated && getValues("numberOfDealsEvaluated") == '' ? true : false}
                                 //defaultValue={formData.numberOfDealsEvaluated === undefined ? " " : formData["numberOfDealsEvaluated"]}
                                value={formData["numberOfDealsEvaluated"] || ''}
                                 variant="standard"
@@ -126,6 +167,12 @@ export const DetailedApplication2D = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.numberOfDealsEvaluated && getValues("numberOfDealsEvaluated") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.numberOfDealsEvaluated?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -135,6 +182,8 @@ export const DetailedApplication2D = (props: any) => {
                                 required
                                 id="sourcingBreakUps"
                                 label="B. Break-up of sourcing of the deals - investment banks, sponsor network, direct etc."
+                                {...register("sourcingBreakUps")}
+                                error={errors.sourcingBreakUps && getValues("sourcingBreakUps") == '' ? true : false}
                                 //defaultValue={formData.sourcingBreakUps === undefined ? " " : formData["sourcingBreakUps"]}
                                value={formData["sourcingBreakUps"] || ''}
                                 variant="standard"
@@ -142,6 +191,12 @@ export const DetailedApplication2D = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.sourcingBreakUps && getValues("sourcingBreakUps") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.sourcingBreakUps?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -151,6 +206,8 @@ export const DetailedApplication2D = (props: any) => {
                                 required
                                 id="businessPlanBreakUps"
                                 label="C. Break-up of business plans / deals industry / sector-wise and stage-wise. "
+                                {...register("businessPlanBreakUps")}
+                                error={errors.businessPlanBreakUps && getValues("businessPlanBreakUps") == '' ? true : false}
                                 //defaultValue={formData.businessPlanBreakUps === undefined ? " " : formData["businessPlanBreakUps"]}
                                value={formData["businessPlanBreakUps"] || ''}
                                 variant="standard"
@@ -158,6 +215,12 @@ export const DetailedApplication2D = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.businessPlanBreakUps && getValues("businessPlanBreakUps") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.businessPlanBreakUps?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -167,6 +230,8 @@ export const DetailedApplication2D = (props: any) => {
                                 required
                                 id="conversionRation"
                                 label="D. Conversion ratio for transactions sourced to those completed."
+                                {...register("conversionRation")}
+                                error={errors.conversionRation && getValues("conversionRation") == '' ? true : false}
                                 //defaultValue={formData.conversionRation === undefined ? " " : formData["conversionRation"]}
                                value={formData["conversionRation"] || ''}
                                 variant="standard"
@@ -174,6 +239,12 @@ export const DetailedApplication2D = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
+                            {errors.conversionRation && getValues("conversionRation") == '' ?
+                                <div  style={{ marginTop: '-10px' }}>
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{errors.conversionRation?.message}</>
+                                    </Typography>
+                                </div> : <></>}
                         </CardContent>
                     </Card>
 
@@ -199,7 +270,7 @@ export const DetailedApplication2D = (props: any) => {
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 <Button
-                                    onClick={(e) => handleClick(e, "next")}
+                                    onClick={handleSubmit(onSubmitNext)}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"
                                     disableElevation
