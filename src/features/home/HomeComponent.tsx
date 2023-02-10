@@ -197,7 +197,7 @@ export const Home = (pros:any) => {
                                         </TableCell> : <TableCell align="center" component="th" scope="row">
                                             <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a>
                                         </TableCell>}
-                                        <TableCell align="center">{row.investmentManager}</TableCell>
+                                        <TableCell align="center">{row.createdByName}</TableCell>
                                         <TableCell align="center">{String(getStatusDescription(row.stage, row.status))}</TableCell>
                                         <TableCell align="center">{row.detailedApplicationCreatedOn}</TableCell>
                                         <TableCell align="center">{Moment(String(row.createdOn)).format("DD/MM/YYYY")}</TableCell>

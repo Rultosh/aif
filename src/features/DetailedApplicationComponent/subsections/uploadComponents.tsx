@@ -9,6 +9,7 @@ import ListFiles from "../../../components/ListFiles";
 
 interface UploadComponentProps {
     id: String
+    signed?: boolean
 }
 
 export const UploadComponents = (props: UploadComponentProps) => {
@@ -20,7 +21,7 @@ export const UploadComponents = (props: UploadComponentProps) => {
 
     return (<>
         <Box>
-            <DocumentUpload id={props.id}
+            <DocumentUpload id={props.id} signed={props.signed}
                 onSuccess={handleSuccess}>
                 <FileUploadIcon>
                 </FileUploadIcon>
