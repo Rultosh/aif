@@ -1,8 +1,9 @@
 export interface IPrelimApplicationData {
     id: Number | undefined,
     status: String | undefined,
-    createdBy: Number | undefined
-    parentId: Number | undefined
+    createdBy: Number | undefined,
+    createdByName: String | undefined,
+    parentId: Number | undefined,
     createdOn: String | undefined,
     detailedApplicationCreatedOn: String | undefined,
     updatedBy: String | undefined,
@@ -52,6 +53,7 @@ export const defaultIPrelimApplicationData : IPrelimApplicationData = {
   id: undefined,
   status:  undefined,
   createdBy:  undefined,
+  createdByName: undefined,
   parentId:  undefined,
   createdOn:  undefined,
   detailedApplicationCreatedOn: undefined,
