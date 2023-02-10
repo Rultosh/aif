@@ -16,6 +16,13 @@ export function fetchFundOverviewList(pageInfo : IPageInfo | undefined) {
   });
 }
 
+export function fetchFundOverviewAllList(pageInfo : IPageInfo | undefined) {
+  return api({
+    method: 'get',
+    url: `/api/prelims`
+  });
+}
+
 export function postPrelimApplication(prelimAppData:IPrelimApplicationData) {
   return api({
     method: 'post',
