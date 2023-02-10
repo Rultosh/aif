@@ -9,14 +9,14 @@ import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 
 type InitialState = {
   history: IHistory,
-  queries: IHistory[],
+  histories: IHistory[],
   response: string | undefined,
   status: IStatus
   actionStatus: IStatus
 }
 const initialState: InitialState = {
   history: {} as IHistory,
-  queries: [],
+  histories: [],
   response: undefined,
   status: {fetchStatus: FetchStatus.IDLE},
   actionStatus: {fetchStatus: FetchStatus.IDLE}
@@ -51,7 +51,7 @@ const historySlice = createSlice({
     .addCase(
       fetchHistoryAsync.fulfilled,
       (state, action: PayloadAction<IHistory[]>) => {
-        state.queries = action.payload;
+        state.histories = action.payload;
         state.response = undefined;
         state.status.fetchStatus = FetchStatus.IDLE;
       }

@@ -90,13 +90,13 @@ export const Declaration = (props:any) => {
                                 <Typography sx={{ flex: 1, fontWeight: 'bold' }}>I / We (Partner/Directors) hereby declare that</Typography>
                                 <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>A.  The information given above and the statements and other papers enclosed are to be the best of our knowledge and belief,true and correct in all particulars.</Typography>
                                 <Divider />
-                                <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>B.  There are no arrears of statutory dues and no government enquiries/proceedings/prosecution/legal acrtion are pending/initiated against the Fund / Sponsor/ AMC / Trustee Company / promoters / directors / partners except as indicated in the application.</Typography>
+                                <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>B.  There are no arrears of statutory dues and no government enquiries/proceedings/prosecution/legal action are pending/initiated against the Fund / Sponsor/ AMC / Trustee Company / promoters / directors / partners except as indicated in the application.</Typography>
                                 <Divider />
                                 <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>C.  I / We also confirm that I/none of the Sponsors / promoters or directors or partners have at any time declared themselves as insolvent;</Typography>
                                 <Divider />
-                                <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>D.  I / We have no objection if SIDBI furnishes the information submitted by me/us to other banks /FIs/CIBIL/RBI/any other agency may be deemed fit in connection with considaration of my.our application for capital Commitment to the proposed venture capital fund.</Typography>
+                                <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>D.  I / We have no objection if SIDBI furnishes the information submitted by me/us to other banks /FIs/CIBIL/RBI/any other agency as may be deemed fit in connection with considaration of my/our application for capital Commitment to the proposed venture capital fund.</Typography>
                                 <Divider />
-                                <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>E.  I / We have no objection if SIDBI and/or its representatives making necessary enquiries/verification (incuding in CIBIL or any other credit information agencies database) while considering my/our application for capital contribution. I / We undertake to furnish all other information that may be by SIDBI in connection with my/ our application for capital Commitment.</Typography>
+                                <Typography sx={{ flex: 1, mt: 2, mb: 2 }}>E.  I / We have no objection if SIDBI and/or its representatives making necessary enquiries/verification (incuding in CIBIL or any other credit information agencies database) while considering my/our application for capital contribution. I / We undertake to furnish all other information that may be required by SIDBI in connection with my/ our application for capital Commitment.</Typography>
                                 <Divider />
                                 <FormGroup>
                                     <FormControlLabel sx={{mt:2}} control={

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ActionWrapper } from '../../../../lib/api-status/actionWrapper'
-import { fetchFundOverviewData, fetchFundOverviewList, patchPrelimApplication, postPrelimApplication, postApplication } from './fundOverviewDataApi'
+import { fetchFundOverviewData, fetchFundOverviewList, fetchFundOverviewAllList, patchPrelimApplication, postPrelimApplication, postApplication } from './fundOverviewDataApi'
 import { getError } from '../../../../lib/api-status/errorHandler'
 import { defaultIPrelimApplicationData, IPrelimApplicationData, IApplicationData } from './IPrelimApplicationData'
 import { FetchStatus, IStatus } from '../../../../lib/api-status/IStatus'
@@ -46,6 +46,21 @@ export const getPrelimApplicationList = createAsyncThunk(
     try {
       if(args.argument) {
         const response = await fetchFundOverviewList(args.argument);
+        return response.data;
+      }
+    } catch(reason) {
+      console.log(reason)
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
+
+export const getPrelimApplicationAllList = createAsyncThunk(
+  'prelimApplicationlist/read',
+  async (args: ActionWrapper<IPageInfo>, {rejectWithValue}) => { 
+    try {
+      if(args.argument) {
+        const response = await fetchFundOverviewAllList(args.argument);
         return response.data;
       }
     } catch(reason) {

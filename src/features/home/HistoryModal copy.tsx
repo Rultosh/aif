@@ -1,42 +1,41 @@
 import React, * as Rect from 'react'
-import { Modal, Box, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Modal, Box, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { useNavigate } from "react-router-dom";
 import uuid from "react-uuid";
 import { defaultIQueryResolution, IQueryResolution } from "./IQueryResolution";
-import { fetchHistoryAsync, selecthistory } from './historySlice'
+import { fetchQuriesAsync, postQuriesAsync, selectqueryResolution } from './queryResolutionSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
-import Moment from 'moment';
 
 export const QueryResolutionModal = (props: any) => {
 
     const id = props?.prelimDetails?.id
     const [formData, setFormData] = useState(defaultIQueryResolution);
     const [formDataList, setFormDataList] = useState([] as any);
-    const history = useAppSelector(selecthistory)
+    const state = useAppSelector(selectqueryResolution)
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
 
 
     useEffect(() => {
-        console.log('calling fetchHistoryAsync');
-        dispatch(fetchHistoryAsync(
+        console.log('calling fetchQuriesAsync');
+        dispatch(fetchQuriesAsync(
             wrapArgument(actionUid, id)
         ))
 
-    }, [history])
-    // console.log(history)
-    // function handleSubmit(){
+    }, [state.actionStatus.fetchStatus === FetchStatus.IDLE, state.status.fetchStatus == FetchStatus.IDLE])
+
+    function handleSubmit(){
         
-    //     dispatch(postQuriesAsync(
-    //         wrapArgument(actionUid, formData)
-    //     ))
-    //     setFormData(defaultIQueryResolution)
-    // }
+        dispatch(postQuriesAsync(
+            wrapArgument(actionUid, formData)
+        ))
+        setFormData(defaultIQueryResolution)
+    }
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -82,7 +81,7 @@ export const QueryResolutionModal = (props: any) => {
     >
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-                <TableContainer>
+                {/* <TableContainer component={Paper}  >
                     <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
                         <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                             <TableRow>
@@ -90,14 +89,16 @@ export const QueryResolutionModal = (props: any) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {/* {
-                                state.history ? state.history.map((row) => {
-                                    return <>{row}</>
+                            {
+                                prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
+                                    return <TableRow key={`${row.nameOfTheFund}`}>
+                                        <TableCell align="center">{row.investmentManager}</TableCell>
+                                    </TableRow>
                                 }) : <></>
-                            } */}
+                            }
                         </TableBody>
                     </Table>
-                </TableContainer>
+                </TableContainer> */}
             </Box>
         </Box>
     </Modal>
