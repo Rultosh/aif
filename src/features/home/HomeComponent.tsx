@@ -1,4 +1,4 @@
-import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
+import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Container } from '@mui/material';
 import NavigationBar from '../../components/NavigationBar'
 import React, * as Rect from 'react'
 import { useState, useEffect } from "react"
@@ -27,6 +27,8 @@ import Moment from 'moment';
 import { fetchHistoryAsync, selecthistory } from './historySlice';
 import {CheckAuth} from '../../app/api';
 import { useNavigate } from 'react-router-dom';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 export const Home = (pros:any) => {
 
@@ -178,121 +180,122 @@ export const Home = (pros:any) => {
     }
 
     return (
-        <div className="homeComp" style={{ height: 670 }}>
+        <div className="homeComp">
             <NavigationBar></NavigationBar>
-            {prelimApplications.allStatus.fetchStatus === FetchStatus.IDLE ? <div >
-                <TableContainer component={Paper}  >
-                    <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
-                        <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
-                            <TableRow>
-                                {headerComponent}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {
-                                prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
-                                    return <TableRow key={`${row.nameOfTheFund}`}>
-                                        {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
-                                            <a href={`/preliminary/${row.id}/${String(getPath(row.status))}`}>{row.nameOfTheFund}</a>
-                                        </TableCell> : <TableCell align="center" component="th" scope="row">
-                                            <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a>
-                                        </TableCell>}
-                                        <TableCell align="center">{row.investmentManager}</TableCell>
-                                        <TableCell align="center">{String(getStatusDescription(row.stage, row.status))}</TableCell>
-                                        <TableCell align="center">{row.detailedApplicationCreatedOn}</TableCell>
-                                        <TableCell align="center">{Moment(String(row.createdOn)).format("DD/MM/YYYY")}</TableCell>
-                                        <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
-                                        <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>
-                                        {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
-                                            <Tooltip title="Download">
-                                                <IconButton>
-                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Download All">
-                                                <IconButton>
-                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)} />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TableCell> : <TableCell align="center" component="th" scope="row">
-                                            <Tooltip title="Download">
-                                                <IconButton>
-                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Download All">
-                                                <IconButton>
-                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadAsZip?access_token=${localStorage.getItem('token')}`)} />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TableCell>}
-                                        <TableCell align="center"><MailIcon onClick={() => openModel(row)} ></MailIcon></TableCell>
-                                        <TableCell align="center"><HistoryIcon onClick={() => openModelHistory(row)} ></HistoryIcon></TableCell>
-                                        <TableCell align="center">
-                                            <Grid container xs={12} spacing={0.5}>
-                                                <Grid item >
-                                                    <Tooltip title={row.stage == 'PRELIM' ? "Preliminary application - " + row.status : "Preliminary application - APPROVED"}>
-                                                        <Box
-                                                            component="img"
-                                                            sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                            alt="success"
-                                                            src={row.stage == 'PRELIM' ? getStatusImg(row) : greenImg}
-                                                        />
-                                                    </Tooltip>
+            {prelimApplications.allStatus.fetchStatus === FetchStatus.IDLE ? <>
+                <Container maxWidth="xl" sx={{ py: '20px' }}>
+                    <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                            <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
+                                <TableRow>
+                                    {headerComponent}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {
+                                    prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
+                                        return <TableRow key={`${row.nameOfTheFund}`}>
+                                            {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
+                                                <a href={`/preliminary/${row.id}/${String(getPath(row.status))}`}>{row.nameOfTheFund}</a>
+                                            </TableCell> : <TableCell align="center" component="th" scope="row">
+                                                <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a>
+                                            </TableCell>}
+                                            <TableCell align="center">{row.investmentManager}</TableCell>
+                                            <TableCell align="center">{String(getStatusDescription(row.stage, row.status))}</TableCell>
+                                            <TableCell align="center">{row.detailedApplicationCreatedOn}</TableCell>
+                                            <TableCell align="center">{Moment(String(row.createdOn)).format("DD/MM/YYYY")}</TableCell>
+                                            <TableCell align="center">{String(row.sdTotalTargetCorpus)}</TableCell>
+                                            <TableCell align="center">{String(row.contributionSought || 0)}</TableCell>
+                                            {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
+                                                <Tooltip title="Download">
+                                                    <IconButton>
+                                                        <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Download All">
+                                                    <IconButton>
+                                                        <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell> : <TableCell align="center" component="th" scope="row">
+                                                <Tooltip title="Download">
+                                                    <IconButton>
+                                                        <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Download All">
+                                                    <IconButton>
+                                                        <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadAsZip?access_token=${localStorage.getItem('token')}`)} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell>}
+                                            <TableCell align="center"><MailIcon onClick={() => openModel(row)} ></MailIcon></TableCell>
+                                            <TableCell align="center"><HistoryIcon onClick={() => openModelHistory(row)} ></HistoryIcon></TableCell>
+                                            <TableCell align="center">
+                                                <Grid container xs={12} spacing={0.5}>
+                                                    <Grid item >
+                                                        <Tooltip title={row.stage == 'PRELIM' ? "Preliminary application - " + row.status : "Preliminary application - APPROVED"}>
+                                                            <Box
+                                                                component="img"
+                                                                sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                                alt="success"
+                                                                src={row.stage == 'PRELIM' ? getStatusImg(row) : greenImg}
+                                                            />
+                                                        </Tooltip>
+                                                    </Grid>
+                                                    {row.stage == 'DETAILED' ? 
+                                                    <Grid item >
+                                                        <Tooltip title={"Detailed application - " + row.status}>
+                                                            <Box
+                                                                component="img"
+                                                                sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                                alt="success"
+                                                                src={getStatusImg(row)}
+                                                            />
+                                                        </Tooltip>
+                                                    </Grid> : <></>}
+
                                                 </Grid>
-                                                {row.stage == 'DETAILED' ? 
-                                                <Grid item >
-                                                    <Tooltip title={"Detailed application - " + row.status}>
-                                                        <Box
-                                                            component="img"
-                                                            sx={{ width: '15px', height: '15px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                            alt="success"
-                                                            src={getStatusImg(row)}
-                                                        />
-                                                    </Tooltip>
-                                                </Grid> : <></>}
+                                            </TableCell>
 
-                                            </Grid>
-                                        </TableCell>
-
-                                    </TableRow>
-                                }) : <></>
-                            }
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <Grid container sx={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <Grid item xs={2}>
-                        <Box >
-                            {pageInfo.pageNumber > 0 ? <Button variant='contained' sx={{ background: "#363062", color: "white" }} onClick={previousPage}>Previous</Button> : <></>}
-                            {prelimApplications.prelimApplications.length >= 5 ? <Button variant='contained' sx={{ background: "#363062", color: 'white' }} onClick={nextPage}>Next</Button> : <></>}
-                        </Box>
+                                        </TableRow>
+                                    }) : <></>
+                                }
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Grid container sx={{ flexDirection: 'row', justifyContent: 'center', mt: '20px' }}>
+                        <Grid item>
+                            <Box >
+                                {pageInfo.pageNumber > 0 ? <Button variant='contained' sx={{ backgroundImage: "linear-gradient(to bottom right, #475eab, #00b6f0)", color: 'white', fontWeight: 700, mr: '20px' }} onClick={previousPage}><KeyboardDoubleArrowLeftIcon /> Previous</Button> : <></>}
+                                {prelimApplications.prelimApplications.length >= 5 ? <Button variant='contained' sx={{ backgroundImage: "linear-gradient(to bottom right, #475eab, #00b6f0)", color: 'white', fontWeight: 700 }} onClick={nextPage}>Next <KeyboardDoubleArrowRightIcon /></Button> : <></>}
+                            </Box>
+                        </Grid>
                     </Grid>
-                </Grid>
 
-                {openQueryModal ? <QueryResolutionModal
-                    isActive={openQueryModal}
-                    open={() => openModel(selectedRow)}
-                    close={closeModel}
-                    prelimDetails={selectedRow}
-                ></QueryResolutionModal>
-                    //investmentAssociateFormData={row}
+                    {openQueryModal ? <QueryResolutionModal
+                        isActive={openQueryModal}
+                        open={() => openModel(selectedRow)}
+                        close={closeModel}
+                        prelimDetails={selectedRow}
+                    ></QueryResolutionModal>
+                        //investmentAssociateFormData={row}
 
-                    //prelimApplicationId={props.row.prelimApplicationId} />
-                    : <></>}
+                        //prelimApplicationId={props.row.prelimApplicationId} />
+                        : <></>}
 
-                {openHistoryModal ? <HistoryModal
-                    isActive={openHistoryModal}
-                    open={() => openModelHistory(selectedRow)}
-                    close={closeModelHistory}
-                    prelimDetails={selectedRow}
-                ></HistoryModal>
-                    //investmentAssociateFormData={row}
+                    {openHistoryModal ? <HistoryModal
+                        isActive={openHistoryModal}
+                        open={() => openModelHistory(selectedRow)}
+                        close={closeModelHistory}
+                        prelimDetails={selectedRow}
+                    ></HistoryModal>
+                        //investmentAssociateFormData={row}
 
-                    //prelimApplicationId={props.row.prelimApplicationId} />
-                    : <></>}
-
-            </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
+                        //prelimApplicationId={props.row.prelimApplicationId} />
+                        : <></>}
+                </Container>
+            </> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
 
         </div>
     )
