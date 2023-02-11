@@ -30,7 +30,7 @@ const ChangePassword = (props:any) => {
     })
 
     function handleSubmitForm() {
-
+        setShowResponse(true)
         dispatch(
             changeUserPasswordAsync(
                 wrapArgument(actionUid, formData)

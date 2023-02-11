@@ -28,7 +28,8 @@ import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import fundImg from '../../images/fund.png'
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { updateStepperIndex } from './subsections/sideNavBarSlice'
-
+import { selectedDetailedApplications } from "../detailedApplication/sidbiReference/detailedApplicationSlice";
+import { selectUsers } from "../admin/adminSlice"
 
 const ColorlibStepIconRoot = styled('div')<{
     ownerState: { completed?: boolean; active?: boolean };
@@ -70,7 +71,7 @@ function ColorlibStepIcon(props: StepIconProps) {
         </ColorlibStepIconRoot>
     );
 }
-const steps = ['Preliminary Application', 'Detailed Application', 'Investment Theme of Fund', 'Detailed Engagement And Role of IM with Portfolio Companies', 'Illustration of carry distribution of the Fund'];
+let steps = ['Preliminary Application', 'Detailed Application', 'Investment Theme of Fund', 'Detailed Engagement And Role of IM with Portfolio Companies', 'Illustration of carry distribution of the Fund'];
 
 
 
@@ -86,6 +87,10 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
     const [parentId] = useState(Number(id))
     const [value, setValue] = React.useState(0);
     const [activeStepper, setActiveStepper] = React.useState(0);
+    const detailedApplicationState = useAppSelector(selectedDetailedApplications);
+    const usersState = useAppSelector(selectUsers)
+    const userRole = usersState.role;
+    const appliationStatus = detailedApplicationState[0]?.data[parentId]?.status
     const activeStepperIndex = useAppSelector(state => state.sideNavBarStore.activeStepper)
     const dispatch = useAppDispatch();
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -109,6 +114,14 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
         if (!id) {
             
            navigate(`/Detailed/NEW/SidbiReference`)
+        }
+    });
+
+    useEffect(() => {
+        if(userRole == 'ADMIN' && appliationStatus == 'SUBMITTED'){
+            steps = ['Illustration of carry distribution of the Fund']
+            liItems = ["carryDistribution"]
+            navigate(`/Detailed/${id}/carryDistribution`);
         }
     });
     return (

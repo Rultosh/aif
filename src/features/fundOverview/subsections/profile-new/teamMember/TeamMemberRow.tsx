@@ -79,19 +79,19 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    <TableRow key={teamMember.id}>
+                    <TableRow key={props.teamMember.id}>
                       <TableCell align="center" component="th" scope="row">
-                        {teamMember.name}
+                        {props.teamMember.name}
                       </TableCell>
-                      <TableCell align="center">{Moment(teamMember.dob).format("DD/MM/YYYY")}</TableCell>
-                      <TableCell align="center">{Moment(teamMember.dateofJoiningAMC).format("DD/MM/YYYY")}</TableCell>
-                      <TableCell align="center">{teamMember.location}</TableCell>
-                      <TableCell align="center">{teamMember.education}</TableCell>
-                      <TableCell align="center">{teamMember.yearsOfRelevantExp}</TableCell>
-                      <TableCell align="center">{teamMember.prevProfessionalExp}</TableCell>
-                      <TableCell align="center">{teamMember.keyPerson}</TableCell>
-                      <TableCell align="center">{teamMember.memberOfInvesteeCommitte}</TableCell>
-                      <TableCell align="center">{teamMember.directorship}</TableCell>
+                      <TableCell align="center">{Moment(props.teamMember.dob).format("DD/MM/YYYY")}</TableCell>
+                      <TableCell align="center">{Moment(props.teamMember.dateofJoiningAMC).format("DD/MM/YYYY")}</TableCell>
+                      <TableCell align="center">{props.teamMember.location}</TableCell>
+                      <TableCell align="center">{props.teamMember.education}</TableCell>
+                      <TableCell align="center">{props.teamMember.yearsOfRelevantExp}</TableCell>
+                      <TableCell align="center">{props.teamMember.prevProfessionalExp}</TableCell>
+                      <TableCell align="center">{props.teamMember.keyPerson}</TableCell>
+                      <TableCell align="center">{props.teamMember.memberOfInvesteeCommitte}</TableCell>
+                      <TableCell align="center">{props.teamMember.directorship}</TableCell>
                       <TableCell align="center">
                         <div style={{ display: 'flex' }}>
                           <Edit onClick={handleOpen} />&nbsp;
@@ -113,25 +113,25 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
                 {show ? <>
           <Grid item xs={12}>
             <Box sx={{ mt: 2, mb: 2 }}>
-              <InvestmentResponsibleAsLeadList teamMemberId={teamMember.id} />
+              <InvestmentResponsibleAsLeadList teamMemberId={props.teamMember.id} />
             </Box>
           </Grid>
 
           <Grid item xs={12}>
             <Box sx={{ mt: 2, mb: 2 }}>
-              <InvestmentResponsibleAsNonLeadList teamMemberId={teamMember.id} />
+              <InvestmentResponsibleAsNonLeadList teamMemberId={props.teamMember.id} />
             </Box>
           </Grid>
 
           <Grid item xs={12}>
             <Box sx={{ mt: 2, mb: 2 }}>
-              <CompanyContactDetailsList teamMemberId={teamMember.id} />
+              <CompanyContactDetailsList teamMemberId={props.teamMember.id} />
             </Box>
           </Grid>
 
           <Grid item xs={12}>
             <Box sx={{ mt: 2, mb: 2 }}>
-              <IndependentReferencesList parentId={teamMember.id} />
+              <IndependentReferencesList parentId={props.teamMember.id} />
             </Box>
           </Grid> </>:null}
 
@@ -140,7 +140,7 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
       </CardContent></Card>
   </Box>
     <TeamMemberModel
-      teamMember={teamMember}
+      teamMember={props.teamMember}
       open={open}
       onClose={setOpen} /></div>
 
