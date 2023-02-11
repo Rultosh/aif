@@ -1,20 +1,22 @@
-import { Modal, Box, Card, CardContent, Typography, Divider, TextField, Button, Grid } from "@mui/material";
+import React, * as Rect from 'react'
+import { Modal, Box, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { useNavigate } from "react-router-dom";
 import uuid from "react-uuid";
-import { defaultIHistory, IHistory } from "./IHistory";
-import { fetchHistoryAsync, postHistoryAsync, selecthistory } from './historySlice'
+import { defaultIQueryResolution, IQueryResolution } from "./IQueryResolution";
+import { fetchHistoryAsync, selecthistory } from './historySlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
+import Moment from 'moment';
 
-export const HistoryModal = (props: any) => {
+export const QueryResolutionModal = (props: any) => {
 
     const id = props?.prelimDetails?.id
-    const [formData, setFormData] = useState(defaultIHistory);
+    const [formData, setFormData] = useState(defaultIQueryResolution);
     const [formDataList, setFormDataList] = useState([] as any);
-    const state = useAppSelector(selecthistory)
+    const history = useAppSelector(selecthistory)
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
@@ -26,20 +28,20 @@ export const HistoryModal = (props: any) => {
             wrapArgument(actionUid, id)
         ))
 
-    }, [state.actionStatus.fetchStatus === FetchStatus.IDLE, state.status.fetchStatus == FetchStatus.IDLE])
-
-    function handleSubmit(){
+    }, [history])
+    // console.log(history)
+    // function handleSubmit(){
         
-        dispatch(postHistoryAsync(
-            wrapArgument(actionUid, formData)
-        ))
-        setFormData(defaultIHistory)
-    }
+    //     dispatch(postQuriesAsync(
+    //         wrapArgument(actionUid, formData)
+    //     ))
+    //     setFormData(defaultIQueryResolution)
+    // }
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
         let copiedValue = { ...formData }
-        copiedValue.history = ev.target.value;
+        copiedValue.query = ev.target.value;
         copiedValue.id = id;
         setFormData(copiedValue);
     };
@@ -56,6 +58,21 @@ export const HistoryModal = (props: any) => {
         p: 4,
     };
 
+    const tableHeaders = [
+        "Stage",
+        "Status",
+        "Created On",
+        "Remarks"]
+
+    let headerComponent = []
+
+    for (let i = 0; i < tableHeaders.length; i++) {
+        headerComponent.push(
+            <React.Fragment >
+                <TableCell align="center" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
+            </React.Fragment>)
+    }
+
     return <Modal
         open={props.open}
         onClose={props.close}
@@ -65,52 +82,25 @@ export const HistoryModal = (props: any) => {
     >
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-                <Card sx={{ display: 'flex', background: '#f2f2f2' }}>
-                    <CardContent sx={{ flex: 1 }}>
-                        {state?.histories?.map((q: IHistory) => (
-                            <Box sx={{ ml: 2 }}>
-                                <Typography variant="subtitle1" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mt: 2 }}>{q.history}</Typography>
-                                <Typography variant="caption" sx={{ flex: 1, color: '#363062', mb: 2 }}>{"by "+q.createdByName+" on " + q.createdOn}</Typography>
-                                <Divider sx={{ mb: 2 }} />
-                            </Box>
-                        ))}
-
-                    </CardContent>
-                </Card>
-
-                <Card sx={{ mt: 2, display: 'flex', background: '#f2f2f2' }}>
-                    <CardContent sx={{ flex: 1 }}>
-                        <Grid container xs={12}>
-                            <Grid item xs={11}>
-                                <TextField
-                                    required
-                                    id="history"
-                                    label="Add new History"
-                                    //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                    value={formData["history"] || ''}
-                                    variant="standard"
-                                    onChange={handleChange}
-
-                                    sx={{ display: 'flex', ml: 2 }}
-                                />
-                            </Grid>
-                            <Grid item xs={1}>
-                                <Button
-                                    onClick={handleSubmit}
-                                    //startIcon={<ArrowLeftIcon />}
-                                    variant="contained"
-                                    disableElevation
-                                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                                    Submit
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </CardContent>
-                </Card>
-
+                <TableContainer>
+                    <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                        <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
+                            <TableRow>
+                                {headerComponent}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {/* {
+                                state.history ? state.history.map((row) => {
+                                    return <>{row}</>
+                                }) : <></>
+                            } */}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Box>
         </Box>
     </Modal>
 }
 
-export default HistoryModal;
+export default QueryResolutionModal;

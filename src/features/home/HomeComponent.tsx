@@ -24,7 +24,6 @@ import greyImg from '../../images/grey.png'
 import { selectUsers } from '../admin/adminSlice'
 import { IPrelimApplicationData } from '../fundOverview/subsections/fundOverviewData/IPrelimApplicationData';
 import Moment from 'moment';
-import { fetchHistoryAsync, selecthistory } from './historySlice';
 import {CheckAuth} from '../../app/api';
 import { useNavigate } from 'react-router-dom';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
@@ -43,7 +42,6 @@ export const Home = (pros:any) => {
     const state = useAppSelector(selectedDetailedApplications);
     const dispatch = useAppDispatch();
     const prelimApplications = useAppSelector(selectPrelimApplication);
-    const applicationHistory = useAppSelector(selecthistory);
     const [openQueryModal, setOpenQueryModal] = useState(false);
     const [openHistoryModal, setOpenHistoryModal] = useState(false);
     const [selectedRow, setSelectedRow] = useState({} as any);
@@ -71,9 +69,6 @@ export const Home = (pros:any) => {
     function openModelHistory(row: any) {
         setSelectedRowHistory(row.id)
         setOpenHistoryModal(true);
-        dispatch(fetchHistoryAsync(wrapArgument(
-            actionUid, String(row.id)
-        )))
     }
 
     function closeModel() {

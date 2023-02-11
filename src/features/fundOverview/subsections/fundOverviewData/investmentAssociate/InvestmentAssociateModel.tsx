@@ -40,8 +40,14 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
       )
       setInvestmentAssociateFormData({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
     }
+    handleCloseModal();
+  }
+
+  const handleCloseModal = () => {
+    reset();
     props.handleClose();
   }
+
 
   useEffect(() => {
     setInvestmentAssociateFormData({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
@@ -110,7 +116,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
   return <Modal
     open={props.open}
-    onClose={props.handleClose}
+    onClose={handleCloseModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
   >

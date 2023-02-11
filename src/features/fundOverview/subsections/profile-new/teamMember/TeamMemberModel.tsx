@@ -405,42 +405,21 @@ console.log(teamMember)
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>
-                <FormControl variant="standard" sx={{ display: 'flex' }}>
-                  <InputLabel id="demo-simple-select-standard-label">Directorship Held</InputLabel>
-                  <Controller
-                    name="directorship"
-                    control={control}
-                    defaultValue={null}
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error, invalid }
-                    }) => (
-                      console.log(invalid && (getValues("directorship") || '')),
-                      (
-                        <>
-                          <Select
-                            labelId="directorship"
-                            id="directorship"
-                            value={teamMember.directorship}
-                            onChange={handleChange}
-                            name="directorship"
-                            // defaultValue={teamMember["directorship"] === undefined ? " " : teamMember["directorship"]}
-                            error={invalid && (getValues("directorship") == null) ? true : false}
-                          >
+                <TextField
+                  required
+                  id="directorship"
+                  label="Directorship Held"
+                  value={teamMember.directorship}
+                  {...register("directorship")}
+                  error={(errors.directorship && getValues("directorship") == '') ? true : false}
+                  variant="standard"
+                  onChange={handleChange}
 
-                            <MenuItem key={"Yes"} value={"Yes"} selected={teamMember.directorship == "Yes"}>Yes</MenuItem>
-                            <MenuItem key={"No"} value={"No"} selected={teamMember.directorship == "No"}>No</MenuItem>
-                          </Select>
-                          {invalid && (getValues("directorship") == null) ? <FormHelperText>
-                            <Typography variant="caption" color="error" sx={{ ml: '10px' }}>
-                              <>{errors.directorship?.message}</>
-                            </Typography>
-                          </FormHelperText> : <></>}
-                        </>
-                      )
-                    )}
-                  />
-                </FormControl>
+                  sx={{ display: 'flex' }}
+                />
+                <Typography variant="caption" color="error">
+                  <>{(errors.directorship && getValues("directorship") == '')?errors.directorship.message : ''}</>
+                </Typography>
               </Grid>
               <Grid item xs={4.5}>
                 {/* <TextField

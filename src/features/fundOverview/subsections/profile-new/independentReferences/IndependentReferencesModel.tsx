@@ -230,7 +230,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     // }}
 
                     sx={{ display: 'flex' }}
-                    inputProps={{ maxLength: 10 }}
+                    inputProps={{ maxLength: 15 }}
                   />
                   <Typography variant="caption" color="error">
                     <>{(errors.telephoneNo) ? errors.telephoneNo.message : ''}</>

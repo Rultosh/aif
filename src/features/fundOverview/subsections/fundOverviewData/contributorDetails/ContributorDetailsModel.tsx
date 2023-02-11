@@ -41,6 +41,11 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
       )
       setContributorDetailsFormData({ ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId })
     }
+    handleCloseModal();
+  }
+
+  const handleCloseModal = () => {
+    reset();
     props.handleClose();
   }
 
@@ -112,7 +117,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
   return <Modal
     open={props.open}
-    onClose={props.handleClose}
+    onClose={handleCloseModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
   >
