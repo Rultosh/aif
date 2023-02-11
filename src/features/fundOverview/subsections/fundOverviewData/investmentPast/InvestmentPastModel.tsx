@@ -52,6 +52,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       )
       setinvestmentPastFormData({ ...props.investmentPastFormData, prelimApplicationId: props.prelimApplicationId })
     }
+    handleCloseModal();
+  }
+
+  const handleCloseModal = () => {
+    reset();
     props.handleClose();
   }
 
@@ -120,7 +125,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
 
   return <Modal
     open={props.open}
-    onClose={props.handleClose}
+    onClose={handleCloseModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
   >

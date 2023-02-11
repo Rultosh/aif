@@ -54,6 +54,11 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       )
       setInvestmentPartnerFormData({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
     }
+    handleCloseModal();
+  }
+
+  const handleCloseModal = () => {
+    reset();
     props.handleClose();
   }
 
@@ -122,7 +127,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
   return <Modal
     open={props.open}
-    onClose={props.handleClose}
+    onClose={handleCloseModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
   >
