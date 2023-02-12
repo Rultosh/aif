@@ -149,6 +149,15 @@ console.log(prelimApplications.prelimApplication);
         )))
     }
 
+    const isGoodToShowApplication = (row: IPrelimApplicationData) => {
+        let role = usersState.role;
+        if (row.status === 'SUBMITTED' && role == 'ADMIN')
+            return true
+        if (['REVISE','CREATED'].includes(String(row.status)) && role == 'USER')
+            return true
+        return false
+    }
+
     const getStatusImg = (row: IPrelimApplicationData) => {
         if (row.status == 'REJECTED') {
             return redImg
@@ -231,9 +240,9 @@ console.log(prelimApplications.prelimApplication);
                                         prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
                                             return <TableRow key={`${row.nameOfTheFund}`}>
                                                 {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row">
-                                                    {row.status != 'REJECTED' ?<a href={`/preliminary/${row.id}/${String(getPath(row.status))}`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
+                                                    {isGoodToShowApplication(row) ?<a href={`/preliminary/${row.id}/${String(getPath(row.status))}`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
                                                 </TableCell> : <TableCell align="center" component="th" scope="row">
-                                                    {!(['APPROVED','REJECTED'].includes(String(row.status))) ? <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
+                                                    {isGoodToShowApplication(row) ? <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
                                                 </TableCell>}
                                                 <TableCell align="center">{row.investmentManager}</TableCell>
                                                 <TableCell align="center">{String(getStatusDescription(row.stage, row.status))}</TableCell>
