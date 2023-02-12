@@ -986,7 +986,7 @@ export const CarryDistribution = (props: any) => {
 
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                                {!(prilimFormData.status == 'SUBMITTED') ? <Button
+                                {!(prilimFormData.status == 'SUBMITTED') ? <><Button
                                     //onClick={(e) => handleClickSave(e, "submit")}
                                     // onClick={handleClickSubmit}
                                     onClick={handleClickSubmit}
@@ -997,7 +997,20 @@ export const CarryDistribution = (props: any) => {
                                     disableElevation
                                     sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
                                     Submit
-                                </Button> : ['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') ?
+                                </Button> 
+                                <Button
+                                    //onClick={(e) => handleClickSave(e, "submit")}
+                                    // onClick={handleClickSubmit}
+                                    onClick={handleSave}
+                                    //endIcon={<ArrowRightIcon />}
+                                    id='submit'
+                                    color='success'
+                                    variant="contained"
+                                    disableElevation
+                                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
+                                    Save
+                                </Button>
+                                </>: ['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') ?
 
                                     <>
                                         <Button color='success' id='approve' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >

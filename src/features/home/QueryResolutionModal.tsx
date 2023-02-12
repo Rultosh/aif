@@ -8,6 +8,7 @@ import { defaultIQueryResolution, IQueryResolution } from "./IQueryResolution";
 import { fetchQuriesAsync, postQuriesAsync, selectqueryResolution } from './queryResolutionSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
+import { selectUsers } from '../admin/adminSlice'
 
 export const QueryResolutionModal = (props: any) => {
 
@@ -18,6 +19,7 @@ export const QueryResolutionModal = (props: any) => {
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
+    const usersState = useAppSelector(selectUsers)
 
 
     useEffect(() => {
@@ -65,7 +67,10 @@ export const QueryResolutionModal = (props: any) => {
     >
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
+            <Typography variant="subtitle1" sx={{ flex: 1,fontWeight: 'bolder', color: '#363062', mb: 2 }}>{"To: " +  (usersState.role === 'ADMIN' ? props?.prelimDetails?.createdByName || "User" : 'VCF ADMIN')}</Typography>
+            <Divider sx={{ mb: 2 }} />
                 <Card sx={{ display: 'flex', background: '#f2f2f2' }}>
+                    
                     <CardContent sx={{ flex: 1 }}>
                         {state?.queries?.map((q: IQueryResolution) => (
                             <Box sx={{ ml: 2 }}>
@@ -85,7 +90,7 @@ export const QueryResolutionModal = (props: any) => {
                                 <TextField
                                     required
                                     id="query"
-                                    label="Add new Query"
+                                    label={usersState.role == 'USER' ? "Add a new Query" : "Provide a Resolution for the Query"}
                                     //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                     value={formData["query"] || ''}
                                     variant="standard"
