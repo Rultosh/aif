@@ -27,6 +27,8 @@ import { selectUsers } from '../../admin/adminSlice'
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import InputAdornment from '@mui/material/InputAdornment';
+import { isAllDocsAvailable } from '../../fundOverview/subsections/preview/docsMandateApi'
+import { ModalComponent } from '../../../components/ModalComponent'
 
 export const CarryDistribution = (props: any) => {
 
@@ -50,15 +52,16 @@ export const CarryDistribution = (props: any) => {
     const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
     const usersState = useAppSelector(selectUsers)
     const [deleteClicked, setDeleteClicked] = useState(false);
+    const [showResponse, setShowResponse] = useState(false);
 
     //const prelimApplicationId = detailedApplicationState.
 
     useEffect(() => {
-        if(props.checkUnAuth){
+        if (props.checkUnAuth) {
             navigate('/login')
         }
     })
-    
+
 
     useEffect(() => {
         dispatch(updateStepperIndex(4))
@@ -119,7 +122,7 @@ export const CarryDistribution = (props: any) => {
                 //setFormDataDetailsList(newData)
             }
         }
-        else if(detailsState[parentId]?.data != undefined &&  Object.keys(detailsState[parentId]?.data).length == 0){
+        else if (detailsState[parentId]?.data != undefined && Object.keys(detailsState[parentId]?.data).length == 0) {
             setFormDataDetailsList([] as any)
         }
     }, [detailsState[parentId]?.data])
@@ -232,21 +235,23 @@ export const CarryDistribution = (props: any) => {
         return sum
     }
 
-        //Distribution Amouunt
-        const getDisAmount = () => {
-            let sum = ((Number(formData?.catchupAmount) || 0) + (Number(formData.carryAmount) || 0))
-            console.log(sum)
-            return sum
-        }
-    
-        //Balance Distribution Amouunt
-        const getDisBalanceAmount = () => {
-            let sum = ((Number(formData?.catchupBalance) || 0) + (Number(formData.carryBalance) || 0))
-            console.log(sum)
-            return sum
-        }
+    //Distribution Amouunt
+    const getDisAmount = () => {
+        let sum = ((Number(formData?.catchupAmount) || 0) + (Number(formData.carryAmount) || 0))
+        console.log(sum)
+        return sum
+    }
 
-    
+    //Balance Distribution Amouunt
+    const getDisBalanceAmount = () => {
+        let sum = ((Number(formData?.catchupBalance) || 0) + (Number(formData.carryBalance) || 0))
+        console.log(sum)
+        return sum
+    }
+
+    const handleClose= () => {
+        setShowResponse(false)
+    };
 
 
     const handleClickSave = (ev: any, navTo: string) => {
@@ -262,21 +267,40 @@ export const CarryDistribution = (props: any) => {
         setCommentPreview(ev.target.value)
     };
 
+    
 
-    function handleClickSubmit(ev: any) {
-        console.log("prelimId", parentId)
-        handleSave()
-        dispatch(
-            createApplicationAsync(
-                wrapArgument(
-                    actionId, { id: Number(prilimFormData.prelimApplicationId), statusComments: commentPreview, status: ev.target.id }
+    async function handleClickSubmit(ev: any) {
+        if (await checkAllDocsOk(parentId, "detailed")) {
+            console.log("prelimId", parentId)
+            handleSave()
+            dispatch(
+                createApplicationAsync(
+                    wrapArgument(
+                        actionId, { id: Number(prilimFormData.prelimApplicationId), statusComments: commentPreview, status: ev.target.id }
+                    )
                 )
-            )
-        );
-        navigate('/home')
+            );
+            navigate('/home')
+        }
+        else {
+            setShowResponse(true);
+        }
     }
 
-
+    async function checkAllDocsOk(id: any, applicationName: any) {
+        try {
+            const res = await isAllDocsAvailable(id, applicationName)
+            if (res.status === 200) {
+                return true
+            }
+            else {
+                return false
+            }
+        } catch (reason) {
+            console.log(reason);
+            return false
+        }
+    }
 
     let carryDetailsComponent = []
     if (formDataDetailsList != undefined) {
@@ -330,7 +354,7 @@ export const CarryDistribution = (props: any) => {
 
                         <Grid item xs={1} >
                             <IconButton onClick={(e) => handleDeleteDetails(e, formDataDetailsList[keysArr[i]])}>
-                            <CloseIcon className="remove_icon" sx={{  hover: 'blue' }} ></CloseIcon>
+                                <CloseIcon className="remove_icon" sx={{ hover: 'blue' }} ></CloseIcon>
                             </IconButton>
                             {/*<Button
                                 //onClick={(e) => handleClickSave(e, "previous")}
@@ -360,37 +384,37 @@ export const CarryDistribution = (props: any) => {
                     <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Illustration of carry distribution of the Fund</Typography>
 
                     <Divider sx={{ mt: 2 }} />{usersState.role == 'USER' ? <>
-                    <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
-                        <CardContent sx={{ flex: 1 }}>
-                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>Carry Distribution</Typography>
-                            <Grid container spacing={3}>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        id="corpus"
-                                        label="Corpus[Rs. In crore]"
-                                        //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["corpus"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
+                        <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
+                            <CardContent sx={{ flex: 1 }}>
+                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>Carry Distribution</Typography>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            id="corpus"
+                                            label="Corpus[Rs. In crore]"
+                                            //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
+                                            value={formData["corpus"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="hurdle"
-                                        label="Hurdle (%)"
-                                        //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["hurdle"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
+                                            sx={{ display: 'flex', ml: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="hurdle"
+                                            label="Hurdle (%)"
+                                            //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
+                                            value={formData["hurdle"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
-                                    />
-                                    {/*<FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
+                                            sx={{ display: 'flex', ml: 2, mb: 2 }}
+                                        />
+                                        {/*<FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Hurdle</InputLabel>
 
                                         <MasterData propertyType="fundManager"
@@ -398,22 +422,22 @@ export const CarryDistribution = (props: any) => {
                                             //propertyValue={formData.hurdle || 0}
                                             onChange={handleSelectChange} />
     </FormControl>*/}
-                                </Grid>
+                                    </Grid>
 
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="catchup"
-                                        label="Catchup(%)"
-                                        //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["catchup"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="catchup"
+                                            label="Catchup(%)"
+                                            //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
+                                            value={formData["catchup"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
-                                    />
-                                    {/*}
+                                            sx={{ display: 'flex', ml: 2, mb: 2 }}
+                                        />
+                                        {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Catchup(%)</InputLabel>
 
@@ -421,22 +445,22 @@ export const CarryDistribution = (props: any) => {
                                             propertyValue={Number(formData.catchup) || 0}
                                             onChange={handleSelectChange} />
 </FormControl>*/}
-                                </Grid>
+                                    </Grid>
 
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="carry"
-                                        label="Carry(%)"
-                                        //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["carry"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="carry"
+                                            label="Carry(%)"
+                                            //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
+                                            value={formData["carry"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
-                                    />
-                                    {/*}
+                                            sx={{ display: 'flex', ml: 2, mb: 2 }}
+                                        />
+                                        {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Carry(%)</InputLabel>
 
@@ -445,22 +469,22 @@ export const CarryDistribution = (props: any) => {
                                             //propertyValue={formData.fundManager || 0}
                                             onChange={handleSelectChange} />
 </FormControl>*/}
-                                </Grid>
+                                    </Grid>
 
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="profit"
-                                        label="Profit to investors(%)"
-                                        //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["profit"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="profit"
+                                            label="Profit to investors(%)"
+                                            //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
+                                            value={formData["profit"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
-                                    />
-                                    {/*}
+                                            sx={{ display: 'flex', ml: 2, mb: 2 }}
+                                        />
+                                        {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, mt: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Profit to investors(%)</InputLabel>
 
@@ -469,23 +493,23 @@ export const CarryDistribution = (props: any) => {
                                             //propertyValue={formData.fundManager || 0}
                                             onChange={handleSelectChange} />
 </FormControl>*/}
-                                </Grid>
+                                    </Grid>
 
-                                <Grid item xs={6}>
+                                    <Grid item xs={6}>
 
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="corpusAssumed"
-                                        label="Distributable corpus assumed for illustration[Rs. Crore]"
-                                        //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                        value={formData["corpusAssumed"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="corpusAssumed"
+                                            label="Distributable corpus assumed for illustration[Rs. Crore]"
+                                            //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
+                                            value={formData["corpusAssumed"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
 
-                                        sx={{ display: 'flex', ml: 2, mb: 2 }}
-                                    />
-                                    {/*}
+                                            sx={{ display: 'flex', ml: 2, mb: 2 }}
+                                        />
+                                        {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, mt: 2, display: 'flex' }}>
                                         <InputLabel id="demo-simple-select-standard-label">Distributable corpus assumed for illustration[Rs. Crore]</InputLabel>
 
@@ -494,461 +518,461 @@ export const CarryDistribution = (props: any) => {
                                             //propertyValue={formData.fundManager || 0}
                                             onChange={handleSelectChange} />
 </FormControl> */}
-                                </Grid>
-                            </Grid>
-
-                            <Divider sx={{ mt: 7, mb: 2 }} />
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}></Grid>
-                                <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Amount</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Balance Amount</Typography>
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>1.Capital to Investors (Rs. Crore)</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="capitalAmount"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["capitalAmount"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="capitalBalance"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["capitalBalance"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>2.Hurdle to the Investors (…….% on Capital to Investors) – Rs. Crore</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="hurdleAmount"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["hurdleAmount"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="hurdleBalance"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["hurdleBalance"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>3.Catchup to Fund Manager (…….% on Hurdle to Investors) – Rs. Crore</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="catchupAmount"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["catchupAmount"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="catchupBalance"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["catchupBalance"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>4.Profit to the Investors(..% after catch up i.e, 80% on Rs..cr)– Rs. Crore</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="profitAmount"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["profitAmount"] || ''}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="profitBalance"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["profitBalance"]}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>5.Carry to Fund Manager (…….% on Rs ………………… crore) – Rs. Crore</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="carryAmount"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["carryAmount"]}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="carryBalance"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={formData["carryBalance"]}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}></Grid>
-                                <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + getAmount()}</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getBalanceAmount()}</Typography>
+                                    </Grid>
                                 </Grid>
 
-                            </Grid>
+                                <Divider sx={{ mt: 7, mb: 2 }} />
 
-                            <Divider sx={{ mt: 2 }} />
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>6.Profit to Investors (2+4) ) – Rs. Crore</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="profittoInvestorsAmount"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={Number(formData.hurdleAmount || 0) + Number(formData.profitAmount || 0)}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="profittoInvestors"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={Number(formData.hurdleBalance || 0) + Number(formData.profitBalance || 0)}
-                                        variant="standard"
-                                        // onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>7.Distribution/Carry with Catchup to IM (3+5) ) – Rs. Crore</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="distributionAmount"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={Number(formData.catchupAmount || 0) + Number(formData.carryAmount || 0)}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        required
-                                        type="number"
-                                        id="distribution"
-                                        //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                        value={Number(formData.catchupBalance || 0) + Number(formData.carryBalance || 0)}
-                                        variant="standard"
-                                        onChange={handleChange}
-
-                                        sx={{ display: 'flex', mt: 2, mb: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}></Grid>
-                                <Grid item xs={3}>
-                                    
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + (getProfitOfInvestors() + getDisAmount())}</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getBalanceProfitOfInvestors() + getDisBalanceAmount()}</Typography>
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}></Grid>
+                                    <Grid item xs={3}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Amount</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Balance Amount</Typography>
+                                    </Grid>
                                 </Grid>
 
-                            </Grid>
-
-                            <Divider sx={{ mt: 2 }} />
-
-                            <Grid container spacing={6} >
-                                <Grid item xs={6}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Distribution of Carry:</Typography>
-                                </Grid>
-                                <Grid item xs={2.5}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Carry%</Typography>
-
-                                </Grid>
-                                <Grid item xs={2.5}>
-                                    <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Out of Rs crore Carry</Typography>
-
-                                </Grid>
-                            </Grid>
-                            {carryDetailsComponent}
-
-                            {detailsState[parentId]?.status[actionId]?.actionStatus.fetchStatus == 'idle' ?
                                 <Grid container spacing={6} >
                                     <Grid item xs={6}>
-                                        <TextField
-                                            required
-                                            id="distribution"
-                                            label=""
-                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                            value={newformDataDetails["distribution"]}
-                                            variant="standard"
-                                            onChange={handleNewChange}
-
-                                            sx={{ display: 'flex', mt: 2, ml: 2 }}
-                                        />
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>1.Capital to Investors (Rs. Crore)</Typography>
                                     </Grid>
-                                    <Grid item xs={2.5}>
+                                    <Grid item xs={3}>
                                         <TextField
                                             required
                                             type="number"
-                                            id="percent"
-                                            label="%"
+                                            id="capitalAmount"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                            value={newformDataDetails["percent"]}
+                                            value={formData["capitalAmount"] || ''}
                                             variant="standard"
-                                            onChange={handleNewChange}
+                                            onChange={handleChange}
 
-                                            sx={{ display: 'flex', mb: 2 }}
-                                            InputProps={{
-                                                endAdornment: <>%</>,
-                                            }}
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
                                         />
                                     </Grid>
-
-                                    <Grid item xs={2.5}>
+                                    <Grid item xs={3}>
                                         <TextField
                                             required
                                             type="number"
-                                            id="carryOutOfCrore"
-                                            label=" "
+                                            id="capitalBalance"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
-                                            value={newformDataDetails["carryOutOfCrore"]}
+                                            value={formData["capitalBalance"] || ''}
                                             variant="standard"
-                                            onChange={handleNewChange}
+                                            onChange={handleChange}
 
-                                            sx={{ display: 'flex', mb: 2 }}
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
                                         />
                                     </Grid>
+                                </Grid>
 
-                                    <Grid item xs={1} >
-                                    <IconButton onClick={handleSaveDetails}>
-                                        <AddIcon className="add_icon" sx={{ mt: 2, hover: 'blue' }} ></AddIcon>
-                                        </IconButton>
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>2.Hurdle to the Investors (…….% on Capital to Investors) – Rs. Crore</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="hurdleAmount"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={formData["hurdleAmount"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="hurdleBalance"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={formData["hurdleBalance"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>3.Catchup to Fund Manager (…….% on Hurdle to Investors) – Rs. Crore</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="catchupAmount"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={formData["catchupAmount"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="catchupBalance"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={formData["catchupBalance"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>4.Profit to the Investors(..% after catch up i.e, 80% on Rs..cr)– Rs. Crore</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="profitAmount"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={formData["profitAmount"] || ''}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="profitBalance"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={formData["profitBalance"]}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>5.Carry to Fund Manager (…….% on Rs ………………… crore) – Rs. Crore</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="carryAmount"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={formData["carryAmount"]}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="carryBalance"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={formData["carryBalance"]}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}></Grid>
+                                    <Grid item xs={3}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + getAmount()}</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getBalanceAmount()}</Typography>
                                     </Grid>
 
                                 </Grid>
-                                : <></>}
 
-                        </CardContent>
-                    </Card>
-                    
-                    <Divider sx={{ mt: 2 }} />
+                                <Divider sx={{ mt: 2 }} />
 
-                    <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
-                        <CardContent sx={{ flex: 1 }}>
-                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>Attachment Of Signed Document</Typography>
-                            <Typography variant='body2' sx={{ flex: 1, color: '#363062', mb: 2, mt: 5 }}>* If application is in revision state Please download all pdf, copy sign it again and upload it then procced to submit.</Typography>
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>6.Profit to Investors (2+4) ) – Rs. Crore</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="profittoInvestorsAmount"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={Number(formData.hurdleAmount || 0) + Number(formData.profitAmount || 0)}
+                                            variant="standard"
+                                            onChange={handleChange}
 
-                            <Card sx={{ display: 'flex', mt: 3, background: '#ffffff' }}>
-                                <CardContent sx={{ flex: 1 }}>
-                                    <Toolbar disableGutters sx={{ mt: -2, ml: -2, mr: -2, justifyContent: "center", backgroundColor: '#d9d9d9' }}>
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="profittoInvestors"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={Number(formData.hurdleBalance || 0) + Number(formData.profitBalance || 0)}
+                                            variant="standard"
+                                            // onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>7.Distribution/Carry with Catchup to IM (3+5) ) – Rs. Crore</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="distributionAmount"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={Number(formData.catchupAmount || 0) + Number(formData.carryAmount || 0)}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <TextField
+                                            required
+                                            type="number"
+                                            id="distribution"
+                                            //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                            value={Number(formData.catchupBalance || 0) + Number(formData.carryBalance || 0)}
+                                            variant="standard"
+                                            onChange={handleChange}
+
+                                            sx={{ display: 'flex', mt: 2, mb: 2 }}
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}></Grid>
+                                    <Grid item xs={3}>
+
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{"Total " + (getProfitOfInvestors() + getDisAmount())}</Typography>
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>{getBalanceProfitOfInvestors() + getDisBalanceAmount()}</Typography>
+                                    </Grid>
+
+                                </Grid>
+
+                                <Divider sx={{ mt: 2 }} />
+
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Distribution of Carry:</Typography>
+                                    </Grid>
+                                    <Grid item xs={2.5}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Carry%</Typography>
+
+                                    </Grid>
+                                    <Grid item xs={2.5}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Out of Rs crore Carry</Typography>
+
+                                    </Grid>
+                                </Grid>
+                                {carryDetailsComponent}
+
+                                {detailsState[parentId]?.status[actionId]?.actionStatus.fetchStatus == 'idle' ?
+                                    <Grid container spacing={6} >
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                required
+                                                id="distribution"
+                                                label=""
+                                                //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                                value={newformDataDetails["distribution"]}
+                                                variant="standard"
+                                                onChange={handleNewChange}
+
+                                                sx={{ display: 'flex', mt: 2, ml: 2 }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={2.5}>
+                                            <TextField
+                                                required
+                                                type="number"
+                                                id="percent"
+                                                label="%"
+                                                //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                                value={newformDataDetails["percent"]}
+                                                variant="standard"
+                                                onChange={handleNewChange}
+
+                                                sx={{ display: 'flex', mb: 2 }}
+                                                InputProps={{
+                                                    endAdornment: <>%</>,
+                                                }}
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={2.5}>
+                                            <TextField
+                                                required
+                                                type="number"
+                                                id="carryOutOfCrore"
+                                                label=" "
+                                                //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
+                                                value={newformDataDetails["carryOutOfCrore"]}
+                                                variant="standard"
+                                                onChange={handleNewChange}
+
+                                                sx={{ display: 'flex', mb: 2 }}
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={1} >
+                                            <IconButton onClick={handleSaveDetails}>
+                                                <AddIcon className="add_icon" sx={{ mt: 2, hover: 'blue' }} ></AddIcon>
+                                            </IconButton>
+                                        </Grid>
+
+                                    </Grid>
+                                    : <></>}
+
+                            </CardContent>
+                        </Card>
+
+                        <Divider sx={{ mt: 2 }} />
+
+                        <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
+                            <CardContent sx={{ flex: 1 }}>
+                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>Attachment Of Signed Document</Typography>
+                                <Typography variant='body2' sx={{ flex: 1, color: '#363062', mb: 2, mt: 5 }}>* If application is in revision state Please download all pdf, copy sign it again and upload it then procced to submit.</Typography>
+
+                                <Card sx={{ display: 'flex', mt: 3, background: '#ffffff' }}>
+                                    <CardContent sx={{ flex: 1 }}>
+                                        <Toolbar disableGutters sx={{ mt: -2, ml: -2, mr: -2, justifyContent: "center", backgroundColor: '#d9d9d9' }}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={6}>
+                                                    <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Section Name</Typography>
+
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Download unsigned document</Typography>
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Upload signed document</Typography>
+                                                </Grid>
+                                            </Grid>
+                                        </Toolbar>
                                         <Grid container spacing={2}>
                                             <Grid item xs={6}>
-                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Section Name</Typography>
-
+                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 4 }}>Detailed Application</Typography>
                                             </Grid>
                                             <Grid item xs={3}>
-                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Download unsigned document</Typography>
+                                                <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
+                                                </Box>
                                             </Grid>
                                             <Grid item xs={3}>
-                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2, ml: 2 }}>Upload signed document</Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Toolbar>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={6}>
-                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 4 }}>Detailed Application</Typography>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                            <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
-                                            </Box>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                {/* <Grid item xs={3}> */}
+                                                <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
+                                                    {/* <Grid item xs={3}> */}
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryDetailedApplication${parentId}`} signed={true}></UploadComponents>
                                                     </div>
-                                                {/* </Grid> */}
-                                            </Box>
+                                                    {/* </Grid> */}
+                                                </Box>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                    <Divider sx={{ mt: 2 }} />
+                                        <Divider sx={{ mt: 2 }} />
 
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={6}>
-                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 4 }}>Investment Theme of Fund</Typography>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={6}>
+                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 4 }}>Investment Theme of Fund</Typography>
 
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                            <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadInvestmentThemeOfFundPreview?access_token=${localStorage.getItem('token')}`)} />
-                                            </Box>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                {/* <Grid item xs={3}> */}
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadInvestmentThemeOfFundPreview?access_token=${localStorage.getItem('token')}`)} />
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
+                                                    {/* <Grid item xs={3}> */}
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryInvestmentThemeOfFund${parentId}`} signed={true}></UploadComponents>
                                                     </div>
-                                                {/* </Grid> */}
-                                            </Box>
+                                                    {/* </Grid> */}
+                                                </Box>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                    <Divider sx={{ mt: 2 }} />
+                                        <Divider sx={{ mt: 2 }} />
 
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={6}>
-                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 4 }}>Detailed engagement and role of IM with Portfolio Companies</Typography>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={6}>
+                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 4 }}>Detailed engagement and role of IM with Portfolio Companies</Typography>
 
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                            <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadEngagementAndRolePreview?access_token=${localStorage.getItem('token')}`)} />
-                                            </Box>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                {/* <Grid item xs={3}> */}
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadEngagementAndRolePreview?access_token=${localStorage.getItem('token')}`)} />
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
+                                                    {/* <Grid item xs={3}> */}
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryDetailedEngagement${parentId}`} signed={true}></UploadComponents>
                                                     </div>
-                                                {/* </Grid> */}
-                                            </Box>
+                                                    {/* </Grid> */}
+                                                </Box>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                    <Divider sx={{ mt: 2 }} />
+                                        <Divider sx={{ mt: 2 }} />
 
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={6}>
-                                            <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 4 }}>Illustration of carry distribution of the Fund</Typography>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={6}>
+                                                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 4 }}>Illustration of carry distribution of the Fund</Typography>
 
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                            <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadCarryDistributionPreview?access_token=${localStorage.getItem('token')}`)} />
-                                            </Box>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                                                {/* <Grid item xs={3}> */}
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
+                                                    <FileDownloadIcon onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${parentId}/downloadCarryDistributionPreview?access_token=${localStorage.getItem('token')}`)} />
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
+                                                    {/* <Grid item xs={3}> */}
                                                     <div style={{ margin: "15px" }}>
                                                         <UploadComponents id={`carryIllustration${parentId}`} signed={true}></UploadComponents>
                                                     </div>
-                                                {/* </Grid> */}
-                                            </Box>
+                                                    {/* </Grid> */}
+                                                </Box>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                    <Divider sx={{ mt: 2 }} />
+                                        <Divider sx={{ mt: 2 }} />
 
 
-                                </CardContent>
-                            </Card>
-                        </CardContent>
-                    </Card> </>: <></>}
+                                    </CardContent>
+                                </Card>
+                            </CardContent>
+                        </Card> </> : <></>}
                     <Grid container xs={12}>
                         <Grid item xs={12}>
                             <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
@@ -973,7 +997,7 @@ export const CarryDistribution = (props: any) => {
                                 startIcon={<ArrowLeftIcon />}
                                 variant="contained"
                                 disableElevation
-                                disabled= {!(usersState.role == 'USER')}
+                                disabled={!(usersState.role == 'USER')}
                                 sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                 Back
                             </Button>
@@ -997,20 +1021,20 @@ export const CarryDistribution = (props: any) => {
                                     disableElevation
                                     sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
                                     Submit
-                                </Button> 
-                                <Button
-                                    //onClick={(e) => handleClickSave(e, "submit")}
-                                    // onClick={handleClickSubmit}
-                                    onClick={handleSave}
-                                    //endIcon={<ArrowRightIcon />}
-                                    id='submit'
-                                    color='success'
-                                    variant="contained"
-                                    disableElevation
-                                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
-                                    Save
                                 </Button>
-                                </>: ['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') ?
+                                    <Button
+                                        //onClick={(e) => handleClickSave(e, "submit")}
+                                        // onClick={handleClickSubmit}
+                                        onClick={handleSave}
+                                        //endIcon={<ArrowRightIcon />}
+                                        id='submit'
+                                        color='success'
+                                        variant="contained"
+                                        disableElevation
+                                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
+                                        Save
+                                    </Button>
+                                </> : ['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') ?
 
                                     <>
                                         <Button color='success' id='approve' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
@@ -1026,6 +1050,16 @@ export const CarryDistribution = (props: any) => {
                             </Box>
                         </Grid>
                     </Grid>
+                    {showResponse ? <ModalComponent
+                        open={showResponse}
+                        close={handleClose}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                        className="special_modal"
+                        msg={"Please upload all Documents before submitting the Application"}
+                        status={"error"}
+                    >
+                    </ModalComponent> : <></>}
                 </CardContent>
             </Card>
         </Grid>
