@@ -404,7 +404,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             required
                             type="number"
                             id="contributionSought"
-                            label="Contribution sought(INR crores)"
+                            label="Contribution sought(₹ crores)"
                             value={prelimApplicationFormData.contributionSought || ''}
                             {...register("contributionSought")}
                             error={errors.contributionSought && getValues("contributionSought") == '' ? true : false}
@@ -434,7 +434,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             required
                             type="number"
                             id="termOfFund"
-                            label="Term of the Fund (No. of months from final closing)"
+                            label="Term of the Fund (No. of months from first closing)"
                             {...register("termOfFund")}
                             error={errors.termOfFund && getValues("termOfFund") ==  '' ? true : false}
                             value={prelimApplicationFormData.termOfFund || ''}
@@ -471,7 +471,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             required
                             type="number"
                             id="preferredReturn"
-                            label="Preferred Return/Hurdle Rate p.a. Per Tax(%)"
+                            label="Preferred Return/Hurdle Rate p.a. Pre Tax(%)"
                             value={prelimApplicationFormData.preferredReturn || ''}
                             {...register("preferredReturn")}
                             error={errors.preferredReturn && getValues("preferredReturn") ==  '' ? true : false}
@@ -611,7 +611,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                     required
                                                     type="number"
                                                     id="sdDescription"
-                                                    label="Capital raised till date (INR Crore)"
+                                                    label="Capital raised till date (₹ Crore)"
                                                     value={prelimApplicationFormData.sdDescription || ''}
                                                     {...register("sdDescription")}
                                                     error={errors.sdDescription && getValues("sdDescription") == '' ? true : false}
@@ -679,7 +679,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdTotalTargetCorpus"
-                                                label="Total Target Corpus (INR Crore)"
+                                                label="Total Target Corpus (₹ Crore)"
                                                 value={prelimApplicationFormData.sdTotalTargetCorpus || ''}
                                                 {...register("sdTotalTargetCorpus")}
                                                 error={errors.sdTotalTargetCorpus && getValues("sdTotalTargetCorpus") ==  '' ? true : false}
@@ -746,7 +746,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdGreenShoeTotalTargetCorpus"
-                                                label="Total Target Corpus (INR Crore)"
+                                                label="Total Target Corpus (₹ Crore)"
                                                 value={prelimApplicationFormData.sdGreenShoeTotalTargetCorpus || ''}
                                                 {...register("sdGreenShoeTotalTargetCorpus")}
                                                 error={errors.sdGreenShoeTotalTargetCorpus && getValues("sdGreenShoeTotalTargetCorpus") ==  '' ? true : false}
@@ -908,33 +908,26 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                             {Number(prelimAppicationId) ?
                                                 <Grid item xs={12}>
                                                     <Grid container spacing={2}>
-                                                        <Grid item xs={3} justifyContent="center" alignItems="center">
+                                                        <Grid item xs="auto">
 
                                                             <DocumentChip
                                                                 label="Pvt. Placement Memorandum"
                                                                 id={`sdPvtPlacementMemorandum${prelimAppicationId}`} /> 
                                                         </Grid>
-                                                        <Grid item xs={3} justifyContent="center" alignItems="center">
+                                                        <Grid item xs="auto">
                                                             <DocumentChip
                                                                 label="IM Agreement"
                                                                 id={`sdImAgreement${prelimAppicationId}`} />
                                                         </Grid>
-                                                        <Grid item xs={3} justifyContent="center" alignItems="center">
+                                                        <Grid item xs="auto">
                                                             <DocumentChip
                                                                 label="Trust Deed"
                                                                 id={`sdTrustDeal${prelimAppicationId}`} />
                                                         </Grid>
-                                                        <Grid item xs={3} justifyContent="center" alignItems="center">
+                                                        <Grid item xs="auto">
                                                             <DocumentChip
                                                                 label="SEBI Certificate"
                                                                 id={`sdSEBICertificate${prelimAppicationId}`} />
-                                                            {/* <DocumentChip 
-                                                        label="SEBI Certificate" 
-                                                        id="sdSEBICertificate"
-                                                        onSuccess={handleDocumentUpload}
-                                                        onDelete={handleDocumentDelete}
-                                                        url={prelimApplicationFormData.sdSEBICertificate} /> */}
-                                                            {/* <Chip label="SEBI Certificate" size="medium" sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} /> */}
                                                         </Grid>
                                                     </Grid>
                                                 </Grid> : <Grid item xs={12}>Please save the form to upload documents</Grid>}

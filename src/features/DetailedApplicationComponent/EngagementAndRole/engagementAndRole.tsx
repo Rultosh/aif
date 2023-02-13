@@ -118,7 +118,7 @@ export const EngagementAndRole = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2, mt: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed Engagement And Role Of IM With The Portfolio Companies</Typography>
+                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Detailed engagement and role of IM with the portfolio companies</Typography>
 
                     <Divider sx={{ mt: 2 }} />
                     <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>

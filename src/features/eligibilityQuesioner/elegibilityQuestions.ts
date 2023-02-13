@@ -7,7 +7,7 @@ export const questions = {
       {
         "id": 2,
         "text":"What is your Fund Target Size?",
-        "options": [{"id":1,"text":"<= Rs 300 crore"},{"id":2,"text":">Rs 300 & <= Rs 500 crore"},{"id":3,"text":">Rs 500 & <= Rs 750 crore"},{"id":4,"text":">Rs 750 & <= Rs 1000 crore"},{"id":5,"text":">Rs 1000 crore"}]
+        "options": [{"id":1,"text":"<= ₹ 300 crore"},{"id":2,"text":">₹ 300 & <= ₹ 500 crore"},{"id":3,"text":">₹ 500 & <= ₹ 750 crore"},{"id":4,"text":">₹ 750 & <= ₹ 1000 crore"},{"id":5,"text":">₹ 1000 crore"}]
       },
       {
         "id": 3,
@@ -15,7 +15,7 @@ export const questions = {
       },
       {
         "id": 4,
-        "text":"Does your Fund agree to invest at least twice the amount of contribution sought from Fund of Funds for Startups (FFS) into Startups? <br> <br> For instance, if contribution sought is Rs 100 crore, Fund should invest at least Rs 200 crore in Startups as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)" 
+        "text":"Does your Fund agree to invest at least twice the amount of contribution sought from Fund of Funds for Startups (FFS) into Startups? <br> <br> For instance, if contribution sought is ₹ 100 crore, Fund should invest at least ₹ 200 crore in Startups as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)" 
       },
       {
         "id": 5,
@@ -38,7 +38,7 @@ export const questions = {
       {
         "id": 2,
         "text":"What is your Fund Target Size?",
-        "options": [{"id":1,"text":"<= Rs 300 crore"},{"id":2,"text":">Rs 300 & <= Rs 500 crore"},{"id":3,"text":">Rs 500 & <= Rs 750 crore"},{"id":4,"text":">Rs 750 & <= Rs 1000 crore"},{"id":5,"text":">Rs 1000 crore"}]
+        "options": [{"id":1,"text":"<= ₹ 300 crore"},{"id":2,"text":">₹ 300 & <= ₹ 500 crore"},{"id":3,"text":">₹ 500 & <= ₹ 750 crore"},{"id":4,"text":">₹ 750 & <= ₹ 1000 crore"},{"id":5,"text":">₹ 1000 crore"}]
       },
       {
         "id": 3,
@@ -54,7 +54,7 @@ export const questions = {
       },
       {
         "id": 6,
-        "text":"Does your Fund agree to invest at least twice the amount of contribution sought from Aspire Fund into Startups/early stage enterprises under Micro,Small and Medium Enterprises(MSME) category, out of which equivalent amount of Fund shall be invested in the agro and rural focused start-ups or early stage enterprises under MSME category?<br> <br> *For instance, if contribution sought is Rs 100 crore, Fund should invest at least Rs 200 crore in MSME as defined under MSMED Act,2006 further out of which, 100 crores shall be invested in the agro and rural focused Start-ups/ early stage enterprises under MSME category)" 
+        "text":"Does your Fund agree to invest at least twice the amount of contribution sought from Aspire Fund into Startups/early stage enterprises under Micro,Small and Medium Enterprises(MSME) category, out of which equivalent amount of Fund shall be invested in the agro and rural focused start-ups or early stage enterprises under MSME category?<br> <br> *For instance, if contribution sought is ₹ 100 crore, Fund should invest at least ₹ 200 crore in MSME as defined under MSMED Act,2006 further out of which, 100 crores shall be invested in the agro and rural focused Start-ups/ early stage enterprises under MSME category)" 
       },
       {
         "id": 7,
@@ -74,7 +74,7 @@ export const questions = {
       {
         "id": 2,
         "text":"What is your Fund Target Size?",
-        "options": [{"id":1,"text":"<= Rs 300 crore"},{"id":2,"text":">Rs 300 & <= Rs 500 crore"},{"id":3,"text":">Rs 500 & <= Rs 750 crore"},{"id":4,"text":">Rs 750 & <= Rs 1000 crore"},{"id":5,"text":">Rs 1000 crore"}]
+        "options": [{"id":1,"text":"<= ₹ 300 crore"},{"id":2,"text":">₹ 300 & <= ₹ 500 crore"},{"id":3,"text":">₹ 500 & <= ₹ 750 crore"},{"id":4,"text":">₹ 750 & <= ₹ 1000 crore"},{"id":5,"text":">₹ 1000 crore"}]
       },
       {
         "id": 3,
@@ -90,7 +90,7 @@ export const questions = {
       },
       {
         "id": 6,
-        "text":"Does your Fund agree to invest at least 1.5 times the amount of contribution sought from Up Start-up Fund into Startups?<br> <br> *For instance, if contribution sought is Rs 100 crore, Fund should invest at least Rs 150 crore in the Startups as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)" 
+        "text":"Does your Fund agree to invest at least 1.5 times the amount of contribution sought from Up Start-up Fund into Startups?<br> <br> *For instance, if contribution sought is ₹ 100 crore, Fund should invest at least ₹ 150 crore in the Startups as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)" 
       },
       {
         "id": 7,

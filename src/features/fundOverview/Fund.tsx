@@ -105,7 +105,7 @@ export const Fund = (props:any) => {
                                 expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
                             >
                                 <Typography sx={{ color: 'white' }}>
-                                    2. Details of Investment team(at Partner level)
+                                    2. Details of Investment team(At partner level)
                                 </Typography>
 
                             </AccordionSummary>

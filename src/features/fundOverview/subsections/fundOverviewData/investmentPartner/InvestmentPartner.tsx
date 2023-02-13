@@ -62,7 +62,7 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
         setOpen(false)
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
-    const tableHeaders = ["Name", "Designation", "Age", "Qualification", "VC/ PE Experience", "Details of the Companies Invested", "Action"]
+    const tableHeaders = ["Name", "Designation", "Age", "Qualification", "VC/ PE Experience", "Brief Details of VC/PE Experience", "Action"]
 
     let headerComponent = []
 

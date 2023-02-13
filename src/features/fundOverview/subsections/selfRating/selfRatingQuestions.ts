@@ -3,7 +3,7 @@ export const questions = {
       {
         "id": 1,
         "text":"Sponsor's (only those Sponsor(s) having direct involvement in the Fund) / IM's Commitment to the proposed Fund" ,
-        "options":[">=10% of corpus", ">=5% but less than 10% of corpus", ">=2.50% but less than 5% corpus", "Lower of 2.50% or Rs.5 Cr of corpus as per SEBI Regulations"],
+        "options":[">=10% of corpus", ">=5% but less than 10% of corpus", ">=2.50% but less than 5% corpus", "Lower of 2.50% or ₹5 Cr of corpus as per SEBI Regulations"],
         "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
@@ -17,14 +17,14 @@ export const questions = {
     {
         "id": 3,
         "text":"Aggregate Investment / Entreprenuership experience of investment team members(other than Partners / Directors) of Fund Manager" ,
-        "options":["More than 10 years", "More than 5 years but upto 10 years", "More than 3 years but upto 5 years < 40%", "Upto 3 years / No related experience"],
+        "options":["More than 10 years", "More than 5 years but upto 10 years", "More than 3 years but upto 5 years", "Upto 3 years / No related experience"],
         "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
         "id": 4,
         "text":"Average Investment experience of Partners/Directors of Fund Manager" ,
-        "options":["More than 20 years", "More than 15 years but upto 20 years", "More than 10 years but upto 15 years < 40%", "Upto 10 years/No related experience"],
+        "options":["More than 20 years", "More than 15 years but upto 20 years", "More than 10 years but upto 15 years", "Upto 10 years/No related experience"],
         "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
@@ -59,7 +59,7 @@ export const questions = {
     {
         "id": 9,
         "text":"Profile of Auditors engaged/proposed to be engaged by the Fund" ,
-        "options":["Big 4 Auditors/propose to engage 1 of Big 4 auditors", "Not form Big 4 list, but reputed auditors", "Not so reputed names"],
+        "options":["Big 5 Auditors/propose to engage one of Big 5 auditors", "Not form Big 5 list, but reputed auditors", "Not so reputed names"],
         "size":6,
         'weightage':[1,0.6,0.3]
     },

@@ -288,7 +288,7 @@ export const DetailedApplication2I = (props: any) => {
                             </Toolbar>
                             <Grid container spacing={2}>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 4 }}>Balance Sheet</Typography>
+                                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 4 }}>Investment Manager</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
@@ -322,7 +322,7 @@ export const DetailedApplication2I = (props: any) => {
 
                             <Grid container spacing={2}>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 4 }}>Income & Expenditure (P&LA/c) of Sponsor</Typography>
+                                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 4 }}>Sponsor</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
@@ -390,7 +390,7 @@ export const DetailedApplication2I = (props: any) => {
 
                             <Grid container spacing={2}>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 4 }}>Asset Management Company</Typography>
+                                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 4 }}>Present Fund</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
@@ -423,7 +423,7 @@ export const DetailedApplication2I = (props: any) => {
                             <Divider sx={{ mt: 2 }} />
                             <Grid container spacing={2}>
                                 <Grid item xs={3}>
-                                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 4 }}>Previous Fund(s) & Present Fund</Typography>
+                                    <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 4 }}>Previous Fund(s)</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Box sx={{ mb: 2, mt: 4, ml: 2 }}>

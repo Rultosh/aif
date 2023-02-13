@@ -337,7 +337,7 @@ export const DetailedApplication2B = (props: any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >14. Are all contributors governed by same team and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor(along with reasons)</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >14. Are all contributors governed by same term and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor(along with reasons)</Typography>
                             <TextField
                                 required
                                 id="contribTerms"

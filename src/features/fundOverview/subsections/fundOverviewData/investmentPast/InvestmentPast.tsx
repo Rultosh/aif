@@ -58,7 +58,7 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
     const tableHeaders = [
         "Name Of Company", 
         "Sector", 
-        "Amount Invested(INR Crore)", 
+        "Amount Invested(₹ Crore)", 
         "Date Of Investment", 
         "Brief Profile",
         "Action"]
