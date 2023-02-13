@@ -40,7 +40,7 @@ export const ProfileNew = (props:any) => {
           {/*<Card sx={{ mt: 4, backgroundColor: "#363062" }}>
               <CardContent >*/}
           <Box sx={{ mb: 2 }}>
-            <TeamMemberList />
+            <TeamMemberList checkUnAuth={props.checkUnAuth}/>
           </Box>
           {/*</CardContent>
             </Card>
