@@ -900,7 +900,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 <UploadIcon />
                                                 <Typography
                                                     variant="subtitle1"
-                                                    sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>
+                                                    sx={{ flex: 1, ml: '10px', mb: '10px', textAlign: "left", fontWeight: 'bold' }}>
                                                     Supporting Documents
                                                     <span style={{ fontWeight: "normal" }}>
                                                         (Max. file size 5 MB each)</span> </Typography>
@@ -909,7 +909,6 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 <Grid item xs={12}>
                                                     <Grid container spacing={2}>
                                                         <Grid item xs="auto">
-
                                                             <DocumentChip
                                                                 label="Pvt. Placement Memorandum"
                                                                 id={`sdPvtPlacementMemorandum${prelimAppicationId}`} /> 

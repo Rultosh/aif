@@ -89,7 +89,7 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
                                     {investmentPastsState.investmentPasts && investmentPastsState.investmentPasts.length > 0?
                                         investmentPastsState.investmentPasts.map((row: IInvestmentPast) => (
                                             <InvestmentPastRow row={row}/>
-                                    )):<TableRow><TableCell colSpan={7}>Now rows to display.</TableCell></TableRow>
+                                    )):<TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
                                     }
                                 </TableBody>:<TableBody>
                                     <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>

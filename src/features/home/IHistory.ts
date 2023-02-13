@@ -1,23 +1,19 @@
 import { IEntity } from "../../lib/api-wrappers/IEntity";
 
 export interface IHistory extends IEntity {
-  createdBy: string | undefined,
-  createdByName: string | undefined,
+  status: string | undefined,
+  stage: string | undefined,
   createdOn: string | undefined,
-  updatedBy: string | undefined,
-  updatedOn: string | undefined,
-  query: string | undefined,
-  
-  
+  remarks: string | undefined,
+  history: string | undefined,
 }
 
 export const defaultIHistory : IHistory = {
   id: undefined,
   parentId: undefined,
-  createdBy: undefined,
-  createdByName: undefined,
+  status: undefined,
+  stage: undefined,
   createdOn: undefined,
-  updatedBy: undefined,
-  updatedOn: undefined,
-  query: undefined,
+  remarks: undefined,
+  history: undefined,
 }

@@ -1,9 +1,10 @@
 import api from "../../app/api";
+import { IHistory } from "./IHistory";
 
-export function getHistory(selectedRow:string) {
+export function getHistory(id:string) {
   return api({
     method: 'get',
-    url: `api/application/${selectedRow}/statuses`
+    url: `api/application/${id}/statuses`
   });
 }
 

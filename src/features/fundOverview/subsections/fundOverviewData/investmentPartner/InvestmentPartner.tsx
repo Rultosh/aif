@@ -90,7 +90,7 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
                                     {investmentPartnersState.investmentPartners && investmentPartnersState.investmentPartners.length > 0?
                                         investmentPartnersState.investmentPartners.map((row: IInvestmentPartner) => (
                                             <InvestmentPartnerRow row={row}/>
-                                    )):<TableRow><TableCell colSpan={7}>Now rows to display.</TableCell></TableRow>
+                                    )):<TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
                                     }
                                 </TableBody>:<TableBody>
                                     <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
