@@ -67,7 +67,7 @@ export const Home = (pros:any) => {
     }
 
     function openModelHistory(row: any) {
-        setSelectedRowHistory(row.id)
+        setSelectedRowHistory(row)
         setOpenHistoryModal(true);
     }
 
@@ -326,9 +326,9 @@ console.log(prelimApplications.prelimApplication);
 
                     {openHistoryModal ? <HistoryModal
                         isActive={openHistoryModal}
-                        open={() => openModelHistory(selectedRow)}
+                        open={() => openModelHistory(selectedRowHistory)}
                         close={closeModelHistory}
-                        prelimDetails={selectedRow}
+                        prelimDetails={selectedRowHistory}
                     ></HistoryModal>
                         //investmentAssociateFormData={row}
 

@@ -84,7 +84,7 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
                                     {contributorDetailsState.contributorDetails && contributorDetailsState.contributorDetails.length > 0?
                                         contributorDetailsState.contributorDetails.map((row: IContributorDetails) => (
                                             <ContributorDetailsRow row={row}/>
-                                    )):<TableRow><TableCell colSpan={7}>Now rows to display.</TableCell></TableRow>
+                                    )):<TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
                                     }
                                     
                                     {contributorDetailsState.contributorDetails && contributorDetailsState.contributorDetails.length > 0?
