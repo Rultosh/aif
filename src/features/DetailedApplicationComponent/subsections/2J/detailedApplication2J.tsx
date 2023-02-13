@@ -105,7 +105,7 @@ export const DetailedApplication2J = (props: any) => {
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>J. KYC Details and Undertakings</Typography>
 
-                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>53. Details of Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, I nvestment/Management Team to be provided in the format attached (Annexure I) for verification of Defaulter's Checklist.</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>53. Details of Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment/Management Team to be provided in the format attached (Annexure I) for verification of Defaulter's Checklist.</Typography>
                     <Grid container xs={12}>
                         <Grid item xs={4}>
                             <Button
@@ -140,7 +140,7 @@ export const DetailedApplication2J = (props: any) => {
                         </Grid>
                     </Grid>
                     <Divider sx={{ mt: 2 }} />
-                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>54. Whether provision of the connected lending by the select all-India Financial Institutions (Fls) of RBI vide letter dated December 21, 2002 attracted? (Annexure II).</Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>54. Whether provision of the connected lending by the select All India Financial Institution (AIFI) of RBI vide letter dated December 21, 2002 attracted? (Annexure II).</Typography>
                     <Grid container xs={12}>
                         <Grid item xs={4}>
                             <Button

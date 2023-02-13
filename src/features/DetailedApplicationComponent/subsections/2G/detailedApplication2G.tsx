@@ -226,7 +226,7 @@ export const DetailedApplication2G = (props:any) => {
                     </Card>
                     <Divider sx={{ mt: 2 }} />
 
-                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>35. Please attach CVs of the MD / CEO / CIO / CFO / Investment Manager(s) / Key personnel of the Investment Manager (anyone drawing CTC of more than Rs.24 lakh p.a.) </Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 4 }}>35. Please attach CVs of the MD / CEO / CIO / CFO / Investment Manager(s) / Key personnel of the Investment Manager (anyone drawing CTC of more than ₹24 lakh p.a.) </Typography>
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>

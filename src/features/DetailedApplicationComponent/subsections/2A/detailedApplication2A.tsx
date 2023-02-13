@@ -97,12 +97,12 @@ export const DetailedApplication2A = (props:any) => {
     let listItem = ['Please upload the files following convention as "FundName_Documentname_Date" for file (Include date in filename if relevent to the document) ', "Please fill up / answer all the points to the extent possible.", "Receipt of the information does not in any way bind / commits SIDBI to sanction assistance to the VC / PE fund, which will be considered on the merits of the case.", "If any of the points are covered in the Private Placement Memorandum (PPM), then please give reference to the relevant paragraph / page number of the PPM.", "Please upload the copy of supporting documents. Please ensure any single file is not more than 5MB.", "If there are more than one document against a specific question, please zip the relevant documents and upload the zipped file.", "Answers may be specific. Please avoid vague answers."];
 
     const validationSchema = Yup.object().shape({
-        domesticAmount1: Yup.string().required("Domestic is required"),
-        internationalAmount1: Yup.string().required("International is required"),
-        totalAmount1: Yup.string().required("Total is required"),
-        domesticAmount2: Yup.string().required("Domestic is required"),
-        internationalAmount2: Yup.string().required("International is required"),
-        totalAmount2: Yup.string().required("Total is required"),
+        domesticAmount1: Yup.string().required("This value is required"),
+        internationalAmount1: Yup.string().required("This value is required"),
+        totalAmount1: Yup.string().required("This value is required"),
+        domesticAmount2: Yup.string().required("This value is required"),
+        internationalAmount2: Yup.string().required("This value is required"),
+        totalAmount2: Yup.string().required("This value is required"),
         detailOfFundLife: Yup.string().required("Detail of Fund Life is required"),
         investmentPeriod: Yup.string().required("Investment Period is required"),
         targetReturnOfTheFund: Yup.string().required("Target Return Of The Fund is required"),
@@ -188,14 +188,14 @@ export const DetailedApplication2A = (props:any) => {
                     <Card sx={{ display: 'flex', mb: 2, background: '#bfbbdd' }}>
                         <CardContent sx={{ flex: 1 }}>
                             <Grid container spacing={2}>
-                                <Grid item xs={2}>
+                                <Grid item xs="auto">
                                     <Button 
                                         href="/templates/SIDBI ASF-FFS Detailed Application.pdf"
                                         sx={{ background: "#363062", color: "white" 
                                     }} >Click here</Button>
                                 </Grid>
-                                <Grid item xs={10}>
-                                    <Box sx={{ justifyContent: "center", ml: -6, mt: 1 }}>
+                                <Grid item xs="auto">
+                                    <Box sx={{ justifyContent: "center", mt: 1 }}>
                                         <Typography variant="body2" sx={{ flex: 1, color: '#363062' }}>To view the Detailed Application format to assess the data required for submission.</Typography>
                                     </Box>
                                 </Grid>
@@ -205,27 +205,38 @@ export const DetailedApplication2A = (props:any) => {
                     <Divider sx={{ mt: 6 }} />
 
                     <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2, mt: 2 }}>A. Key Features of the Fund</Typography>
-                    <Typography variant="body2" sx={{ flex: 1, color: '#363062' }}>1. Target corpus (Rs Crores). Please provide provision for Green shoe (if any) </Typography>
+                    <Typography variant="body2" sx={{ flex: 1, color: '#363062' }}>1. Target corpus (₹ Crores). Please provide provision for Green shoe (if any) </Typography>
 
                     <Card sx={{ display: 'flex', mb: 4, mt: 1 }}>
                         <CardContent sx={{ flex: 1 }}>
-                            <Grid container xs={12} spacing={2}>
-                                <Grid item xs={4}>
-                                    <Toolbar disableGutters sx={{ justifyContent: 'center', mt: -2, mr: -2, ml: -2, color: 'white', backgroundColor: '#363062' }}>
+                            <Grid container xs={12} spacing={0} sx={{ mb: 4 }}>
+                                <Grid item xs={3}>
+                                    <Toolbar disableGutters sx={{ justifyContent: 'center', color: 'white', backgroundColor: '#363062' }}>
+                                    </Toolbar>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <Toolbar disableGutters sx={{ justifyContent: 'center', color: 'white', backgroundColor: '#363062' }}>
                                         Domestic
                                     </Toolbar>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <Toolbar disableGutters sx={{ justifyContent: 'center', mt: -2, mr: -2, ml: -2, color: 'white', backgroundColor: '#363062' }}>
+                                <Grid item xs={3}>
+                                    <Toolbar disableGutters sx={{ justifyContent: 'center', color: 'white', backgroundColor: '#363062' }}>
                                         International
                                     </Toolbar>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <Toolbar disableGutters sx={{ justifyContent: 'center', mt: -2, mr: -2, color: 'white', backgroundColor: '#363062' }}>
+                                <Grid item xs={3}>
+                                    <Toolbar disableGutters sx={{ justifyContent: 'center', color: 'white', backgroundColor: '#363062' }}>
                                         Total
                                     </Toolbar>
                                 </Grid>
-                                <Grid item xs={4}>
+                            </Grid>
+                            <Grid container xs={12} spacing={3}>
+                                <Grid item xs={3}>
+                                    <Toolbar disableGutters sx={{ justifyContent: 'center', fontWeight: '700' }}>
+                                        Target Corpus
+                                    </Toolbar>
+                                </Grid>
+                                <Grid item xs={3}>
                                     <TextField
                                         required
                                         id="domesticAmount1"
@@ -243,7 +254,7 @@ export const DetailedApplication2A = (props:any) => {
                                         <>{errors.domesticAmount1 && getValues("domesticAmount1") == ''? errors.domesticAmount1.message : ''}</>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <TextField
                                         required
                                         id="internationalAmount1"
@@ -254,13 +265,13 @@ export const DetailedApplication2A = (props:any) => {
                                         value={formData["internationalAmount1"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
-                                        sx={{ display: 'flex', mb: 2, ml: 2 }}
+                                        sx={{ display: 'flex', mb: 2 }}
                                     />
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.internationalAmount1 && getValues("internationalAmount1") == ''? errors.internationalAmount1.message : ''}</>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <TextField
                                         required
                                         id="totalAmount1"
@@ -271,17 +282,22 @@ export const DetailedApplication2A = (props:any) => {
                                         value={formData["totalAmount1"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
-                                        sx={{ display: 'flex', mb: 2, ml: 2 }}
+                                        sx={{ display: 'flex', mb: 2 }}
                                     />
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.totalAmount1 && getValues("totalAmount1") == ''? errors.totalAmount1.message : ''}</>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
+                                    <Toolbar disableGutters sx={{ justifyContent: 'center', fontWeight: '700' }}>
+                                        Greenshoe
+                                    </Toolbar>
+                                </Grid>
+                                <Grid item xs={3}>
                                     <TextField
                                         required
                                         id="domesticAmount2"
-                                        label="Green shoe Response to question is required"
+                                        label="Response to question is required"
                                         {...register("domesticAmount2")}
                                         error={errors.domesticAmount2 && getValues("domesticAmount2") == '' ? true : false}
                                         //defaultValue={formData.domesticAmount2 === undefined ? " " : formData["domesticAmount2"]}
@@ -294,35 +310,35 @@ export const DetailedApplication2A = (props:any) => {
                                         <>{errors.domesticAmount2 && getValues("domesticAmount2") == ''? errors.domesticAmount2.message : ''}</>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <TextField
                                         required
                                         id="internationalAmount2"
-                                        label="Green shoe Response to question is required"
+                                        label="Response to question is required"
                                         {...register("internationalAmount2")}
                                         error={errors.internationalAmount2 && getValues("internationalAmount2") == '' ? true : false}
                                         //defaultValue={formData.internationalAmount2 === undefined ? " " : formData["internationalAmount2"]}
                                         value={formData["internationalAmount2"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
-                                        sx={{ display: 'flex', mb: 2, ml: 2 }}
+                                        sx={{ display: 'flex', mb: 2 }}
                                     />
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.internationalAmount2 && getValues("internationalAmount2") == ''? errors.internationalAmount2.message : ''}</>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <TextField
                                         required
                                         id="totalAmount2"
-                                        label="Green shoe Response to question is required"
+                                        label="Response to question is required"
                                         {...register("totalAmount2")}
                                         error={errors.totalAmount2 && getValues("totalAmount2") == '' ? true : false}
                                         //defaultValue={formData.totalAmount2 === undefined ? " " : formData["totalAmount2"]}
                                         value={formData["totalAmount2"] || ''}
                                         variant="standard"
                                         onChange={handleChange}
-                                        sx={{ display: 'flex', mb: 2, ml: 2 }}
+                                        sx={{ display: 'flex', mb: 2 }}
                                     />
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.totalAmount2 && getValues("totalAmount2") == ''? errors.totalAmount2.message : ''}</>

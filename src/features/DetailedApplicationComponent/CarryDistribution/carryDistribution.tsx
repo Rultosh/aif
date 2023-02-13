@@ -392,7 +392,7 @@ export const CarryDistribution = (props: any) => {
                                         <TextField
                                             required
                                             id="corpus"
-                                            label="Corpus[Rs. In crore]"
+                                            label="Corpus[₹ In crore]"
                                             //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
                                             value={formData["corpus"] || ''}
                                             variant="standard"
@@ -501,7 +501,7 @@ export const CarryDistribution = (props: any) => {
                                             required
                                             type="number"
                                             id="corpusAssumed"
-                                            label="Distributable corpus assumed for illustration[Rs. Crore]"
+                                            label="Distributable corpus assumed for illustration[₹ Crore]"
                                             //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
                                             value={formData["corpusAssumed"] || ''}
                                             variant="standard"
@@ -511,7 +511,7 @@ export const CarryDistribution = (props: any) => {
                                         />
                                         {/*}
                                     <FormControl variant="standard" sx={{ ml: 2, mt: 2, display: 'flex' }}>
-                                        <InputLabel id="demo-simple-select-standard-label">Distributable corpus assumed for illustration[Rs. Crore]</InputLabel>
+                                        <InputLabel id="demo-simple-select-standard-label">Distributable corpus assumed for illustration[₹ Crore]</InputLabel>
 
                                         <MasterData propertyType="fundManager"
                                             propertyValue={0}
@@ -535,7 +535,7 @@ export const CarryDistribution = (props: any) => {
 
                                 <Grid container spacing={6} >
                                     <Grid item xs={6}>
-                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>1.Capital to Investors (Rs. Crore)</Typography>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>1.Capital to Investors (₹ Crore)</Typography>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
@@ -567,7 +567,7 @@ export const CarryDistribution = (props: any) => {
 
                                 <Grid container spacing={6} >
                                     <Grid item xs={6}>
-                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>2.Hurdle to the Investors (…….% on Capital to Investors) – Rs. Crore</Typography>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>2.Hurdle to the Investors (…….% on Capital to Investors) – ₹ Crore</Typography>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
@@ -599,7 +599,7 @@ export const CarryDistribution = (props: any) => {
 
                                 <Grid container spacing={6} >
                                     <Grid item xs={6}>
-                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>3.Catchup to Fund Manager (…….% on Hurdle to Investors) – Rs. Crore</Typography>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>3.Catchup to Fund Manager (…….% on Hurdle to Investors) – ₹ Crore</Typography>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
@@ -630,7 +630,7 @@ export const CarryDistribution = (props: any) => {
 
                                 <Grid container spacing={6} >
                                     <Grid item xs={6}>
-                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>4.Profit to the Investors(..% after catch up i.e, 80% on Rs..cr)– Rs. Crore</Typography>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>4.Profit to the Investors(..% after catch up i.e, 80% on ₹.cr)– ₹ Crore</Typography>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
@@ -662,7 +662,7 @@ export const CarryDistribution = (props: any) => {
 
                                 <Grid container spacing={6} >
                                     <Grid item xs={6}>
-                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>5.Carry to Fund Manager (…….% on Rs ………………… crore) – Rs. Crore</Typography>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>5.Carry to Fund Manager (…….% on ₹ ………………… crore) – ₹ Crore</Typography>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
@@ -707,7 +707,7 @@ export const CarryDistribution = (props: any) => {
 
                                 <Grid container spacing={6} >
                                     <Grid item xs={6}>
-                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>6.Profit to Investors (2+4) ) – Rs. Crore</Typography>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>6.Profit to Investors (2+4) ) – ₹ Crore</Typography>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
@@ -739,7 +739,7 @@ export const CarryDistribution = (props: any) => {
 
                                 <Grid container spacing={6} >
                                     <Grid item xs={6}>
-                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>7.Distribution/Carry with Catchup to IM (3+5) ) – Rs. Crore</Typography>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, ml: 2, justifyContent: 'center' }}>7.Distribution/Carry with Catchup to IM (3+5) ) – ₹ Crore</Typography>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
@@ -792,7 +792,7 @@ export const CarryDistribution = (props: any) => {
 
                                     </Grid>
                                     <Grid item xs={2.5}>
-                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Out of Rs crore Carry</Typography>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Out of ₹ crore Carry</Typography>
 
                                     </Grid>
                                 </Grid>

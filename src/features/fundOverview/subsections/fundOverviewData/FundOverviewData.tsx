@@ -304,7 +304,7 @@ export const FundOverviewData = () => {
                     <TextField
                         required
                         id="contribution"
-                        label="Contribution sought(INR crores)"
+                        label="Contribution sought(₹ crores)"
                         defaultValue={formValue["contribution"] === undefined ? " " : formValue["contribution"]}
                         value={formValue["contribution"]}
                         variant="standard"
@@ -531,7 +531,7 @@ export const FundOverviewData = () => {
                                         <TextField
                                             required
                                             id="totalCorpus"
-                                            label="Total Target Corpus (INR Crore)"
+                                            label="Total Target Corpus (₹ Crore)"
                                             defaultValue={formValue["totalCorpus"] === undefined ? " " : formValue["totalCorpus"]}
                                             value={formValue["totalCorpus"]}
                                             variant="standard"
