@@ -1,21 +1,18 @@
-import React, * as Rect from 'react'
-import { Modal, Box, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Modal, Box, TableContainer, Table, TableHead, TableRow, TableBody, TableCell } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import uuid from "react-uuid";
-import { defaultIQueryResolution, IQueryResolution } from "./IQueryResolution";
+import { IHistory } from "./IHistory";
 import { fetchHistoryAsync, selecthistory } from './historySlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
-import Moment from 'moment';
-import { selectUsers } from '../admin/adminSlice';
+import { selectUsers } from '../admin/adminSlice'
+import React, * as Rect from 'react'
 
-export const QueryResolutionModal = (props: any) => {
+export const HistoryModal = (props: any) => {
 
     const id = props?.prelimDetails?.id
-    const [formData, setFormData] = useState(defaultIQueryResolution);
-    const [formDataList, setFormDataList] = useState([] as any);
-    const history = useAppSelector(selecthistory)
+    const state = useAppSelector(selecthistory)
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const usersState = useAppSelector(selectUsers)
@@ -27,23 +24,7 @@ export const QueryResolutionModal = (props: any) => {
             wrapArgument(actionUid, id)
         ))
 
-    }, [history])
-    // console.log(history)
-    // function handleSubmit(){
-        
-    //     dispatch(postQuriesAsync(
-    //         wrapArgument(actionUid, formData)
-    //     ))
-    //     setFormData(defaultIQueryResolution)
-    // }
-
-    const handleChange = (ev: any) => {
-        ev.preventDefault();
-        let copiedValue = { ...formData }
-        copiedValue.query = ev.target.value;
-        copiedValue.id = id;
-        setFormData(copiedValue);
-    };
+    }, [state.actionStatus.fetchStatus === FetchStatus.IDLE, state.status.fetchStatus == FetchStatus.IDLE])
 
     const style = {
         position: 'absolute' as 'absolute',
@@ -82,24 +63,31 @@ export const QueryResolutionModal = (props: any) => {
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
                 <TableContainer>
-                    <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
-                        <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
+                     <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                         <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
+                             <TableRow>
+                                 {headerComponent}
+                             </TableRow>
+                         </TableHead>
+                         <TableBody>
+                            {state?.histories? state?.histories?.map((row: IHistory) => (
+                               <TableRow key={`${row.id}`}>
+                                   <TableCell align="center">{row.stage}</TableCell>
+                                   <TableCell align="center">{row.status}</TableCell>
+                                   <TableCell align="center">{row.createdOn}</TableCell>
+                                   <TableCell align="center">{row.remarks}</TableCell>
+                               </TableRow>
+                            )) : <>
                             <TableRow>
-                                {headerComponent}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {/* {
-                                state.history ? state.history.map((row) => {
-                                    return <>{row}</>
-                                }) : <></>
-                            } */}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                <TableCell align="center" colSpan={4}>No rows to display.</TableCell>
+                            </TableRow> </>
+                            }
+                         </TableBody>
+                     </Table>
+                 </TableContainer>
             </Box>
         </Box>
     </Modal>
 }
 
-export default QueryResolutionModal;
+export default HistoryModal;
