@@ -83,6 +83,9 @@ export const Preview = (props: any) => {
     }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
 
     async function checkAllDocsOk(id: any, applicationName: any) {
+        if (usersState.role === 'ADMIN'){
+            return true
+        }
         try{
         const res = await isAllDocsAvailable(id, applicationName)
         if (res.status === 200) {

@@ -779,7 +779,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdFirstClosingDomesticAmount"
-                                                label={prelimApplicationFormData.firstClosing ? "Expected Domestic Amount" : "Domestic Amount"}
+                                                label={prelimApplicationFormData.firstClosing ? "Domestic Amount" : "Expected Domestic Amount"}
                                                 value={prelimApplicationFormData.sdFirstClosingDomesticAmount || ''}
                                                 {...register("sdFirstClosingDomesticAmount")}
                                                 error={errors.sdFirstClosingDomesticAmount && getValues("sdFirstClosingDomesticAmount") ==  '' ? true : false}
@@ -828,7 +828,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdFirstClosingOverseasAmount"
-                                                label={prelimApplicationFormData.firstClosing ? "Expected Overseas Amount" : "Overseas Amount"}
+                                                label={prelimApplicationFormData.firstClosing ? "Overseas Amount" : "Expected Overseas Amount"}
                                                 value={prelimApplicationFormData.sdFirstClosingOverseasAmount || ''}
                                                 {...register("sdFirstClosingOverseasAmount")}
                                                 error={errors.sdFirstClosingOverseasAmount && getValues("sdFirstClosingOverseasAmount") ==  '' ? true : false}
