@@ -94,7 +94,7 @@ export const DetailedApplication2A = (props:any) => {
         }
     }
 
-    let listItem = ['Please upload the files following convention as "FundName_Documentname_Date" for file (Include date in filename if relevent to the document) ', "Please fill up / answer all the points to the extent possible.", "Receipt of the information does not in any way bind / commits SIDBI to sanction assistance to the VC / PE fund, which will be considered on the merits of the case.", "If any of the points are covered in the Private Placement Memorandum (PPM), then please give reference to the relevant paragraph / page number of the PPM.", "Please upload the copy of supporting documents. Please ensure any single file is not more than 5MB.", "If there are more than one document against a specific question, please zip the relevant documents and upload the zipped file.", "Answers may be specific. Please avoid vague answers."];
+    let listItem = ['Please upload the files following convention as "FundName_Documentname_Date" for file (Include date in filename if relevant to the document) ', "Please fill up / answer all the points to the extent possible.", "Receipt of the information does not in any way bind / commits SIDBI to sanction assistance to the VC / PE fund, which will be considered on the merits of the case.", "If any of the points are covered in the Private Placement Memorandum (PPM), then please give reference to the relevant paragraph / page number of the PPM.", "Please upload the copy of supporting documents. Please ensure any single file is not more than 5MB.", "If there are more than one document against a specific question, please zip the relevant documents and upload the zipped file.", "Answers may be specific. Please avoid vague answers."];
 
     const validationSchema = Yup.object().shape({
         domesticAmount1: Yup.string().required("This value is required"),
@@ -453,7 +453,7 @@ export const DetailedApplication2A = (props:any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >7. Provisions relating to fund set up costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc.Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM/Fund?.</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >7. Provisions relating to fund set up costs and justification for the same and the provisions relating to other expenses like mentoring fee, upfront fee, processing fee, deal sourcing fee, sitting fees received by nominee directors appointed by the Fund / IM  etc. Will these be credited to the Fund or the IM? Will there be any other fee(s) collected by the IM/Fund?.</Typography>
                             <TextField
                                 required
                                 id="provisionOfFundSetup"
@@ -475,7 +475,7 @@ export const DetailedApplication2A = (props:any) => {
 
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
-                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >8. Whether the Fund will make primary investment only i.e. the funds shall be utilized by the investee company only for its growth plans?</Typography>
+                        <Typography variant="body2" sx={{ flex: 1, color: '#363062',ml:2,mb:1 }} >8. Whether the Fund will make primary investments only i.e. the funds shall be utilized by the investee company only for its growth plans?</Typography>
                             <TextField
                                 required
                                 id="fundOnlyPrimaryInvestment"
