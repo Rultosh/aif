@@ -58,6 +58,7 @@ export default function DocumentChip(props: DocumentChipProps) {
       <input {...getInputProps()} />
         <div style={{display: "inline"}}>
           {props.children}
+          <div style={{ color: "red", display: "inline-block", marginLeft: '10px' }}>{error}</div>
         </div>
     </div>
   </>

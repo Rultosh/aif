@@ -24,6 +24,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import UploadComponents from '../uploadComponents'
 
 export const DetailedApplication2B = (props: any) => {
 
@@ -261,22 +262,8 @@ export const DetailedApplication2B = (props: any) => {
                                             </Typography>
                                         </div> : <></>}
                                 </Grid>
-                                <Grid item xs={9} sx={{ mt: 2 }}>
-
-                                    <InputLabel variant="standard" sx={{ ml: 2 }}>
-                                        <DocumentUpload id={`firstClosing${parentId}`}
-                                            onSuccess={firstClosingSuccess}>
-                                            <FileUploadIcon onClick={handleOnClickUpload} >
-                                            </FileUploadIcon>
-                                        </DocumentUpload>
-                                    </InputLabel>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <Box>
-                                        <ListFiles
-                                            id={`firstClosing${parentId}`}
-                                            refreshId={firstClosingUid} />
-                                    </Box>
+                                <Grid item xs={6} sx={{ mt: 2 }}>
+                                    <UploadComponents id={`firstClosing${parentId}`}></UploadComponents>
                                 </Grid>
                             </Grid>
                         </CardContent>
