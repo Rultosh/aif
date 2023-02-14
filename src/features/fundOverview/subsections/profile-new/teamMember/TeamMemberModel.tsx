@@ -40,7 +40,8 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
   const dispatch = useAppDispatch();
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setTeamMember(defaultTeamMember)
+    //setTeamMember(defaultTeamMember)
+    setTeamMember(props.teamMember)
     setOpen(false);
     props.onClose(false);
   }
