@@ -4,6 +4,7 @@ export interface IHistory extends IEntity {
   status: string | undefined,
   stage: string | undefined,
   createdOn: string | undefined,
+  createdByName: string | undefined,
   remarks: string | undefined,
   history: string | undefined,
 }
@@ -14,6 +15,7 @@ export const defaultIHistory : IHistory = {
   status: undefined,
   stage: undefined,
   createdOn: undefined,
+  createdByName: undefined,
   remarks: undefined,
   history: undefined,
 }
