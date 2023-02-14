@@ -30,7 +30,7 @@ export function changePassword(passwordDetails:IChangePassword) {
   return api({
     method: 'post',
     data: passwordDetails,
-    url: `auth/setpassword`
+    url: `auth/changepassword`
   });
 }
 
