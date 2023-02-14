@@ -49,6 +49,7 @@
     "uat": "env-cmd -f .env.server npm start",
     "build": "env-cmd -f .env.development react-scripts build",
     "build-uat": "env-cmd -f .env.server npx react-scripts build",
+    "build-prod": "env-cmd -f .env.prod npx react-scripts build",
     "package": "npm run build-uat && cd build && jar -cvf vcf.war .",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
