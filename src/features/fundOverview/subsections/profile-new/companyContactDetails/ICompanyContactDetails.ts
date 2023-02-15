@@ -8,7 +8,7 @@ export interface ICompanyContactDetails {
     mobileNo: string | undefined,
     email: string | undefined,
     alternateEmail: string | undefined,
-    yearOfInvestment: number | undefined,
+    yearOfInvestment: string | undefined,
 }
 
 export const defaultIICompanyContactDetails = {
