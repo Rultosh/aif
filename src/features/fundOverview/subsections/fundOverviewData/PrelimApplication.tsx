@@ -151,9 +151,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
     }
 
     console.log((dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)]?.values, prelimApplicationFormData.dealSubsector);
+    
+    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        nameOfTheFund: Yup.string().required("Name of the Fund is required"),
+        nameOfTheFund: Yup.string().required("Name of the Fund is required")
+            .test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sponsor: Yup.string().required("Sponsor is required"),
         investmentManager: Yup.string().required("Investment Manager is required"),
         // fundManager: Yup.string(),
@@ -219,13 +223,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             label="Name of the Fund"
                             value={prelimApplicationFormData.nameOfTheFund || ''}
                             {...register("nameOfTheFund")}
-                            error={errors.nameOfTheFund && getValues("nameOfTheFund") == '' ? true : false}
+                            error={errors.nameOfTheFund ? true : false}
                             onChange={handleChange}
                             variant="standard"
                             sx={{ display: 'flex', ml: 2 }}
                         />
                         <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                            <>{errors.nameOfTheFund && getValues("nameOfTheFund") == ''?errors.nameOfTheFund.message : ''}</>
+                            <>{errors.nameOfTheFund ?errors.nameOfTheFund.message : ''}</>
                         </Typography>
                     </Grid>
                     <Grid item xs={4}>
