@@ -151,18 +151,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
     }
 
     console.log((dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)]?.values, prelimApplicationFormData.dealSubsector);
+    
+    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        nameOfTheFund: Yup.string().required("Name of the Fund is required").test("test-name", "Enter a valid Name of Fund", function (value: any) {
-            const nameOfFundRegex = /<[^>]*>/; // Change This Regex Based On Requirement
-            const IsValidNameOfFund = value.match(nameOfFundRegex);
-            console.log(IsValidNameOfFund);
-            if (!IsValidNameOfFund) {
-              return true;
-
-            }
-            return false;
-          }).nullable(),
+        nameOfTheFund: Yup.string().required("Name of the Fund is required")
+            .test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sponsor: Yup.string().required("Sponsor is required"),
         investmentManager: Yup.string().required("Investment Manager is required"),
         // fundManager: Yup.string(),
