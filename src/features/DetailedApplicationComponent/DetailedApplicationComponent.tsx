@@ -119,7 +119,7 @@ const DetailedApplicationComponent: FC<DetailedApplicationComponentProps> = () =
 
     useEffect(() => {
         if(userRole == 'ADMIN' && appliationStatus == 'SUBMITTED'){
-            steps = ['Illustration of carry distribution of the Fund']
+            steps = ['Admin Approval']
             liItems = ["carryDistribution"]
             navigate(`/Detailed/${id}/carryDistribution`);
         }
