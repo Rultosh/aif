@@ -99,18 +99,21 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
 
     handleClose();
   }
+    
+  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const htmlTagsNotAllowed = "Tags not allowed in input.";
   
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
+    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     dob: Yup.string().required("Date of Birth is required").nullable(),
     dateofJoiningAMC: Yup.string().required("Date of Joining is required").nullable(),
-    location: Yup.string().required("Location is required"),
+    location: Yup.string().required("Location is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     yearsOfRelevantExp: Yup.string().required("Years Of Relevant Experience is required").nullable(),
-    prevProfessionalExp: Yup.string().required("Previous Professional Experience is required"),
-    education: Yup.string().required("Education is required"),
+    prevProfessionalExp: Yup.string().required("Previous Professional Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    education: Yup.string().required("Education is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     keyPerson: Yup.string().required("Key Person is required").nullable(),
-    memberOfInvesteeCommitte: Yup.string().required("Member Of Investee Committe is required"),
-    directorship: Yup.string().required("Directorship Held is required").nullable()
+    memberOfInvesteeCommitte: Yup.string().required("Member Of Investee Committe is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    directorship: Yup.string().required("Directorship Held is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
   });
 
   const {
@@ -157,14 +160,14 @@ console.log(teamMember)
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={teamMember.name}
                   {...register("name")}
-                  error={(errors.name && getValues("name") == '') ? true : false}
+                  error={(errors.name) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
+                  <>{(errors.name)?errors.name.message : ''}</>
                 </Typography>
               </Grid>
               {/*<Grid item xs={2.5}>
@@ -264,7 +267,7 @@ console.log(teamMember)
                   label="Location"
                   value={teamMember.location}
                   {...register("location")}
-                  error={(errors.location && getValues("location") == '') ? true : false}
+                  error={(errors.location) ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   variant="standard"
@@ -273,7 +276,7 @@ console.log(teamMember)
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.location && getValues("location") == '')?errors.location.message : ''}</>
+                  <>{(errors.location)?errors.location.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>
@@ -324,14 +327,14 @@ console.log(teamMember)
                   label="Previous Professional Experience"
                   value={teamMember.prevProfessionalExp}
                   {...register("prevProfessionalExp")}
-                  error={(errors.prevProfessionalExp && getValues("prevProfessionalExp") == '') ? true : false}
+                  error={(errors.prevProfessionalExp) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.prevProfessionalExp && getValues("prevProfessionalExp") == '')?errors.prevProfessionalExp.message : ''}</>
+                  <>{(errors.prevProfessionalExp)?errors.prevProfessionalExp.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>
@@ -341,13 +344,13 @@ console.log(teamMember)
                   label="Education"
                   value={teamMember.education}
                   {...register("education")}
-                  error={(errors.education && getValues("education") == '') ? true : false}
+                  error={(errors.education) ? true : false}
                   variant="standard"
                   onChange={handleChange}
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.education && getValues("education") == '')?errors.education.message : ''}</>
+                  <>{(errors.education)?errors.education.message : ''}</>
                 </Typography> 
               </Grid>
               <Grid item xs={4.5}>
@@ -395,14 +398,14 @@ console.log(teamMember)
                   label="Member Of Investee Committe"
                   value={teamMember.memberOfInvesteeCommitte}
                   {...register("memberOfInvesteeCommitte")}
-                  error={(errors.memberOfInvesteeCommitte && getValues("memberOfInvesteeCommitte") == '') ? true : false}
+                  error={(errors.memberOfInvesteeCommitte) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.memberOfInvesteeCommitte && getValues("memberOfInvesteeCommitte") == '')?errors.memberOfInvesteeCommitte.message : ''}</>
+                  <>{(errors.memberOfInvesteeCommitte)?errors.memberOfInvesteeCommitte.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>
@@ -412,14 +415,14 @@ console.log(teamMember)
                   label="Directorship Held"
                   value={teamMember.directorship}
                   {...register("directorship")}
-                  error={(errors.directorship && getValues("directorship") == '') ? true : false}
+                  error={(errors.directorship) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.directorship && getValues("directorship") == '')?errors.directorship.message : ''}</>
+                  <>{(errors.directorship)?errors.directorship.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>

@@ -98,11 +98,14 @@ export const DetailedApplication2E = (props: any) => {
             navigate(`/Detailed/${parentId}/detailed2D`);
         }
     }
+    
+    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        listOfExternalFirms: Yup.string().required("List Of External Firms is required"),
-        monitoringPractices: Yup.string().required("Monitoring Practices is required"),
-        imValueAdd: Yup.string().required("Please describe how the investment manager(s) add value / propose to add value to the investments is required")
+        listOfExternalFirms: Yup.string().required("List Of External Firms is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        monitoringPractices: Yup.string().required("Monitoring Practices is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        imValueAdd: Yup.string().required("Please describe how the investment manager(s) add value / propose to add value to the investments is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
     });
 
     const {
@@ -166,7 +169,7 @@ export const DetailedApplication2E = (props: any) => {
                                 id="listOfExternalFirms"
                                 //label="26. List of external firms (legal, technical, financial / accounting etc.) who are assisting / would be assisting the Investment Manager in the due diligence process."
                                 {...register("listOfExternalFirms")}
-                                error={errors.listOfExternalFirms && getValues("listOfExternalFirms") == '' ? true : false}
+                                error={errors.listOfExternalFirms ? true : false}
                                 //defaultValue={formDatalistOfExternalFirms === undefined ? " " : formData["listOfExternalFirms"]}
                                value={formData["listOfExternalFirms"] || ''}
                                 variant="standard"
@@ -174,7 +177,7 @@ export const DetailedApplication2E = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.listOfExternalFirms && getValues("listOfExternalFirms") == '' ?
+                            {errors.listOfExternalFirms ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.listOfExternalFirms?.message}</>
@@ -192,7 +195,7 @@ export const DetailedApplication2E = (props: any) => {
                                 id="monitoringPractices"
                                 //label="27. List the activities involved in monitoring and follow-up of investments? How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same."
                                 {...register("monitoringPractices")}
-                                error={errors.monitoringPractices && getValues("monitoringPractices") == '' ? true : false}
+                                error={errors.monitoringPractices ? true : false}
                                 //defaultValue={formDatamonitoringPractices === undefined ? " " : formData["monitoringPractices"]}
                                value={formData["monitoringPractices"] || ''}
                                 variant="standard"
@@ -200,7 +203,7 @@ export const DetailedApplication2E = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.monitoringPractices && getValues("monitoringPractices") == '' ?
+                            {errors.monitoringPractices ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.monitoringPractices?.message}</>
@@ -217,7 +220,7 @@ export const DetailedApplication2E = (props: any) => {
                                 id="imValueAdd"
                                 label="28. Please describe how the investment manager(s) add value / propose to add value to the investments."
                                 {...register("imValueAdd")}
-                                error={errors.imValueAdd && getValues("imValueAdd") == '' ? true : false}
+                                error={errors.imValueAdd ? true : false}
                                 //defaultValue={formDataimValueAdd === undefined ? " " : formData["imValueAdd"]}
                                value={formData["imValueAdd"] || ''}
                                 variant="standard"
@@ -225,7 +228,7 @@ export const DetailedApplication2E = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.imValueAdd && getValues("imValueAdd") == '' ?
+                            {errors.imValueAdd ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.imValueAdd?.message}</>

@@ -83,9 +83,12 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     boxShadow: 24,
     p: 4,
   };
+    
+  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const htmlTagsNotAllowed = "Tags not allowed in input.";
   
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
+    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     amount: Yup.string().required("Amount is required"),
     percentOfCorpus: Yup.string().required("Percent Of Corpus is required"),
     contributionType: Yup.string().required("Contribution Type is required"),
@@ -140,14 +143,14 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={contributorDetailsFormData.name}
                   {...register("name")}
-                  error={(errors.name && getValues("name") == '') ? true : false}
+                  error={(errors.name) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                    <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
+                    <>{(errors.name)?errors.name.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4}>

@@ -156,10 +156,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
     const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        nameOfTheFund: Yup.string().required("Name of the Fund is required")
-            .test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        sponsor: Yup.string().required("Sponsor is required"),
-        investmentManager: Yup.string().required("Investment Manager is required"),
+        nameOfTheFund: Yup.string().required("Name of the Fund is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        sponsor: Yup.string().required("Sponsor is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        investmentManager: Yup.string().required("Investment Manager is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         // fundManager: Yup.string(),
         // dealType: Yup.string(),
         // impact: Yup.string(),
@@ -167,15 +166,15 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         dateOfFilingWithSEBI: Yup.string().required("This value is required").nullable(),
         // dealSector: Yup.string(),
         // dealSubsector: Yup.string().required("Deal Sub Sector is required"),
-        nameOfTrustee: Yup.string().required("Name of Trustee is required"),
+        nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         contributionSought: Yup.string().required("Contribution Sought is required"),
         termOfFund: Yup.string().required("Term of Fund is required"),
         commitmentPeriod: Yup.string().required("Commitment Period is required"),
         preferredReturn: Yup.string().required("Preferred Return is required"),
         managementFees: Yup.string().required("Management Fees is required"),
         carriedInterest: Yup.string().required("Carried Interest is required"),
-        description: Yup.string().required("Description is required"),
-        investmentStrategy: Yup.string().required("Investment Strategy is required"),
+        description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sdDescription: Yup.string().required("Capital raised till date is required"),
         sdTargetCorpusDomestic: Yup.string().required("Domestic is required"),
         sdTargetCorpusOverseas: Yup.string().required("Overseas is required"),
@@ -239,13 +238,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             label="Sponsor"
                             value={prelimApplicationFormData.sponsor || ''}
                             {...register("sponsor")}
-                            error={errors.sponsor && getValues("sponsor") == '' ? true : false}
+                            error={errors.sponsor ? true : false}
                             onChange={handleChange}
                             variant="standard"
                             sx={{ display: 'flex' }}
                         />
                         <Typography variant="caption" color="error">
-                            <>{errors.sponsor && getValues("sponsor") == ''?errors.sponsor.message : ''}</>
+                            <>{errors.sponsor?errors.sponsor.message : ''}</>
                         </Typography>
                     </Grid>
 
@@ -256,13 +255,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             label="Investment Manager (IM)/AMC"
                             value={prelimApplicationFormData.investmentManager || ''}
                             {...register("investmentManager")}
-                            error={errors.investmentManager && getValues("investmentManager") == '' ? true : false}
+                            error={errors.investmentManager ? true : false}
                             onChange={handleChange}
                             variant="standard"
                             sx={{ display: 'flex', mr: 2 }}
                         />
                         <Typography variant="caption" color="error">
-                           <>{errors.investmentManager && getValues("investmentManager") == ''?errors.investmentManager.message : ''}</>
+                           <>{errors.investmentManager?errors.investmentManager.message : ''}</>
                        </Typography>
                     </Grid>
 
@@ -359,13 +358,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             label="Name Of The Trustee"
                             value={prelimApplicationFormData.nameOfTrustee || ''}
                             {...register("nameOfTrustee")}
-                            error={errors.nameOfTrustee && getValues("nameOfTrustee") == '' ? true : false}
+                            error={errors.nameOfTrustee ? true : false}
                             onChange={handleChange}
                             variant="standard"
                             sx={{ display: 'flex' }}
                         />
                         <Typography variant="caption" color="error">
-                            <>{errors.nameOfTrustee && getValues("nameOfTrustee") == ''?errors.nameOfTrustee.message : ''}</>
+                            <>{errors.nameOfTrustee?errors.nameOfTrustee.message : ''}</>
                         </Typography>
                     </Grid>
 
@@ -578,13 +577,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             label="Sector Description(Stage of investment like pre revenue, pre growth, seed stage, series A, Series B etc)"
                             value={prelimApplicationFormData.description || ''}
                             {...register("description")}
-                            error={errors.description && getValues("description") == '' ? true : false}
+                            error={errors.description ? true : false}
                             onChange={handleChange}
                             variant="standard"
                             sx={{ display: 'flex', mr: 2 }}
                         />
                         <Typography variant="caption" color="error">
-                            <>{errors.description && getValues("description") == ''?errors.description.message : ''}</>
+                            <>{errors.description?errors.description.message : ''}</>
                         </Typography>
                     </Grid>
 
@@ -595,13 +594,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             label="Investment Strategy"
                             value={prelimApplicationFormData.investmentStrategy || ''}
                             {...register("investmentStrategy")}
-                            error={errors.investmentStrategy && getValues("investmentStrategy") == '' ? true : false}
+                            error={errors.investmentStrategy ? true : false}
                             onChange={handleChange}
                             variant="standard"
                             sx={{ display: 'flex', ml: 2, mr: 2 }}
                         />
                         <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                            <>{errors.investmentStrategy && getValues("investmentStrategy") == ''?errors.investmentStrategy.message : ''}</>
+                            <>{errors.investmentStrategy?errors.investmentStrategy.message : ''}</>
                         </Typography>
                     </Grid>
                     <Grid item xs={12}>

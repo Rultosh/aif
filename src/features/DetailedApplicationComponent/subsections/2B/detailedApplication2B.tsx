@@ -146,16 +146,19 @@ export const DetailedApplication2B = (props: any) => {
     }
 
     let listItem = ['Please upload the files following convention as "FundName_Documentname_Date" for file (Include date in filename if relevent to the document) ', "Please fill up / answer all the points to the extent possible.", "Receipt of the information does not in any way bind / commits SIDBI to sanction assistance to the VC / PE fund, which will be considered on the merits of the case.", "If any of the points are covered in the Private Placement Memorandum (PPM), then please give reference to the relevant paragraph / page number of the PPM.", "Please upload the copy of supporting documents. Please ensure any single file is not more than 5MB.", "If there are more than one document against a specific question, please zip the relevant documents and upload the zipped file.", "Answers may be specific. Please avoid vague answers."];
+    
+    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        fundLaunchedDate: Yup.string().required("Fund Launched Date is required"),
-        commitmentReceived: Yup.string().required("Commitment Received is required"),
-        firstClosing: Yup.string().required("First Closing is required"),
-        dateOfFinalClosing: Yup.string().required("Date Of Final Closing is required"),
-        contribTerms: Yup.string().required("Contributor Terms is required"),
-        investmentManagerPlacementAgent: Yup.string().required("Investment Manager Placement Agent is required")
+        fundLaunchedDate: Yup.string().required("Fund Launched Date is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        commitmentReceived: Yup.string().required("Commitment Received is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        firstClosing: Yup.string().required("First Closing is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        dateOfFinalClosing: Yup.string().required("Date Of Final Closing is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        contribTerms: Yup.string().required("Contributor Terms is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        investmentManagerPlacementAgent: Yup.string().required("Investment Manager Placement Agent is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
     });
-
+    
     const {
         register,
         handleSubmit,
@@ -220,7 +223,7 @@ export const DetailedApplication2B = (props: any) => {
                                 id="fundLaunchedDate"
                                 label="10. When was the fund launched?"
                                 {...register("fundLaunchedDate")}
-                                error={errors.fundLaunchedDate && getValues("fundLaunchedDate") == '' ? true : false}
+                                error={errors.fundLaunchedDate ? true : false}
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                 value={formData["fundLaunchedDate"] || ''}
                                 variant="standard"
@@ -228,7 +231,7 @@ export const DetailedApplication2B = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.fundLaunchedDate && getValues("fundLaunchedDate") == '' ?
+                            {errors.fundLaunchedDate ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.fundLaunchedDate?.message}</>
@@ -247,7 +250,7 @@ export const DetailedApplication2B = (props: any) => {
                                         id="commitmentReceived"
                                         //label="11. How much commitments have been  received so far? Please indicate what % of commitments received from the investors who contributed to earlier Funds managed by the Investment Manager and from non-institutonal source including employee(s) of the fund. List name(s) of contributors with amounts commited and atttac copies of their commitment letters, document signed with them."
                                         {...register("commitmentReceived")}
-                                        error={errors.commitmentReceived && getValues("commitmentReceived") == '' ? true : false}
+                                        error={errors.commitmentReceived ? true : false}
                                         //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                                         value={formData["commitmentReceived"] || ''}
                                         variant="standard"
@@ -255,7 +258,7 @@ export const DetailedApplication2B = (props: any) => {
 
                                         sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
-                                    {errors.commitmentReceived && getValues("commitmentReceived") == '' ?
+                                    {errors.commitmentReceived ?
                                         <div  style={{ marginTop: '-10px' }}>
                                             <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                                 <>{errors.commitmentReceived?.message}</>
@@ -278,7 +281,7 @@ export const DetailedApplication2B = (props: any) => {
                                         id="firstClosing"
                                         label='12. Has the "first closing"/"initial closing" been done? If so, when and at what amount?'
                                         {...register("firstClosing")}
-                                        error={errors.firstClosing && getValues("firstClosing") == '' ? true : false}
+                                        error={errors.firstClosing ? true : false}
                                         //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                                         value={formData["firstClosing"] || ''}
                                         variant="standard"
@@ -286,7 +289,7 @@ export const DetailedApplication2B = (props: any) => {
 
                                         sx={{ display: 'flex', ml: 2, mb: 2 }}
                                     />
-                                    {errors.firstClosing && getValues("firstClosing") == '' ?
+                                    {errors.firstClosing ?
                                         <div  style={{ marginTop: '-10px' }}>
                                             <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                                 <>{errors.firstClosing?.message}</>
@@ -305,7 +308,7 @@ export const DetailedApplication2B = (props: any) => {
                                 id="dateOfFinalClosing"
                                 label="13. What is the expected date of final closing of the fund?"
                                 {...register("dateOfFinalClosing")}
-                                error={errors.dateOfFinalClosing && getValues("dateOfFinalClosing") == '' ? true : false}
+                                error={errors.dateOfFinalClosing ? true : false}
                                 //defaultValue={formData.dateOfFinalClosing === undefined ? " " : formData["dateOfFinalClosing"]}
                                 value={formData["dateOfFinalClosing"] || ''}
                                 variant="standard"
@@ -313,7 +316,7 @@ export const DetailedApplication2B = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.dateOfFinalClosing && getValues("dateOfFinalClosing") == '' ?
+                            {errors.dateOfFinalClosing ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.dateOfFinalClosing?.message}</>
@@ -330,7 +333,7 @@ export const DetailedApplication2B = (props: any) => {
                                 id="contribTerms"
                                 //label="14. Are all contributors governed by same team and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor(along with reasons)"
                                 {...register("contribTerms")}
-                                error={errors.contribTerms && getValues("contribTerms") == '' ? true : false}
+                                error={errors.contribTerms ? true : false}
                                 //defaultValue={formData.contribTerms === undefined ? " " : formData["contribTerms"]}
                                 value={formData["contribTerms"] || ''}
                                 variant="standard"
@@ -338,7 +341,7 @@ export const DetailedApplication2B = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.contribTerms && getValues("contribTerms") == '' ?
+                            {errors.contribTerms ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.contribTerms?.message}</>
@@ -355,7 +358,7 @@ export const DetailedApplication2B = (props: any) => {
                                 id="investmentManagerPlacementAgent"
                                 //label="15. Has the Investment Manager or the Fund or the sponsor of anyone associated with the fund engaged any placement agents? If yes, please provide details of funds raised and payment(s) made / to be made to the agents. Please also clarify as to who is bearing the cost of the agents?"
                                 {...register("investmentManagerPlacementAgent")}
-                                error={errors.investmentManagerPlacementAgent && getValues("investmentManagerPlacementAgent") == '' ? true : false}
+                                error={errors.investmentManagerPlacementAgent ? true : false}
                                 //defaultValue={formData.investmentManagerPlacementAgent === undefined ? " " : formData["investmentManagerPlacementAgent"]}
                                 value={formData["investmentManagerPlacementAgent"] || ''}
                                 variant="standard"
@@ -363,7 +366,7 @@ export const DetailedApplication2B = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.investmentManagerPlacementAgent && getValues("investmentManagerPlacementAgent") == '' ?
+                            {errors.investmentManagerPlacementAgent ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.investmentManagerPlacementAgent?.message}</>

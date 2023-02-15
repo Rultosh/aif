@@ -96,12 +96,15 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     boxShadow: 24,
     p: 4,
   };
+    
+  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const htmlTagsNotAllowed = "Tags not allowed in input.";
 
   const validationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name of Company is required"),
-    sector: Yup.string().required("Sector is required"),
+    nameOfCompany: Yup.string().required("Name of Company is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     amountInvested: Yup.string().required("Amount Invested is required"),
-    briefProfile: Yup.string().required("Brief Profile is required"),
+    briefProfile: Yup.string().required("Brief Profile is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     dateOfInvestment: Yup.string().required("Date of Investment is required"),
   });
 
@@ -148,14 +151,14 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.nameOfCompany}
                   {...register("nameOfCompany")}
-                  error={(errors.nameOfCompany && getValues("nameOfCompany") == '') ? true : false}
+                  error={(errors.nameOfCompany) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.nameOfCompany && getValues("nameOfCompany") == '')?errors.nameOfCompany.message : ''}</>
+                  <>{(errors.nameOfCompany)?errors.nameOfCompany.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={3.5}>
@@ -166,14 +169,14 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.sector}
                   {...register("sector")}
-                  error={(errors.sector && getValues("sector") == '') ? true : false}
+                  error={(errors.sector) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.sector && getValues("sector") == '')?errors.sector.message : ''}</>
+                  <>{(errors.sector)?errors.sector.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4}>
@@ -202,14 +205,14 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   label="Brief Profile"
                   value={investmentPastFormData.briefProfile}
                   {...register("briefProfile")}
-                  error={(errors.briefProfile && getValues("briefProfile") == '') ? true : false}
+                  error={(errors.briefProfile) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.briefProfile && getValues("briefProfile") == '')?errors.briefProfile.message : ''}</>
+                  <>{(errors.briefProfile)?errors.briefProfile.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>

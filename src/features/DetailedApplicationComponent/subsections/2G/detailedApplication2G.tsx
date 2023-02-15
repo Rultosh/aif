@@ -96,14 +96,17 @@ export const DetailedApplication2G = (props:any) => {
 
     let listItem = ["a. Company & amount invested - sector, location, investment thesis, years(s) of investment; instruments used, structuring specialty, firm which did the Financial/ Legal/ Technical due diligence etc.", "b. Time taken from sourcing to closure", "c. How was the deal sourced?", "d. % holding & valuation (pre-money and post-money)", "e. Key reasons for the investment & basis for valuation", "f. What was / is the value-add made by the respective employee - please give details of strategy, process, operations, business development, any other value add done.", "g. If exited, then exit amount, IRR on exit, method of exit.", "h. Any loss / write-off? If yes, details along with reasons.", "i. Any learning from past investments / divestments?", "j. Given a chance, what would you do differently compared to the past?", "k. If not exited (as on date), then valuation, notional IRR %, basis of valuation, whether EVCA or any other valuation guideline used. "]
 
+    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const htmlTagsNotAllowed = "Tags not allowed in input.";
+
     const validationSchema = Yup.object().shape({
-        subsidiaryOfAnotherCompany: Yup.string().required("This value is required"),
-        overallEmployeeCost: Yup.string().required("This value is required"),
-        employeeCarry: Yup.string().required("This value is required"),
-        regulartoryInvestigation: Yup.string().required("This value is required"),
-        vcExlusive: Yup.string().required("This value is required"),
-        directorship: Yup.string().required("This value is required"),
-        employeeShareHolding: Yup.string().required("This value is required")
+        subsidiaryOfAnotherCompany: Yup.string().required("This value is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        overallEmployeeCost: Yup.string().required("This value is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        employeeCarry: Yup.string().required("This value is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        regulartoryInvestigation: Yup.string().required("This value is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        vcExlusive: Yup.string().required("This value is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        directorship: Yup.string().required("This value is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        employeeShareHolding: Yup.string().required("This value is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
     });
 
     const {
@@ -186,7 +189,7 @@ export const DetailedApplication2G = (props:any) => {
                                 id="subsidiaryOfAnotherCompany"
                                 // label="33. Is the Investment Manager a subsidiary of another Company? If yes, details of the same and please attach copies of the Annual Reports of the Holding Company for the last 3 years. "
                                 {...register("subsidiaryOfAnotherCompany")}
-                                error={errors.subsidiaryOfAnotherCompany && getValues("subsidiaryOfAnotherCompany") == '' ? true : false}
+                                error={errors.subsidiaryOfAnotherCompany ? true : false}
                                 //defaultValue={formData.subsidiaryOfAnotherCompany === undefined ? " " : formData["subsidiaryOfAnotherCompany"]}
                                 value={formData["subsidiaryOfAnotherCompany"] || ''}
                                 variant="standard"
@@ -194,7 +197,7 @@ export const DetailedApplication2G = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.subsidiaryOfAnotherCompany && getValues("subsidiaryOfAnotherCompany") == '' ?
+                            {errors.subsidiaryOfAnotherCompany ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.subsidiaryOfAnotherCompany?.message}</>
@@ -280,7 +283,7 @@ export const DetailedApplication2G = (props:any) => {
                                 id="overallEmployeeCost"
                                 //label="37. What is the overall employee cost for the last 3 years? Please indicate the CTC bands of various grades of employees (total, fixed & variable)."
                                 {...register("overallEmployeeCost")}
-                                error={errors.overallEmployeeCost && getValues("overallEmployeeCost") == '' ? true : false}
+                                error={errors.overallEmployeeCost ? true : false}
                                 //defaultValue={formData.monitoringPractices === undefined ? " " : formData["monitoringPractices"]}
                                 value={formData["overallEmployeeCost"] || ''}
                                 variant="standard"
@@ -288,7 +291,7 @@ export const DetailedApplication2G = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.overallEmployeeCost && getValues("overallEmployeeCost") == '' ?
+                            {errors.overallEmployeeCost ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.overallEmployeeCost?.message}</>
@@ -306,7 +309,7 @@ export const DetailedApplication2G = (props:any) => {
                                 id="employeeCarry"
                                 //label="38. What is the policy regarding carry How much do the employees get? How are the carried interest tied up if key man provisions are triggered? "
                                 {...register("employeeCarry")}
-                                error={errors.employeeCarry && getValues("employeeCarry") == '' ? true : false}
+                                error={errors.employeeCarry ? true : false}
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                 value={formData["employeeCarry"] || ''}
                                 variant="standard"
@@ -314,7 +317,7 @@ export const DetailedApplication2G = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.employeeCarry && getValues("employeeCarry") == '' ?
+                            {errors.employeeCarry ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.employeeCarry?.message}</>
@@ -332,7 +335,7 @@ export const DetailedApplication2G = (props:any) => {
                                 id="regulartoryInvestigation"
                                 //label="39. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employes(e)of the Investment Manager been reported to / investigated by any regulatory authority during the last 5 years? If yes, please give .11 details of the same."
                                 {...register("regulartoryInvestigation")}
-                                error={errors.regulartoryInvestigation && getValues("regulartoryInvestigation") == '' ? true : false}
+                                error={errors.regulartoryInvestigation ? true : false}
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                 value={formData["regulartoryInvestigation"] || ''}
                                 variant="standard"
@@ -340,7 +343,7 @@ export const DetailedApplication2G = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.regulartoryInvestigation && getValues("regulartoryInvestigation") == '' ?
+                            {errors.regulartoryInvestigation ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.regulartoryInvestigation?.message}</>
@@ -356,7 +359,7 @@ export const DetailedApplication2G = (props:any) => {
                                 id="vcExlusive"
                                 label="40. Is the Investment Manager exclusively handling VC business or is it also doing any other business or activity?"
                                 {...register("vcExlusive")}
-                                error={errors.vcExlusive && getValues("vcExlusive") == '' ? true : false}
+                                error={errors.vcExlusive ? true : false}
                                 //defaultValue={formData.otherVCFsManaged === undefined ? " " : formData["otherVCFsManaged"]}
                                 value={formData["vcExlusive"] || ''}
                                 variant="standard"
@@ -364,7 +367,7 @@ export const DetailedApplication2G = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.vcExlusive && getValues("vcExlusive") == '' ?
+                            {errors.vcExlusive ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.vcExlusive?.message}</>
@@ -380,7 +383,7 @@ export const DetailedApplication2G = (props:any) => {
                                 id="directorship"
                                 label="41. How many directorships does each Investment Manager (employee) hold? What is the policy in this regard?"
                                 {...register("directorship")}
-                                error={errors.directorship && getValues("directorship") == '' ? true : false}
+                                error={errors.directorship ? true : false}
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                 value={formData["directorship"] || ''}
                                 variant="standard"
@@ -388,7 +391,7 @@ export const DetailedApplication2G = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.directorship && getValues("directorship") == '' ?
+                            {errors.directorship ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.directorship?.message}</>
@@ -406,7 +409,7 @@ export const DetailedApplication2G = (props:any) => {
                                 id="employeeShareHolding"
                                // label="42. Details of shareholding (controlling stake) by any employee in any investee company / public / private company, directly or indirectly."
                                 {...register("employeeShareHolding")}
-                                error={errors.employeeShareHolding && getValues("employeeShareHolding") == '' ? true : false}
+                                error={errors.employeeShareHolding ? true : false}
                                 //defaultValue={formData.shareHoldingPattern === undefined ? " " : formData["shareHoldingPattern"]}
                                 value={formData["employeeShareHolding"] || ''}
                                 variant="standard"
@@ -414,7 +417,7 @@ export const DetailedApplication2G = (props:any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.employeeShareHolding && getValues("employeeShareHolding") == '' ?
+                            {errors.employeeShareHolding ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.employeeShareHolding?.message}</>

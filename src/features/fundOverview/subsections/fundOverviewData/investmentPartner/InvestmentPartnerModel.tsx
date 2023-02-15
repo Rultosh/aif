@@ -98,13 +98,16 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     boxShadow: 24,
     p: 4,
   };
+    
+  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const htmlTagsNotAllowed = "Tags not allowed in input.";
   
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
-    designation: Yup.string().required("Designation is required"),
+    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     age: Yup.string().required("Age is required"),
-    qualification: Yup.string().required("Qualification is required"),
-    description: Yup.string().required("Brief details of VC/PE Experience is required"),
+    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    description: Yup.string().required("Brief details of VC/PE Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     vcpeExperience: Yup.string().required("VC/PE Experience is required")
   });
 
@@ -148,7 +151,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   id="name"
                   label="Name"
                   {...register("name")}
-                  error={(errors.name && getValues("name") == '') ? true : false}
+                  error={(errors.name) ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.name}
                   variant="standard"
@@ -157,7 +160,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
+                  <>{(errors.name)?errors.name.message : ''}</>
                 </Typography>
 
               </Grid>
@@ -169,14 +172,14 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.designation}
                   {...register("designation")}
-                  error={(errors.designation && getValues("designation") == '')? true : false}
+                  error={(errors.designation)? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.designation && getValues("designation") == '')?errors.designation.message : ''}</>
+                  <>{(errors.designation)?errors.designation.message : ''}</>
                 </Typography>
 
               </Grid>
@@ -207,14 +210,14 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.qualification}
                   {...register("qualification")}
-                  error={(errors.qualification && getValues("qualification") =='') ? true : false}
+                  error={(errors.qualification) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.qualification && getValues("qualification") == '')?errors.qualification.message : ''}</>
+                  <>{(errors.qualification)?errors.qualification.message : ''}</>
                 </Typography>
 
               </Grid>
@@ -266,13 +269,13 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   value={investmentPartnerFormData.description}
                   variant="standard"
                   {...register("description")}
-                  error={(errors.description && getValues("description") == '') ? true : false}
+                  error={(errors.description) ? true : false}
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.description && getValues("description") == '')?errors.description.message : ''}</>
+                  <>{(errors.description)?errors.description.message : ''}</>
                 </Typography>
 
               </Grid>

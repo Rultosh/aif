@@ -98,10 +98,13 @@ export const DetailedApplication2F = (props: any) => {
             navigate(`/Detailed/${parentId}/detailed2E`);
         }
     }
+    
+    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        reportingStructure: Yup.string().required("Comments is required"),
-        freqOfMeeting: Yup.string().required("Frequency of meetings is required")
+        reportingStructure: Yup.string().required("Comments is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        freqOfMeeting: Yup.string().required("Frequency of meetings is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
     });
 
     const {
@@ -169,7 +172,7 @@ export const DetailedApplication2F = (props: any) => {
                                 id="reportingStructure"
                                 label=""
                                 {...register("reportingStructure")}
-                                error={errors.reportingStructure && getValues("reportingStructure") == '' ? true : false}
+                                error={errors.reportingStructure ? true : false}
                                 //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
                                 value={formData["reportingStructure"] || ''}
                                 variant="standard"
@@ -177,7 +180,7 @@ export const DetailedApplication2F = (props: any) => {
                                 placeholder="Please enter comments"
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.reportingStructure && getValues("reportingStructure") == '' ?
+                            {errors.reportingStructure ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.reportingStructure?.message}</>
@@ -204,7 +207,7 @@ export const DetailedApplication2F = (props: any) => {
                                 id="freqOfMeeting"
                                 label="31. Frequency of meetings to update the contributor. "
                                 {...register("freqOfMeeting")}
-                                error={errors.freqOfMeeting && getValues("freqOfMeeting") == '' ? true : false}
+                                error={errors.freqOfMeeting ? true : false}
                                 //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
                                 value={formData["freqOfMeeting"] || ''}
                                 variant="standard"
@@ -212,7 +215,7 @@ export const DetailedApplication2F = (props: any) => {
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
-                            {errors.freqOfMeeting && getValues("freqOfMeeting") == '' ?
+                            {errors.freqOfMeeting ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.freqOfMeeting?.message}</>

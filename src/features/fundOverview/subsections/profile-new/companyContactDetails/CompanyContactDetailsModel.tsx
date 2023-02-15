@@ -91,11 +91,14 @@ console.log(investmentResponsibleAsLead);
     
     handleClose();
   }
+    
+  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const htmlTagsNotAllowed = "Tags not allowed in input.";
 
   const validationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name Of Company is required"),
-    nameOfPromoter: Yup.string().required("Name Of Promoter is required"),
-    address: Yup.string().required("Address is required"),
+    nameOfCompany: Yup.string().required("Name Of Company is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    nameOfPromoter: Yup.string().required("Name Of Promoter is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    address: Yup.string().required("Address is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     telephoneNo: Yup.string().required("Telephone No is required").test("test-name", "Enter a valid Telephone No", function (value: any) {
       const PhoneRegex = /^(\+91-|\+91|0)?\d{15}$/; // Change This Regex Based On Requirement
       const IsValidPhone = PhoneRegex.test(value);
@@ -179,14 +182,14 @@ console.log(investmentResponsibleAsLead);
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.nameOfCompany}
                   {...register("nameOfCompany")}
-                  error={(errors.nameOfCompany && getValues("nameOfCompany") == '') ? true : false}
+                  error={(errors.nameOfCompany) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.nameOfCompany && getValues("nameOfCompany") == '') ? errors.nameOfCompany.message : ''}</>
+                  <>{(errors.nameOfCompany) ? errors.nameOfCompany.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={2.5}>
@@ -198,14 +201,14 @@ console.log(investmentResponsibleAsLead);
                   //value={formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.nameOfPromoter}
                   {...register("nameOfPromoter")}
-                  error={(errors.nameOfPromoter && getValues("nameOfPromoter") == '') ? true : false}
+                  error={(errors.nameOfPromoter) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.nameOfPromoter && getValues("nameOfPromoter") == '') ? errors.nameOfPromoter.message : ''}</>
+                  <>{(errors.nameOfPromoter) ? errors.nameOfPromoter.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={3}>
@@ -215,7 +218,7 @@ console.log(investmentResponsibleAsLead);
                   label="Address"
                   value={investmentResponsibleAsLead.address}
                   {...register("address")}
-                  error={(errors.address && getValues("address") == '') ? true : false}
+                  error={(errors.address) ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   variant="standard"
@@ -224,7 +227,7 @@ console.log(investmentResponsibleAsLead);
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.address && getValues("address") == '') ? errors.address.message : ''}</>
+                  <>{(errors.address) ? errors.address.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>
