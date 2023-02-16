@@ -91,15 +91,18 @@ console.log(investmentResponsibleAsLead);
 
     handleClose();
   }
+    
+  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const htmlTagsNotAllowed = "Tags not allowed in input.";
   
   const validationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name Of Company is required"),
+    nameOfCompany: Yup.string().required("Name Of Company is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     amountInvested: Yup.string().required("Amount Invested is required"),
     dateOfInvestment: Yup.string().required("Date of Investment is required").nullable(),
-    exitOrWriteOff: Yup.string().required("Exit Or Writeoff is required"),
+    exitOrWriteOff: Yup.string().required("Exit Or Writeoff is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     dateofExitorWriteOff: Yup.string().required("Date of Exit Or Writeoff is required").nullable(),
-    irrPercent: Yup.string().required("IRR % is required"),
-    comment: Yup.string().required("Comment is required")
+    irrPercent: Yup.string().required("IRR % is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    comment: Yup.string().required("Comment is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
   });
 
   const {
@@ -146,14 +149,14 @@ console.log(investmentResponsibleAsLead);
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.nameOfCompany}
                   {...register("nameOfCompany")}
-                  error={(errors.nameOfCompany && getValues("nameOfCompany") == '') ? true : false}
+                  error={(errors.nameOfCompany) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.nameOfCompany && getValues("nameOfCompany") == '') ? errors.nameOfCompany.message : ''}</>
+                  <>{(errors.nameOfCompany) ? errors.nameOfCompany.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={2.25}>
@@ -226,7 +229,7 @@ console.log(investmentResponsibleAsLead);
                   label="Exit or writeoff"
                   value={investmentResponsibleAsLead.exitOrWriteOff}
                   {...register("exitOrWriteOff")}
-                  error={(errors.exitOrWriteOff && getValues("exitOrWriteOff") == '') ? true : false}
+                  error={(errors.exitOrWriteOff) ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   variant="standard"
@@ -235,7 +238,7 @@ console.log(investmentResponsibleAsLead);
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.exitOrWriteOff && getValues("exitOrWriteOff") == '') ? errors.exitOrWriteOff.message : ''}</>
+                  <>{(errors.exitOrWriteOff) ? errors.exitOrWriteOff.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>
@@ -290,14 +293,14 @@ console.log(investmentResponsibleAsLead);
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.irrPercent}
                   {...register("irrPercent")}
-                  error={(errors.irrPercent && getValues("irrPercent") == '') ? true : false}
+                  error={(errors.irrPercent) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.irrPercent && getValues("irrPercent") == '') ? errors.irrPercent.message : ''}</>
+                  <>{(errors.irrPercent) ? errors.irrPercent.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>
@@ -307,7 +310,7 @@ console.log(investmentResponsibleAsLead);
                   label="Comment"
                   value={investmentResponsibleAsLead.comment}
                   {...register("comment")}
-                  error={(errors.Comment && getValues("comment") == '') ? true : false}
+                  error={(errors.comment) ? true : false}
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   variant="standard"
@@ -316,7 +319,7 @@ console.log(investmentResponsibleAsLead);
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.comment && getValues("comment") == '') ? errors.comment.message : ''}</>
+                  <>{(errors.comment) ? errors.comment.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>

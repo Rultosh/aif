@@ -97,9 +97,12 @@ export const DetailedApplication2I = (props: any) => {
             navigate(`/Detailed/${parentId}/detailed2H`);
         }
     }
+    
+    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        sebiCompliance: Yup.string().required("Compliance is required")
+        sebiCompliance: Yup.string().required("Compliance is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
     });
 
     const {
@@ -241,7 +244,7 @@ export const DetailedApplication2I = (props: any) => {
                                     id="sebiCompliance"
                                     label='If No, reasons therefore'
                                     {...register("sebiCompliance")}
-                                    error={errors.sebiCompliance && getValues("sebiCompliance") == '' ? true : false}
+                                    error={errors.sebiCompliance ? true : false}
                                     // defaultValue={formData.reason === undefined ? " " : formData["reason"]}
                                     value={formData["sebiCompliance"] || ''}
                                     variant="standard"
@@ -254,7 +257,7 @@ export const DetailedApplication2I = (props: any) => {
                                         <UploadComponents id={`sebiComplianceCertificate${parentId}`}></UploadComponents>
                                     </div>
                                 </Grid>}
-                            {errors.sebiCompliance && getValues("sebiCompliance") == '' ?
+                            {errors.sebiCompliance ?
                                 <div  style={{ marginTop: '-10px' }}>
                                     <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                         <>{errors.sebiCompliance?.message}</>

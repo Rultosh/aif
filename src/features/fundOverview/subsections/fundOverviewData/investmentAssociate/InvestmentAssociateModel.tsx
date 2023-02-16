@@ -87,14 +87,17 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     boxShadow: 24,
     p: 4,
   };
+    
+  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const htmlTagsNotAllowed = "Tags not allowed in input.";
   
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
-    designation: Yup.string().required("Designation is required"),
+    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     age: Yup.string().required("Age is required"),
-    qualification: Yup.string().required("Qualification is required"),
+    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     investmentExperience: Yup.string().required("Investment Experience is required"),
-    description: Yup.string().required("Description is required")
+    description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
   });
 
   const {
@@ -139,14 +142,14 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.name}
                   {...register("name")}
-                  error={(errors.name && getValues("name") == '') ? true : false}
+                  error={(errors.name) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.name && getValues("name") == '')?errors.name.message : ''}</>
+                  <>{(errors.name)?errors.name.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={3.5}>
@@ -157,14 +160,14 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.designation}
                   {...register("designation")}
-                  error={(errors.designation && getValues("designation") == '') ? true : false}
+                  error={(errors.designation) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.designation && getValues("designation") == '')?errors.designation.message : ''}</>
+                  <>{(errors.designation)?errors.designation.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={1}>
@@ -194,7 +197,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.qualification}
                   {...register("qualification")}
-                  error={(errors.qualification && getValues("qualification") == '') ? true : false}
+                  error={(errors.qualification) ? true : false}
                   variant="standard"
                   onChange={handleChange}
                   name="qualification"
@@ -202,7 +205,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.qualification && getValues("qualification") == '')?errors.qualification.message : ''}</>
+                  <>{(errors.qualification)?errors.qualification.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={4.5}>
@@ -250,14 +253,14 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentAssociateFormData.description}
                   {...register("description")}
-                  error={(errors.description && getValues("description") == '') ? true : false}
+                  error={(errors.description) ? true : false}
                   variant="standard"
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
                 />
                 <Typography variant="caption" color="error">
-                  <>{(errors.description && getValues("description") == '')?errors.description.message : ''}</>
+                  <>{(errors.description)?errors.description.message : ''}</>
                 </Typography>
               </Grid>
               <Grid item xs={12} >

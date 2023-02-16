@@ -59,7 +59,7 @@ export const questions = {
     {
         "id": 9,
         "text":"Profile of Auditors engaged/proposed to be engaged by the Fund" ,
-        "options":["Big 5 Auditors/propose to engage one of Big 5 auditors", "Not form Big 5 list, but reputed auditors", "Not so reputed names"],
+        "options":["Big 5 Auditors/propose to engage one of Big 5 auditors", "Not from Big 5 list, but reputed auditors", "Not so reputed names"],
         "size":6,
         'weightage':[1,0.6,0.3]
     },

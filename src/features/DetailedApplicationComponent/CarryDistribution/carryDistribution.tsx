@@ -270,7 +270,7 @@ export const CarryDistribution = (props: any) => {
     
 
     async function handleClickSubmit(ev: any) {
-        if (await checkAllDocsOk(parentId, "detailed")) {
+        // if (await checkAllDocsOk(parentId, "detailed")) {
             console.log("prelimId", parentId)
             handleSave()
             dispatch(
@@ -281,13 +281,16 @@ export const CarryDistribution = (props: any) => {
                 )
             );
             navigate('/home')
-        }
-        else {
-            setShowResponse(true);
-        }
+        // }
+        // else {
+            // setShowResponse(true);
+        // }
     }
 
     async function checkAllDocsOk(id: any, applicationName: any) {
+        if (usersState.role === 'ADMIN'){
+            return true
+        }
         try {
             const res = await isAllDocsAvailable(id, applicationName)
             if (res.status === 200) {
@@ -381,7 +384,7 @@ export const CarryDistribution = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2, mt: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                    <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Illustration of carry distribution of the Fund</Typography>
+                {usersState.role === 'USER' ? <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Illustration of carry distribution of the Fund</Typography> : <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>{prilimFormData.sidbiReferenceNumber}</Typography> }
 
                     <Divider sx={{ mt: 2 }} />{usersState.role == 'USER' ? <>
                         <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
@@ -992,7 +995,7 @@ export const CarryDistribution = (props: any) => {
                             </Card>
                         </Grid>
                         <Grid item xs={4}>
-                            <Button
+                        {usersState.role === 'USER' ? <Button
                                 onClick={(e) => handleClickSave(e, "previous")}
                                 startIcon={<ArrowLeftIcon />}
                                 variant="contained"
@@ -1000,11 +1003,11 @@ export const CarryDistribution = (props: any) => {
                                 disabled={!(usersState.role == 'USER')}
                                 sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                 Back
-                            </Button>
+                            </Button>: <></>}
                         </Grid>
                         <Grid item xs={4} >
                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Step 5 of 5</Typography>
+                            {usersState.role === 'USER' ? <Typography sx={{ flex: 1, mt: 3, mb: 3, justifyContent: 'center' }}>Step 5 of 5</Typography> : <></>}
                             </Box>
                         </Grid>
 
