@@ -270,7 +270,7 @@ export const CarryDistribution = (props: any) => {
     
 
     async function handleClickSubmit(ev: any) {
-        if (await checkAllDocsOk(parentId, "detailed")) {
+        // if (await checkAllDocsOk(parentId, "detailed")) {
             console.log("prelimId", parentId)
             handleSave()
             dispatch(
@@ -281,10 +281,10 @@ export const CarryDistribution = (props: any) => {
                 )
             );
             navigate('/home')
-        }
-        else {
-            setShowResponse(true);
-        }
+        // }
+        // else {
+            // setShowResponse(true);
+        // }
     }
 
     async function checkAllDocsOk(id: any, applicationName: any) {
