@@ -100,7 +100,7 @@ console.log(investmentResponsibleAsLead);
     nameOfPromoter: Yup.string().required("Name Of Promoter is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     address: Yup.string().required("Address is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     telephoneNo: Yup.string().required("Telephone No is required").test("test-name", "Enter a valid Telephone No", function (value: any) {
-      const PhoneRegex = /^(\+91-|\+91|0)?\d{15}$/; // Change This Regex Based On Requirement
+      const PhoneRegex = /^(\+91-|\+91|0)?\d{10,15}$/; // Change This Regex Based On Requirement
       const IsValidPhone = PhoneRegex.test(value);
       if (!IsValidPhone) {
         return false;
@@ -328,7 +328,33 @@ console.log(investmentResponsibleAsLead);
                 /> */}
                  <LocalizationProvider dateAdapter={AdapterDayjs} >
                   <Stack spacing={3}>
-                    <Controller
+                  <Controller
+                      name="yearOfInvestment"
+                      control={control}
+                      defaultValue={null}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error, invalid }
+                      }) => (
+                        // console.log(invalid),
+                        (<DesktopDatePicker
+                          views={["year"]}
+                          // inputFormat='DD/MM/YYYY'
+                          // disableFuture={true}
+                          label="Year of investment"
+                          value={investmentResponsibleAsLead.yearOfInvestment+'-08-18T21:00:00'}
+                          // minDate={Today.toString()}
+                          onChange={(newValue) => {
+                            setValue('yearOfInvestment', newValue);
+                            setDateValue("yearOfInvestment", newValue);
+                          }}
+                          renderInput={(params) => <TextField
+                            helperText={(invalid && getValues("yearOfInvestment") == null && (investmentResponsibleAsLead.yearOfInvestment || '') == '') ? <Typography variant="caption" {...register('yearOfInvestment')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                        />
+                        )
+                      )}
+                    />
+                    {/* <Controller
                       name="yearOfInvestment"
                       control={control}
                       defaultValue={null}
@@ -359,7 +385,7 @@ console.log(investmentResponsibleAsLead);
                         />
                         )
                       )}
-                    />
+                    /> */}
                   </Stack>
                 </LocalizationProvider>
                 <Typography variant="caption" color="error">

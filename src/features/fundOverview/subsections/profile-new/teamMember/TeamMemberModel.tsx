@@ -112,7 +112,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
     prevProfessionalExp: Yup.string().required("Previous Professional Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     education: Yup.string().required("Education is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     keyPerson: Yup.string().required("Key Person is required").nullable(),
-    memberOfInvesteeCommitte: Yup.string().required("Member Of Investee Committe is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    memberOfInvesteeCommitte: Yup.string().required("Member Of Investee Committe is required").nullable(),
     directorship: Yup.string().required("Directorship Held is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
   });
 
@@ -390,23 +390,44 @@ console.log(teamMember)
                     )}
                   />
                 </FormControl>
-                </Grid>
+              </Grid>
               <Grid item xs={4.5}>
-                <TextField
-                  required
-                  id="memberOfInvesteeCommitte"
-                  label="Member Of Investee Committe"
-                  value={teamMember.memberOfInvesteeCommitte}
-                  {...register("memberOfInvesteeCommitte")}
-                  error={(errors.memberOfInvesteeCommitte) ? true : false}
-                  variant="standard"
-                  onChange={handleChange}
-
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.memberOfInvesteeCommitte)?errors.memberOfInvesteeCommitte.message : ''}</>
-                </Typography>
+                <FormControl variant="standard" sx={{ display: 'flex' }}>
+                  <InputLabel id="demo-simple-select-standard-label">Member Of Investee Committe</InputLabel>
+                  <Controller
+                    name="memberOfInvesteeCommitte"
+                    control={control}
+                    defaultValue={null}
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error, invalid }
+                    }) => (
+                      console.log(invalid && (getValues("memberOfInvesteeCommitte") || '')),
+                      (
+                        <>
+                          <Select
+                            labelId="memberOfInvesteeCommitte"
+                            id="memberOfInvesteeCommitte"
+                            value={teamMember.memberOfInvesteeCommitte || ''}
+                            onChange={handleChange}
+                            name="memberOfInvesteeCommitte"
+                            // defaultValue={teamMember["memberOfInvesteeCommitte"] === undefined ? " " : teamMember["memberOfInvesteeCommitte"]}
+                            error={invalid && (getValues("memberOfInvesteeCommitte") == null) ? true : false}
+                          >
+        
+                            <MenuItem key={"Yes"} value={"Yes"} selected={teamMember.memberOfInvesteeCommitte == "Yes"}>Yes</MenuItem>
+                            <MenuItem key={"No"} value={"No"} selected={teamMember.memberOfInvesteeCommitte == "No"}>No</MenuItem>
+                          </Select>
+                          {invalid && (getValues("memberOfInvesteeCommitte") == null) ? <FormHelperText>
+                            <Typography variant="caption" color="error" sx={{ ml: '10px' }}>
+                              <>{errors.memberOfInvesteeCommitte?.message}</>
+                            </Typography>
+                          </FormHelperText> : <></>}
+                        </>
+                      )
+                    )}
+                  />
+                </FormControl>
               </Grid>
               <Grid item xs={4.5}>
                 <TextField
