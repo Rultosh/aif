@@ -90,7 +90,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
     designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     organisation: Yup.string().required("Organisation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     telephoneNo: Yup.string().required("Telephone No is required").test("test-name", "Enter a valid Telephone No", function (value: any) {
-      const PhoneRegex = /^(\+91-|\+91|0)?\d{15}$/; // Change This Regex Based On Requirement
+      const PhoneRegex = /^(\+91-|\+91|0)?\d{10,15}$/; // Change This Regex Based On Requirement
       const IsValidPhone = PhoneRegex.test(value);
       if (!IsValidPhone) {
         return false;
