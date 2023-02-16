@@ -100,52 +100,74 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
     const dealSubSectorValues = {
         "26": {
-            values: ["Blue Collar Outsourcing",
+            values: [
+                "Other",
+                "Blue Collar Outsourcing",
                 "Equipment Rental",
+                "Oil and Gas Services",
                 "Specialised BPO or IT Services",
+                "Testing and Inspection",
+                "Transport Logistics",
+                "Water Waste Management",
                 "White Collar Outsourcing",
-                "Other"
             ]
         },
         "27": {
-            values: ["Apparel",
+            values: [
+                "Other",
+                "Apparel",
                 "Education",
-                "Food Retailers",
+                "Food and Beverage Producers",
+                "Food Retailers",                
                 "General Retailers",
                 "Healthcare",
+                "Home and Personal Care",
                 "Household Durables",
                 "Leisure",
                 "Restaurants",
-                "Other"
             ]
         },
         "28": {
             values: [
+                "Other",
                 "Banking",
-                "Wealth and Distribution",
+                "FS Infrastructure and Payments",
                 "Specialty Credit",
-                "Other"
+                "Wealth and Distribution",
             ]
         },
         "29": {
             values: [
-                "Electronics", "Medical Technology", "Industrial Consumables", "Power", "Transportation Equipment", "Water Waste Management", "Other"
+                "Other",
+                "Construction and Building Equipment",
+                "Construction and Building Materials",
+                "Electronics", 
+                "Farm and Agriculture",
+                "Industrial Consumables", 
+                "Medical Technology", 
+                "Paper, Packaging and Print",
+                "Power", 
+                "Transportation Equipment", 
+                "Water Waste Management", 
             ]
         },
         "30": {
             values: [
-                "Distribution", "Non Renewables", "Renewables", "Transport", "Other"
+                "Other", "Distribution", "Renewables", "Non Renewables", "Transport"
             ]
         },
         "31": {
             values: [
-                "Hospitality", "Industrial", "Office", "Residential", "Retail", "Other"
-
+                "Other", "Hospitality", "Industrial", "Office", "Residential", "Retail", 
             ]
         },
         "32": {
             values: [
-                "Agribusiness", "Media", "Regional or Sector Funds", "Telecoms", "Other"
+                "Other", 
+                "Agribusiness", 
+                "Media", "Minerals, Oil and Gas", 
+                "Regional or Sector Funds", 
+                "Telecoms"
             ]
         }
     }
@@ -554,7 +576,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                 onChange={handleChange}
                                 name="dealSubsector"
                             >
-                                <MenuItem key={'test'} value={'test'} selected={String(prelimApplicationFormData.dealSubsector || '') === 'test'}>{'test'}</MenuItem>
+                                {/* <MenuItem key={'test'} value={'test'} selected={String(prelimApplicationFormData.dealSubsector || '') === 'test'}>{'test'}</MenuItem> */}
                                 {prelimApplicationFormData.dealSector &&
                                     (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)] &&
                                     (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)].values.map((item: string) => {
