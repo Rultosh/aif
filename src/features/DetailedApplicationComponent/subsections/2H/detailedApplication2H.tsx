@@ -62,7 +62,7 @@ export const DetailedApplication2H = (props:any) => {
   useEffect(() => {
     if (parentId && Number(parentId)) {
       if (!state[0]?.data[parentId]) {
-        controller.fetch({ ...formData, parentId: Number(parentId) });
+        controller.fetch({ ...formData, id: Number(parentId) });
       }
     }
   }, [])

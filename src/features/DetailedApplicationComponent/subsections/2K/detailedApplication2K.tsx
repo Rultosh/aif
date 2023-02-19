@@ -20,6 +20,7 @@ import SaveIcon from '@mui/icons-material/Save';
 export const DetailedApplication2K = (props: any) => {
 
     const params = useParams()
+    
     const parentId  = Number(params.id)
     const [formData, setFormData] = useState(defaultIDetailedApplication);
     const [actionId] = useState(uuid())
@@ -61,7 +62,7 @@ export const DetailedApplication2K = (props: any) => {
     useEffect(() => {
         if (parentId && Number(parentId)) {
           if (!state[0]?.data[parentId]) {
-            controller.fetch({ ...formData, parentId: Number(parentId) });
+            controller.fetch({ ...formData, id: Number(parentId) });
             }
         }
     }, [])
@@ -69,6 +70,7 @@ export const DetailedApplication2K = (props: any) => {
     useEffect(() => {
         let newData = state[0]?.data[Number(parentId)];
         if (newData) setFormData(newData)
+        setAgreed(newData?.declarationAccepted || false);
     }, [state[0]?.data])
 
     /*const handleChange = (key:string) => {
