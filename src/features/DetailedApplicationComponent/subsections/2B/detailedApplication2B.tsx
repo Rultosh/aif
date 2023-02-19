@@ -147,7 +147,7 @@ export const DetailedApplication2B = (props: any) => {
 
     let listItem = ['Please upload the files following convention as "FundName_Documentname_Date" for file (Include date in filename if relevent to the document) ', "Please fill up / answer all the points to the extent possible.", "Receipt of the information does not in any way bind / commits SIDBI to sanction assistance to the VC / PE fund, which will be considered on the merits of the case.", "If any of the points are covered in the Private Placement Memorandum (PPM), then please give reference to the relevant paragraph / page number of the PPM.", "Please upload the copy of supporting documents. Please ensure any single file is not more than 5MB.", "If there are more than one document against a specific question, please zip the relevant documents and upload the zipped file.", "Answers may be specific. Please avoid vague answers."];
     
-    const checkScript = (value: any) => !value.match(/<[^> ]*>/);
+    const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
     const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({

@@ -86,7 +86,7 @@ export const DetailedApplication2H = (props:any) => {
     let listItem = ["a. Name of the fund(s), features of the fund like industry / sector / investment stage / geographic focus etc. (as may be applicable),", "b. total corpus, total amount invested, total number of investments, average investment size,", "c. total amount distributed to the contributors,", "d. undrawn capital (if any, with reasons thereof),", "e. IRR of the fund (full exits, partial exits, entire fund, in the hands of the contributors),", "f. Please furnish the list of investee companies along with their status (current valuation / exit value) of those fund(s)."]
     let subListItem = ["• Company & amount invested", "• % holding & valuation (pre-money and post-money)", "• Key reasons for the investment & basis for investment valuation", "• What was / is the value add made by the Investment Manager", "• Strategy for exit (if not exited);", "• If not exited (as on date), then valuation as on recent date along with valuation report", "• If exited, then exit amount, IRR on exit, method of exit."]
     
-    const checkScript = (value: any) => !value.match(/<[^> ]*>/);
+    const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
     const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
