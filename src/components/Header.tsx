@@ -33,14 +33,21 @@ const Header = (props: any) => {
         >
          Alternative Investment Fund
         </Typography>
-        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+       
           {navItems.map((item) => (
-            
-            <Button key={item} sx={{ color: '#fff' }}>
+             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+               {item == 'FAQs' ? <Button
+                                href="/templates/FAQs.zip"
+                                disableElevation
+                                sx={{ color: '#FFFFFF', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px' }} >
+                                {item}
+                            </Button>
+            :<Button key={item} sx={{ color: '#fff' }}>
               {item}
-            </Button>
+            </Button>}
+            </Box>
           ))}
-        </Box>
+        
         </Toolbar >
       </Container>
     </AppBar>
