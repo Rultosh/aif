@@ -84,7 +84,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     p: 4,
   };
     
-  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const checkScript = (value: any) => !value.match(/<[^> ]*>/);
   const htmlTagsNotAllowed = "Tags not allowed in input.";
   
   const validationSchema = Yup.object().shape({

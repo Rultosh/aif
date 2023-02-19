@@ -99,7 +99,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     p: 4,
   };
     
-  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const checkScript = (value: any) => !value.match(/<[^> ]*>/);
   const htmlTagsNotAllowed = "Tags not allowed in input.";
   
   const validationSchema = Yup.object().shape({
