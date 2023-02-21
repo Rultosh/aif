@@ -42,6 +42,7 @@ import { PrivateRoute } from './components/auth/PrivateRoute';
 import { AdminRoute } from './components/auth/AdminRoute';
 import { UserAdminRoute } from './components/auth/UserAdminRoute';
 import {CheckAuth} from '../src/app/api';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 function App() {
 
@@ -58,8 +59,14 @@ function App() {
     });
     return tempVal
   }
+  // const THEME = createTheme({
+  //   typography: {
+  //   "fontFamily": "Roboto",
+  //   }
+  // });
 
   return (
+    // <ThemeProvider theme={THEME}>
     <div className="App"  >
       <Header className="App-header">
       </Header>
@@ -294,6 +301,7 @@ function App() {
         </Route>
       </Routes>
     </div>
+  // </ThemeProvider>
   );
 }
 

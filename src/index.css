@@ -50,6 +50,7 @@ cursor: pointer;
 
 .login_card_left{
   background-image: url('./images/login_card.png');
+  background-position-x: center;
 }
 
 code {
@@ -69,4 +70,31 @@ code {
 .remove_icon:hover {
   background-color: #f12d2d; 
   cursor:'pointer';
+}
+
+.tooltipHeadLogin:before {
+  content: "";
+  position: absolute;
+  border-top: 15px solid #363062;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  top: 100%;
+  left: 45%;
+  margin-left: -5px;
+  margin-top: -5px;
+}
+
+.headerLink a {
+  color: black;
+  text-decoration: none;
+}
+
+.menuItemHeader {
+  border-bottom: 3px solid transparent;
+}
+
+.menuItemHeader:hover {
+  border-bottom: 1px solid #B499C7;
+  border-radius: 0;
+  background-color: transparent !important;
 }
