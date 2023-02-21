@@ -14,6 +14,8 @@ import logo from '../images/logo.png'
 import { Link } from 'react-router-dom'
 import Divider from '@mui/material/Divider';
 
+import loginRupeeIconImg from '../images/logo_rupee_symbol.png'
+
 
 
 
@@ -21,32 +23,54 @@ import Divider from '@mui/material/Divider';
 const Header = (props: any) => {
 
   const navItems = ['FAQs', 'Help', 'Toll Free: 1800 XXX 1234'];
+  let count = 0;
   return (
     <AppBar position="static" component='nav' sx={{ backgroundColor: '#363062' }}>
       <Container maxWidth="xl">
       <Toolbar disableGutters>
-        
+        <Box
+          className='logoIconRupee'
+          component="img"
+          sx={{ position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+          alt="success"
+          src={loginRupeeIconImg}
+        />
+
         <Typography
           variant="h6"
           component="div"
-          sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' ,fontWeight:'bold'} }}
+          sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' ,fontWeight:'normal'} }}
         >
-         Alternative Investment Fund
+         {/* Alternative Investment Fund */}
+          <div id="Component_15__2" className="Component_15___2">
+            <div id="ALTERNATE_INVESTMENT_FUND__" style={{ fontSize: '40px', color: 'rgba(255,255,255,1)' }}>
+              <span>A</span>
+              <span style={{fontSize:'25px'}}>LTERNATE </span>
+              <span>I</span>
+              <span style={{fontSize:'25px'}}>NVESTMENT</span>
+              <span> F</span>
+              <span style={{fontSize:'25px'}}>UND</span>
+              <span>  </span>
+            </div>
+          </div>
         </Typography>
        
-          {navItems.map((item) => (
+        <div className='logoLineAnimation'></div>
+          {navItems.map((item) => {
+            count++;
+            return (
              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                {item == 'FAQs' ? <Button
                                 href="/templates/FAQs.zip"
                                 disableElevation
-                                sx={{ color: '#FFFFFF', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px' }} >
+                                sx={{ color: '#FFFFFF', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px', borderRight: '1px solid white', borderRadius: '0' }} >
                                 {item}
                             </Button>
-            :<Button key={item} sx={{ color: '#fff' }}>
+            :<Button key={item} sx={{ color: '#fff', pt: 0.5, pb: 0.5, borderRight: navItems.length == count? '0px solid white' : '1px solid white', borderRadius: '0' }}>
               {item}
             </Button>}
             </Box>
-          ))}
+          )})}
         
         </Toolbar >
       </Container>

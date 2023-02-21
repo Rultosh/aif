@@ -112,7 +112,7 @@ export const TeamMemberModel = (props: TeamMemberModelProps) => {
     prevProfessionalExp: Yup.string().required("Previous Professional Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     education: Yup.string().required("Education is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     keyPerson: Yup.string().required("Key Person is required").nullable(),
-    memberOfInvesteeCommitte: Yup.string().required("Member Of Investee Committe is required").nullable(),
+    memberOfInvesteeCommitte: Yup.string().required("Member Of Investee Committee is required").nullable(),
     directorship: Yup.string().required("Directorship Held is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
   });
 
@@ -393,7 +393,7 @@ console.log(teamMember)
               </Grid>
               <Grid item xs={4.5}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
-                  <InputLabel id="demo-simple-select-standard-label">Member Of Investee Committe</InputLabel>
+                  <InputLabel id="demo-simple-select-standard-label">Member Of Investee Committee</InputLabel>
                   <Controller
                     name="memberOfInvesteeCommitte"
                     control={control}

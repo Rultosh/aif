@@ -1,3 +1,59 @@
+.logoIconRupee {
+  position: absolute !important;
+  width: 20px;
+  height: 20px;
+  left: 157px;
+  top: 0px;
+  overflow: visible;
+  animation-name: logoIconRupee;
+  animation-duration: 5s;  
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-in;
+  visibility: hidden;
+}
+
+@keyframes logoIconRupee {
+  70% { visibility: hidden; }
+  100% { visibility: visible; }
+  from {top: -100000px; background-color: transparent;}
+  to {top: 6px; background-color: transparent;}
+}
+
+.loginIconImg {
+  position: relative !important;
+  animation-name: loginIconImg;
+  animation-duration: 5s;  
+  /* animation-delay: 10s; */
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-in;
+  visibility: hidden;
+}
+
+@keyframes loginIconImg {
+  70% { visibility: hidden; }
+  100% { visibility: visible; }
+  from {top: 50px; background-color: transparent;}
+  to {top: 6px; background-color: transparent;}
+}
+
+div.logoLineAnimation {
+  width: 420px;
+  height: 3px;
+  background: transparent;
+  position: absolute;
+  animation-name: example;
+  animation-duration: 5s;  
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-in;
+  visibility: hidden;
+}
+
+@keyframes example {
+  70% { visibility: hidden; }
+  100% { visibility: visible; }
+  from {left: -100000px; top: 65px; background-color: transparent;}
+  to {left: 0px; top: 65px; background-color: rgba(113,116,155,1) ;}
+}
 
 .App-header {
   background-color: white;

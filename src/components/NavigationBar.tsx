@@ -169,7 +169,7 @@ const NavigationBar = (props: any) => {
               {pages != undefined ? pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, }}>
-                    <Link to={`/${page}`}>
+                    <Link to={`/${page}`} style = {{cursor:'pointer', color: '#000000', textDecoration: 'none'}}>
                       {page}
                     </Link>
                   </Typography>
@@ -213,9 +213,10 @@ const NavigationBar = (props: any) => {
                 key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ ml: '50px', my: 2, color: '#363062', display: 'block', fontSize: '15px', fontWeight: 'bold', textTransform: 'none' }}
+                className="menuItemHeader"
 
               >
-                <Link to={`/${page}`} style = {{cursor:'pointer'}}>
+                <Link to={`/${page}`} style = {{cursor:'pointer', color: '#000000', textDecoration: 'none'}}>
                   {page}
                 </Link>
               </Button>
