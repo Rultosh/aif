@@ -1052,6 +1052,7 @@ export const CarryDistribution = (props: any) => {
                                         //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                                         //value={formData["commitmentReceived"] || ''}
                                         variant="standard"
+                                        multiline
                                         onChange={handlePreviewComments}
 
                                         sx={{ display: 'flex', }}

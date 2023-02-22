@@ -176,6 +176,7 @@ export const DetailedApplication2F = (props: any) => {
                                 //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
                                 value={formData["reportingStructure"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
                                 placeholder="Please enter comments"
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -211,6 +212,7 @@ export const DetailedApplication2F = (props: any) => {
                                 //defaultValue={formValue.nameOfTheTrustee === undefined ? " " : formValue["NameOfTheFund"]}
                                 value={formData["freqOfMeeting"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}

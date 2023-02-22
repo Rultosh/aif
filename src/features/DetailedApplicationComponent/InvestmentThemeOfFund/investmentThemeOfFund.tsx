@@ -130,6 +130,7 @@ export const InvestmentThemeOfFund = (props: any) => {
                                 //defaultValue={formData.investmentThemeOfFund === undefined ? " " : formData["investmentThemeOfFund"]}
                                 value={formData["investmentThemeOfFund"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}

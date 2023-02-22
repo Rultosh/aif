@@ -602,6 +602,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={errors.description ? true : false}
                             onChange={handleChange}
                             variant="standard"
+                            multiline
                             sx={{ display: 'flex', mr: 2 }}
                         />
                         <Typography variant="caption" color="error">
@@ -619,6 +620,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={errors.investmentStrategy ? true : false}
                             onChange={handleChange}
                             variant="standard"
+                            multiline
                             sx={{ display: 'flex', ml: 2, mr: 2 }}
                         />
                         <Typography variant="caption" color="error" sx={{ ml: '20px' }}>

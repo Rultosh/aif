@@ -167,6 +167,7 @@ export const DetailedApplication2D = (props: any) => {
                                value={formData["numberOfDealsEvaluated"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -191,6 +192,7 @@ export const DetailedApplication2D = (props: any) => {
                                value={formData["sourcingBreakUps"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -215,6 +217,7 @@ export const DetailedApplication2D = (props: any) => {
                                value={formData["businessPlanBreakUps"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -239,6 +242,7 @@ export const DetailedApplication2D = (props: any) => {
                                value={formData["conversionRation"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />

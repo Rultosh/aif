@@ -227,6 +227,7 @@ export const DetailedApplication2B = (props: any) => {
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                 value={formData["fundLaunchedDate"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -254,6 +255,7 @@ export const DetailedApplication2B = (props: any) => {
                                         //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                                         value={formData["commitmentReceived"] || ''}
                                         variant="standard"
+                                        multiline
                                         onChange={handleChange}
 
                                         sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -285,6 +287,7 @@ export const DetailedApplication2B = (props: any) => {
                                         //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
                                         value={formData["firstClosing"] || ''}
                                         variant="standard"
+                                        multiline
                                         onChange={handleChange}
 
                                         sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -312,6 +315,7 @@ export const DetailedApplication2B = (props: any) => {
                                 //defaultValue={formData.dateOfFinalClosing === undefined ? " " : formData["dateOfFinalClosing"]}
                                 value={formData["dateOfFinalClosing"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -337,6 +341,7 @@ export const DetailedApplication2B = (props: any) => {
                                 //defaultValue={formData.contribTerms === undefined ? " " : formData["contribTerms"]}
                                 value={formData["contribTerms"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -362,6 +367,7 @@ export const DetailedApplication2B = (props: any) => {
                                 //defaultValue={formData.investmentManagerPlacementAgent === undefined ? " " : formData["investmentManagerPlacementAgent"]}
                                 value={formData["investmentManagerPlacementAgent"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}

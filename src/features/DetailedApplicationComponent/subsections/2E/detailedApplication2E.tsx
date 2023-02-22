@@ -174,6 +174,7 @@ export const DetailedApplication2E = (props: any) => {
                                value={formData["listOfExternalFirms"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -200,6 +201,7 @@ export const DetailedApplication2E = (props: any) => {
                                value={formData["monitoringPractices"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -225,6 +227,7 @@ export const DetailedApplication2E = (props: any) => {
                                value={formData["imValueAdd"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
