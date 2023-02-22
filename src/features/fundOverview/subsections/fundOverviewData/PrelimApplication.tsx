@@ -663,7 +663,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdTargetCorpusDomestic"
-                                                label="Domestic"
+                                                label="Domestic (₹ Crore)"
                                                 value={prelimApplicationFormData.sdTargetCorpusDomestic || ''}
                                                 {...register("sdTargetCorpusDomestic")}
                                                 error={errors.sdTargetCorpusDomestic && getValues("sdTargetCorpusDomestic") ==  '' ? true : false}
@@ -680,7 +680,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdTargetCorpusOverseas"
-                                                label="Overseas, if any"
+                                                label="Overseas, if any (₹ Crore)"
                                                 value={prelimApplicationFormData.sdTargetCorpusOverseas || ''}
                                                 {...register("sdTargetCorpusOverseas")}
                                                 error={errors.sdTargetCorpusOverseas && getValues("sdTargetCorpusOverseas") ==  '' ? true : false}
@@ -730,7 +730,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdGreenShoeTargetCorpusDomestic"
-                                                label="Domestic"
+                                                label="Domestic (₹ Crore)"
                                                 value={prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic || ''}
                                                 {...register("sdGreenShoeTargetCorpusDomestic")}
                                                 error={errors.sdGreenShoeTargetCorpusDomestic && getValues("sdGreenShoeTargetCorpusDomestic") ==  '' ? true : false}
@@ -747,7 +747,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdGreenShoeTargetCorpusOverseas"
-                                                label="Overseas, if any"
+                                                label="Overseas, if any (₹ Crore)"
                                                 value={prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas || ''}
                                                 {...register("sdGreenShoeTargetCorpusOverseas")}
                                                 error={errors.sdGreenShoeTargetCorpusOverseas && getValues("sdGreenShoeTargetCorpusOverseas") ==  '' ? true : false}
@@ -804,7 +804,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdFirstClosingDomesticAmount"
-                                                label={prelimApplicationFormData.firstClosing ? "Domestic Amount" : "Expected Domestic Amount"}
+                                                label={prelimApplicationFormData.firstClosing ? "Domestic Amount (₹ Crore)" : "Expected Domestic Amount (₹ Crore)"}
                                                 value={prelimApplicationFormData.sdFirstClosingDomesticAmount || ''}
                                                 {...register("sdFirstClosingDomesticAmount")}
                                                 error={errors.sdFirstClosingDomesticAmount && getValues("sdFirstClosingDomesticAmount") ==  '' ? true : false}
@@ -853,7 +853,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 required
                                                 type="number"
                                                 id="sdFirstClosingOverseasAmount"
-                                                label={prelimApplicationFormData.firstClosing ? "Overseas Amount" : "Expected Overseas Amount"}
+                                                label={prelimApplicationFormData.firstClosing ? "Overseas Amount (₹ Crore)" : "Expected Overseas Amount (₹ Crore)"}
                                                 value={prelimApplicationFormData.sdFirstClosingOverseasAmount || ''}
                                                 {...register("sdFirstClosingOverseasAmount")}
                                                 error={errors.sdFirstClosingOverseasAmount && getValues("sdFirstClosingOverseasAmount") ==  '' ? true : false}

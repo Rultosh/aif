@@ -184,7 +184,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   required
                   type="number"
                   id="amountInvested"
-                  label="Amount Invested"
+                  label="Amount Invested (₹ Crore)"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPastFormData.amountInvested}
                   {...register("amountInvested")}

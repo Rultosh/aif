@@ -164,7 +164,7 @@ console.log(investmentResponsibleAsLead);
                   required
                   type="number"
                   id="amountInvested"
-                  label="Amount invested"
+                  label="Amount invested (₹ Crore)"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   //value={formValue["NameOfTheFund"]}
                   value={investmentResponsibleAsLead.amountInvested}

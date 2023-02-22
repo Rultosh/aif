@@ -22,7 +22,7 @@ export const InvestmentResponsibleAsNonLeadList = (props: InvestmentResponsibleA
 
     const dispatch = useAppDispatch();
     const [open, setOpen] = useState(false);
-    const tableHeaders = ["Name of company", "Amount invested", "Date of investment", "Exited/Write off", "Date of exit", "IRR Percent", "Comment", "Action"]
+    const tableHeaders = ["Name of company", "Amount invested (₹ Crore)", "Date of investment", "Exited/Write off", "Date of exit", "IRR Percent", "Comment", "Action"]
 
     let headerComponent = []
 
