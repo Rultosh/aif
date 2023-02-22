@@ -3,7 +3,7 @@ export const questions = {
       {
         "id": 1,
         "text":"Sponsor's (only those Sponsor(s) having direct involvement in the Fund) / IM's Commitment to the proposed Fund" ,
-        "options":[">=10% of corpus", ">=5% but less than 10% of corpus", ">=2.50% but less than 5% corpus", "Lower of 2.50% or ₹5 Cr of corpus as per SEBI Regulations"],
+        "options":[">=10% of corpus", ">=5% but less than 10% of corpus", ">=2.50% but less than 5% corpus", "Lower of 2.50% or Rs.5 Cr of corpus as per SEBI Regulations"],
         "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
@@ -52,7 +52,9 @@ export const questions = {
     {
         "id": 8,
         "text":"Advisory Board / Governance Board, LP Advisory Committee, etc." ,
-        "options":["The Fund shall have a full fledged  Advisory Board / Governance Board,LP Advisory Committee, etc. with representation from major investors", "The Fund shall have an Advisory Board / Governance Board, LP Advisory Committee, etc. with representation from a few investors", "The Fund do not propose to have such committees"],
+        "options":[
+            "The Fund shall have a full fledged Advisory Board / Governance Board,LP Advisory Committee, etc. with representation from major investors", 
+            "The Fund shall have an Advisory Board / Governance Board, LP Advisory Committee, etc. with representation from a few investors", "The Fund do not propose to have such committees"],
         "size":12,
         'weightage':[1,0.6,0.3]
     },

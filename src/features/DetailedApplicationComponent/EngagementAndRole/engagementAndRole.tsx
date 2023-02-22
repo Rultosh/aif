@@ -43,7 +43,7 @@ export const EngagementAndRole = (props: any) => {
         dispatch(updateStepperIndex(3))
       if (parentId && Number(parentId)) {
         if (!state[0]?.data[parentId]) {
-          controller.fetch({ ...formData, parentId: Number(parentId) });
+          controller.fetch({ ...formData, id: Number(parentId) });
         }
       }
     }, [])
