@@ -164,6 +164,56 @@ export const CarryDistribution = (props: any) => {
         setFormData(copiedValue);
     };
 
+    const handleChangeCapitalBalanceAmount = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        copiedValue['capitalBalance'] =  String(Number(formData["corpusAssumed"] || 0) - ev.target.value);
+        setFormData(copiedValue);
+        console.log(formData);
+    };
+
+    const handleChangeHurdleBalanceAmount = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        copiedValue['hurdleBalance'] =  String(Number(formData["capitalBalance"] || 0) - ev.target.value);
+        setFormData(copiedValue);
+        console.log(formData);
+    };
+
+    const handleChangeCatchupBalanceAmount = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        copiedValue['catchupBalance'] =  String(Number(formData["hurdleBalance"] || 0) - ev.target.value);
+        setFormData(copiedValue);
+        console.log(formData);
+    };
+
+    const handleChangeProfitBalanceAmount = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        copiedValue['profitBalance'] =  String(Number(formData["catchupBalance"] || 0) - ev.target.value);
+        setFormData(copiedValue);
+        console.log(formData);
+    };
+
+    const handleChangeCarryBalanceAmount = (ev: any) => {
+        ev.preventDefault();
+        let copiedValue = { ...formData }
+        let key = ev.target.id ? ev.target.id : ev.target.name;
+        copiedValue[key as keyof typeof formData] = ev.target.value;
+        copiedValue['carryBalance'] =  String(Number(formData["profitBalance"] || 0) - ev.target.value);
+        setFormData(copiedValue);
+        console.log(formData);
+    };
+
     const handleNewChange = (ev: any) => {
         ev.preventDefault();
         let copiedValue = { ...newformDataDetails }
@@ -216,7 +266,7 @@ export const CarryDistribution = (props: any) => {
 
     //sum of 1 to 5 balance
     const getBalanceAmount = () => {
-        let sum = (Number(formData?.capitalBalance) || 0) + (Number(formData?.hurdleBalance) || 0) + (Number(formData.catchupBalance) || 0) + (Number(formData.profitBalance) || 0) + (Number(formData.carryBalance || 0))
+        let sum = (Number(formData?.corpusAssumed) || 0) - ((Number(formData?.capitalAmount) || 0) + (Number(formData?.hurdleAmount) || 0) + (Number(formData.catchupAmount) || 0) + (Number(formData.profitAmount) || 0) + (Number(formData.carryAmount || 0)))
         console.log(sum)
         return sum
     }
@@ -548,7 +598,10 @@ export const CarryDistribution = (props: any) => {
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["capitalAmount"] || ''}
                                             variant="standard"
-                                            onChange={handleChange}
+                                            onChange={(ev: any) => {
+                                                handleChange(ev);
+                                                handleChangeCapitalBalanceAmount(ev);
+                                            }}
 
                                             sx={{ display: 'flex', mt: 2, mb: 2 }}
                                         />
@@ -580,7 +633,10 @@ export const CarryDistribution = (props: any) => {
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["hurdleAmount"] || ''}
                                             variant="standard"
-                                            onChange={handleChange}
+                                            onChange={(ev: any) => {
+                                                handleChange(ev);
+                                                handleChangeHurdleBalanceAmount(ev);
+                                            }}
 
                                             sx={{ display: 'flex', mt: 2, mb: 2 }}
                                         />
@@ -612,7 +668,10 @@ export const CarryDistribution = (props: any) => {
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["catchupAmount"] || ''}
                                             variant="standard"
-                                            onChange={handleChange}
+                                            onChange={(ev: any) => {
+                                                handleChange(ev);
+                                                handleChangeCatchupBalanceAmount(ev);
+                                            }}
 
                                             sx={{ display: 'flex', mt: 2, mb: 2 }}
                                         />
@@ -643,7 +702,10 @@ export const CarryDistribution = (props: any) => {
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["profitAmount"] || ''}
                                             variant="standard"
-                                            onChange={handleChange}
+                                            onChange={(ev: any) => {
+                                                handleChange(ev);
+                                                handleChangeProfitBalanceAmount(ev);
+                                            }}
 
                                             sx={{ display: 'flex', mt: 2, mb: 2 }}
                                         />
@@ -675,7 +737,10 @@ export const CarryDistribution = (props: any) => {
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["carryAmount"]}
                                             variant="standard"
-                                            onChange={handleChange}
+                                            onChange={(ev: any) => {
+                                                handleChange(ev);
+                                                handleChangeCarryBalanceAmount(ev);
+                                            }}
 
                                             sx={{ display: 'flex', mt: 2, mb: 2 }}
                                         />
