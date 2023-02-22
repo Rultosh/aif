@@ -207,6 +207,7 @@ export const SelfRating = (props:any) => {
                                                     value={getValue("q" + (i + 1).toString() + "Comments") || ''}
 
                                                     variant="standard"
+                                                    multiline
                                                     onChange={(e) => handleChange(e, (i + 1).toString() + "Comments")}
 
                                                     sx={{ display: 'flex', ml: 2 }}

@@ -132,6 +132,7 @@ export const EngagementAndRole = (props: any) => {
                                 //defaultValue={formData.imRoleAndEngagement === undefined ? " " : formData["fundLaunchedDate"]}
                                 value={formData["imRoleAndEngagement"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}

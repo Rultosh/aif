@@ -361,6 +361,7 @@ export const DetailedApplication2A = (props:any) => {
                                 error={errors.detailOfFundLife ? true : false}
                                 //defaultValue={formData.detailOfFundLife === undefined ? " " : formData["detailOfFundLife"]}
                                 value={formData["detailOfFundLife"] || ''}
+                                multiline
                                 variant="standard"
                                 onChange={handleChange}
                                 sx={{ display: 'flex', ml: 2 }}
@@ -381,6 +382,7 @@ export const DetailedApplication2A = (props:any) => {
                                 error={errors.investmentPeriod ? true : false}
                                 //defaultValue={formData.investmentPeriod === undefined ? " " : formData["investmentPeriod"]}
                                 value={formData["investmentPeriod"] || ''}
+                                multiline
                                 variant="standard"
                                 onChange={handleChange}
                                 sx={{ display: 'flex', ml: 2 }}
@@ -402,6 +404,7 @@ export const DetailedApplication2A = (props:any) => {
                                 //defaultValue={formData.targetReturnOfTheFund === undefined ? " " : formData["targetReturnOfTheFund"]}
                                 value={formData["targetReturnOfTheFund"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2 }}
@@ -424,7 +427,7 @@ export const DetailedApplication2A = (props:any) => {
                                 value={formData["hurdleRate"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
-
+                                multiline
                                 sx={{ display: 'flex', ml: 2 }}
                             />
                             <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
@@ -444,6 +447,7 @@ export const DetailedApplication2A = (props:any) => {
                                 //defaultValue={formData.managementFee === undefined ? " " : formData["managementFee"]}
                                 value={formData["managementFee"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2 }}
@@ -466,6 +470,7 @@ export const DetailedApplication2A = (props:any) => {
                                 //defaultValue={formData.provisionOfFundSetup === undefined ? " " : formData["provisionOfFundSetup"]}
                                 value={formData["provisionOfFundSetup"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2 }}
@@ -488,6 +493,7 @@ export const DetailedApplication2A = (props:any) => {
                                 //defaultValue={formData.fundOnlyPrimaryInvestment === undefined ? " " : formData["fundOnlyPrimaryInvestment"]}
                                 value={formData["fundOnlyPrimaryInvestment"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2 }}
@@ -510,6 +516,7 @@ export const DetailedApplication2A = (props:any) => {
                                 //defaultValue={formData.detailsOfExistingFund === undefined ? " " : formData["detailsOfExistingFund"]}
                                 value={formData["detailsOfExistingFund"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
                                 sx={{ display: 'flex', ml: 2 }}
                             />

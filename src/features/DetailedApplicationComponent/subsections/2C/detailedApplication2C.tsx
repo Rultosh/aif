@@ -185,6 +185,7 @@ export const DetailedApplication2C = (props: any) => {
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                value={formData["approvers"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -210,6 +211,7 @@ export const DetailedApplication2C = (props: any) => {
                                 //defaultValue={formData.nominatinPolicy === undefined ? " " : formData["nominatinPolicy"]}
                                value={formData["nominatinPolicy"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -278,6 +280,7 @@ export const DetailedApplication2C = (props: any) => {
                                 //defaultValue={formData.investmentStrategy === undefined ? " " : formData["investmentStrategy"]}
                                value={formData["investmentStrategy"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -304,6 +307,7 @@ export const DetailedApplication2C = (props: any) => {
                                 //defaultValue={formData.grossReturnObjective === undefined ? " " : formData["grossReturnObjective"]}
                                value={formData["grossReturnObjective"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -328,6 +332,7 @@ export const DetailedApplication2C = (props: any) => {
                                 //defaultValue={formData.targetSizePercentage === undefined ? " " : formData["targetSizePercentage"]}
                                value={formData["targetSizePercentage"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -353,6 +358,7 @@ export const DetailedApplication2C = (props: any) => {
                                value={formData["targetNumberOfInvestmentPlanned"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -377,6 +383,7 @@ export const DetailedApplication2C = (props: any) => {
                                value={formData["avgHoldingPeriod"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -401,6 +408,7 @@ export const DetailedApplication2C = (props: any) => {
                                value={formData["exitStrategy"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -425,6 +433,7 @@ export const DetailedApplication2C = (props: any) => {
                                 //defaultValue={formData.controlsAndRights === undefined ? " " : formData["controlsAndRights"]}
                                value={formData["controlsAndRights"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -451,6 +460,7 @@ export const DetailedApplication2C = (props: any) => {
                                value={formData["managementReplacements"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />
@@ -475,6 +485,7 @@ export const DetailedApplication2C = (props: any) => {
                                value={formData["investmentRollover"] || ''}
                                 variant="standard"
                                 onChange={handleChange}
+                                multiline
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
                             />

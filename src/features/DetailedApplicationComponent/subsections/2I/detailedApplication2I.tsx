@@ -254,6 +254,7 @@ export const DetailedApplication2I = (props: any) => {
                                     // defaultValue={formData.reason === undefined ? " " : formData["reason"]}
                                     value={formData["sebiCompliance"] || ''}
                                     variant="standard"
+                                    multiline
                                     onChange={handleChange}
                                     sx={{ display: 'flex', ml: 2, mb: 2 }}
                                 /> :

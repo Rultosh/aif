@@ -205,6 +205,7 @@ export const DetailedApplication2H = (props:any) => {
                                 //defaultValue={formData.monitoringPractices === undefined ? " " : formData["monitoringPractices"]}
                                 value={formData["disputes"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}

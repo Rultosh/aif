@@ -190,53 +190,54 @@ export const Preview = (props: any) => {
                                 </CardContent>
                             </Card>
 
-                            <Box sx={{ display: 'flex' }}>
-                                <div style={{ margin: '5px' }}>
-                                    <Chip
-                                        icon={<FileDownloadIcon />}
-                                        label="Download Applicaton"
-                                        size="medium"
-                                        component="a"
-                                        href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
-                                        sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': { backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
-                                </div>
-                                <div style={{ margin: '5px' }}>
-                                    <Chip
-                                        icon={<FileDownloadIcon />}
-                                        label="Download All as Zip"
-                                        size="medium"
-                                        component="a"
-                                        href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
-                                        sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': { backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
-                                </div>
-                                <div style={{ margin: '5px' }}>
-                                    <DocumentChip
-                                        label="Upload Digitally Signed Application"
-                                        id={`DigitallySignedApplication${id}`}
-                                        signed={true}
-                                    />
-                                </div>
-                                <div style={{ margin: '5px' }}>
-                                    <DocumentChip
-                                        label="Upload Digital Certificates"
-                                        id={`DigitalCertificate${id}`} />
-                                </div>
-                                <div style={{ margin: '5px' }}>
-                                    <DocumentChip
-                                        label="Upload"
-                                        id={`unsignedDocument${id}`} />
-                                </div>
-                            </Box>
-                            <TextField
-                                required
-                                id="previewComments"
-                                label="Leave a comment"
-                                //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
-                                //value={formData["commitmentReceived"] || ''}
-                                variant="standard"
-                                {...register("previewComments")}
-                                error={(errors.previewComments && getValues("previewComments") == '') ? true : false}
-                                onChange={handleChange}
+                        <Box sx={{ display: 'flex' }}>
+                            <div style={{ margin: '5px' }}>
+                                <Chip
+                                    icon={<FileDownloadIcon />}
+                                    label="Download Applicaton"
+                                    size="medium"
+                                    component="a"
+                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': { backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
+                            </div>
+                            <div style={{ margin: '5px' }}>
+                                <Chip
+                                    icon={<FileDownloadIcon />}
+                                    label="Download All as Zip"
+                                    size="medium"
+                                    component="a"
+                                    href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
+                                    sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': { backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
+                            </div>
+                            <div style={{ margin: '5px' }}>
+                                <DocumentChip
+                                    label="Upload Digitally Signed Application"
+                                    id={`DigitallySignedApplication${id}`}
+                                    signed={true}
+                                />
+                            </div>
+                            <div style={{ margin: '5px' }}>
+                                <DocumentChip
+                                    label="Upload Digital Certificates"
+                                    id={`DigitalCertificate${id}`} />
+                            </div>
+                            <div style={{ margin: '5px' }}>
+                                <DocumentChip
+                                    label="Upload"
+                                    id={`unsignedDocument${id}`} />
+                            </div>
+                        </Box>
+                        <TextField
+                            required
+                            id="previewComments"
+                            label="Leave a comment"
+                            //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
+                            //value={formData["commitmentReceived"] || ''}
+                            variant="standard"
+                            multiline
+                            {...register("previewComments")}
+                            error={(errors.previewComments && getValues("previewComments") == '') ? true : false}
+                            onChange={handleChange}
 
                                 sx={{ display: 'flex', }}
                             />

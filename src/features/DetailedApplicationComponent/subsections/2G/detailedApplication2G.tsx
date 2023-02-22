@@ -193,6 +193,7 @@ export const DetailedApplication2G = (props:any) => {
                                 //defaultValue={formData.subsidiaryOfAnotherCompany === undefined ? " " : formData["subsidiaryOfAnotherCompany"]}
                                 value={formData["subsidiaryOfAnotherCompany"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -287,6 +288,7 @@ export const DetailedApplication2G = (props:any) => {
                                 //defaultValue={formData.monitoringPractices === undefined ? " " : formData["monitoringPractices"]}
                                 value={formData["overallEmployeeCost"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -313,6 +315,7 @@ export const DetailedApplication2G = (props:any) => {
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                 value={formData["employeeCarry"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -339,6 +342,7 @@ export const DetailedApplication2G = (props:any) => {
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                 value={formData["regulartoryInvestigation"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -363,6 +367,7 @@ export const DetailedApplication2G = (props:any) => {
                                 //defaultValue={formData.otherVCFsManaged === undefined ? " " : formData["otherVCFsManaged"]}
                                 value={formData["vcExlusive"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -387,6 +392,7 @@ export const DetailedApplication2G = (props:any) => {
                                 //defaultValue={formData.approvers === undefined ? " " : formData["approvers"]}
                                 value={formData["directorship"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
@@ -413,6 +419,7 @@ export const DetailedApplication2G = (props:any) => {
                                 //defaultValue={formData.shareHoldingPattern === undefined ? " " : formData["shareHoldingPattern"]}
                                 value={formData["employeeShareHolding"] || ''}
                                 variant="standard"
+                                multiline
                                 onChange={handleChange}
 
                                 sx={{ display: 'flex', ml: 2, mb: 2 }}
