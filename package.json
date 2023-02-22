@@ -47,6 +47,7 @@
     "start": "react-scripts start",
     "dev": "env-cmd -f .env.development npm start",
     "uat": "env-cmd -f .env.server npm start",
+    "migration": "env-cmd -f .env.migration npm start",
     "build": "env-cmd -f .env.development react-scripts build",
     "build-uat": "env-cmd -f .env.server npx react-scripts build",
     "build-prod": "env-cmd -f .env.prod npx react-scripts build",
