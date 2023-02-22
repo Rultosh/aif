@@ -36,7 +36,9 @@ const NavigationBar = (props: any) => {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const role = usersState?.role;
   const userName = usersState?.me?.contactPerson;
-
+  
+  const pathname = (window.location.pathname).toLowerCase();
+  
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -208,19 +210,23 @@ const NavigationBar = (props: any) => {
 
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages != undefined ? pages.map((page) => (
+            {pages != undefined ? pages.map((page) => {
+              let pageLowerCase = page.toLowerCase();
+              return (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ ml: '50px', my: 2, color: '#363062', display: 'block', fontSize: '15px', fontWeight: 'bold', textTransform: 'none' }}
-                className="menuItemHeader"
-
+                // className={"menuItemHeader"}
+                className={"menuItemHeader " + (pathname.includes(pageLowerCase)? "activePage" : "")}
               >
+                <div className='headerHoverHightlightTop'></div>
                 <Link to={`/${page}`} style = {{cursor:'pointer', color: '#000000', textDecoration: 'none'}}>
                   {page}
                 </Link>
+                <div className='headerHoverHightlight'></div>
               </Button>
-            )) : <></>}
+            )}) : <></>}
           </Box>
 
           <Box sx={{ flexGrow: 0, display: { xs: 'block' } }}>

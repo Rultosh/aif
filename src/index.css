@@ -91,10 +91,122 @@ code {
 
 .menuItemHeader {
   border-bottom: 3px solid transparent;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
 }
 
-.menuItemHeader:hover {
-  border-bottom: 1px solid #B499C7;
-  border-radius: 0;
+.menuItemHeader:hover, .menuItemHeader:focus {
   background-color: transparent !important;
+}
+
+.menuItemHeader .headerHoverHightlight {
+  visibility: hidden;
+  /* width: 40px; */
+  height: 5px;
+  background: #B499C7;
+  border-radius: 20px;
+}
+
+.menuItemHeader:hover .headerHoverHightlight {
+  visibility: visible;
+}
+
+.menuItemHeader .headerHoverHightlightTop {
+  visibility: hidden;
+  /* width: 40px; */
+  margin-top: 5px;
+  height: 5px;
+  background: #B499C7;
+  border-radius: 20px;
+}
+
+.menuItemHeader.activePage:before {
+  content: "";
+  position: absolute;
+  border-top: 15px solid #ffffff;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  top: 108%;
+  left: 35%;
+  margin-left: -5px;
+  margin-top: -5px;
+}
+
+.signInButtonArrow {
+  color: #a1a3ee;
+  font-size: 32px;
+  /* width: 220px; */
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 36px;
+  visibility: hidden;
+}
+
+.signInButtonArrow{
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.signInButtonArrow:after {
+  content: url("./images/arrow.svg");
+  position: absolute;
+  opacity: 0;  
+  top: -18px;
+  right: -80px;
+  transition: 0.5s;
+}
+
+.signInButton:hover .signInButtonArrow{
+  padding-right: 24px;
+  padding-left:8px;
+  visibility: visible;
+}
+
+.signInButton:hover .signInButtonArrow:after {
+  opacity: 1;
+  right: -10px;
+}
+
+
+
+
+
+
+.signUpButtonArrow {
+  color: #a1a3ee;
+  font-size: 32px;
+  /* width: 220px; */
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 36px;
+  visibility: hidden;
+}
+
+.signUpButtonArrow{
+  cursor: pointer;
+  display: inline-block;
+  position: absolute;
+  transition: 0.5s;
+}
+
+.signUpButtonArrow:after {
+  content: url("./images/arrow.svg");
+  position: absolute;
+  opacity: 0;  
+  top: -50px;
+  right: -60px;
+  transition: 0.5s;
+}
+
+.signUpButton:hover .signUpButtonArrow{
+  padding-right: 24px;
+  padding-left:8px;
+  visibility: visible;
+}
+
+.signUpButton:hover .signUpButtonArrow:after {
+  opacity: 1;
+  right: -10px;
 }

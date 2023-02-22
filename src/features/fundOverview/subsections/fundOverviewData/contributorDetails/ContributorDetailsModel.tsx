@@ -158,7 +158,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   required
                   type='number'
                   id="amount"
-                  label="Amount"
+                  label="Amount (₹ Crore)"
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={contributorDetailsFormData.amount}
                   {...register("amount")}

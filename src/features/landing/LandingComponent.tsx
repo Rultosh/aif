@@ -231,12 +231,13 @@ const Landing = () => {
                                                         />
                                                         </Grid> */}
                                                     <Grid item xs={12} >
-                                                        <Box display="flex">
-                                                            <Button type="submit" variant="contained" disableElevation sx={{ mt: 4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#878ADD, #505282)', borderRadius: '10px', fontWeight: 600 }} onClick={isUserValid}>
+                                                        <div className="signInButton" style={{ width: 'fit-content' }}>
+                                                            <Button type="submit" variant="contained" disableElevation sx={{ mt: -4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#878ADD, #505282)', borderRadius: '10px', fontWeight: 600 }} onClick={isUserValid}>
                                                                 Sign In
                                                             </Button>
-                                                        </Box>
-                                                    </Grid  >
+                                                            <span className="signInButtonArrow"></span>
+                                                        </div>
+                                                    </Grid>
 
                                                 </Box>
                                                 <Typography sx={{ flex: 1, mt: 2, mb: "2px", mx: 4 }}>To reset your password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
@@ -264,61 +265,33 @@ const Landing = () => {
 
                                             </Toolbar>
 
-                                            <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ borderRight: '1px solid #9596A9', mt: 2, mb: 2, py: 4 }}>
-                                                <Grid item  xs={12}>
-
-                                                    <Grid item xs={12} >
-                                                        <Box display="flex"
-                                                            justifyContent="center"
-                                                            alignItems="center">
-                                                            <Typography variant='subtitle2' sx={{ flex: 1, mt: 2, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
-
-                                                        </Box>
-                                                    </Grid  >
-
-                                                    <Box display="flex"
-                                                        justifyContent="center"
-                                                        alignItems="center"
-                                                        sx={{ mt: 2 }}>
-
-                                                        <Toolbar disableGutters sx={{ justifyContent: "center" }}>
-                                                            <Box
-                                                                component="img"
-                                                                sx={{ width: '165px', height: '83px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                                alt="success"
-                                                                src={azadiLogo}
-                                                            />
-
-                                                        </Toolbar>
-
-                                                    </Box>
-
-                                                    <Grid item xs={12} >
-                                                        <Box display="flex"
-                                                            justifyContent="center"
-                                                            alignItems="center">
-                                                            <Typography variant='subtitle2' sx={{ flex: 1, mt: 2, ml: '10px', textAlign: "center" }}>Check your eligibility without Sign up</Typography>
-
-                                                        </Box>
-                                                    </Grid  >
-
-                                                    <Box
-                                                        justifyContent="center"
-                                                        alignItems="center"
-                                                        sx={{ mt: 3, display: 'flex', flexWrap: 'wrap' }}>
-
-                                                        <Grid item xs={12} >
-                                                            <Box display="flex"
-                                                                justifyContent="center"
-                                                                alignItems="center">
-                                                                <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#EC8D1C, #844F10)', borderRadius: '10px', fontWeight: 600 }} onClick={submitOnCheckEligibility} >
-                                                                    Check Eligibility
-                                                                </Button>
-                                                            </Box>
-                                                        </Grid  >
-
-                                                    </Box>
+                                            <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ borderRight: '1px solid #9596A9', py: 4 }}>
+                                                <Grid item xs={12}>
+                                                    <Typography variant='subtitle2' sx={{ flex: 1, mt: 3, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
                                                 </Grid>
+                                                <Grid item xs={12}>
+                                                    <Toolbar disableGutters sx={{ justifyContent: "center",  mt: 2.5 }}>
+                                                        <Box
+                                                            component="img"
+                                                            sx={{ width: '165px', height: '83px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                            alt="success"
+                                                            src={azadiLogo}
+                                                        />
+                                                    </Toolbar>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Typography variant='subtitle2' sx={{ flex: 1, mt: 2.5, ml: '10px', textAlign: "center" }}>Check your eligibility without Sign up</Typography>
+                                                </Grid>
+
+                                                <Grid item xs={12} sx={{ mt: 3 }}>
+                                                    <div className="signUpButton" style={{ width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
+                                                        <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#EC8D1C, #844F10)', borderRadius: '10px', fontWeight: 600 }} onClick={submitOnCheckEligibility} >
+                                                            Check Eligibility
+                                                        </Button>
+                                                        <span className="signUpButtonArrow"></span>
+                                                    </div>
+                                                </Grid>
+                                               
                                             </Grid>
                                         {/* </CardContent>
 
