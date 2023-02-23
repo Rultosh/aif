@@ -55,6 +55,19 @@ div.logoLineAnimation {
   to {left: 0px; top: 65px; background-color: rgba(113,116,155,1) ;}
 }
 
+div.formAnimation {
+  position: relative;
+  animation: formAnimation 0.4s;
+}
+
+@keyframes formAnimation {
+  /* 0% { visibility: visible; }
+  70% { visibility: visible; }
+  100% { visibility: visible; } */
+  from {left: -100px; top: 0px;}
+  to {left: 0px; top: 0px;}
+}
+
 .App-header {
   background-color: white;
 

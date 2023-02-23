@@ -72,125 +72,127 @@ export const Fund = (props:any) => {
         }
     }
     return (
-        <Card sx={{ display: 'flex', mb: 2 }}>
-            <CardContent sx={{ flex: 1 }}>
-                <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062' }}>Fund Overview</Typography>
-                <Divider color='#363062' />
-                <Typography variant="subtitle1" sx={{ flex: 1, textAlign: "center", mt: 4, mb: 1, color: '#363062', fontWeight: '500' }}>Details of the Fund</Typography>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "1"} onChange={handleChange("1")}>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-                            >
-                                <Typography sx={{ color: 'white' }}>
-                                    1.Fund Overview
-                                </Typography>
+        <div className="formAnimation">
+            <Card sx={{ display: 'flex', mb: 2 }}>
+                <CardContent sx={{ flex: 1 }}>
+                    <Typography sx={{ flex: 1, fontWeight: 'bolder', color: '#363062' }}>Fund Overview</Typography>
+                    <Divider color='#363062' />
+                    <Typography variant="subtitle1" sx={{ flex: 1, textAlign: "center", mt: 4, mb: 1, color: '#363062', fontWeight: '500' }}>Details of the Fund</Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "1"} onChange={handleChange("1")}>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+                                >
+                                    <Typography sx={{ color: 'white' }}>
+                                        1.Fund Overview
+                                    </Typography>
 
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Box sx={{ backgroundColor: "#f2f2f2" }}>
-                                    {/*<FundOverviewData ></FundOverviewData>*/}
-                                    <PrelimApplicationData
-                                        prelimApplicationId={prelimApplicationId}
-                                        setPrelimApplicationId={handleApplicationIdCreation}
-                                    ></PrelimApplicationData>
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Box sx={{ backgroundColor: "#f2f2f2" }}>
+                                        {/*<FundOverviewData ></FundOverviewData>*/}
+                                        <PrelimApplicationData
+                                            prelimApplicationId={prelimApplicationId}
+                                            setPrelimApplicationId={handleApplicationIdCreation}
+                                        ></PrelimApplicationData>
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid>
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "2"} onChange={handleChange("2")}>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+                                >
+                                    <Typography sx={{ color: 'white' }}>
+                                        2. Details of Investment team(At partner level)
+                                    </Typography>
+
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Box sx={{ backgroundColor: "#f2f2f2" }}>
+                                        <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)}></InvestmentPartner>
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "3"} onChange={handleChange("3")}>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+                                >
+                                    <Typography sx={{ color: 'white' }}>
+                                        3. Details of Contributor to the Fund
+                                    </Typography>
+
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Box sx={{ backgroundColor: "#f2f2f2" }}>
+                                        <ContributorDetails prelimApplicationId={Number(prelimApplicationId)}></ContributorDetails>
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "4"} onChange={handleChange("4")}>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+                                >
+                                    <Typography sx={{ color: 'white' }}>
+                                    4. Details of Investment team(at Associate level)
+                                    </Typography>
+
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Box sx={{ backgroundColor: "#f2f2f2" }}>
+                                        <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)}></InvestmentAssociate>
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "5"} onChange={handleChange("5")}>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+                                >
+                                    <Typography sx={{ color: 'white' }}>
+                                    5. Investments made, if any from the current Fund
+                                    </Typography>
+
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Box sx={{ backgroundColor: "#f2f2f2" }}>
+                                        <InvestmentPast prelimApplicationId={Number(prelimApplicationId)}></InvestmentPast>
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "6"} onChange={handleChange("6")}>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
+                                >
+                                    <Typography sx={{ color: 'white' }}>
+                                    6. Past investment track record of the AMC
+                                    </Typography>
+
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Box sx={{ backgroundColor: "#f2f2f2" }}>
+                                        <div style={{display: "inline", padding: "10px"}}><a href="/templates/SASF_Fund Track Record Template.xlsx">Download Template</a></div>
+                                        <div style={{display: "inline", padding: "10px"}}><UploadComponents id={`pastInvestmentTrackRecord${id}`} signed={false}></UploadComponents></div>
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
                     </Grid>
-                    {Number(prelimApplicationId) ? <Grid item xs={12}>
-                        <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "2"} onChange={handleChange("2")}>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-                            >
-                                <Typography sx={{ color: 'white' }}>
-                                    2. Details of Investment team(At partner level)
-                                </Typography>
-
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Box sx={{ backgroundColor: "#f2f2f2" }}>
-                                    <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)}></InvestmentPartner>
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid> : <></>}
-                    {Number(prelimApplicationId) ? <Grid item xs={12}>
-                        <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "3"} onChange={handleChange("3")}>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-                            >
-                                <Typography sx={{ color: 'white' }}>
-                                    3. Details of Contributor to the Fund
-                                </Typography>
-
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Box sx={{ backgroundColor: "#f2f2f2" }}>
-                                    <ContributorDetails prelimApplicationId={Number(prelimApplicationId)}></ContributorDetails>
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid> : <></>}
-                    {Number(prelimApplicationId) ? <Grid item xs={12}>
-                        <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "4"} onChange={handleChange("4")}>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-                            >
-                                <Typography sx={{ color: 'white' }}>
-                                4. Details of Investment team(at Associate level)
-                                </Typography>
-
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Box sx={{ backgroundColor: "#f2f2f2" }}>
-                                    <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)}></InvestmentAssociate>
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid> : <></>}
-                    {Number(prelimApplicationId) ? <Grid item xs={12}>
-                        <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "5"} onChange={handleChange("5")}>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-                            >
-                                <Typography sx={{ color: 'white' }}>
-                                5. Investments made, if any from the current Fund
-                                </Typography>
-
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Box sx={{ backgroundColor: "#f2f2f2" }}>
-                                    <InvestmentPast prelimApplicationId={Number(prelimApplicationId)}></InvestmentPast>
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid> : <></>}
-                    {Number(prelimApplicationId) ? <Grid item xs={12}>
-                        <Accordion sx={{ backgroundColor: '#363062' }} expanded={expanded === "6"} onChange={handleChange("6")}>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-                            >
-                                <Typography sx={{ color: 'white' }}>
-                                6. Past investment track record of the AMC
-                                </Typography>
-
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Box sx={{ backgroundColor: "#f2f2f2" }}>
-                                    <div style={{display: "inline", padding: "10px"}}><a href="/templates/SASF_Fund Track Record Template.xlsx">Download Template</a></div>
-                                    <div style={{display: "inline", padding: "10px"}}><UploadComponents id={`pastInvestmentTrackRecord${id}`} signed={false}></UploadComponents></div>
-                                </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Grid> : <></>}
-                </Grid>
-                {Number(prelimApplicationId) ? <Button onClick={(e) => handleClick(e, "next")} endIcon={<ArrowRightIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                    Profile
-                </Button> : <></>}
-            </CardContent>
-        </Card>
+                    {Number(prelimApplicationId) ? <Button onClick={(e) => handleClick(e, "next")} endIcon={<ArrowRightIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Profile
+                    </Button> : <></>}
+                </CardContent>
+            </Card>
+        </div>
     );
 }
 
