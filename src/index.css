@@ -210,3 +210,18 @@ code {
   opacity: 1;
   right: -10px;
 }
+
+.workflowCircle {
+  height: 150px;
+  width: 150px;
+  background-color: #8ee926;
+  border-radius: 50%;
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.workflowCircle:hover {
+  box-shadow: 5px 5px #d5bae8;
+}
