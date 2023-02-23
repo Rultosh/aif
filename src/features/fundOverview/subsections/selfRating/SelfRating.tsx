@@ -228,51 +228,53 @@ export const SelfRating = (props:any) => {
     }
 
     return (
-        <Card sx={{ display: 'flex', mb: 2 }}>
-            <CardContent sx={{ flex: 1 }}>
-                <Grid container spacing={2} >
-                    <Grid item xs={11}>
-                        <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Self Rating</Typography>
+        <div className="formAnimation">
+            <Card sx={{ display: 'flex', mb: 2 }}>
+                <CardContent sx={{ flex: 1 }}>
+                    <Grid container spacing={2} >
+                        <Grid item xs={11}>
+                            <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Self Rating</Typography>
+                        </Grid>
+                        <Grid item xs={1}>
+                            {['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '') ?
+                                <Box sx={{ position: 'fixed', backgroundColor: '#D586F7' }}>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column-reverse', flexWrap: 'wrap', justifyContent: 'center', alignContent: 'flex-end', }}>
+                                        <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Score:{selfRatingValue.score || 0}</Typography>
+                                    </Box>
+                                </Box>:<></>
+                                }
+                        </Grid>
                     </Grid>
-                    <Grid item xs={1}>
-                        {['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '') ?
-                            <Box sx={{ position: 'fixed', backgroundColor: '#D586F7' }}>
-                                <Box sx={{ display: 'flex', flexDirection: 'column-reverse', flexWrap: 'wrap', justifyContent: 'center', alignContent: 'flex-end', }}>
-                                    <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Score:{selfRatingValue.score || 0}</Typography>
-                                </Box>
-                            </Box>:<></>
-                            }
-                    </Grid>
-                </Grid>
 
-                {selfRatingQuestionComponents}
-                <Button
-                    onClick={(e) => handleClick(e, "previous")}
-                    startIcon={<ArrowLeftIcon />}
-                    variant="contained"
-                    disableElevation
-                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                    Profile
-                </Button>
-                <Button
-                    color='success'
-                    onClick={handleClickSave}
-                    // onClick={handleSubmit(onSubmit)}
-                    variant="contained"
-                    disableElevation
-                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                    Save
-                </Button>
-                <Button
-                    onClick={(e) => handleClick(e, "next")}
-                    endIcon={<ArrowRightIcon />}
-                    variant="contained"
-                    disableElevation
-                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                    Declaration
-                </Button>
-            </CardContent >
-        </Card >
+                    {selfRatingQuestionComponents}
+                    <Button
+                        onClick={(e) => handleClick(e, "previous")}
+                        startIcon={<ArrowLeftIcon />}
+                        variant="contained"
+                        disableElevation
+                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Profile
+                    </Button>
+                    <Button
+                        color='success'
+                        onClick={handleClickSave}
+                        // onClick={handleSubmit(onSubmit)}
+                        variant="contained"
+                        disableElevation
+                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Save
+                    </Button>
+                    <Button
+                        onClick={(e) => handleClick(e, "next")}
+                        endIcon={<ArrowRightIcon />}
+                        variant="contained"
+                        disableElevation
+                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Declaration
+                    </Button>
+                </CardContent >
+            </Card >
+        </div>
     );
 }
 
