@@ -174,7 +174,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
     console.log((dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)]?.values, prelimApplicationFormData.dealSubsector);
     
-    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
     const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({

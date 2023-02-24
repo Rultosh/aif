@@ -96,7 +96,7 @@ export const DetailedApplication2G = (props:any) => {
 
     let listItem = ["a. Company & amount invested - sector, location, investment thesis, years(s) of investment; instruments used, structuring specialty, firm which did the Financial/ Legal/ Technical due diligence etc.", "b. Time taken from sourcing to closure", "c. How was the deal sourced?", "d. % holding & valuation (pre-money and post-money)", "e. Key reasons for the investment & basis for valuation", "f. What was / is the value-add made by the respective employee - please give details of strategy, process, operations, business development, any other value add done.", "g. If exited, then exit amount, IRR on exit, method of exit.", "h. Any loss / write-off? If yes, details along with reasons.", "i. Any learning from past investments / divestments?", "j. Given a chance, what would you do differently compared to the past?", "k. If not exited (as on date), then valuation, notional IRR %, basis of valuation, whether EVCA or any other valuation guideline used. "]
 
-    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
     const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({

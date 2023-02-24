@@ -52,7 +52,9 @@ export const questions = {
     {
         "id": 8,
         "text":"Advisory Board / Governance Board, LP Advisory Committee, etc." ,
-        "options":["The Fund shall have a full fledged  Advisory Board / Governance Board,LP Advisory Committee, etc. with representation from major investors", "The Fund shall have an Advisory Board / Governance Board, LP Advisory Committee, etc. with representation from a few investors", "The Fund do not propose to have such committees"],
+        "options":[
+            "The Fund shall have a full fledged Advisory Board / Governance Board,LP Advisory Committee, etc. with representation from major investors", 
+            "The Fund shall have an Advisory Board / Governance Board, LP Advisory Committee, etc. with representation from a few investors", "The Fund do not propose to have such committees"],
         "size":12,
         'weightage':[1,0.6,0.3]
     },

@@ -42,7 +42,7 @@ export const InvestmentThemeOfFund = (props: any) => {
         dispatch(updateStepperIndex(2))
       if (parentId && Number(parentId)) {
         if (!state[0]?.data[parentId]) {
-          controller.fetch({ ...formData, parentId: Number(parentId) });
+          controller.fetch({ ...formData, id: Number(parentId) });
         }
       }
     }, [])

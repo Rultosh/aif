@@ -21,5 +21,5 @@ export const defaultIDetailedApplication2I : IDetailedApplication2I = {
   trustDeed: undefined,
   sebiRegistration: undefined,
   sebiCompliance: undefined,
-  sebiComplianceAvailable: undefined
+  sebiComplianceAvailable: false
 }

@@ -98,11 +98,17 @@ export const DetailedApplication2I = (props: any) => {
         }
     }
     
-    const checkScript = (value: any) => !value.match(/<[^>]*>/);
+    const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
     const htmlTagsNotAllowed = "Tags not allowed in input.";
 
-    const validationSchema = Yup.object().shape({
+    /*const validationSchema = Yup.object().shape({
         sebiCompliance: Yup.string().required("Compliance is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
+    });*/
+    const validationSchema = Yup.object().shape({
+        sebiCompliance: Yup.string().ensure().when("sebiComplianceAvailable",{
+            is:false,
+            then:Yup.string().required("Compliance is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
+        })
     });
 
     const {
@@ -235,7 +241,7 @@ export const DetailedApplication2I = (props: any) => {
                     </Card>
                     <Divider sx={{ mt: 2 }} />
                     <Typography sx={{ flex: 1, color: '#363062', mb: 2, mt: 2, ml: 2 }}>51. Compliance certificate on SEBI's VCF/AIF Regulations, if applicable. If not applicable, please give reasons, if any.</Typography>
-                    <FormControlLabel sx={{ mt: 2, mb: 2, ml: 2 }} control={<Switch checked={formData.sebiComplianceAvailable} onChange={handleToggle} />} label={!formData.sebiComplianceAvailable? "No" : "Yes"} />
+                    <FormControlLabel sx={{ mt: 2, mb: 2, ml: 2 }} {...register("sebiComplianceAvailable")} control={<Switch checked={formData.sebiComplianceAvailable} onChange={handleToggle} />} label={!formData.sebiComplianceAvailable? "No" : "Yes"} />
                     <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
                         <CardContent sx={{ flex: 1 }}>
                             {!formData.sebiComplianceAvailable ?

@@ -97,7 +97,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     p: 4,
   };
     
-  const checkScript = (value: any) => !value.match(/<[^>]*>/);
+  const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
   const htmlTagsNotAllowed = "Tags not allowed in input.";
 
   const validationSchema = Yup.object().shape({
