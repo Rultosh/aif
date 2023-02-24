@@ -40,9 +40,9 @@ export const InvestmentResponsibleAsNonLeadRow = (props: InvestmentResponsibleAs
         {props.investmentResponsibleAsNonLead.nameOfCompany}
       </TableCell>
       <TableCell align="center">{props.investmentResponsibleAsNonLead.amountInvested}</TableCell>
-      <TableCell align="center">{Moment(props.investmentResponsibleAsNonLead.dateOfInvestment).format("DD/MM/YYYY")}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsNonLead.dateOfInvestment && Moment(props.investmentResponsibleAsNonLead.dateOfInvestment).format("DD/MM/YYYY")}</TableCell>
       <TableCell align="center">{props.investmentResponsibleAsNonLead.exitOrWriteOff}</TableCell>
-      <TableCell align="center">{Moment(props.investmentResponsibleAsNonLead.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
+      <TableCell align="center">{props.investmentResponsibleAsNonLead.dateofExitorWriteOff && Moment(props.investmentResponsibleAsNonLead.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
       <TableCell align="center">{props.investmentResponsibleAsNonLead.irrPercent}</TableCell>
       <TableCell align="center">{props.investmentResponsibleAsNonLead.comment}</TableCell>
       <TableCell align="center">

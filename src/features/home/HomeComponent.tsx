@@ -247,7 +247,7 @@ console.log(prelimApplications.prelimApplication);
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.createdByName}</TableCell>
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0, width: '150px' }}>{String(getStatusDescription(row.stage, row.status))}</TableCell>
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{Moment(String(row.createdOn)).format("DD/MM/YYYY")}</TableCell>
-                                                    <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{Moment(String(row.detailedApplicationCreatedOn)).format("DD/MM/YYYY")}</TableCell>
+                                                    <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.detailedApplicationCreatedOn && Moment(String(row.detailedApplicationCreatedOn)).format("DD/MM/YYYY")}</TableCell>
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{String(row.sdTotalTargetCorpus)}</TableCell>
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{String(row.contributionSought || 0)}</TableCell>
                                                     {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row" sx={{ borderBottomWidth: 0 }}>
