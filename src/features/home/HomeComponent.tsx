@@ -228,7 +228,7 @@ console.log(prelimApplications.prelimApplication);
                             </Grid>
                         </Grid>
                         <TableContainer sx={{ p: '0px 30px', width: 'auto' }}>
-                            <Box sx={{ border: '2px solid #34344b' }}>
+                            <Box sx={{ border: '2px solid #8f8f93' }}>
                                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                                     <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                                         <TableRow sx={{ backgroundColor: '#34344b' }}>
@@ -245,7 +245,7 @@ console.log(prelimApplications.prelimApplication);
                                                         {isGoodToShowApplication(row) ? <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
                                                     </TableCell>}
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.createdByName}</TableCell>
-                                                    <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{String(getStatusDescription(row.stage, row.status))}</TableCell>
+                                                    <TableCell align="center" sx={{ borderBottomWidth: 0, width: '150px' }}>{String(getStatusDescription(row.stage, row.status))}</TableCell>
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.detailedApplicationCreatedOn}</TableCell>
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{Moment(String(row.createdOn)).format("DD/MM/YYYY")}</TableCell>
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{String(row.sdTotalTargetCorpus)}</TableCell>

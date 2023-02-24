@@ -162,6 +162,7 @@ export const CarryDistribution = (props: any) => {
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
         setFormData(copiedValue);
+        return copiedValue;
     };
 
     const handleChangeCapitalBalanceAmount = (ev: any) => {
@@ -171,7 +172,7 @@ export const CarryDistribution = (props: any) => {
         copiedValue[key as keyof typeof formData] = ev.target.value;
         copiedValue['capitalBalance'] =  String(Number(formData["corpusAssumed"] || 0) - ev.target.value);
         setFormData(copiedValue);
-        console.log(formData);
+        handleChangeAllBalanceAmount(copiedValue);
     };
 
     const handleChangeHurdleBalanceAmount = (ev: any) => {
@@ -179,9 +180,9 @@ export const CarryDistribution = (props: any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
-        copiedValue['hurdleBalance'] =  String(Number(formData["capitalBalance"] || 0) - ev.target.value);
+        copiedValue['hurdleBalance'] =  String((Number(formData["corpusAssumed"] || 0) - Number(formData["capitalAmount"] || 0)) - ev.target.value);
         setFormData(copiedValue);
-        console.log(formData);
+        handleChangeAllBalanceAmount(copiedValue);
     };
 
     const handleChangeCatchupBalanceAmount = (ev: any) => {
@@ -189,9 +190,9 @@ export const CarryDistribution = (props: any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
-        copiedValue['catchupBalance'] =  String(Number(formData["hurdleBalance"] || 0) - ev.target.value);
+        copiedValue['catchupBalance'] =  String(((Number(formData["corpusAssumed"] || 0) - Number(formData["capitalAmount"] || 0)) - Number(formData["hurdleAmount"] || 0)) - ev.target.value);
         setFormData(copiedValue);
-        console.log(formData);
+        handleChangeAllBalanceAmount(copiedValue);
     };
 
     const handleChangeProfitBalanceAmount = (ev: any) => {
@@ -199,9 +200,9 @@ export const CarryDistribution = (props: any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
-        copiedValue['profitBalance'] =  String(Number(formData["catchupBalance"] || 0) - ev.target.value);
+        copiedValue['profitBalance'] =  String((((Number(formData["corpusAssumed"] || 0) - Number(formData["capitalAmount"] || 0)) - Number(formData["hurdleAmount"] || 0)) - Number(formData["catchupAmount"] || 0)) - ev.target.value);
         setFormData(copiedValue);
-        console.log(formData);
+        handleChangeAllBalanceAmount(copiedValue);
     };
 
     const handleChangeCarryBalanceAmount = (ev: any) => {
@@ -209,9 +210,18 @@ export const CarryDistribution = (props: any) => {
         let copiedValue = { ...formData }
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
-        copiedValue['carryBalance'] =  String(Number(formData["profitBalance"] || 0) - ev.target.value);
+        copiedValue['carryBalance'] =  String(((((Number(formData["corpusAssumed"] || 0) - Number(formData["capitalAmount"] || 0)) - Number(formData["hurdleAmount"] || 0)) - Number(formData["catchupAmount"] || 0)) - Number(formData["profitAmount"] || 0)) - ev.target.value);
         setFormData(copiedValue);
-        console.log(formData);
+        handleChangeAllBalanceAmount(copiedValue);
+    };
+
+    const handleChangeAllBalanceAmount = (copiedValue: any) => {
+        copiedValue['capitalBalance'] =  String(Number(copiedValue["corpusAssumed"] || 0) - Number(copiedValue["capitalAmount"] || 0));
+        copiedValue['hurdleBalance'] =  String((Number(copiedValue["corpusAssumed"] || 0) - Number(copiedValue["capitalAmount"] || 0)) - Number(copiedValue["hurdleAmount"] || 0));
+        copiedValue['catchupBalance'] =  String(((Number(copiedValue["corpusAssumed"] || 0) - Number(copiedValue["capitalAmount"] || 0)) - Number(copiedValue["hurdleAmount"] || 0)) - Number(copiedValue["catchupAmount"] || 0));
+        copiedValue['profitBalance'] =  String((((Number(copiedValue["corpusAssumed"] || 0) - Number(copiedValue["capitalAmount"] || 0)) - Number(copiedValue["hurdleAmount"] || 0)) - Number(copiedValue["catchupAmount"] || 0)) - Number(copiedValue["profitAmount"] || 0));
+        copiedValue['carryBalance'] =  String(((((Number(copiedValue["corpusAssumed"] || 0) - Number(copiedValue["capitalAmount"] || 0)) - Number(copiedValue["hurdleAmount"] || 0)) - Number(copiedValue["catchupAmount"] || 0)) - Number(copiedValue["profitAmount"] || 0)) - Number(copiedValue["carryAmount"] || 0));
+        setFormData(copiedValue);
     };
 
     const handleNewChange = (ev: any) => {
@@ -297,6 +307,30 @@ export const CarryDistribution = (props: any) => {
         let sum = ((Number(formData?.catchupBalance) || 0) + (Number(formData.carryBalance) || 0))
         console.log(sum)
         return sum
+    }
+
+    const getTotalPercent = () => {
+        let percentTotal = 0;
+
+        if (formDataDetailsList != undefined) {
+            let keysArr = Object.keys(formDataDetailsList)
+            for (let i = 0; i < keysArr.length; i++) {
+                percentTotal = Number(formDataDetailsList[keysArr[i]]["percent"]) + percentTotal;
+            }
+            return percentTotal
+        }
+    }
+
+    const getTotalOutOfCarry = () => {
+        let carryOutOfCroreTotal = 0;
+        
+        if (formDataDetailsList != undefined) {
+            let keysArr = Object.keys(formDataDetailsList)
+            for (let i = 0; i < keysArr.length; i++) {
+                carryOutOfCroreTotal = Number(formDataDetailsList[keysArr[i]]["carryOutOfCrore"]) + carryOutOfCroreTotal;
+            }
+            return carryOutOfCroreTotal
+        }
     }
 
     const handleClose= () => {
@@ -558,7 +592,10 @@ export const CarryDistribution = (props: any) => {
                                             //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
                                             value={formData["corpusAssumed"] || ''}
                                             variant="standard"
-                                            onChange={handleChange}
+                                            onChange={(ev: any) => {
+                                                let formDataUpdate = handleChange(ev);
+                                                handleChangeAllBalanceAmount(formDataUpdate);
+                                            }}
 
                                             sx={{ display: 'flex', ml: 2, mb: 2 }}
                                         />
@@ -608,6 +645,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="capitalBalance"
@@ -643,6 +683,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="hurdleBalance"
@@ -678,6 +721,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="catchupBalance"
@@ -712,6 +758,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="profitBalance"
@@ -747,6 +796,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="carryBalance"
@@ -779,6 +831,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="profittoInvestorsAmount"
@@ -792,6 +847,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="profittoInvestors"
@@ -811,6 +869,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="distributionAmount"
@@ -824,6 +885,9 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
                                             required
                                             type="number"
                                             id="distribution"
@@ -923,6 +987,18 @@ export const CarryDistribution = (props: any) => {
                                     </Grid>
                                     : <></>}
 
+                                <Grid container spacing={6} >
+                                    <Grid item xs={6}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, textAlign: 'right' }}>Total</Typography>
+                                    </Grid>
+                                    <Grid item xs={2.5}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, textAlign: 'left' }}>{getTotalPercent()}</Typography>
+                                    </Grid>
+                                    <Grid item xs={2.5}>
+                                        <Typography sx={{ flex: 1, mt: 3, mb: 3, textAlign: 'left' }}>{getTotalOutOfCarry()}</Typography>
+                                    </Grid>
+
+                                </Grid>
                             </CardContent>
                         </Card>
 

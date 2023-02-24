@@ -147,7 +147,7 @@ console.log(teamMember)
 
           <CardContent sx={{ flex: 1 }}>
             <Grid container spacing={2} >
-              <Grid item xs={9}>
+              <Grid item xs={12}>
                 <Box sx={{ display: 'inline-flex' }}>
                   <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Team Member</Typography>
                 </Box>
@@ -319,7 +319,7 @@ console.log(teamMember)
                   />
                 </FormControl>                
               </Grid>
-              <Grid item xs={4.5}>
+              <Grid item xs={9}>
 
               <TextField
                   required
@@ -329,6 +329,7 @@ console.log(teamMember)
                   {...register("prevProfessionalExp")}
                   error={(errors.prevProfessionalExp) ? true : false}
                   variant="standard"
+                  multiline
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
@@ -353,7 +354,7 @@ console.log(teamMember)
                   <>{(errors.education)?errors.education.message : ''}</>
                 </Typography> 
               </Grid>
-              <Grid item xs={4.5}>
+              <Grid item xs={2.25}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
                   <InputLabel id="demo-simple-select-standard-label">Key Person</InputLabel>
                   <Controller
@@ -391,7 +392,7 @@ console.log(teamMember)
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={4.5}>
+              <Grid item xs={2.25}>
                 <FormControl variant="standard" sx={{ display: 'flex' }}>
                   <InputLabel id="demo-simple-select-standard-label">Member Of Investee Committee</InputLabel>
                   <Controller
@@ -429,7 +430,7 @@ console.log(teamMember)
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={4.5}>
+              <Grid item xs={9}>
                 <TextField
                   required
                   id="directorship"
@@ -438,6 +439,7 @@ console.log(teamMember)
                   {...register("directorship")}
                   error={(errors.directorship) ? true : false}
                   variant="standard"
+                  multiline
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}

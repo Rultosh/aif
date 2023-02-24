@@ -267,20 +267,17 @@ const Landing = () => {
 
                                             <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ borderRight: '1px solid #9596A9', py: 4 }}>
                                                 <Grid item xs={12}>
-                                                    <Typography variant='subtitle2' sx={{ flex: 1, mt: 3, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
+                                                    <Typography sx={{ flex: 1, mt: 3, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <Toolbar disableGutters sx={{ justifyContent: "center",  mt: 2.5 }}>
                                                         <Box
                                                             component="img"
-                                                            sx={{ width: '165px', height: '83px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                            sx={{ height: '122px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
                                                             alt="success"
                                                             src={azadiLogo}
                                                         />
                                                     </Toolbar>
-                                                </Grid>
-                                                <Grid item xs={12}>
-                                                    <Typography variant='subtitle2' sx={{ flex: 1, mt: 2.5, ml: '10px', textAlign: "center" }}>Check your eligibility without Sign up</Typography>
                                                 </Grid>
 
                                                 <Grid item xs={12} sx={{ mt: 3 }}>
@@ -290,6 +287,9 @@ const Landing = () => {
                                                         </Button>
                                                         <span className="signUpButtonArrow"></span>
                                                     </div>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Typography sx={{ flex: 1, mt: 3, ml: '10px', textAlign: "center" }}>Check your eligibility without Sign up</Typography>
                                                 </Grid>
                                                
                                             </Grid>

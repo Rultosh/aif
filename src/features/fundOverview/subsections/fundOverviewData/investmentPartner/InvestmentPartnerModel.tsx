@@ -260,7 +260,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 /> */}
 
               </Grid>
-              <Grid item xs={4.5}>
+              <Grid item xs={9}>
                 <TextField
                   required
                   id="description"
@@ -268,6 +268,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
                   value={investmentPartnerFormData.description}
                   variant="standard"
+                  multiline
                   {...register("description")}
                   error={(errors.description) ? true : false}
                   onChange={handleChange}
