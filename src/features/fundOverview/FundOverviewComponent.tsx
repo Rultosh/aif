@@ -20,6 +20,8 @@ export const FundOverview = (props:any) => {
     const prelimApplicationState = useAppSelector(selectPrelimApplication);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
     const navigate = useNavigate();
+  
+    const pathname = (window.location.pathname).toLowerCase();
 
     useEffect(() => {
         if(props.checkUnAuth){
@@ -81,31 +83,33 @@ export const FundOverview = (props:any) => {
                         <Grid container spacing={2}>
                             {isUserPermittedToView() ?
                                 <Grid item xs={2}>
-                                    <Card sx={{ display: 'flex' }}>
-                                        <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                            <IconButton onClick={() => navigate("fund")}>
-                                                <CardMedia
-                                                    component="img"
-                                                    width="20"
-                                                    //height="80"
-                                                    image={fundImg}
-                                                    alt="test-img"
-                                                />
-
-                                            </IconButton>
-
-                                            <Typography textAlign="center" sx={{ color: 'red', fontWeight: 700 }}>
+                                    <Card sx={{ display: 'flex', borderRadius: '10px' }}>
+                                        <CardContent sx={{ flex: 1, alignContent: 'center', pb: '0 !important', p: 0, position: 'relative' }} >
+                                            <Box className={"prelimsNavTab " + (pathname.includes("fund")? "activeTab" : "")}>
                                                 <Link to="fund" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                    Fund Overview
+                                                    <IconButton onClick={() => navigate("fund")} className="prelimsNavTabIcon">
+                                                        <CardMedia
+                                                            component="img"
+                                                            width="20"
+                                                            //height="80"
+                                                            image={fundImg}
+                                                            alt="test-img"
+                                                        />
+
+                                                    </IconButton>
+
+                                                    <Typography textAlign="center" sx={{ fontWeight: 700, pb: 3 }}>
+                                                        Fund Overview
+                                                    </Typography>
                                                 </Link>
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                    <Divider />
+                                            </Box>
+                                        {/* </CardContent> */}
+                                    {/* </Card> */}
+                                    <Divider sx={{ border: '1.5px solid #556ab1' }} />
                                     {id?.toString() != 'NEW' ? <>
-                                        <Card sx={{ display: 'flex' }}>
-                                            <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                                <IconButton onClick={() => navigate("Profile")}>
+                                        <Box className={"prelimsNavTab " + (pathname.includes("profile")? "activeTab" : "")}>
+                                            <Link to="Profile" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                <IconButton onClick={() => navigate("Profile")} className="prelimsNavTabIcon">
                                                     <CardMedia
                                                         component="img"
                                                         width="20"
@@ -116,17 +120,15 @@ export const FundOverview = (props:any) => {
 
                                                 </IconButton>
 
-                                                <Typography textAlign="center" sx={{ fontWeight: 700 }}>
-                                                    <Link to="Profile" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                <Typography textAlign="center" sx={{ fontWeight: 700, pb: 3 }}>
                                                         Profile
-                                                    </Link>
                                                 </Typography>
-                                            </CardContent>
-                                        </Card>
-                                        <Divider />
-                                        <Card sx={{ display: 'flex' }}>
-                                            <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                                <IconButton onClick={() => navigate("selfRating")}>
+                                            </Link>
+                                        </Box>
+                                        <Divider sx={{ border: '1.5px solid #556ab1' }} />
+                                        <Box className={"prelimsNavTab " + (pathname.includes("selfrating")? "activeTab" : "")}>
+                                            <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                <IconButton onClick={() => navigate("selfRating")} className="prelimsNavTabIcon">
                                                     <CardMedia
                                                         component="img"
                                                         width="20"
@@ -137,17 +139,15 @@ export const FundOverview = (props:any) => {
 
                                                 </IconButton>
 
-                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
-                                                    <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                        Self Rating
-                                                    </Link>
+                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, pb: 3 }}>
+                                                    Self Rating
                                                 </Typography>
-                                            </CardContent>
-                                        </Card>
-                                        <Divider />
-                                        <Card sx={{ display: 'flex' }}>
-                                            <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                                <IconButton onClick={() => navigate("Declaration")}>
+                                            </Link>
+                                        </Box>
+                                        <Divider sx={{ border: '1.5px solid #556ab1' }} />
+                                        <Box className={"prelimsNavTab " + (pathname.includes("declaration")? "activeTab" : "")}>
+                                            <Link to="declaration" style={{ textDecoration: 'none', color: '#363062' }}>
+                                                <IconButton onClick={() => navigate("Declaration")} className="prelimsNavTabIcon">
                                                     <CardMedia
                                                         component="img"
                                                         width="20"
@@ -158,17 +158,15 @@ export const FundOverview = (props:any) => {
 
                                                 </IconButton>
 
-                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
-                                                    <Link to="declaration" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                        Declaration
-                                                    </Link>
+                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, pb: 3 }}>
+                                                    Declaration
                                                 </Typography>
-                                            </CardContent>
-                                        </Card>
-                                        <Divider />
-                                        <Card sx={{ display: 'flex', mb: 2 }}>
-                                            <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                                <IconButton onClick={() => navigate("preview")}>
+                                            </Link>
+                                        </Box>
+                                        <Divider sx={{ border: '1.5px solid #556ab1' }} />
+                                        <Box className={"prelimsNavTab " + (pathname.includes("preview")? "activeTab" : "")}>
+                                            <Link to="preview" style={{ textDecoration: 'none', color: '#363062'}}>
+                                                <IconButton onClick={() => navigate("preview")} className="prelimsNavTabIcon">
                                                     <CardMedia
                                                         component="img"
                                                         width="20"
@@ -179,22 +177,21 @@ export const FundOverview = (props:any) => {
 
                                                 </IconButton>
 
-                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
-                                                    <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                        Preview
-                                                    </Link>
+                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, pb: 3 }}>
+                                                    Preview
                                                 </Typography>
-                                            </CardContent>
-                                        </Card>
-                                        <Divider />
+                                            </Link>
+                                        </Box>
                                     </>
                                         : null}
+                                        </CardContent>
+                                    </Card>
                                 </Grid>
                                 :
                                 <Grid item xs={2}>
                                     <Card sx={{ display: 'flex', mb: 2 }}>
                                         <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                            <IconButton onClick={() => navigate("preview")}>
+                                            <IconButton onClick={() => navigate("preview")} className="prelimsNavTabIcon">
                                                 <CardMedia
                                                     component="img"
                                                     width="20"
