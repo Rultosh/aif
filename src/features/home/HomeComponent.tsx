@@ -228,7 +228,7 @@ console.log(prelimApplications.prelimApplication);
                             </Grid>
                         </Grid>
                         <TableContainer sx={{ p: '0px 30px', width: 'auto' }}>
-                            <Box sx={{ border: '2px solid #8f8f93' }}>
+                            <Box sx={{ border: '2px solid #dbdbde' }}>
                                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                                     <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                                         <TableRow sx={{ backgroundColor: '#34344b' }}>

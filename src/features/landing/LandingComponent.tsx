@@ -281,11 +281,11 @@ const Landing = () => {
                                                 </Grid>
 
                                                 <Grid item xs={12} sx={{ mt: 3 }}>
-                                                    <div className="signUpButton" style={{ width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
+                                                    <div className="checkEligibilityButton" style={{ width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
                                                         <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#EC8D1C, #844F10)', borderRadius: '10px', fontWeight: 600 }} onClick={submitOnCheckEligibility} >
                                                             Check Eligibility
                                                         </Button>
-                                                        <span className="signUpButtonArrow"></span>
+                                                        <span className="checkEligibilityButtonArrow"></span>
                                                     </div>
                                                 </Grid>
                                                 <Grid item xs={12}>
