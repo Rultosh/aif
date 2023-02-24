@@ -345,8 +345,15 @@ console.log(investmentResponsibleAsLead);
                           value={investmentResponsibleAsLead.yearOfInvestment+'-08-18T21:00:00'}
                           // minDate={Today.toString()}
                           onChange={(newValue) => {
-                            setValue('yearOfInvestment', newValue);
-                            setDateValue("yearOfInvestment", newValue);
+                            if(newValue) {
+                              var startDate = new Date(newValue);
+                              console.log("new value", startDate.getFullYear())
+                              setValue('yearOfInvestment', newValue);
+                              setDateValue("yearOfInvestment", newValue);
+                              let copiedValue = { ...investmentResponsibleAsLead };
+                              copiedValue['yearOfInvestment'] = String(startDate.getFullYear());
+                              setCompanyContactDetails(copiedValue);
+                            }
                           }}
                           renderInput={(params) => <TextField
                             helperText={(invalid && getValues("yearOfInvestment") == null && (investmentResponsibleAsLead.yearOfInvestment || '') == '') ? <Typography variant="caption" {...register('yearOfInvestment')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
