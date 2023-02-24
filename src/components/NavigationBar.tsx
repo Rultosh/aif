@@ -130,7 +130,7 @@ const NavigationBar = (props: any) => {
           <Box
             component="img"
             sx={{
-              height: 64,
+              height: 55,
               display: { xs: 'none', md: 'block' },
             }}
             alt="sidbi_logo"
@@ -170,8 +170,8 @@ const NavigationBar = (props: any) => {
             >
               {pages != undefined ? pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, }}>
-                    <Link to={`/${page}`} style = {{cursor:'pointer', color: '#000000', textDecoration: 'none'}}>
+                  <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
+                    <Link to={`/${page}`} style = {{cursor:'pointer', color: '#000000', textDecoration: 'none', fontSize: '16px'}}>
                       {page}
                     </Link>
                   </Typography>
@@ -221,7 +221,7 @@ const NavigationBar = (props: any) => {
                 className={"menuItemHeader " + (pathname.includes(pageLowerCase)? "activePage" : "")}
               >
                 <div className='headerHoverHightlightTop'></div>
-                <Link to={`/${page}`} style = {{cursor:'pointer', color: '#000000', textDecoration: 'none'}}>
+                <Link to={`/${page}`} style = {{cursor:'pointer', color: '#000000', textDecoration: 'none', fontSize: '16px' }}>
                   {page}
                 </Link>
                 <div className='headerHoverHightlight'></div>

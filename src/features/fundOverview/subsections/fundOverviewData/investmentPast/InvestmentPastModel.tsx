@@ -198,7 +198,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   <>{(errors.amountInvested && getValues("amountInvested") == '')?errors.amountInvested.message : ''}</>
                 </Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={7.5}>
                 <TextField
                   required
                   id="briefProfile"
@@ -207,6 +207,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                   {...register("briefProfile")}
                   error={(errors.briefProfile) ? true : false}
                   variant="standard"
+                  multiline
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}

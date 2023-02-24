@@ -45,7 +45,7 @@ const Header = (props: any) => {
           <div id="Component_15__2" className="Component_15___2">
             <div id="ALTERNATE_INVESTMENT_FUND__" style={{ fontSize: '40px', color: 'rgba(255,255,255,1)' }}>
               <span>A</span>
-              <span style={{fontSize:'25px'}}>LTERNATE </span>
+              <span style={{fontSize:'25px'}}>LTERNATIVE </span>
               <span>I</span>
               <span style={{fontSize:'25px'}}>NVESTMENT</span>
               <span> F</span>
