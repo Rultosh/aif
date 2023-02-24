@@ -100,7 +100,7 @@ console.log(investmentResponsibleAsLead);
     amountInvested: Yup.string().required("Amount Invested is required"),
     dateOfInvestment: Yup.string().required("Date of Investment is required").nullable(),
     exitOrWriteOff: Yup.string().required("Exit Or Writeoff is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    dateofExitorWriteOff: Yup.string().required("Date of Exit Or Writeoff is required").nullable(),
+    // dateofExitorWriteOff: Yup.string().required("Date of Exit Or Writeoff is required").nullable(),
     irrPercent: Yup.string().required("IRR % is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     comment: Yup.string().required("Comment is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
   });
