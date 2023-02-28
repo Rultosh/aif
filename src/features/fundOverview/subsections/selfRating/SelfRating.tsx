@@ -15,6 +15,7 @@ import { selectUsers } from '../../../admin/adminSlice'
 // import { useForm } from "react-hook-form";
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import * as Yup from "yup";
+// import useCookie, { getCookie } from 'react-use-cookie';
 
 
 
@@ -35,11 +36,17 @@ export const SelfRating = (props:any) => {
     const usersState = useAppSelector(selectUsers)
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
+    // const selfRatingCookie = getCookie('selfRating') || '0';
+    // const [selfRating, setSelfRating] = useCookie('selfRating', selfRatingCookie);
 
     useEffect(() => {
         if(props.checkUnAuth){
             navigate('/login')
         }
+
+        // if(getCookie('selfRating') == '1'){
+        //     handleClickSave();
+        // }
     })
     
     useEffect(() => {
@@ -92,6 +99,9 @@ export const SelfRating = (props:any) => {
                 )
             )
         }
+        // if(selfRatingValue){
+        // setSelfRating('0');
+        // }
     }
 
     function calculateScore(v: any, sel: string, idx: number) {

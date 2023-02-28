@@ -2,7 +2,7 @@ import './App.css';
 import Header from './components/Header'
 import EligibilityQuestioner from './features/eligibilityQuesioner/EligibilityQuestionerComponent'
 import EligibilityResults from './features/eligibilityResults/EligibilityResultsComponent'
-import { useState, useEffect } from "react"
+import { useState, useEffect, createContext, useContext } from "react"
 import { Route, Routes } from "react-router"
 import { useNavigate } from 'react-router-dom';
 import Landing from './features/landing/LandingComponent'
@@ -43,9 +43,20 @@ import { AdminRoute } from './components/auth/AdminRoute';
 import { UserAdminRoute } from './components/auth/UserAdminRoute';
 import {CheckAuth} from '../src/app/api';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+// import useCookie, { getCookie } from 'react-use-cookie';
+
+// let initialState = {
+//   shoppingList : 'test'
+// }
+
+// export const UserContext = createContext(initialState);
 
 function App() {
+  // const [user, setUser] = useState(null);
+  // const [selfRatingLink, setSelfRatingLink] = useCookie('selfRatingLink', '0');
 
+  // let { shoppingList } = useContext(UserContext);
+  // console.log(shoppingList);
   const userLogged = useAppSelector(state => state.landing.validUser);//false;
   const checkIsCorrectStateToUpdate = (data: any, keyObj: any) => {
     let tempVal = false
@@ -64,6 +75,10 @@ function App() {
   //   "fontFamily": "Roboto",
   //   }
   // });
+
+  //   useEffect(() => {
+  //     setSelfRatingLink('0');
+  // })
 
   return (
     // <ThemeProvider theme={THEME}>

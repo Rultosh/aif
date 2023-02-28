@@ -2,7 +2,7 @@ import { Box, Button, Card, CardContent, CardMedia, Container, Divider, Grid, Ty
 import { Link, useNavigate, Outlet, useParams } from 'react-router-dom';
 import NavigationBar from '../../components/NavigationBar'
 import React, * as Rect from 'react'
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import fundImg from '../../images/fund.png'
 import decImg from '../../images/declaration.png'
 import selfRatingImg from '../../images/rating.png'
@@ -11,9 +11,13 @@ import IconButton from '@mui/material/IconButton';
 import { selectUsers } from '../admin/adminSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { selectPrelimApplication } from "../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
-
+// import { UserContext } from '../../App';
+// import useCookie, { getCookie } from 'react-use-cookie';
+// import WarningIcon from '@mui/icons-material/Warning';
 
 export const FundOverview = (props:any) => {
+    // let { shoppingList } = useContext(UserContext);
+    // const [user, setUser] = useState(shoppingList);
 
     const { id } = useParams();
     const usersState = useAppSelector(selectUsers)
@@ -21,12 +25,18 @@ export const FundOverview = (props:any) => {
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
     const navigate = useNavigate();
   
-    const pathname = (window.location.pathname).toLowerCase();
+    const pathname = (window.location.pathname).toLowerCase();  
+    // const selfRatingCookie = getCookie('selfRating') || '0';
+    // const [selfRating, setSelfRating] = useCookie('selfRating', selfRatingCookie);
+    // const [selfRatingLink, setSelfRatingLink] = useCookie('selfRatingLink', '0');
 
     useEffect(() => {
         if(props.checkUnAuth){
             navigate('/login')
         }
+        // if(selfRatingLink == '0'){
+        // setSelfRating('0');
+        // }
     })
 
     useEffect(() => {
@@ -105,8 +115,8 @@ export const FundOverview = (props:any) => {
                                             </Box>
                                         {/* </CardContent> */}
                                     {/* </Card> */}
-                                    <Divider sx={{ border: '1.5px solid #556ab1' }} />
                                     {id?.toString() != 'NEW' ? <>
+                                    <Divider sx={{ border: '1.5px solid #556ab1' }} />
                                         <Box className={"prelimsNavTab " + (pathname.includes("profile")? "activeTab" : "")}>
                                             <Link to="Profile" style={{ textDecoration: 'none', color: '#363062' }}>
                                                 <IconButton onClick={() => navigate("Profile")} className="prelimsNavTabIcon">
@@ -128,26 +138,39 @@ export const FundOverview = (props:any) => {
                                         <Divider sx={{ border: '1.5px solid #556ab1' }} />
                                         <Box className={"prelimsNavTab " + (pathname.includes("selfrating")? "activeTab" : "")}>
                                             <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                <IconButton onClick={() => navigate("selfRating")} className="prelimsNavTabIcon">
-                                                    <CardMedia
-                                                        component="img"
-                                                        width="20"
-                                                        //height="80"
-                                                        image={selfRatingImg}
-                                                        alt="test-img"
-                                                    />
-
-                                                </IconButton>
-
-                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, pb: 3 }}>
+                                                {/* {selfRating == '1'? 
+                                                    <>
+                                                    <WarningIcon style={{ width: '-webkit-fill-available', height: '40px', marginTop: '28px', marginBottom: '24px', color: 'red' }} />
+                                                    <Typography textAlign="center" sx={{ color: 'red', fontWeight: 700, pb: 3 }}>
                                                     Self Rating
-                                                </Typography>
+                                                    </Typography>
+                                                    </>
+                                                    :
+                                                    <> */}
+                                                    <IconButton onClick={() => navigate("selfRating")} className="prelimsNavTabIcon"> 
+                                                        <CardMedia
+                                                            component="img"
+                                                            width="20"
+                                                            //height="80"
+                                                            image={selfRatingImg}
+                                                            alt="test-img"
+                                                        />
+                                                    </IconButton>
+                                                    <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, pb: 3 }}>
+                                                    Self Rating
+                                                    </Typography>
+                                                    {/* </>
+                                                } */}
                                             </Link>
                                         </Box>
                                         <Divider sx={{ border: '1.5px solid #556ab1' }} />
                                         <Box className={"prelimsNavTab " + (pathname.includes("declaration")? "activeTab" : "")}>
-                                            <Link to="declaration" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                <IconButton onClick={() => navigate("Declaration")} className="prelimsNavTabIcon">
+                                            <Link to="declaration" style={{ textDecoration: 'none', color: '#363062' }} 
+                                            // onClick={() => {setSelfRating('1'); setSelfRatingLink('1');}}
+                                            >
+                                                <IconButton onClick={() => {navigate("Declaration"); 
+                                                // setSelfRating('1'); setSelfRatingLink('1');
+                                                }} className="prelimsNavTabIcon">
                                                     <CardMedia
                                                         component="img"
                                                         width="20"
