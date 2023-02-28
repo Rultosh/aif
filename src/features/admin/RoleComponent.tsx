@@ -75,7 +75,7 @@ const RoleComponent = (props: any) => {
                                     >
 
                                         <MenuItem key={"USER"} value={0}>USER</MenuItem>
-                                        <MenuItem key={"USERADMIN"} value={1}>USERADMIN</MenuItem>
+                                        <MenuItem key={"ADMIN"} value={1}>ADMIN</MenuItem>
 
                                     </Select>
                                 </FormControl>

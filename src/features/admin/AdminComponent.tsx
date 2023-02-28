@@ -115,17 +115,18 @@ const Admin = (props: any) => {
                                         <TableCell align="center">
                                             {row.role == 'REGISTERED' ? <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} /> : <></>}
                                         </TableCell>
-                                        {open ? <RoleComponent
-                                            open={open}
-                                            userDetails = {selectedRow}
-                                            handleClose={handleClose}></RoleComponent>
-                                            : <></>}
+                                        
                                     </TableRow>
                                 })
                             }
                         </TableBody>
                     </Table>
                 </TableContainer>
+                {open ? <RoleComponent
+                                            open={open}
+                                            userDetails = {selectedRow}
+                                            handleClose={handleClose}></RoleComponent>
+                                            : <></>}
 
             </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
 
