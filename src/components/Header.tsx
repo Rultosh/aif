@@ -13,6 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import logo from '../images/logo.png'
 import { Link } from 'react-router-dom'
 import Divider from '@mui/material/Divider';
+import MailIcon from '@mui/icons-material/Mail';
 
 import loginRupeeIconImg from '../images/logo_rupee_symbol.png'
 
@@ -22,7 +23,7 @@ import loginRupeeIconImg from '../images/logo_rupee_symbol.png'
 
 const Header = (props: any) => {
 
-  const navItems = ['FAQs', 'Help', 'Toll Free: 1800 XXX 1234'];
+  const navItems = ['FAQs', 'Help', 'vcfapplication@sidbi.in'];
   let count = 0;
   return (
     <AppBar position="static" component='nav' sx={{ backgroundColor: '#363062' }}>
@@ -66,9 +67,12 @@ const Header = (props: any) => {
                                 sx={{ color: '#FFFFFF', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px', borderRight: '1px solid white', borderRadius: '0' }} >
                                 {item}
                             </Button>
-            :<Button key={item} sx={{ color: '#fff', pt: 0.5, pb: 0.5, borderRight: navItems.length == count? '0px solid white' : '1px solid white', borderRadius: '0' }}>
+            :
+            <Button key={item} sx={{ color: '#fff', pt: 0.5, pb: 0.5, borderRight: navItems.length == count? '0px solid white' : '1px solid white', borderRadius: '0', textTransform: navItems.length == count?'initial' : '' }}>
+              {navItems.length == count? <MailIcon sx={{ mr: 1 }}/> : <></>}
               {item}
-            </Button>}
+            </Button>
+            }
             </Box>
           )})}
         

@@ -27,7 +27,8 @@ const NavigationBar = (props: any) => {
   const navigate = useNavigate();
   const [actionUid] = useState(uuid())
   const userPages = ['Home', 'Workflow', 'Preliminary'];
-  const adminPages = ['Home', 'Admin', 'Workflow'];
+  const adminPages = ['Home', 'Workflow'];
+  const userAdminPages = ['Home', 'Admin', 'Workflow'];
   const settings = ['Change Password','Logout'];
   const dispatch = useAppDispatch()
   const usersState = useAppSelector(selectUsers)
@@ -78,8 +79,11 @@ const NavigationBar = (props: any) => {
 
 
   useEffect(() => {
-    if (usersState.status.fetchStatus === FetchStatus.IDLE  && ['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '')) {
+    if (usersState.status.fetchStatus === FetchStatus.IDLE  && ['ADMIN'].includes(usersState.role!= undefined? usersState.role : '')) {
       setPages(adminPages)
+    }
+    if (usersState.status.fetchStatus === FetchStatus.IDLE  && ['USERADMIN'].includes(usersState.role!= undefined? usersState.role : '')) {
+      setPages(userAdminPages)
     }
   }, [role])
 

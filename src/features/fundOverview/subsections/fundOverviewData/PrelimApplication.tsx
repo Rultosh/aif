@@ -189,7 +189,15 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         // dealSector: Yup.string(),
         // dealSubsector: Yup.string().required("Deal Sub Sector is required"),
         nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        contributionSought: Yup.string().required("Contribution Sought is required"),
+        contributionSought: Yup.string().required("Contribution Sought is required").test("test-name", "Enter value that cannot exceed 25% of target corpus", function (value: any) {
+            let sdTotalTargetCorpusVal = Number(prelimApplicationFormData.sdTotalTargetCorpus || '0');
+            let contributionSoughtVal = Number(prelimApplicationFormData.contributionSought || '0');
+            let sdTotalTargetCorpusValCalc = sdTotalTargetCorpusVal * 0.25; // Not more than 25%
+            if (sdTotalTargetCorpusValCalc < contributionSoughtVal) {
+              return false;
+            }
+            return true;
+          }),
         termOfFund: Yup.string().required("Term of Fund is required"),
         commitmentPeriod: Yup.string().required("Commitment Period is required"),
         preferredReturn: Yup.string().required("Preferred Return is required"),
@@ -432,7 +440,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             label="Contribution sought(₹ crores)"
                             value={prelimApplicationFormData.contributionSought || ''}
                             {...register("contributionSought")}
-                            error={errors.contributionSought && getValues("contributionSought") == '' ? true : false}
+                            error={errors.contributionSought ? true : false}
                             onChange={handleChange}
                             //  onKeyUp={(val) =>{
                             //     if(val === '4'){
@@ -451,7 +459,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             inputProps={{ min: 0, max: 9999, step: 1 }}
                         />
                         <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                           <>{errors.contributionSought && getValues("contributionSought") ==  ''?errors.contributionSought.message : ''}</>
+                           <>{errors.contributionSought?errors.contributionSought.message : ''}</>
                        </Typography>
                     </Grid>
                     <Grid item xs={4}>

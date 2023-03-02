@@ -45,7 +45,7 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
   for (let i = 0; i < tableHeaders.length; i++) {
     headerComponent.push(
       <React.Fragment >
-        <TableCell align="center" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
+        <TableCell align="center" sx={{ fontWeight: 'bold', }}>{tableHeaders[i]}</TableCell>
       </React.Fragment>)
   }
 
@@ -70,8 +70,8 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
       <CardContent >
         <Grid container spacing={2} >
           <Grid item xs={12}>
-            <Box sx={{ width: 'auto' }}>
-              <TableContainer component={Paper}  >
+            <Box>
+              <TableContainer component={Paper}   sx={{ maxHeight: 340 }}>
                 <Table sx={{ mt: 1, mb: 1 }} aria-label="customized table">
                   <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                     <TableRow>
@@ -79,7 +79,7 @@ export const TeamMemberRow = (props: TeamMemberRowProps) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    <TableRow key={props.teamMember.id}>
+                    <TableRow key={props.teamMember.id} sx={{ verticalAlign:'baseline'}}>
                       <TableCell align="center" component="th" scope="row">
                         {props.teamMember.name}
                       </TableCell>

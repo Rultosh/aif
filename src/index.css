@@ -269,3 +269,7 @@ code {
 .prelimsNavTabIcon:hover, .prelimsNavTabIcon:focus {
   background-color: transparent !important;
 }
+
+textarea.MuiInputBase-input {
+  text-align: justify !important;
+}

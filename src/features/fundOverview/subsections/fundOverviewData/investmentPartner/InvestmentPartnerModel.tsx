@@ -97,6 +97,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    maxHeight: '70vh',
+    overflow: 'auto'
   };
     
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
@@ -127,168 +129,175 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     setInvestmentPartnerFormData(data);
     handleSubmitForm();
   };
+  
+  function getModalStyle() {
+    const top = 50
+    const left = 50
+
+    return {
+        top: `${top}%`,
+        left: `${left}%`,
+        transform: `translate(-${top}%, -${left}%)`,
+        overflow: "scroll"
+    };
+  }
 
   return <Modal
     open={props.open}
     onClose={handleCloseModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
+    disableScrollLock
   >
     <Box sx={style}>
       <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-        <Card sx={{ display: 'flex', }}>
+        <Grid container spacing={2} >
+          <Grid item xs={9}>
+            <Box sx={{ display: 'inline-flex' }}>
+              <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details Of Investment Team (At Partner Level)</Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={4.5}>
+            <TextField
+              required
+              id="name"
+              label="Name"
+              {...register("name")}
+              error={(errors.name) ? true : false}
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPartnerFormData.name}
+              variant="standard"
+              onChange={handleChange}
 
-          <CardContent sx={{ flex: 1 }}>
-            <Grid container spacing={2} >
-              <Grid item xs={9}>
-                <Box sx={{ display: 'inline-flex' }}>
-                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details Of Investment Team (At Partner Level)</Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={4.5}>
-                <TextField
-                  required
-                  id="name"
-                  label="Name"
-                  {...register("name")}
-                  error={(errors.name) ? true : false}
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPartnerFormData.name}
-                  variant="standard"
-                  onChange={handleChange}
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.name)?errors.name.message : ''}</>
+            </Typography>
 
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.name)?errors.name.message : ''}</>
-                </Typography>
+          </Grid>
+          <Grid item xs={3.5}>
+            <TextField
+              required
+              id="designation"
+              label="Designation"
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPartnerFormData.designation}
+              {...register("designation")}
+              error={(errors.designation)? true : false}
+              variant="standard"
+              onChange={handleChange}
 
-              </Grid>
-              <Grid item xs={3.5}>
-                <TextField
-                  required
-                  id="designation"
-                  label="Designation"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPartnerFormData.designation}
-                  {...register("designation")}
-                  error={(errors.designation)? true : false}
-                  variant="standard"
-                  onChange={handleChange}
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.designation)?errors.designation.message : ''}</>
+            </Typography>
 
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.designation)?errors.designation.message : ''}</>
-                </Typography>
+          </Grid>
+          <Grid item xs={1}>
+            <TextField
+              required
+              type="number"
+              id="age"
+              label="Age"
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPartnerFormData.age}
+              {...register("age")}
+              error={(errors.age && getValues("age") == '') ? true : false}
+              variant="standard"
+              onChange={handleChange}
 
-              </Grid>
-              <Grid item xs={1}>
-                <TextField
-                  required
-                  type="number"
-                  id="age"
-                  label="Age"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPartnerFormData.age}
-                  {...register("age")}
-                  error={(errors.age && getValues("age") == '') ? true : false}
-                  variant="standard"
-                  onChange={handleChange}
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.age && getValues("age") == '')?errors.age.message : ''}</>
+            </Typography>
+          </Grid>
+          <Grid item xs={4.5}>
+            <TextField
+              required
+              id="qualification"
+              label="Qualification"
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPartnerFormData.qualification}
+              {...register("qualification")}
+              error={(errors.qualification) ? true : false}
+              variant="standard"
+              onChange={handleChange}
 
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                 <>{(errors.age && getValues("age") == '')?errors.age.message : ''}</>
-               </Typography>
-              </Grid>
-              <Grid item xs={4.5}>
-                <TextField
-                  required
-                  id="qualification"
-                  label="Qualification"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPartnerFormData.qualification}
-                  {...register("qualification")}
-                  error={(errors.qualification) ? true : false}
-                  variant="standard"
-                  onChange={handleChange}
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.qualification)?errors.qualification.message : ''}</>
+            </Typography>
 
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.qualification)?errors.qualification.message : ''}</>
-                </Typography>
+          </Grid>
+          <Grid item xs={4.5}>
+            <FormControl variant="standard" sx={{  display: 'flex' }}>
+              <InputLabel id="demo-simple-select-standard-label">VC/PE Experience in investing</InputLabel>
+              <Select
+              required
+                labelId="vcpeExperience"
+                id="vcpeExperience"
+                value={investmentPartnerFormData.vcpeExperience || ''}
+                {...register("vcpeExperience")}
+                error={(errors.vcpeExperience && getValues("vcpeExperience") =='') ? true : false}
+                onChange={handleChange}
+                name="vcpeExperience"
+                // defaultValue={investmentPartnerFormData["vcpeExperience"] === undefined ? " " : investmentPartnerFormData["vcpeExperience"]}
+              >
 
-              </Grid>
-              <Grid item xs={4.5}>
-                <FormControl variant="standard" sx={{  display: 'flex' }}>
-                  <InputLabel id="demo-simple-select-standard-label">VC/PE Experience in investing</InputLabel>
-                  <Select
-                  required
-                    labelId="vcpeExperience"
-                    id="vcpeExperience"
-                    value={investmentPartnerFormData.vcpeExperience || ''}
-                    {...register("vcpeExperience")}
-                    error={(errors.vcpeExperience && getValues("vcpeExperience") =='') ? true : false}
-                    onChange={handleChange}
-                    name="vcpeExperience"
-                    // defaultValue={investmentPartnerFormData["vcpeExperience"] === undefined ? " " : investmentPartnerFormData["vcpeExperience"]}
-                  >
-
-                    <MenuItem key={"0-5 years"} value="0-5 years" selected={String(investmentPartnerFormData.vcpeExperience) == "0-5 years"}>0-5 years</MenuItem>
-                    <MenuItem key={"5-10 years"} value="5-10 years" selected={String(investmentPartnerFormData.vcpeExperience) == "5-10 years"}>5-10 years</MenuItem>
-                    <MenuItem key={"10-15 years"} value="10-15 years" selected={String(investmentPartnerFormData.vcpeExperience) == "10-15 years"}>10-15 years</MenuItem>
-                    <MenuItem key={"15+ years"} value="15+ years" selected={String(investmentPartnerFormData.vcpeExperience) == "15+ years"}>15+ years</MenuItem>
-                  </Select>
-                </FormControl>
-                <Typography variant="caption" color="error">
-                  <>{(errors.vcpeExperience && getValues("vcpeExperience") == '')?errors.vcpeExperience.message : ''}</>
-                </Typography>
+                <MenuItem key={"0-5 years"} value="0-5 years" selected={String(investmentPartnerFormData.vcpeExperience) == "0-5 years"}>0-5 years</MenuItem>
+                <MenuItem key={"5-10 years"} value="5-10 years" selected={String(investmentPartnerFormData.vcpeExperience) == "5-10 years"}>5-10 years</MenuItem>
+                <MenuItem key={"10-15 years"} value="10-15 years" selected={String(investmentPartnerFormData.vcpeExperience) == "10-15 years"}>10-15 years</MenuItem>
+                <MenuItem key={"15+ years"} value="15+ years" selected={String(investmentPartnerFormData.vcpeExperience) == "15+ years"}>15+ years</MenuItem>
+              </Select>
+            </FormControl>
+            <Typography variant="caption" color="error">
+              <>{(errors.vcpeExperience && getValues("vcpeExperience") == '')?errors.vcpeExperience.message : ''}</>
+            </Typography>
 
 
-                {/*<TextField
-                  required
-                  id="vcpeExperience"
-                  label="VC/PE Experience in investing"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPartnerFormData.vcpeExperience}
-                  variant="standard"
-                  onChange={handleChange}
+            {/*<TextField
+              required
+              id="vcpeExperience"
+              label="VC/PE Experience in investing"
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPartnerFormData.vcpeExperience}
+              variant="standard"
+              onChange={handleChange}
 
-                  sx={{ display: 'flex' }}
+              sx={{ display: 'flex' }}
 /> */}
 
-              </Grid>
-              <Grid item xs={9}>
-                <TextField
-                  required
-                  id="description"
-                  label="Brief details of VC/PE Experience"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPartnerFormData.description}
-                  variant="standard"
-                  multiline
-                  {...register("description")}
-                  error={(errors.description) ? true : false}
-                  onChange={handleChange}
+          </Grid>
+          <Grid item xs={9}>
+            <TextField
+              required
+              id="description"
+              label="Brief details of VC/PE Experience"
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPartnerFormData.description}
+              variant="standard"
+              multiline
+              {...register("description")}
+              error={(errors.description) ? true : false}
+              onChange={handleChange}
 
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.description)?errors.description.message : ''}</>
-                </Typography>
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.description)?errors.description.message : ''}</>
+            </Typography>
 
-              </Grid>
-              <Grid item xs={12} >
-                <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
-                  Submit
-                </Button>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-
+          </Grid>
+          <Grid item xs={12} >
+            <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   </Modal>

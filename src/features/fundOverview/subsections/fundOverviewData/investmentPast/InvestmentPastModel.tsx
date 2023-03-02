@@ -95,6 +95,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    maxHeight: '70vh',
+    overflow: 'auto'
   };
     
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
@@ -134,129 +136,123 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
   >
     <Box sx={style}>
       <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-        <Card sx={{ display: 'flex', }}>
+        <Grid container spacing={2} >
+          <Grid item xs={9}>
+            <Box sx={{ display: 'inline-flex' }}>
+              <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Add Investment</Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={4.5}>
+            <TextField
+              required
+              id="nameOfCompany"
+              label="Name Of Company"
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPastFormData.nameOfCompany}
+              {...register("nameOfCompany")}
+              error={(errors.nameOfCompany) ? true : false}
+              variant="standard"
+              onChange={handleChange}
 
-          <CardContent sx={{ flex: 1 }}>
-            <Grid container spacing={2} >
-              <Grid item xs={9}>
-                <Box sx={{ display: 'inline-flex' }}>
-                  <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Add Investment</Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={4.5}>
-                <TextField
-                  required
-                  id="nameOfCompany"
-                  label="Name Of Company"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPastFormData.nameOfCompany}
-                  {...register("nameOfCompany")}
-                  error={(errors.nameOfCompany) ? true : false}
-                  variant="standard"
-                  onChange={handleChange}
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.nameOfCompany)?errors.nameOfCompany.message : ''}</>
+            </Typography>
+          </Grid>
+          <Grid item xs={3.5}>
+            <TextField
+              required
+              id="sector"
+              label="Sector"
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPastFormData.sector}
+              {...register("sector")}
+              error={(errors.sector) ? true : false}
+              variant="standard"
+              onChange={handleChange}
 
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.nameOfCompany)?errors.nameOfCompany.message : ''}</>
-                </Typography>
-              </Grid>
-              <Grid item xs={3.5}>
-                <TextField
-                  required
-                  id="sector"
-                  label="Sector"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPastFormData.sector}
-                  {...register("sector")}
-                  error={(errors.sector) ? true : false}
-                  variant="standard"
-                  onChange={handleChange}
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.sector)?errors.sector.message : ''}</>
+            </Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <TextField
+              required
+              type="number"
+              id="amountInvested"
+              label="Amount Invested (₹ Crore)"
+              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
+              value={investmentPastFormData.amountInvested}
+              {...register("amountInvested")}
+              error={(errors.amountInvested && getValues("amountInvested") == '') ? true : false}
+              variant="standard"
+              onChange={handleChange}
 
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.sector)?errors.sector.message : ''}</>
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  required
-                  type="number"
-                  id="amountInvested"
-                  label="Amount Invested (₹ Crore)"
-                  //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-                  value={investmentPastFormData.amountInvested}
-                  {...register("amountInvested")}
-                  error={(errors.amountInvested && getValues("amountInvested") == '') ? true : false}
-                  variant="standard"
-                  onChange={handleChange}
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.amountInvested && getValues("amountInvested") == '')?errors.amountInvested.message : ''}</>
+            </Typography>
+          </Grid>
+          <Grid item xs={7.5}>
+            <TextField
+              required
+              id="briefProfile"
+              label="Brief Profile"
+              value={investmentPastFormData.briefProfile}
+              {...register("briefProfile")}
+              error={(errors.briefProfile) ? true : false}
+              variant="standard"
+              multiline
+              onChange={handleChange}
 
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.amountInvested && getValues("amountInvested") == '')?errors.amountInvested.message : ''}</>
-                </Typography>
-              </Grid>
-              <Grid item xs={7.5}>
-                <TextField
-                  required
-                  id="briefProfile"
-                  label="Brief Profile"
-                  value={investmentPastFormData.briefProfile}
-                  {...register("briefProfile")}
-                  error={(errors.briefProfile) ? true : false}
-                  variant="standard"
-                  multiline
-                  onChange={handleChange}
-
-                  sx={{ display: 'flex' }}
-                />
-                <Typography variant="caption" color="error">
-                  <>{(errors.briefProfile)?errors.briefProfile.message : ''}</>
-                </Typography>
-              </Grid>
-              <Grid item xs={4.5}>
-                <LocalizationProvider dateAdapter={AdapterDayjs} >
-                  <Stack spacing={3}>
-                    <Controller
-                      name="dateOfInvestment"
-                      control={control}
-                      defaultValue={null}
-                      render={({
-                        field: { onChange, value },
-                        fieldState: { error, invalid }
-                      }) => (
-                        // console.log(invalid),
-                        (<DesktopDatePicker
-                          inputFormat='DD/MM/YYYY'
-                          disableFuture={true}
-                          label="Date Of Investment"
-                          value={investmentPastFormData.dateOfInvestment || null}
-                          // minDate={Today.toString()}
-                          onChange={(newValue) => {
-                            setValue('dateOfInvestment', newValue);
-                            setDateValue("dateOfInvestment", newValue);
-                          }}
-                          renderInput={(params) => <TextField
-                            helperText={(invalid && getValues("dateOfInvestment") == null) ? <Typography variant="caption" {...register('dateOfInvestment')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
-                        />
-                        )
-                      )}
+              sx={{ display: 'flex' }}
+            />
+            <Typography variant="caption" color="error">
+              <>{(errors.briefProfile)?errors.briefProfile.message : ''}</>
+            </Typography>
+          </Grid>
+          <Grid item xs={4.5}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} >
+              <Stack spacing={3}>
+                <Controller
+                  name="dateOfInvestment"
+                  control={control}
+                  defaultValue={null}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error, invalid }
+                  }) => (
+                    // console.log(invalid),
+                    (<DesktopDatePicker
+                      inputFormat='DD/MM/YYYY'
+                      disableFuture={true}
+                      label="Date Of Investment"
+                      value={investmentPastFormData.dateOfInvestment || null}
+                      // minDate={Today.toString()}
+                      onChange={(newValue) => {
+                        setValue('dateOfInvestment', newValue);
+                        setDateValue("dateOfInvestment", newValue);
+                      }}
+                      renderInput={(params) => <TextField
+                        helperText={(invalid && getValues("dateOfInvestment") == null) ? <Typography variant="caption" {...register('dateOfInvestment')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
                     />
-                  </Stack>
-                </LocalizationProvider>
-              </Grid>
+                    )
+                  )}
+                />
+              </Stack>
+            </LocalizationProvider>
+          </Grid>
 
-              <Grid item xs={12} >
-                <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
-                  Submit
-                </Button>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-
+          <Grid item xs={12} >
+            <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   </Modal>

@@ -58,24 +58,24 @@ const RoleComponent = (props: any) => {
 
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-                <Card sx={{ display: 'flex',  background: '#f2f2f2'}}>
+                {/* <Card sx={{ display: 'flex',  background: '#f2f2f2'}}>
 
-                    <CardContent sx={{ flex: 1 }}>
+                    <CardContent sx={{ flex: 1 }}> */}
                         <Grid container spacing={2} >
                             <Grid item xs={3}>
-                                <FormControl sx={{ m: 1, width: 200 }} size="medium">
+                                <FormControl size="medium" fullWidth>
 
                                     <InputLabel id="demo-select-small">Assign Role</InputLabel>
                                     <Select
                                         labelId="demo-select-small"
                                         id="demo-select-small"
                                         //value={scheme}
-                                        label="scheme"
+                                        label="Assign Role"
                                         onChange={handleSelectChange}
                                     >
 
                                         <MenuItem key={"USER"} value={0}>USER</MenuItem>
-                                        <MenuItem key={"USERADMIN"} value={1}>USERADMIN</MenuItem>
+                                        <MenuItem key={"ADMIN"} value={1}>ADMIN</MenuItem>
 
                                     </Select>
                                 </FormControl>
@@ -95,8 +95,8 @@ const RoleComponent = (props: any) => {
                             </Grid>
                         </Grid>
 
-                    </CardContent>
-                </Card>
+                    {/* </CardContent>
+                </Card> */}
             </Box>
         </Box>
     </Modal >
