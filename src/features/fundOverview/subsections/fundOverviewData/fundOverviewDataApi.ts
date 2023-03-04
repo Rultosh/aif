@@ -34,7 +34,7 @@ export function postPrelimApplication(prelimAppData:IPrelimApplicationData) {
 export function postApplication(prelimAppData:IApplicationData) {
   return api({
     method: 'post',
-    data: prelimAppData.statusComments,
+    data: {'remark': prelimAppData.statusComments},
     url: `/api/application/${prelimAppData.id}/${prelimAppData.status}`
   });
 }
