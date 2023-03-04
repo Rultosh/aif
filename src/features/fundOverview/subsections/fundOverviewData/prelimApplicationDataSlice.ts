@@ -188,7 +188,22 @@ const prelimApplicationDataSlice = createSlice({
     )
     .addCase(getPrelimApplicationList.rejected, (state, action) => {
       state.allStatus.fetchStatus = FetchStatus.FAILED;
+    })
+    .addCase(createApplicationAsync.pending, state => {
+      state.status.fetchStatus = FetchStatus.DOING;
+    })
+    .addCase(
+      createApplicationAsync.fulfilled,
+      (state, action: PayloadAction<IPrelimApplicationData>) => {
+        console.log(action.payload)
+       state.prelimApplication = action.payload
+       state.status.fetchStatus = FetchStatus.IDLE;
+      }
+    )
+    .addCase(createApplicationAsync.rejected, (state, action) => {
+      state.status.fetchStatus = FetchStatus.FAILED;
     });
+    
   }
 })
 
