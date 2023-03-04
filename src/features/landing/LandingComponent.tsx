@@ -1,3 +1,4 @@
+import React, { useRef } from 'react';
 import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, Divider } from "@mui/material";
 import logo from '../../images/logo.png'
 import azadiLogo from '../../images/Azadi.png'
@@ -14,6 +15,10 @@ import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
 import { ModalComponent } from '../../components/ModalComponent'
 import {CheckAuth} from '../../app/api';
 
+import ReCAPTCHA from "react-google-recaptcha";
+import { env } from 'yargs';
+import ReactDOM from 'react-dom';
+
 const Landing = () => {
 
     const [open, setOpen] = useState(true);
@@ -26,6 +31,8 @@ const Landing = () => {
     const errorMsg = useAppSelector(state => state.landing.error);
     const isValidUser = useAppSelector(state => state.landing.validUser);
     const [actionId] = useState(uuid());
+
+    const captchaRef = React.createRef<ReCAPTCHA>();
 
     useEffect(() => {
         // console.log(auth.token);
@@ -67,17 +74,35 @@ const Landing = () => {
             isUserValid()
         }
     }
-    function isUserValid() {
+    async function isUserValid() {
+        const captchaResponse = await captchaRef.current?.executeAsync();
+        console.log("recaptcha", captchaResponse);
         // dispatch(validateUser(value))
-        dispatch(authenticateThunk(wrapArgument(
-            actionId, value
-        )));
+        if(captchaResponse !== null && captchaResponse !== undefined) {
+            dispatch(authenticateThunk(wrapArgument(
+                actionId, {...value, captchaResponse}
+            )));
+
+            captchaRef.current?.reset();
+        }
+        
         // navigate('/home')
         /*dispatch(fetchRoleAsync(
             wrapArgument(actionId, 1)
         ))*/
     }
+
+    function error() {
+        console.log("Captcha error");
+    }
+
     return (
+        <>
+        <ReCAPTCHA
+            ref={captchaRef}
+            size={'invisible'}
+            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
+        />
         <div className="landingComp">
             <Container sx={{ my: '90px', }}>
                 <Box sx={{ flexGrow: 1 }}>
@@ -319,7 +344,7 @@ const Landing = () => {
                     </Grid>
                 </Box></Container>
         </div>
-
+        </>
     )
 }
 
