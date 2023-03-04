@@ -16,6 +16,8 @@ import {ModalComponent} from '../../components/ModalComponent'
 import { state, city } from "./stateAndCity";
 
 import { getError } from "../../lib/api-status/errorHandler"
+import ReCAPTCHA from "react-google-recaptcha";
+import React from "react";
 
 
 const SignUp = () => {
@@ -29,20 +31,21 @@ const SignUp = () => {
     const [showResponse, setShowResponse] = useState(false);
     const [formDataEmail, setFormDataEmail] = useState(false);
 
+    const captchaRef = React.createRef<ReCAPTCHA>();
 
-
-    function handleSubmitForm() {
+    async function handleSubmitForm() {
+        const captchaResponse = await captchaRef.current?.executeAsync();
+        console.log("recaptcha", captchaResponse);
+        // dispatch(validateUser(value))
+        if(captchaResponse !== null && captchaResponse !== undefined) {
         console.log(formData)
-        // if(formDataEmail == true) {
             setShowResponse(true)
             dispatch(
                 signupUsersAsync(
-                    wrapArgument(actionUid, formData)
+                    wrapArgument(actionUid, {...formData, captchaResponse})
                 )
             )
-        // } else {
-        //     getError({"fetchStatus":"failed","responseCode":"400","message":"Invalid request content."});
-        // }
+        }
     }
 
 
@@ -85,6 +88,12 @@ console.log(formDataEmail);
     };
 
     return (
+        <>
+          <ReCAPTCHA
+                ref={captchaRef}
+                size={'invisible'}
+                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
+            />
         <div >
             <Container sx={{ mt: '5px', }}>
                 <Box sx={{ flexGrow: 1 }}>
@@ -407,7 +416,7 @@ console.log(formDataEmail);
                 </Box></Container>
 
         </div>
-
+        </>
     )
 }
 
