@@ -88,48 +88,45 @@ const Admin = (props: any) => {
     return (
         <div className="homeComp" style={{ height: 670 }}>
             <NavigationBar></NavigationBar>
-            {true ? <>
-                <Container maxWidth="xl" sx={{ py: '40px' }}>
-                    <Paper elevation={0} sx={{ backgroundColor: '#f6f6fb', borderRadius: '10px' }}>
-                        <TableContainer component={Paper}  sx={{ maxHeight: 540 }} >
-                            <Table sx={{ minWidth: 700, mt: 0 }} aria-label="customized table">
-                                <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
-                                    <TableRow sx={{ backgroundColor: '#34344b' }}>
-                                        {adminHeaderComponent}
+            {true ? <div >
+                <TableContainer component={Paper}  >
+                    <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                        <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
+                            <TableRow>
+                                {adminHeaderComponent}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                usersState.users.map((row) => {
+                                    return <TableRow key={`${row.id}`}>
+                                        <TableCell align="center">{row.id}</TableCell>
+                                        <TableCell align="center">{row.username}</TableCell>
+                                        <TableCell align="center">{row.companyName}</TableCell>
+                                        <TableCell align="center">{row.contactPerson}</TableCell>
+                                        <TableCell align="center">{row.phoneNumber}</TableCell>
+                                        <TableCell align="center">{row.title}</TableCell>
+                                        <TableCell align="center">{row.state}</TableCell>
+                                        <TableCell align="center">{row.city}</TableCell>
+                                        <TableCell align="center">{row.address}</TableCell>
+                                        <TableCell align="center">{row.role}</TableCell>
+                                        <TableCell align="center">
+                                            {row.role == 'REGISTERED' ? <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} /> : <></>}
+                                        </TableCell>
+                                        
                                     </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {
-                                        usersState.users.map((row) => {
-                                            return <TableRow key={`${row.id}`} sx={{ backgroundColor: '#eeeefe', borderTop: '10px solid #f6f6fb', borderBottom: '10px solid #f6f6fb' }}>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.id}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.username}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.companyName}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.contactPerson}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.phoneNumber}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.title}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.state}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.city}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.address}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.role}</TableCell>
-                                                <TableCell align="center" sx={{ borderBottomWidth: 0 }}>
-                                                    {row.role == 'REGISTERED' ? <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} /> : <></>}
-                                                </TableCell>
-                                            </TableRow>
-                                        })
-                                    }
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Paper>
-                    
-                    {open ? <RoleComponent
-                        open={open}
-                        userDetails = {selectedRow}
-                        handleClose={handleClose}></RoleComponent>
-                    : <></>}
-                </Container>
-            </> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
+                                })
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                {open ? <RoleComponent
+                                            open={open}
+                                            userDetails = {selectedRow}
+                                            handleClose={handleClose}></RoleComponent>
+                                            : <></>}
+
+            </div> : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
 
 
         </div>
