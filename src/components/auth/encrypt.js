@@ -1,6 +1,5 @@
 const encrypt = (password) => {
     var passcode = process.env.REACT_APP_SALT;
-    console.log(passcode)
     var result = [];
     var passLen = passcode.length;
     for(var i=0; i<password.length; i++) {

@@ -20,12 +20,14 @@ const initialState: InitialState = {
 
 export interface ILoginRequest {
     username: String | undefined,
-    password: String | undefined
+    password: String | undefined,
+    captchaResponse: String | undefined,
 }
 
 export const defaultLoginRequest = {
     username: undefined,
-    password: undefined
+    password: undefined,
+    captchaResponse: undefined,
 }
 
 interface ILoginResponse {
