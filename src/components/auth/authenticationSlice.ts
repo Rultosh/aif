@@ -54,11 +54,17 @@ const authticationSlice = createSlice({
   name: 'authentication',
   initialState,
   reducers: {
-    
+    clearErrorMessage:  (state) => {
+      state.status.fetchStatus = FetchStatus.IDLE;
+    },
+    setErrorMessage:  (state, action: PayloadAction<string>) => {
+      state.response = action.payload
+      state.status.fetchStatus = FetchStatus.FAILED
+    }
   },
   extraReducers: builder => {
     builder.addCase(authenticateThunk.pending, state => {
-     
+      state.status.fetchStatus = FetchStatus.DOING;
     })
     .addCase(
         authenticateThunk.fulfilled,
@@ -68,18 +74,21 @@ const authticationSlice = createSlice({
         console.log(JSON.stringify(state));
         state.response = undefined;
         localStorage.setItem('token', String(state.token));
+        state.status.fetchStatus = FetchStatus.IDLE;
       }
     )
     .addCase(authenticateThunk.rejected, (state, action: any) => {
-      let errStr = "unknown error. please contact support"
-      const errOut = "Invalid Username / Password entered. Try again!"
-      state.response = action.payload?.message ? action.payload?.message.toLowerCase() == errStr ? errOut : action.payload?.message: "Error Contact Support";
+      // let errStr = "unknown error. please contact support"
+      // const errOut = "Invalid Username / Password entered. Try again!"
+      // state.response = action.payload?.message ? action.payload?.message.toLowerCase() == errStr ? errOut : action.payload?.message: "Error Contact Support";
+      console.log(action.payload);
+      state.response = action.payload.message;
       state.status.fetchStatus = FetchStatus.FAILED;
     })
   }
 })
 
 export default authticationSlice.reducer
-// export const { saveFormData } = fundOverviewDataSlice.actions
+export const { setErrorMessage, clearErrorMessage } = authticationSlice.actions
 
 export const selectAuthenticatedUser = (state: RootState) => state.auth;
