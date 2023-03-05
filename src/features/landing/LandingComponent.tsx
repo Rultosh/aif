@@ -8,7 +8,7 @@ import { validateUser } from './landingSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import '../../index.css'
 import loginIconImg from '../../images/aif_login_icon.png'
-import { authenticateThunk, defaultLoginRequest, selectAuthenticatedUser } from "../../components/auth/authenticationSlice";
+import { authenticateThunk, clearErrorMessage, defaultLoginRequest, selectAuthenticatedUser, setErrorMessage } from "../../components/auth/authenticationSlice";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
@@ -18,6 +18,7 @@ import {CheckAuth} from '../../app/api';
 import ReCAPTCHA from "react-google-recaptcha";
 import { env } from 'yargs';
 import ReactDOM from 'react-dom';
+import { FetchStatus } from '../../lib/api-status/IStatus';
 
 const Landing = () => {
 
@@ -45,12 +46,12 @@ const Landing = () => {
     })
 
     useEffect(() => {
-        if (state.response !== undefined) {
+        if (state.status.fetchStatus === FetchStatus.FAILED) {
             setShowResponse(true)
         } else {
             setShowResponse(false)
         }
-    }, [state.response])
+    }, [state.status])
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -61,6 +62,7 @@ const Landing = () => {
 
     const handleClose = () => {
         setShowResponse(false)
+        dispatch(clearErrorMessage());
         //setFormData(defaultISignup)
     };
 
@@ -71,29 +73,33 @@ const Landing = () => {
 
     function handleKeyPress(ev: any) {
         if (ev.charCode === 13 && ev.key.toLowerCase() == 'enter') {
-            isUserValid()
+            isUserValid();
         }
     }
     async function isUserValid() {
-        const captchaResponse = await captchaRef.current?.executeAsync();
-        console.log("recaptcha", captchaResponse);
-        // dispatch(validateUser(value))
-        if(captchaResponse !== null && captchaResponse !== undefined) {
-            dispatch(authenticateThunk(wrapArgument(
-                actionId, {...value, captchaResponse}
-            )));
+        var captchaResponse:string|undefined|null;
 
-            captchaRef.current?.reset();
+        if(captchaRef && captchaRef.current) {
+            var captchaTimeout = setTimeout(() => {
+                dispatch(setErrorMessage("Captcha not available. Please refresh the screen and try again."));
+            }, 1000)
+            captchaResponse = await captchaRef.current.executeAsync();
+            clearTimeout(captchaTimeout);
+            console.log("Captcha: " + captchaResponse);
         }
-        
-        // navigate('/home')
-        /*dispatch(fetchRoleAsync(
-            wrapArgument(actionId, 1)
-        ))*/
-    }
 
-    function error() {
-        console.log("Captcha error");
+        if(captchaResponse === null || captchaResponse === undefined) {
+            captchaResponse = "BLANK";
+        }
+
+        console.log(captchaResponse);
+
+        dispatch(authenticateThunk(wrapArgument(
+            actionId, {...value, captchaResponse}
+        )));
+
+        captchaRef.current?.reset();
+        
     }
 
     return (
@@ -213,7 +219,7 @@ const Landing = () => {
                                                             required
                                                             id="username"
                                                             label="Email Id"
-                                                            defaultValue={value.username === undefined ? "" : value.username}
+                                                            defaultValue={""}
                                                             value={value.username}
                                                             onChange={handleChange}
                                                             sx={{ display: 'flex', mb: 4 }}
