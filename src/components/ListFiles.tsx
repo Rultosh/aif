@@ -84,7 +84,7 @@ console.log(files);
           {
             files.map((file) => {
               return <StyledTableRow>
-                <StyledTableCell align="right">{file.name}</StyledTableCell>
+                <StyledTableCell sx={{ textAlign:"justify !important" }}>{file.name}</StyledTableCell>
                 <StyledTableCell align="right">
                   <div onClick={(event) => {event.stopPropagation(); deleteFile(file)}} style={{display: "flex"}}>
                     <Tooltip title="Download">

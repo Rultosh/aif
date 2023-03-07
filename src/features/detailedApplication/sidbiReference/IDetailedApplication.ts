@@ -2,6 +2,7 @@ import { IEntity } from "../../../lib/api-wrappers/IEntity"
 
 export interface IDetailedApplication extends IEntity {
   sidbiReferenceNumber : string | undefined,
+  nameOfTheFund : string | undefined,
   investmentThemeOfFund : string | undefined,
   imRoleAndEngagement : string | undefined,
   declarationAccepted : boolean | undefined,
@@ -14,6 +15,7 @@ export const defaultIDetailedApplication : IDetailedApplication = {
   id : undefined,
   parentId: undefined,
   sidbiReferenceNumber : undefined,
+  nameOfTheFund : undefined,
   investmentThemeOfFund : undefined,
   imRoleAndEngagement : undefined,
   declarationAccepted : false,

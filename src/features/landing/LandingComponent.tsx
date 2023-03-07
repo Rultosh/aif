@@ -19,6 +19,9 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { env } from 'yargs';
 import ReactDOM from 'react-dom';
 import { FetchStatus } from '../../lib/api-status/IStatus';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 const Landing = () => {
 
@@ -28,7 +31,7 @@ const Landing = () => {
     const state = useAppSelector(selectAuthenticatedUser)
     const [showResponse, setShowResponse] = useState(false);
     const initialState = defaultLoginRequest
-    const [value, setValue] = useState(initialState);
+    const [value, setStateValue] = useState(initialState);
     const errorMsg = useAppSelector(state => state.landing.error);
     const isValidUser = useAppSelector(state => state.landing.validUser);
     const [actionId] = useState(uuid());
@@ -57,7 +60,7 @@ const Landing = () => {
         ev.preventDefault();
         let copiedValue = { ...value };
         copiedValue[ev.target.id as keyof typeof initialState] = ev.target.value;
-        setValue(copiedValue);
+        setStateValue(copiedValue);
     };
 
     const handleClose = () => {
@@ -101,6 +104,26 @@ const Landing = () => {
         captchaRef.current?.reset();
         
     }
+  
+    const validationSchema = Yup.object().shape({
+        username: Yup.string().required("Username is required"),
+        password: Yup.string().required("Password is required"),
+      });
+
+    const {
+        setValue,
+        getValues,
+        register,
+        reset,
+        handleSubmit,
+        formState: { errors },
+      } = useForm({
+        resolver: yupResolver(validationSchema),
+      });
+    
+      const onSubmit = (data: any) => {
+        isUserValid();
+      };
 
     return (
         <>
@@ -221,9 +244,14 @@ const Landing = () => {
                                                             label="Email Id"
                                                             defaultValue={""}
                                                             value={value.username}
+                                                            {...register("username")}
+                                                            error={(errors.username) ? true : false}
                                                             onChange={handleChange}
-                                                            sx={{ display: 'flex', mb: 4 }}
+                                                            sx={{ display: 'flex' }}
                                                         />
+                                                        <Typography variant="caption" color="error">
+                                                            <>{(errors.username)?errors.username.message : ''}</>
+                                                        </Typography>
                                                     </Grid>
                                                     <Grid item xs={12} >
                                                         <TextField
@@ -233,10 +261,15 @@ const Landing = () => {
                                                             type="password"
                                                             defaultValue={value["password"] === undefined ? "" : value["password"]}
                                                             value={value["password"]}
+                                                            {...register("password")}
+                                                            error={(errors.password) ? true : false}
                                                             onChange={handleChange}
-                                                            sx={{ display: 'flex', }}
+                                                            sx={{ display: 'flex', mt: 4 }}
                                                             onKeyPress={(e) => handleKeyPress(e)}
                                                         />
+                                                        <Typography variant="caption" color="error">
+                                                            <>{(errors.password)?errors.password.message : ''}</>
+                                                        </Typography>
                                                     </Grid>
                                                     {!isValidUser && errorMsg ?
                                                         <Grid item xs={12} >
@@ -263,7 +296,10 @@ const Landing = () => {
                                                         </Grid> */}
                                                     <Grid item xs={12} >
                                                         <div className="signInButton" style={{ width: 'fit-content' }}>
-                                                            <Button type="submit" variant="contained" disableElevation sx={{ mt: -4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#878ADD, #505282)', borderRadius: '10px', fontWeight: 600 }} onClick={isUserValid}>
+                                                            <Button type="submit" variant="contained" disableElevation sx={{ mt: -4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#878ADD, #505282)', borderRadius: '10px', fontWeight: 600 }} 
+                                                            //onClick={isUserValid}
+                                                            onClick={handleSubmit(onSubmit)}
+                                                            >
                                                                 Sign In
                                                             </Button>
                                                             <span className="signInButtonArrow"></span>

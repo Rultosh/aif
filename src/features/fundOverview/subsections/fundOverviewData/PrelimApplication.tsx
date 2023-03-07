@@ -246,6 +246,29 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
             <Box component="form">
                 <Grid container spacing={2} >
                     <Grid item xs={4}>
+                        <FormControl variant="standard" sx={{ display: 'flex', ml: 2 }}>
+                            <InputLabel id="demo-simple-select-standard-label">Scheme</InputLabel>
+                            <Select
+                                labelId="scheme"
+                                id="scheme"
+                                value={String(prelimApplicationFormData.scheme || '')}
+                                {...register("scheme")}
+                                error={(errors.scheme && getValues("scheme") == '') ? true : false}
+                                onChange={handleChange}
+                                name="scheme"
+                            >
+                                <MenuItem key={"Fund of funds"} value={'0'} selected={String(prelimApplicationFormData.scheme || '') === '0'}>Fund of funds</MenuItem>
+                                <MenuItem key={"Aspire for Start-ups"} value={'1'} selected={String(prelimApplicationFormData.scheme || '') === '1'}>Aspire for Start-ups</MenuItem>
+                                <MenuItem key={"UP Start-up Fund"} value={'2'} selected={String(prelimApplicationFormData.scheme || '') === '2'}>UP Start-up Fund</MenuItem>
+                            </Select>
+                            <Typography variant="caption" color="error">
+                            <>{(errors.scheme && getValues("scheme") == '')?errors.scheme.message : ''}</>
+                            </Typography>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={4}></Grid>
+                    <Grid item xs={4}></Grid>
+                    <Grid item xs={4}>
                         <TextField
                             required
                             id="nameOfTheFund"

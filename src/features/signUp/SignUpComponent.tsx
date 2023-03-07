@@ -18,6 +18,9 @@ import { state, city } from "./stateAndCity";
 import { getError } from "../../lib/api-status/errorHandler"
 import ReCAPTCHA from "react-google-recaptcha";
 import React from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 
 const SignUp = () => {
@@ -86,6 +89,48 @@ console.log(formDataEmail);
         setShowResponse(false)
         //setFormData(defaultISignup)
     };
+  
+    const validationSchema = Yup.object().shape({
+        companyName: Yup.string().required("Company Name is required"),
+        contactPerson: Yup.string().required("Contact Person is required"),
+        username: Yup.string().required("Email is required").test("test-name", "Enter a valid Email", function (value: any) {
+            const EmailRegex =
+              /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+      
+            const IsValidEmail = EmailRegex.test(value);
+            if (!IsValidEmail) {
+              return false;
+            }
+            return true;
+          }),
+        title: Yup.string().required("Title is required"),
+        phoneNumber: Yup.string().required("Phone Number is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
+            const PhoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change This Regex Based On Requirement
+            const IsValidPhone = PhoneRegex.test(value);
+            if (!IsValidPhone) {
+              return false;
+            }
+            return true;
+          }),
+        state: Yup.string().required("State is required"),
+        city: Yup.string().required("City is required"),
+        address: Yup.string().required("Address is required")
+      });
+
+    const {
+        setValue,
+        getValues,
+        register,
+        reset,
+        handleSubmit,
+        formState: { errors },
+      } = useForm({
+        resolver: yupResolver(validationSchema),
+      });
+    
+      const onSubmit = (data: any) => {
+        handleSubmitForm();
+      };
 
     return (
         <>
@@ -206,7 +251,7 @@ console.log(formDataEmail);
                                             <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>4. Temporary credentials will be active ony for 90 days.</Typography> <br></br>
                                         </div>
 
-                                        <Grid container spacing={2} >
+                                        <Grid container spacing={2} sx={{ mt: 3 }}>
                                             <Grid item xs={6}>
                                                 <TextField
                                                     required
@@ -214,9 +259,14 @@ console.log(formDataEmail);
                                                     label="Company Name"
                                                     //defaultValue={value["companyName"] === undefined ? "" : value["companyName"]}
                                                     value={formData["companyName"] || ''}
+                                                    {...register("companyName")}
+                                                    error={(errors.companyName) ? true : false}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
                                                 />
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.companyName)?errors.companyName.message : ''}</>
+                                                </Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <TextField
@@ -224,9 +274,14 @@ console.log(formDataEmail);
                                                     id="contactPerson"
                                                     label="Contact Person Name"
                                                     value={formData["contactPerson"] || ''}
+                                                    {...register("contactPerson")}
+                                                    error={(errors.contactPerson) ? true : false}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
                                                 />
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.contactPerson)?errors.contactPerson.message : ''}</>
+                                                </Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <TextField
@@ -234,9 +289,14 @@ console.log(formDataEmail);
                                                     id="username"
                                                     label="Email"
                                                     // value={formData["username"] || ''}
+                                                    {...register("username")}
+                                                    error={(errors.username) ? true : false}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
                                                 />
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.username)?errors.username.message : ''}</>
+                                                </Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <TextField
@@ -244,9 +304,14 @@ console.log(formDataEmail);
                                                     id="title"
                                                     label="Title"
                                                     value={formData["title"] || ''}
+                                                    {...register("title")}
+                                                    error={(errors.title) ? true : false}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
                                                 />
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.title)?errors.title.message : ''}</>
+                                                </Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <TextField
@@ -255,9 +320,14 @@ console.log(formDataEmail);
                                                     id="phoneNumber"
                                                     label="Phone Number"
                                                     value={formData["phoneNumber"] || ''}
+                                                    {...register("phoneNumber")}
+                                                    error={(errors.phoneNumber) ? true : false}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
                                                 />
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.phoneNumber)?errors.phoneNumber.message : ''}</>
+                                                </Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 {/* <TextField
@@ -275,9 +345,11 @@ console.log(formDataEmail);
                                                         required
                                                         labelId="demo-simple-select-state"
                                                         id="state"
-                                                        name="state"
+                                                        // name="state"
                                                         label="State"
                                                         // value={formData["state"] || ''}
+                                                        {...register("state")}
+                                                        error={(errors.state) ? true : false}
                                                         onChange={handleChange}
                                                     >
                                                         {
@@ -293,6 +365,9 @@ console.log(formDataEmail);
                                                         }
                                                     </Select>
                                                 </FormControl>
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.state)?errors.state.message : ''}</>
+                                                </Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 {/* <TextField
@@ -310,9 +385,11 @@ console.log(formDataEmail);
                                                         required
                                                         labelId="demo-simple-select-city"
                                                         id="city"
-                                                        name="city"
+                                                        // name="city"
                                                         label="City"
                                                         // value={formData["city"] || ''}
+                                                        {...register("city")}
+                                                        error={(errors.city) ? true : false}
                                                         onChange={handleChange}
                                                     >
                                                         {
@@ -328,6 +405,9 @@ console.log(formDataEmail);
                                                         }
                                                     </Select>
                                                 </FormControl>
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.city)?errors.city.message : ''}</>
+                                                </Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <TextField
@@ -335,9 +415,14 @@ console.log(formDataEmail);
                                                     id="address"
                                                     label="Address"
                                                     value={formData["address"] || ''}
+                                                    {...register("address")}
+                                                    error={(errors.address) ? true : false}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
                                                 />
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.address)?errors.address.message : ''}</>
+                                                </Typography>
                                             </Grid>
                                             {/*} <Grid item xs={6}>
                                                 <TextField
@@ -360,7 +445,11 @@ console.log(formDataEmail);
                                                 <Box display="flex"
                                                     justifyContent="center"
                                                     alignItems="center">
-                                                    <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, background: "#363062" }} onClick={handleSubmitForm}>
+                                                    <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, background: "#363062" }} 
+                                                    // onClick={handleSubmitForm}
+                                                    
+                                                    onClick={handleSubmit(onSubmit)}
+                                                    >
                                                         Sign Up
                                                     </Button>
                                                 </Box>

@@ -459,7 +459,7 @@ export const CarryDistribution = (props: any) => {
                 </React.Fragment>)
         }
     }
-
+console.log(prilimFormData);
     return (<>
 
         <Grid item xs={12}>
@@ -468,7 +468,8 @@ export const CarryDistribution = (props: any) => {
             <Card sx={{ display: 'flex', mb: 2, mt: 2 }}>
                 <CardContent sx={{ flex: 1 }}>
 
-                {usersState.role === 'USER' || process.env.REACT_APP_MIGRATION_TESTING === 'Y' ? <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Illustration of carry distribution of the Fund</Typography> : <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>{prilimFormData.sidbiReferenceNumber}</Typography> }
+                {usersState.role === 'USER' || process.env.REACT_APP_MIGRATION_TESTING === 'Y' ? <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>Illustration of carry distribution of the Fund</Typography> : <><Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#363062', mb: 2 }}>{prilimFormData.sidbiReferenceNumber}</Typography>
+                <Typography variant="h6" sx={{ flex: 1, fontWeight: 'bolder', color: '#333333', mb: 2 }}>Name of the Fund: {prilimFormData.nameOfTheFund}</Typography></> }
 
                     <Divider sx={{ mt: 2 }} />{usersState.role === 'USER' || process.env.REACT_APP_MIGRATION_TESTING === 'Y' ? <>
                         <Card sx={{ display: 'flex', mt: 3, background: '#f2f2f2' }}>
