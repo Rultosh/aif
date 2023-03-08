@@ -78,7 +78,7 @@ const SignUp = () => {
             setFormData(copiedValue);
         }
     };
-console.log(formDataEmail);
+    
     const handleReset = () => {
         setShowResponse(false)
         setFormData(defaultISignup)
@@ -395,12 +395,21 @@ console.log(formDataEmail);
                                                         {
                                                             city.categoryData.map((item: any) => {
                                                                 // console.log('CB', props.propertyValue, item.id, props.propertyValue === item.id);
-                                                                return <MenuItem 
-                                                                value={item.ID}
-                                                                // selected={formData["city"] === item.ID} 
-                                                                >
-                                                                    {item.VALUE}
-                                                                </MenuItem>
+                                                                if(item.STATE_ID === formData["state"]){
+                                                                    return <MenuItem 
+                                                                    value={item.ID}
+                                                                    // selected={formData["city"] === item.ID} 
+                                                                    >
+                                                                        {item.VALUE}
+                                                                    </MenuItem>
+                                                                } else {
+                                                                    return <MenuItem 
+                                                                    value={item.ID}
+                                                                    // selected={formData["city"] === item.ID} 
+                                                                    >
+                                                                        {item.VALUE}
+                                                                    </MenuItem>
+                                                                }
                                                             })
                                                         }
                                                     </Select>
