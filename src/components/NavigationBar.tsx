@@ -28,7 +28,7 @@ const NavigationBar = (props: any) => {
   const [actionUid] = useState(uuid())
   const userPages = ['Home', 'Workflow', 'Preliminary'];
   const adminPages = ['Home', 'Workflow'];
-  const userAdminPages = ['Home', 'Admin', 'Workflow'];
+  const userAdminPages = ['Admin', 'Workflow'];
   const settings = ['Change Password','Logout'];
   const dispatch = useAppDispatch()
   const usersState = useAppSelector(selectUsers)

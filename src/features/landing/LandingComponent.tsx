@@ -35,13 +35,20 @@ const Landing = () => {
     const errorMsg = useAppSelector(state => state.landing.error);
     const isValidUser = useAppSelector(state => state.landing.validUser);
     const [actionId] = useState(uuid());
+    const usersState = useAppSelector(selectUsers)
 
     const captchaRef = React.createRef<ReCAPTCHA>();
 
     useEffect(() => {
         // console.log(auth.token);
         // if(auth.token) navigate('/home')
-        if (localStorage.getItem('token')) navigate('/home')
+        if (localStorage.getItem('token')){
+            if (usersState.status.fetchStatus === FetchStatus.IDLE  && ['USERADMIN'].includes(usersState.role!= undefined? usersState.role : '')) {
+                navigate('/Admin')
+            } else {
+                navigate('/home')
+            }
+        }
     })
 
     useEffect(() => {
