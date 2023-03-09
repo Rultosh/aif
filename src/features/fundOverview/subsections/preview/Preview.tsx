@@ -101,7 +101,7 @@ export const Preview = (props: any) => {
     }
 
     async function handleClickSave(ev: any) {
-        if (await checkAllDocsOk(id, "prelims")) {
+        // if (await checkAllDocsOk(id, "prelims")) {
             console.log("prelimId", Number(id))
             dispatch(
                 createApplicationAsync(
@@ -111,11 +111,11 @@ export const Preview = (props: any) => {
                 )
             );
             navigate('/home')
-        }
-        else {
-            setShowResponse(true);
+        // }
+        // else {
+        //     setShowResponse(true);
 
-        }
+        // }
     }
 
     const validationSchema = Yup.object().shape({
