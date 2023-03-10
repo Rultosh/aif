@@ -16,12 +16,21 @@ import Divider from '@mui/material/Divider';
 import MailIcon from '@mui/icons-material/Mail';
 
 import loginRupeeIconImg from '../images/logo_rupee_symbol.png'
-
-
+import { useAppSelector } from '../app/hooks';
+import { selectUsers } from '../features/admin/adminSlice';
 
 
 
 const Header = (props: any) => {
+
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  const usersState = useAppSelector(selectUsers)
+
+  React.useEffect(() => {
+    if(usersState.me.role) setLoggedIn(true);
+    else setLoggedIn(false);
+  }, [usersState.status.fetchStatus])
+  
 
   const navItems = ['FAQs', 'Help', 'vcfapplication@sidbi.in'];
   let count = 0;
@@ -57,25 +66,22 @@ const Header = (props: any) => {
         </Typography>
        
         <div className='logoLineAnimation'></div>
-          {navItems.map((item) => {
-            count++;
-            return (
              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-               {item == 'FAQs' ? <Button
-                                href="/templates/FAQs.zip"
-                                disableElevation
-                                sx={{ color: '#FFFFFF', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px', borderRight: '1px solid white', borderRadius: '0' }} >
-                                {item}
-                            </Button>
-            :
-            <Button key={item} sx={{ color: '#fff', pt: 0.5, pb: 0.5, borderRight: navItems.length == count? '0px solid white' : '1px solid white', borderRadius: '0', textTransform: navItems.length == count?'initial' : '' }}>
-              {navItems.length == count? <MailIcon sx={{ mr: 1 }}/> : <></>}
-              {item}
-            </Button>
-            }
+               <Button
+                  href="/templates/FAQs.zip"
+                  disableElevation
+                  sx={{ color: '#FFFFFF', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px', borderRight: '1px solid white', borderRadius: '0' }} >
+                  {'FAQs'}
+              </Button>
+              <Button key={'help'} 
+                href={loggedIn?"/templates/vcf-help-complete.pptx":"/templates/vcf-help-minimal.pptx"}
+                sx={{ color: '#fff', pt: 0.5, pb: 0.5, borderRight: navItems.length == count? '0px solid white' : '1px solid white', borderRadius: '0', textTransform: navItems.length == count?'initial' : '' }}>
+                {'HELP'}
+              </Button>
+              <Button key={'support-email'} sx={{ color: '#fff', pt: 0.5, pb: 0.5, borderRight: navItems.length == count? '0px solid white' : '1px solid white', borderRadius: '0', textTransform: navItems.length == count?'initial' : '' }}>
+                <MailIcon sx={{ mr: 1 }}/>{'vcfapplication@sidbi.in'}
+              </Button>
             </Box>
-          )})}
-        
         </Toolbar >
       </Container>
     </AppBar>
