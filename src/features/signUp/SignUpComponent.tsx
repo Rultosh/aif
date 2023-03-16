@@ -105,7 +105,7 @@ const SignUp = () => {
           }),
         title: Yup.string().required("Title is required"),
         phoneNumber: Yup.string().required("Phone Number is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
-            const PhoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change This Regex Based On Requirement
+            const PhoneRegex = /^(?=.*[0-9])[- +()0-9]+$/; // Change This Regex Based On Requirement
             const IsValidPhone = PhoneRegex.test(value);
             if (!IsValidPhone) {
               return false;

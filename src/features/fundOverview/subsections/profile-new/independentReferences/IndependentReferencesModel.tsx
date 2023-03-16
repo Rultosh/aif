@@ -90,7 +90,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
     designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     organisation: Yup.string().required("Organisation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     telephoneNo: Yup.string().required("Telephone No is required").test("test-name", "Enter a valid Telephone No", function (value: any) {
-      const PhoneRegex = /^(\+91-|\+91|0)?\d{10,15}$/; // Change This Regex Based On Requirement
+      const PhoneRegex = /^(?=.*[0-9])[- +()0-9]+$/; // Change This Regex Based On Requirement
       const IsValidPhone = PhoneRegex.test(value);
       if (!IsValidPhone) {
         return false;
@@ -98,7 +98,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
       return true;
     }).nullable(),
     mobileNo: Yup.string().required("Mobile No is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
-      const PhoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change This Regex Based On Requirement
+      const PhoneRegex = /^(?=.*[0-9])[- +()0-9]+$/; // Change This Regex Based On Requirement
       const IsValidPhone = PhoneRegex.test(value);
       if (!IsValidPhone) {
         return false;
@@ -233,7 +233,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     // }}
 
                     sx={{ display: 'flex' }}
-                    inputProps={{ maxLength: 15 }}
+                    // inputProps={{ maxLength: 15 }}
                   />
                   <Typography variant="caption" color="error">
                     <>{(errors.telephoneNo) ? errors.telephoneNo.message : ''}</>
@@ -251,7 +251,7 @@ export const IndependentReferencesModel = (props: IndependentReferencesModelProp
                     onChange={handleChange}
 
                     sx={{ display: 'flex' }}
-                    inputProps={{ maxLength: 10 }}
+                    // inputProps={{ maxLength: 10 }}
                   />
                   <Typography variant="caption" color="error">
                     <>{(errors.mobileNo) ? errors.mobileNo.message : ''}</>

@@ -100,7 +100,7 @@ console.log(investmentResponsibleAsLead);
     nameOfPromoter: Yup.string().required("Name Of Promoter is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     address: Yup.string().required("Address is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     telephoneNo: Yup.string().required("Telephone No is required").test("test-name", "Enter a valid Telephone No", function (value: any) {
-      const PhoneRegex = /^(\+91-|\+91|0)?\d{10,15}$/; // Change This Regex Based On Requirement
+      const PhoneRegex = /^(?=.*[0-9])[- +()0-9]+$/; // Change This Regex Based On Requirement
       const IsValidPhone = PhoneRegex.test(value);
       if (!IsValidPhone) {
         return false;
@@ -108,7 +108,7 @@ console.log(investmentResponsibleAsLead);
       return true;
     }),
     mobileNo: Yup.string().required("Mobile No is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
-      const PhoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change This Regex Based On Requirement
+      const PhoneRegex = /^(?=.*[0-9])[- +()0-9]+$/; // Change This Regex Based On Requirement
       const IsValidPhone = PhoneRegex.test(value);
       if (!IsValidPhone) {
         return false;
@@ -245,7 +245,7 @@ console.log(investmentResponsibleAsLead);
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
-                  inputProps={{ maxLength: 15 }}
+                  // inputProps={{ maxLength: 15 }}
                 />
                 <Typography variant="caption" color="error">
                   <>{(errors.telephoneNo) ? errors.telephoneNo.message : ''}</>
@@ -266,7 +266,7 @@ console.log(investmentResponsibleAsLead);
                   onChange={handleChange}
 
                   sx={{ display: 'flex' }}
-                  inputProps={{ maxLength: 10 }}
+                  // inputProps={{ maxLength: 10 }}
                 />
                 <Typography variant="caption" color="error">
                   <>{(errors.mobileNo) ? errors.mobileNo.message : ''}</>
