@@ -157,7 +157,7 @@ const EligibilityQuestioner = () => {
                                         onChange={handleSelectChange}
                                     >
 
-                                        <MenuItem key={"Fund of funds"} value={0}>Fund of funds</MenuItem>
+                                        <MenuItem key={"Fund of funds"} value={0}>Fund of Funds for Startups</MenuItem>
                                         <MenuItem key={"Aspire for MSME"} value={1}>Aspire for MSME</MenuItem>
                                         <MenuItem key={"UP Start-up Fund"} value={2}>UP Start-up Fund</MenuItem>
                                     </Select>
