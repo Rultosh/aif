@@ -55,7 +55,15 @@ const SignUp = () => {
     const handleChange = (ev: any) => {
         
         if(ev.target.id == 'username'){
-            if(ev.target.value != '' && ((ev.target.value.substring(ev.target.value.indexOf('@')) != '@gmail.com') && (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoo.com') && (ev.target.value.substring(ev.target.value.indexOf('@')) != '@rediffmail.com') && (ev.target.value.substring(ev.target.value.indexOf('@')) != '@hotmail.com') && (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoomail.com'))){
+            let username = ev.target.value;
+            username = username && username.toLowerCase();
+            if(username != '' && 
+                ((username.substring(username.indexOf('@')) != '@gmail.com') && 
+                (username.substring(username.indexOf('@')) != '@yahoo.com') && 
+                (username.substring(username.indexOf('@')) != '@yahoo.co.in') && 
+                (username.substring(username.indexOf('@')) != '@rediffmail.com') && 
+                (username.substring(username.indexOf('@')) != '@hotmail.com') && 
+                (username.substring(username.indexOf('@')) != '@yahoomail.com'))){
                 setFormDataEmail(true);
                 ev.preventDefault();
                 let copiedValue = { ...formData }
@@ -89,20 +97,40 @@ const SignUp = () => {
         setShowResponse(false)
         //setFormData(defaultISignup)
     };
+
+    const checkPublicMailsIds = (email : string) => {
+
+        const domain = email && email.toLowerCase().substring(email.indexOf('@'));
+
+        return (domain == "@gmail.com" || 
+            domain == "@yahoo.com" ||
+            domain == "@yahoo.co.in" ||
+            domain == "@rediffmail.com" ||
+            domain == "@hotmail.com" ||
+            domain == "@yahoomail.com"
+            )
+    }
   
     const validationSchema = Yup.object().shape({
         companyName: Yup.string().required("Company Name is required"),
         contactPerson: Yup.string().required("Contact Person is required"),
-        username: Yup.string().required("Email is required").test("test-name", "Enter a valid Email", function (value: any) {
-            const EmailRegex =
-              /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        username: Yup
+            .string()
+            .required("Email is required")
+            .test("email-regex", "Enter a valid Email", function (value: any) {
+                const EmailRegex =
+                    /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
       
-            const IsValidEmail = EmailRegex.test(value);
+                const IsValidEmail = EmailRegex.test(value);
+
             if (!IsValidEmail) {
               return false;
             }
             return true;
-          }),
+          })
+        .test("organization-email", "Enter your official email id", function(value: any) {
+            return !checkPublicMailsIds(value);
+        }),
         title: Yup.string().required("Title is required"),
         phoneNumber: Yup.string().required("Phone Number is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
             const PhoneRegex = /^(?=.*[0-9])[- +()0-9]+$/; // Change This Regex Based On Requirement
