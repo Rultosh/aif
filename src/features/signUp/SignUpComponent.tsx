@@ -58,6 +58,7 @@ const SignUp = () => {
             if(ev.target.value != '' && 
                 ((ev.target.value.substring(ev.target.value.indexOf('@')) != '@gmail.com') && 
                 (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoo.com') && 
+                (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoo.co.in') && 
                 (ev.target.value.substring(ev.target.value.indexOf('@')) != '@rediffmail.com') && 
                 (ev.target.value.substring(ev.target.value.indexOf('@')) != '@hotmail.com') && 
                 (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoomail.com'))){
@@ -101,6 +102,7 @@ const SignUp = () => {
 
         return (domain == "@gmail.com" || 
             domain == "@yahoo.com" ||
+            domain == "@yahoo.co.in" ||
             domain == "@rediffmail.com" ||
             domain == "@hotmail.com" ||
             domain == "@yahoomail.com"
