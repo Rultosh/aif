@@ -55,13 +55,15 @@ const SignUp = () => {
     const handleChange = (ev: any) => {
         
         if(ev.target.id == 'username'){
-            if(ev.target.value != '' && 
-                ((ev.target.value.substring(ev.target.value.indexOf('@')) != '@gmail.com') && 
-                (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoo.com') && 
-                (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoo.co.in') && 
-                (ev.target.value.substring(ev.target.value.indexOf('@')) != '@rediffmail.com') && 
-                (ev.target.value.substring(ev.target.value.indexOf('@')) != '@hotmail.com') && 
-                (ev.target.value.substring(ev.target.value.indexOf('@')) != '@yahoomail.com'))){
+            let username = ev.target.value;
+            username = username && username.toLowerCase();
+            if(username != '' && 
+                ((username.substring(username.indexOf('@')) != '@gmail.com') && 
+                (username.substring(username.indexOf('@')) != '@yahoo.com') && 
+                (username.substring(username.indexOf('@')) != '@yahoo.co.in') && 
+                (username.substring(username.indexOf('@')) != '@rediffmail.com') && 
+                (username.substring(username.indexOf('@')) != '@hotmail.com') && 
+                (username.substring(username.indexOf('@')) != '@yahoomail.com'))){
                 setFormDataEmail(true);
                 ev.preventDefault();
                 let copiedValue = { ...formData }
@@ -98,7 +100,7 @@ const SignUp = () => {
 
     const checkPublicMailsIds = (email : string) => {
 
-        const domain = email.substring(email.indexOf('@'));
+        const domain = email && email.toLowerCase().substring(email.indexOf('@'));
 
         return (domain == "@gmail.com" || 
             domain == "@yahoo.com" ||
