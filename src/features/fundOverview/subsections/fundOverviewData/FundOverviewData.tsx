@@ -164,9 +164,11 @@ export const FundOverviewData = () => {
                             defaultValue={formValue["fundManager"] === undefined ? " " : formValue["fundManager"]}
                         >
 
-                            <MenuItem key={"Fund of funds"} value={"Fund of funds Sampath"}>Fund of funds Sampath</MenuItem>
-                            <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups Sampath"}>Asipre for Start-ups Sampath</MenuItem>
-                            <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
+                            <MenuItem key={"Fund of funds"} value={"Fund of funds Sampath"}>Fund of funds</MenuItem>
+                            <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups Sampath"}>Asipre for Start-ups</MenuItem>
+                            <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund</MenuItem>
+                            <MenuItem key={"Odisha Startup Fund"} value={"Odisha Startup Fund"}>Odisha Startup Fund</MenuItem>
+                            
                         </Select>
                     </FormControl>
                     {/*<TextField
@@ -192,9 +194,10 @@ export const FundOverviewData = () => {
                             defaultValue={formValue["dealType"] === undefined ? " " : formValue["dealType"]}
                         >
 
-                            <MenuItem key={"Fund of funds"} value={"Fund of funds Sampath"}>Fund of funds Sampath</MenuItem>
-                            <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups Sampath"}>Asipre for Start-ups Sampath</MenuItem>
-                            <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
+                            <MenuItem key={"Fund of funds"} value={"Fund of funds"}>Fund of funds Sampath</MenuItem>
+                            <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups"}>Asipre for Start-ups Sampath</MenuItem>
+                            <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund"}>Up Start-up Fund Sampath</MenuItem>
+                            <MenuItem key={"Odisha Startup Fund"} value={"Odisha Startup Fund"}>Odisha Startup Fund</MenuItem>
                         </Select>
                     </FormControl>
                     {/*

@@ -23,7 +23,7 @@ const EligibilityQuestioner = () => {
     const navigate = useNavigate()
     const [formData, setFormData] = useState({} as resultSchema);
     const [enableCheck, setEnableCheck] = useState(false);
-    const schemeNames = ["Fund of funds", "Aspire for MSME", "UP Start-up Fund"]
+    const schemeNames = ["Fund of funds", "Aspire for MSME", "UP Start-up Fund", "Odisha Startup Fund"]
 
     useEffect(() => {
         // dispatch(fetchQuestions())
@@ -160,6 +160,7 @@ const EligibilityQuestioner = () => {
                                         <MenuItem key={"Fund of funds"} value={0}>Fund of Funds for Startups</MenuItem>
                                         <MenuItem key={"Aspire for MSME"} value={1}>Aspire for MSME</MenuItem>
                                         <MenuItem key={"UP Start-up Fund"} value={2}>UP Start-up Fund</MenuItem>
+                                        <MenuItem key={"Odisha Startup Fund"} value={3}>Odisha Startup Fund</MenuItem>
                                     </Select>
                                 </FormControl>
                             </CardContent>

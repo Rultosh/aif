@@ -47,8 +47,6 @@ const eligibilityResultsSlice = createSlice({
         }
       }
       state.loading = false;
-      
-     
     },
   },
   extraReducers: builder => {
