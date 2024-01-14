@@ -114,7 +114,6 @@ const SignUp = () => {
     const validationSchema = Yup.object().shape({
         companyName: Yup
             .string()
-            .matches(/^[A-Za-z ]*$/, 'Please enter valid company name')
             .required("Company Name is required"),
         contactPerson: Yup
             .string()
@@ -137,9 +136,12 @@ const SignUp = () => {
         .test("organization-email", "Enter your official email id", function(value: any) {
             return !checkPublicMailsIds(value);
         }),
-        title: Yup.string().required("Title is required"),
+        title: Yup
+            .string()
+            .matches(/^[A-Za-z ]*$/, 'Please enter valid title')
+            .required("Title is required"),
         phoneNumber: Yup.string().required("Phone Number is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
-            const PhoneRegex = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/; // Change This Regex Based On Requirement
+            const PhoneRegex = /^[0-9]{10}$/; // Change This Regex Based On Requirement
             const IsValidPhone = PhoneRegex.test(value);
             if (!IsValidPhone) {
               return false;
