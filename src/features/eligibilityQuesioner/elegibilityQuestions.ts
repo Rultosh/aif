@@ -91,7 +91,7 @@ export const questions = {
       },
       {
         "id": 6,
-        "text": "Does your Fund agree to invest at least 1.5 times the amount of contribution sought from Up Start-up Fund into Startups?<br> <br> *For instance, if contribution sought is ₹ 100 crore, Fund should invest at least ₹ 150 crore in the Startups as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)"
+        "text": "Does your Fund agree to invest at least 1.5 times the amount of contribution sought from Up Start-up Fund into UP based Startups?<br> <br> *For instance, if contribution sought is ₹ 100 crore, Fund should invest at least ₹ 150 crore in the Startups as defined as per the Gazette Notification G.S.R.364 (E) dt. 11/04/2019 issued by Government of India and as amended from time to time)"
       },
       {
         "id": 7,
