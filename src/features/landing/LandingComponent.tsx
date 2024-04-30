@@ -113,7 +113,21 @@ const Landing = () => {
     }
   
     const validationSchema = Yup.object().shape({
-        username: Yup.string().required("Username is required"),
+        username: Yup.string()
+        .trim()
+        .test("email-regex", "Enter a valid Email", function (value: any) {
+            const EmailRegex =
+                /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  
+            const IsValidEmail = EmailRegex.test(value);
+
+            if (!IsValidEmail) {
+                return false;
+            }else{
+                return true;
+            }
+        })
+        .required("Username is required"),
         password: Yup.string().required("Password is required"),
       });
 

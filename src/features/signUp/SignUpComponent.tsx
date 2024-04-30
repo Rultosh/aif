@@ -114,6 +114,16 @@ const SignUp = () => {
     const validationSchema = Yup.object().shape({
         companyName: Yup
             .string()
+            .trim()
+            .test("Invalid input entered", function (value:any){
+                const pattern = /[<>\/]/;
+                const isNotValidInput = pattern.test(value);
+                if(isNotValidInput){
+                    return false;
+                }else{
+                    return true;
+                }
+            })
             .required("Company Name is required"),
         contactPerson: Yup
             .string()
@@ -154,7 +164,18 @@ const SignUp = () => {
         city: Yup
             .string()
             .required("City is required"),
-        address: Yup.string().required("Address is required")
+        address: Yup.string()
+            .trim()
+            .test("Invalid input entered", function (value:any){
+                const pattern = /[<>\/]/;
+                const isNotValidInput = pattern.test(value);
+                if(isNotValidInput){
+                    return false;
+                }else{
+                    return true;
+                }
+            })
+             .required("Address is required")
       });
 
     const {
