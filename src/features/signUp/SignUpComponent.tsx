@@ -167,7 +167,7 @@ const SignUp = () => {
         address: Yup.string()
             .trim()
             .test("Invalid input entered", function (value:any){
-                const pattern = /[<>\/]/;
+                const pattern = /[<>\/'=()[]-@$%*]/;
                 const isNotValidInput = pattern.test(value);
                 if(isNotValidInput){
                     return false;
