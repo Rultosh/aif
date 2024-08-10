@@ -4,7 +4,7 @@ class MasterDataService {
   load(type) {
     return api({
       method: 'get',
-      url: `/admin/masterData/${type}`,
+      url: `/api/masterData/${type}`,
     });
   }
 }
