@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, Divider } from "@mui/material";
-import logo from '../../images/logo.png'
+import logo from '../../images/logo.png';
+import ffsLogo from '../../images/ffs_final_logo.png';
 import azadiLogo from '../../images/Azadi.png'
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -174,7 +175,24 @@ const Landing = () => {
                                                 <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
                                                     <Box
                                                         component="img"
-                                                        sx={{ width: '200px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                        sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                        alt="success"
+                                                        src={ffsLogo}
+                                                    />
+
+                                                </Toolbar>
+
+                                            </Box>
+
+                                            <Box display="flex"
+                                                justifyContent="center"
+                                                alignItems="center"
+                                                sx={{ mt: 4 }}>
+
+                                                <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
+                                                    <Box
+                                                        component="img"
+                                                        sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
                                                         alt="success"
                                                         src={logo}
                                                     />
