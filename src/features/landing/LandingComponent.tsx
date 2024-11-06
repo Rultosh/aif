@@ -170,13 +170,13 @@ const Landing = () => {
                                             <Box display="flex"
                                                 justifyContent="center"
                                                 alignItems="center"
-                                                sx={{ mt: 8 }}>
+                                                sx={{ mt: 4 }}>
 
                                                 <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
                                                     <Box
                                                         component="img"
                                                         sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                        alt="success"
+                                                        alt="ffsLogo"
                                                         src={ffsLogo}
                                                     />
 
