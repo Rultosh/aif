@@ -10,7 +10,8 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import logo from '../images/logo.png'
+import logo from '../images/logo.png';
+import ffsLogo from '../images/ffs_final_logo.png';
 import { Link, useNavigate } from 'react-router-dom'
 import { fetchRoleAsync, selectUsers } from '../features/admin/adminSlice'
 import { wrapArgument } from "../lib/api-status/actionWrapper";
@@ -135,6 +136,17 @@ const NavigationBar = (props: any) => {
             component="img"
             sx={{
               height: 55,
+              mr : 2,
+              display: { xs: 'none', md: 'block' },
+            }}
+            alt="ffsLogo"
+            src={ffsLogo}
+          />
+
+          <Box
+            component="img"
+            sx={{
+              height: 55,
               display: { xs: 'none', md: 'block' },
             }}
             alt="sidbi_logo"
@@ -199,6 +211,17 @@ const NavigationBar = (props: any) => {
               textDecoration: 'none',
             }}
           >
+            <Box
+              component="img"
+              sx={{
+                height: 64,
+                display: { xs: 'block', md: 'none' }, mr: 1,
+
+              }}
+              alt="ffsLogo"
+              src={ffsLogo}
+            />
+
             <Box
               component="img"
               sx={{
