@@ -8,6 +8,7 @@ import encrypt from "../../components/auth/encrypt";
 
 export function setPassword(passwordDetails:IForgotPassword) {
   passwordDetails.password = encrypt(passwordDetails.password);
+  passwordDetails.matchingPassword = encrypt(passwordDetails.matchingPassword);
   return api({
     method: 'post',
     data: passwordDetails,
