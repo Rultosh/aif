@@ -21,6 +21,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { isAllDocsAvailable } from './docsMandateApi'
 import { ModalComponent } from '../../../../components/ModalComponent'
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export const Preview = (props: any) => {
 
@@ -53,7 +55,8 @@ export const Preview = (props: any) => {
         }
     })
 
-
+    const [actionDate, setActionDate] = useState<Date | null>();
+    const [actionDateError, setActionDateError] = useState<string | undefined>();
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -116,6 +119,29 @@ export const Preview = (props: any) => {
         //     setShowResponse(true);
 
         // }
+    }
+
+    async function handleClickSaveCloseAction(ev: any) {
+
+        setActionDateError(undefined);
+
+        if(actionDate === null || actionDate == undefined) {
+            setActionDateError("Please entre an action date.");
+        } else {
+            console.log("prelimId", Number(id))
+            dispatch(
+                createApplicationAsync(
+                    wrapArgument(
+                        actionUid, { 
+                            id: Number(id), 
+                            statusComments: commentPreview, 
+                            actionDate: actionDate,
+                            status: ev.target.id }
+                    )
+                )
+            );
+            navigate('/home')
+        }
     }
 
     const validationSchema = Yup.object().shape({
@@ -234,8 +260,6 @@ export const Preview = (props: any) => {
                                 required
                                 id="previewComments"
                                 label="Leave a comment"
-                                //defaultValue={formData.commitmentReceived === undefined ? " " : formData["commitmentReceived"]}
-                                //value={formData["commitmentReceived"] || ''}
                                 variant="standard"
                                 multiline
                                 {...register("previewComments")}
@@ -246,6 +270,18 @@ export const Preview = (props: any) => {
                             />
                             <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                 <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
+                            </Typography>
+                            {usersState.role == 'ADMIN' && <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    label="Effective action date (Applicable & Mandatory for Temporary closure, Reopen and closure)"
+                                    inputFormat='DD/MM/YYYY'
+                                    value={actionDate}
+                                    onChange={(newValue) => setActionDate(newValue)}
+                                    renderInput={(params) => <TextField {...params} />}
+                                />
+                            </LocalizationProvider>}
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{actionDateError}</>
                             </Typography>
                         </CardContent>
                     </Card>
@@ -267,7 +303,16 @@ export const Preview = (props: any) => {
                         <Button color='error' id='reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                             Reject
                         </Button>
-                    </> : <></>}
+                        <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                            Temp Close
+                        </Button>
+                        <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                            Close
+                        </Button>
+                    </> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && statusPrelims == 'TEMP_CLOSED') ? 
+                        <Button color='error' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                            Reopen
+                        </Button> : <></>}
 
                     {showResponse ? <ModalComponent
                         open={showResponse}
