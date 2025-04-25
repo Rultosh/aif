@@ -104,6 +104,9 @@ export const Preview = (props: any) => {
     }
 
     async function handleClickSave(ev: any) {
+        
+        setActionDateError(undefined);
+        
         // if (await checkAllDocsOk(id, "prelims")) {
             console.log("prelimId", Number(id))
             dispatch(

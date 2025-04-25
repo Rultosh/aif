@@ -381,6 +381,9 @@ export const CarryDistribution = (props: any) => {
     }
 
     async function handleClickSubmit(ev: any) {
+        
+        setActionDateError(undefined);
+
         // if (await checkAllDocsOk(parentId, "detailed")) {
             console.log("prelimId", parentId)
             handleSave()
