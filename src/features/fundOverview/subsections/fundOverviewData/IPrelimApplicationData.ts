@@ -50,6 +50,7 @@ export interface IPrelimApplicationData {
     firstClosing: boolean,
     stage: String | undefined,
     detailedApplicationId: Number | undefined,
+    actionDate?: Date,
 }
 
 export const defaultIPrelimApplicationData : IPrelimApplicationData = {
@@ -104,10 +105,12 @@ export const defaultIPrelimApplicationData : IPrelimApplicationData = {
   firstClosing: false,
   stage: undefined,
   detailedApplicationId: undefined,
+  actionDate: undefined,
 }
 
 export interface IApplicationData {
   id: Number | undefined,
+  actionDate?: Date,
   statusComments: String | undefined,
   status: String | undefined,
 }
