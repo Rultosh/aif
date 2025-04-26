@@ -1222,16 +1222,7 @@ console.log(prilimFormData);
                                         <Button color='error' id='reject' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                             Reject
                                         </Button>
-                                        <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                                            Temp Close
-                                        </Button>
-                                        <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                                            Close
-                                        </Button>
-                                    </> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && prilimFormData.status === 'TEMP_CLOSED') ? 
-                                    <Button color='error' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                                        Reopen
-                                    </Button> :  <></>}
+                                    </> : <></>}
                             </Box>
                         </Grid>
                         <Grid item xs={12}>
