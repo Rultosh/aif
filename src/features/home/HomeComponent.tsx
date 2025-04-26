@@ -149,7 +149,7 @@ console.log(prelimApplications.prelimApplication);
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
         let role = usersState.role;
-        if (row.status === 'SUBMITTED' && role == 'ADMIN')
+        if (row.status === 'SUBMITTED' || row.status == 'TEMP_CLOSED' && role == 'ADMIN')
             return true
         if (['CLOSE', 'REVISE','CREATED'].includes(String(row.status)) && role == 'USER')
             return true
@@ -193,8 +193,8 @@ console.log(prelimApplications.prelimApplication);
                 return "Approved - " + stageDescription;
             case "REJECTED":
                 return "Rejected - " + stageDescription;
-            case "TEMP_CLOSE":
-                return "Suspended - " + stageDescription;
+            case "TEMP_CLOSED":
+                return "Temporarily Closed - " + stageDescription;
             case "CLOSED":
                 return "Closed - " + stageDescription;
             default:
