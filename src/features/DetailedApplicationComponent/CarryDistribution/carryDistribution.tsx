@@ -353,7 +353,7 @@ export const CarryDistribution = (props: any) => {
         setCommentPreview(ev.target.value)
     };
 
-    const [actionDate, setActionDate] = useState<Date | null>();
+    const [actionDate, setActionDate] = useState<Date>(new Date());
     const [actionDateError, setActionDateError] = useState<string | undefined>();
 
     async function handleClickSaveCloseAction(ev: any) {
@@ -1175,7 +1175,7 @@ console.log(prilimFormData);
                                         label="Effective action date (Applicable & Mandatory for Temporary closure and closure)"
                                         inputFormat='DD/MM/YYYY'
                                         value={actionDate}
-                                        onChange={(newValue) => setActionDate(newValue)}
+                                        onChange={(newValue) => newValue && setActionDate(newValue)}
                                         renderInput={(params) => <TextField {...params} />}
                                     />
                                     </LocalizationProvider>}
