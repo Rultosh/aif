@@ -274,6 +274,14 @@ export const Preview = (props: any) => {
                             <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                 <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
                             </Typography>
+                        </CardContent>
+                    </Card>
+
+                    <Card sx={{ display: 'flex', mt: 2, backgroundColor: "#f2f2f2" }}>
+                        <CardContent sx={{ flex: 1 }}>
+                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
+                            </Typography>
                             {usersState.role == 'ADMIN' && <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
                                     label="Effective action date (Applicable & Mandatory for Temporary closure, Reopen and closure)"
@@ -288,7 +296,6 @@ export const Preview = (props: any) => {
                             </Typography>
                         </CardContent>
                     </Card>
-
 
                     <Button disabled={(statusPrelims == 'SUBMITTED') || usersState.role == 'ADMIN'} onClick={(e) => handleClick(e, "previous")} startIcon={<ArrowLeftIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Declaration
