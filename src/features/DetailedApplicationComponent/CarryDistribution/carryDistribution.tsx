@@ -353,7 +353,7 @@ export const CarryDistribution = (props: any) => {
         setCommentPreview(ev.target.value)
     };
 
-    const [actionDate, setActionDate] = useState<Date>(new Date());
+    const [actionDate, setActionDate] = useState<Date>(prilimFormData.actionDate || new Date());
     const [actionDateError, setActionDateError] = useState<string | undefined>();
 
     async function handleClickSaveCloseAction(ev: any) {

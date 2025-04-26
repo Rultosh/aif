@@ -55,7 +55,7 @@ export const Preview = (props: any) => {
         }
     })
 
-    const [actionDate, setActionDate] = useState<Date>(new Date());
+    const [actionDate, setActionDate] = useState<Date>(prelimApplicationState.prelimApplication.actionDate || new Date());
     const [actionDateError, setActionDateError] = useState<string | undefined>();
 
     const handleChange = (ev: any) => {
