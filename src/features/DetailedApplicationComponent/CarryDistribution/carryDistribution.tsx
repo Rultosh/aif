@@ -1167,24 +1167,6 @@ console.log(prilimFormData);
                                 </CardContent>
                             </Card>
                         </Grid>
-                        <Grid item xs={12}>
-                            <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
-                                <CardContent sx={{ flex: 1 }}>
-                                    {usersState.role == 'ADMIN' && <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
-                                        label="Effective action date (Applicable & Mandatory for Temporary closure and closure)"
-                                        inputFormat='DD/MM/YYYY'
-                                        value={actionDate}
-                                        onChange={(newValue) => newValue && setActionDate(newValue)}
-                                        renderInput={(params) => <TextField {...params} />}
-                                    />
-                                    </LocalizationProvider>}
-                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                        <>{actionDateError}</>
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
                         <Grid item xs={4}>
                         {usersState.role === 'USER' || process.env.REACT_APP_MIGRATION_TESTING === 'Y' ? <Button
                                 onClick={(e) => handleClickSave(e, "previous")}
@@ -1202,7 +1184,7 @@ console.log(prilimFormData);
                             </Box>
                         </Grid>
 
-                        <Grid item xs={6} sx={{ justifyContent: 'right' }}>
+                        <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 {!(prilimFormData.status == 'SUBMITTED' || prilimFormData.status == 'TEMP_CLOSED' || prilimFormData.status == 'CLOSED') ? <><Button
                                     //onClick={(e) => handleClickSave(e, "submit")}
@@ -1240,6 +1222,64 @@ console.log(prilimFormData);
                                         <Button color='error' id='reject' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                             Reject
                                         </Button>
+                                        <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                            Temp Close
+                                        </Button>
+                                        <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                            Close
+                                        </Button>
+                                    </> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && prilimFormData.status === 'TEMP_CLOSED') ? 
+                                    <Button color='error' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                        Reopen
+                                    </Button> :  <></>}
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                                <CardContent sx={{ flex: 1 }}>
+                                    {usersState.role == 'ADMIN' && <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        label="Effective date"
+                                        inputFormat='DD/MM/YYYY'
+                                        value={actionDate}
+                                        onChange={(newValue) => newValue && setActionDate(newValue)}
+                                        renderInput={(params) => <TextField {...params} />}
+                                    />
+                                    </LocalizationProvider>}
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{actionDateError}</>
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={4} sx={{ justifyContent: 'right' }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
+                                {!(prilimFormData.status == 'SUBMITTED' || prilimFormData.status == 'TEMP_CLOSED' || prilimFormData.status == 'CLOSED') ? <><Button
+                                    //onClick={(e) => handleClickSave(e, "submit")}
+                                    // onClick={handleClickSubmit}
+                                    onClick={handleClickSubmit}
+                                    //endIcon={<ArrowRightIcon />}
+                                    id='submit'
+                                    color='success'
+                                    variant="contained"
+                                    disableElevation
+                                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
+                                    Submit
+                                </Button>
+                                    <Button
+                                        //onClick={(e) => handleClickSave(e, "submit")}
+                                        // onClick={handleClickSubmit}
+                                        onClick={handleSave}
+                                        //endIcon={<ArrowRightIcon />}
+                                        id='submit'
+                                        color='success'
+                                        variant="contained"
+                                        disableElevation
+                                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
+                                        Save
+                                    </Button>
+                                </> : ['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') ?
+                                    <>
                                         <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                             Temp Close
                                         </Button>
