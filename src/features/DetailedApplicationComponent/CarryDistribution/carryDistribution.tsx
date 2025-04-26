@@ -1245,37 +1245,13 @@ console.log(prilimFormData);
                         </Grid>
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                                {!(prilimFormData.status == 'SUBMITTED' || prilimFormData.status == 'TEMP_CLOSED' || prilimFormData.status == 'CLOSED') ? <><Button
-                                    //onClick={(e) => handleClickSave(e, "submit")}
-                                    // onClick={handleClickSubmit}
-                                    onClick={handleClickSubmit}
-                                    //endIcon={<ArrowRightIcon />}
-                                    id='submit'
-                                    color='success'
-                                    variant="contained"
-                                    disableElevation
-                                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
-                                    Submit
-                                </Button>
-                                    <Button
-                                        //onClick={(e) => handleClickSave(e, "submit")}
-                                        // onClick={handleClickSubmit}
-                                        onClick={handleSave}
-                                        //endIcon={<ArrowRightIcon />}
-                                        id='submit'
-                                        color='success'
-                                        variant="contained"
-                                        disableElevation
-                                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2, mr: 2 }} >
-                                        Save
-                                    </Button>
-                                </> : ['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') ?
+                                {(['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && prilimFormData.status === 'SUBMITTED') ?
                                     <>
-                                        <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                                            Temp Close
-                                        </Button>
                                         <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                             Close
+                                        </Button>
+                                        <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                            Temp Close
                                         </Button>
                                     </> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && prilimFormData.status === 'TEMP_CLOSED') ? 
                                     <Button color='error' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
