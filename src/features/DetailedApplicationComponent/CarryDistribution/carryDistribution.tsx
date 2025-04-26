@@ -1202,7 +1202,7 @@ console.log(prilimFormData);
                             </Box>
                         </Grid>
 
-                        <Grid item xs={4} sx={{ justifyContent: 'right' }}>
+                        <Grid item xs={6} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
                                 {!(prilimFormData.status == 'SUBMITTED' || prilimFormData.status == 'TEMP_CLOSED' || prilimFormData.status == 'CLOSED') ? <><Button
                                     //onClick={(e) => handleClickSave(e, "submit")}
