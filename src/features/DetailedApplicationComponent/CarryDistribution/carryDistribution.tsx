@@ -1164,6 +1164,12 @@ console.log(prilimFormData);
 
                                         sx={{ display: 'flex', }}
                                     />
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                                <CardContent sx={{ flex: 1 }}>
                                     {usersState.role == 'ADMIN' && <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
                                         label="Effective action date (Applicable & Mandatory for Temporary closure and closure)"
