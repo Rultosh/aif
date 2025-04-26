@@ -55,7 +55,7 @@ export const Preview = (props: any) => {
         }
     })
 
-    const [actionDate, setActionDate] = useState<Date | null>();
+    const [actionDate, setActionDate] = useState<Date>(new Date());
     const [actionDateError, setActionDateError] = useState<string | undefined>();
 
     const handleChange = (ev: any) => {
@@ -287,7 +287,7 @@ export const Preview = (props: any) => {
                                     label="Effective action date (Applicable & Mandatory for Temporary closure, Reopen and closure)"
                                     inputFormat='DD/MM/YYYY'
                                     value={actionDate}
-                                    onChange={(newValue) => setActionDate(newValue)}
+                                    onChange={(newValue) => newValue && setActionDate(newValue)}
                                     renderInput={(params) => <TextField {...params} />}
                                 />
                             </LocalizationProvider>}
