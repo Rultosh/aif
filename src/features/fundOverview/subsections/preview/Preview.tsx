@@ -277,6 +277,24 @@ export const Preview = (props: any) => {
                         </CardContent>
                     </Card>
 
+                    <Button disabled={(statusPrelims == 'SUBMITTED') || usersState.role == 'ADMIN'} onClick={(e) => handleClick(e, "previous")} startIcon={<ArrowLeftIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Declaration
+                    </Button>
+
+                    {(!(statusPrelims == 'SUBMITTED') && usersState.role == 'USER') ? <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                        Submit
+                    </Button> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && statusPrelims == 'SUBMITTED') ? <>
+                        <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                            Approve
+                        </Button>
+                        <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                            Revise
+                        </Button>
+                        <Button color='error' id='reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                            Reject
+                        </Button>
+                    </> : <></>}
+
                     <Card sx={{ display: 'flex', mt: 2, backgroundColor: "#f2f2f2" }}>
                         <CardContent sx={{ flex: 1 }}>
                             <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
@@ -297,22 +315,7 @@ export const Preview = (props: any) => {
                         </CardContent>
                     </Card>
 
-                    <Button disabled={(statusPrelims == 'SUBMITTED') || usersState.role == 'ADMIN'} onClick={(e) => handleClick(e, "previous")} startIcon={<ArrowLeftIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                        Declaration
-                    </Button>
-
-                    {(!(statusPrelims == 'SUBMITTED') && usersState.role == 'USER') ? <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                        Submit
-                    </Button> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && statusPrelims == 'SUBMITTED') ? <>
-                        <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Approve
-                        </Button>
-                        <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Revise
-                        </Button>
-                        <Button color='error' id='reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Reject
-                        </Button>
+                    {(['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && statusPrelims == 'SUBMITTED') ? <>
                         <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                             Temp Close
                         </Button>

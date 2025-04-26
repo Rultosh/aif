@@ -149,7 +149,7 @@ console.log(prelimApplications.prelimApplication);
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
         let role = usersState.role;
-        if (row.status === 'SUBMITTED' || row.status == 'TEMP_CLOSED' && role == 'ADMIN')
+        if ((row.status === 'SUBMITTED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && role == 'ADMIN')
             return true
         if (['CLOSE', 'REVISE','CREATED'].includes(String(row.status)) && role == 'USER')
             return true
