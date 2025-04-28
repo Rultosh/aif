@@ -149,18 +149,18 @@ console.log(prelimApplications.prelimApplication);
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
         let role = usersState.role;
-        if (row.status === 'SUBMITTED' && role == 'ADMIN')
+        if ((row.status === 'SUBMITTED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && role == 'ADMIN')
             return true
-        if (['REVISE','CREATED'].includes(String(row.status)) && role == 'USER')
+        if (['CLOSE', 'REVISE','CREATED'].includes(String(row.status)) && role == 'USER')
             return true
         return false
     }
 
     const getStatusImg = (row: IPrelimApplicationData) => {
-        if (row.status == 'REJECTED') {
+        if (row.status == 'REJECTED' || row.status == 'CLOSED') {
             return redImg
         }
-        else if (row.status == 'CREATED') {
+        else if (row.status == 'CREATED' || row.status == 'TEMP_CLOSED') {
             return greyImg
         }
         else if (row.status == 'REVISE' || row.status == 'SUBMITTED') {
@@ -174,7 +174,7 @@ console.log(prelimApplications.prelimApplication);
         if (usersState.role == 'ADMIN') {
             return 'preview'
         }
-        let path = (status && ['SUBMITTED', 'APPROVED'].includes(status.toString())) ? 'preview' : 'fund'
+        let path = (status && ['SUBMITTED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED'].includes(status.toString())) ? 'preview' : 'fund'
         return path;
     }
 
@@ -193,6 +193,10 @@ console.log(prelimApplications.prelimApplication);
                 return "Approved - " + stageDescription;
             case "REJECTED":
                 return "Rejected - " + stageDescription;
+            case "TEMP_CLOSED":
+                return "Temporarily Closed - " + stageDescription;
+            case "CLOSED":
+                return "Closed - " + stageDescription;
             default:
                 return "Invalid Status";
         }

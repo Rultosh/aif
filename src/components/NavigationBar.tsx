@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import uuid from "react-uuid";
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { FetchStatus } from "../lib/api-status/IStatus";
+import { Textarea } from '@mui/joy';
 
 
 
@@ -131,6 +132,17 @@ const NavigationBar = (props: any) => {
     <AppBar position="static" component='nav' sx={{ backgroundColor: 'white' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
+
+        <Box
+            component="img"
+            sx={{
+              height: 55,
+              mr : 2,
+              display: { xs: 'none', md: 'block' },
+            }}
+            alt="ffsLogo"
+            src={ffsLogo}
+          />
 
           <Box
             component="img"

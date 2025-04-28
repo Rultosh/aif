@@ -29,6 +29,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import InputAdornment from '@mui/material/InputAdornment';
 import { isAllDocsAvailable } from '../../fundOverview/subsections/preview/docsMandateApi'
 import { ModalComponent } from '../../../components/ModalComponent'
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export const CarryDistribution = (props: any) => {
 
@@ -351,9 +353,37 @@ export const CarryDistribution = (props: any) => {
         setCommentPreview(ev.target.value)
     };
 
-    
+    const [actionDate, setActionDate] = useState<Date>(prilimFormData.actionDate || new Date());
+    const [actionDateError, setActionDateError] = useState<string | undefined>();
+
+    async function handleClickSaveCloseAction(ev: any) {
+
+        setActionDateError(undefined);
+
+        if(actionDate === null || actionDate == undefined) {
+            setActionDateError("Please entre an action date.");
+        } else {
+            console.log("prelimId", parentId)
+            handleSave()
+            dispatch(
+                createApplicationAsync(
+                    wrapArgument(
+                        actionId, { 
+                            id: Number(prilimFormData.prelimApplicationId), 
+                            statusComments: commentPreview, 
+                            actionDate: actionDate,
+                            status: ev.target.id }
+                    )
+                )
+            );
+            navigate('/home')
+        }
+    }
 
     async function handleClickSubmit(ev: any) {
+        
+        setActionDateError(undefined);
+
         // if (await checkAllDocsOk(parentId, "detailed")) {
             console.log("prelimId", parentId)
             handleSave()
@@ -1156,7 +1186,7 @@ console.log(prilimFormData);
 
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                                {!(prilimFormData.status == 'SUBMITTED') ? <><Button
+                                {!(prilimFormData.status == 'SUBMITTED' || prilimFormData.status == 'TEMP_CLOSED' || prilimFormData.status == 'CLOSED') ? <><Button
                                     //onClick={(e) => handleClickSave(e, "submit")}
                                     // onClick={handleClickSubmit}
                                     onClick={handleClickSubmit}
@@ -1193,6 +1223,40 @@ console.log(prilimFormData);
                                             Reject
                                         </Button>
                                     </> : <></>}
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Card sx={{ display: 'flex', mt: 2, background: '#f2f2f2' }}>
+                                <CardContent sx={{ flex: 1 }}>
+                                    {usersState.role == 'ADMIN' && <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        label="Effective date"
+                                        inputFormat='DD/MM/YYYY'
+                                        value={actionDate}
+                                        onChange={(newValue) => newValue && setActionDate(newValue)}
+                                        renderInput={(params) => <TextField {...params} />}
+                                    />
+                                    </LocalizationProvider>}
+                                    <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                        <>{actionDateError}</>
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={4} sx={{ justifyContent: 'right' }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
+                                {(['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && prilimFormData.status === 'SUBMITTED') ?
+                                    <>
+                                        <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                            Close
+                                        </Button>
+                                        <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                            Temp Close
+                                        </Button>
+                                    </> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && prilimFormData.status === 'TEMP_CLOSED') ? 
+                                    <Button color='error' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                        Reopen
+                                    </Button> :  <></>}
                             </Box>
                         </Grid>
                     </Grid>

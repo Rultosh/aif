@@ -9,6 +9,7 @@ export interface IDetailedApplication extends IEntity {
   disputes : string | undefined,
   prelimApplicationId: string | undefined,
   status: string | undefined,
+  actionDate: Date | undefined
 }
 
 export const defaultIDetailedApplication : IDetailedApplication = {
@@ -22,6 +23,7 @@ export const defaultIDetailedApplication : IDetailedApplication = {
   disputes : undefined , 
   prelimApplicationId: undefined,
   status: undefined,
+  actionDate: undefined,
 }
 
 export const listDefaultIDetailedApplication: IDetailedApplication[] =[];
