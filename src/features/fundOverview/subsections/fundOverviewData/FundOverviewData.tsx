@@ -169,7 +169,7 @@ export const FundOverviewData = () => {
                             <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund</MenuItem>
                             <MenuItem key={"Odisha Startup Fund"} value={"Odisha Startup Fund"}>Odisha Startup Fund</MenuItem>
                             <MenuItem key={"Bihar Startup Scale-up financing fund"} value={"Bihar Startup Scale-up financing fund"}>Bihar Startup Scale-Up Financing Fund</MenuItem>
-                            
+                            <MenuItem key={"MSInS Fund of Funds for Startups"} value={"MSInS Fund of Funds for Startups"}>MSInS Fund of Funds for Startups</MenuItem>
                         </Select>
                     </FormControl>
                     {/*<TextField
@@ -200,6 +200,7 @@ export const FundOverviewData = () => {
                             <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund"}>Up Start-up Fund Sampath</MenuItem>
                             <MenuItem key={"Odisha Startup Fund"} value={"Odisha Startup Fund"}>Odisha Startup Fund</MenuItem>
                             <MenuItem key={"Bihar Startup Scale-up financing fund"} value={"Bihar Startup Scale-up financing fund"}>Bihar Startup Scale-Up Financing Fund</MenuItem>
+                            <MenuItem key={"MSInS Fund of Funds for Startups"} value={"MSInS Fund of Funds for Startups"}>MSInS Fund of Funds for Startups</MenuItem>
                         </Select>
                     </FormControl>
                     {/*
