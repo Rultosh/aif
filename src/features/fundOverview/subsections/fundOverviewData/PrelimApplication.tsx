@@ -262,6 +262,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                 <MenuItem key={"UP Start-up Fund"} value={"UP Start-up Fund"} selected={String(prelimApplicationFormData.scheme || '') === "UP Start-up Fund"}>UP Start-up Fund</MenuItem>
                                 <MenuItem key={"Odisha Startup Fund"} value={"Odisha Startup Fund"} selected={String(prelimApplicationFormData.scheme || '') === "Odisha Startup Fund"}>Odisha Startup Fund</MenuItem>
                                 <MenuItem key={"Bihar Startup Scale-up financing fund"} value={"Bihar Startup Scale-up financing fund"} selected={String(prelimApplicationFormData.scheme || '') === "Bihar Startup Scale-up financing fund"}>Bihar Startup Scale-Up Financing Fund</MenuItem>
+                                <MenuItem key={"MSInS Fund of Funds for Startups"} value={"MSInS Fund of Funds for Startups"} selected={String(prelimApplicationFormData.scheme || '') === "MSInS Fund of Funds for Startups"}>MSInS Fund of Funds for Startups</MenuItem>
                             </Select>
                             <Typography variant="caption" color="error">
                             <>{(errors.scheme && getValues("scheme") == '')?errors.scheme.message : ''}</>
