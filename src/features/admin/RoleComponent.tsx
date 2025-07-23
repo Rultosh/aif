@@ -46,7 +46,7 @@ const RoleComponent = (props: any) => {
         )
     }
 
-    let roles = ['USER', 'ADMIN']
+    let roles = ['USER', 'ADMIN', 'INELIGIBLE']
 
     return <Modal
         open={props.open}
@@ -76,7 +76,7 @@ const RoleComponent = (props: any) => {
 
                                         <MenuItem key={"USER"} value={0}>USER</MenuItem>
                                         <MenuItem key={"ADMIN"} value={1}>ADMIN</MenuItem>
-
+                                        <MenuItem key={"INELIGIBLE"} value={2}>INELIGIBLE</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>

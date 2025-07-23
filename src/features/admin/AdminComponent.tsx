@@ -15,6 +15,7 @@ import { FetchStatus } from "../../lib/api-status/IStatus";
 import { Delete, Edit } from '@mui/icons-material'
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
+import dayjs from "dayjs";
 
 const Admin = (props: any) => {
 
@@ -73,7 +74,7 @@ const Admin = (props: any) => {
 
     };
 
-    const adminHeaders = ["Id", "UserName", "Company Name", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Approve"]
+    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Approve"]
 
     let adminHeaderComponent = []
 
@@ -105,6 +106,8 @@ const Admin = (props: any) => {
                                                 <TableCell align="center">{row.id}</TableCell>
                                                 <TableCell align="center">{row.username}</TableCell>
                                                 <TableCell align="center">{row.companyName}</TableCell>
+                                                <TableCell align="center">{row.sebiRegistration}</TableCell>
+                                                <TableCell align="center">{row.sebiRegistrationDate && dayjs(row.sebiRegistrationDate).format("DD/MM/YYYY")}</TableCell>
                                                 <TableCell align="center">{row.contactPerson}</TableCell>
                                                 <TableCell align="center">{row.phoneNumber}</TableCell>
                                                 <TableCell align="center">{row.title}</TableCell>
@@ -112,6 +115,7 @@ const Admin = (props: any) => {
                                                 <TableCell align="center">{row.city}</TableCell>
                                                 <TableCell align="center">{row.address}</TableCell>
                                                 <TableCell align="center">{row.role}</TableCell>
+                                                <TableCell align="center">{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY")}</TableCell>
                                                 <TableCell align="center">
                                                     {row.role == 'REGISTERED' ? <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} /> : <></>}
                                                 </TableCell>

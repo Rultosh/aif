@@ -1,4 +1,4 @@
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, FormControlLabel, FormLabel } from "@mui/material";
 import logo from '../../images/logo.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,9 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 
 const SignUp = () => {
@@ -34,23 +37,41 @@ const SignUp = () => {
     const navigate = useNavigate();
     const [showResponse, setShowResponse] = useState(false);
     const [formDataEmail, setFormDataEmail] = useState(false);
+    const [registedWithSebi, setRegisteredWithSebi] = useState("no");
+    const [sebiRegistrationDate, setSebiRegistrationDate] = useState<Date | undefined | null>(null);
+    const [errorssebiRegistrationDate, seterrorssebiRegistrationDate] = useState<String | undefined>(undefined);
 
     const captchaRef = React.createRef<ReCAPTCHA>();
 
     async function handleSubmitForm() {
-        const captchaResponse = await captchaRef.current?.executeAsync();
-        console.log("recaptcha", captchaResponse);
-        // dispatch(validateUser(value))
-        if(captchaResponse !== null && captchaResponse !== undefined) {
-        console.log(formData)
-            setShowResponse(true)
-            dispatch(
-                signupUsersAsync(
-                    wrapArgument(actionUid, {...formData, captchaResponse})
+
+        if(sebiRegistrationDate === undefined || sebiRegistrationDate === null) {
+            seterrorssebiRegistrationDate("SEBI Registration Date is required")
+        } else {
+            seterrorssebiRegistrationDate(undefined)
+            const captchaResponse = await captchaRef.current?.executeAsync();
+            console.log("recaptcha", captchaResponse);
+            // dispatch(validateUser(value))
+            if(captchaResponse !== null && captchaResponse !== undefined) {
+            console.log(formData)
+                setShowResponse(true)
+                dispatch(
+                    signupUsersAsync(
+                        wrapArgument(actionUid, {...formData, sebiRegistrationDate, registeredOn: new Date(), captchaResponse})
+                    )
                 )
-            )
+            }
         }
     }
+
+    const handleChangeRegistedWithSebi = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRegisteredWithSebi((event.target as HTMLInputElement).value);
+    };
+
+
+    const handleChangeRegistedWithSebiDate = (value: Date | undefined | null) => {
+        setSebiRegistrationDate(value);
+    };
 
 
     const handleChange = (ev: any) => {
@@ -126,6 +147,19 @@ const SignUp = () => {
                 }
             })
             .required("Company Name is required"),
+        sebiRegistration: Yup
+            .string()
+            .trim()
+            .test("Invalid input entered", function (value:any){
+                const pattern = /[<>\/]/;
+                const isNotValidInput = pattern.test(value);
+                if(isNotValidInput){
+                    return false;
+                }else{
+                    return true;
+                }
+            })
+            .required("SEBI Registration is required"),
         contactPerson: Yup
             .string()
             .matches(/^[A-Za-z ]*$/, 'Please enter valid contact person')
@@ -206,7 +240,7 @@ const SignUp = () => {
                 <Box sx={{ flexGrow: 1 }}>
                     <Grid container >
                         <Grid item xs={3}>
-                            <Card className="login_card_left" sx={{ display: 'flex', height: '675px', mb: 2, border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#363062" }}>
+                            <Card className="login_card_left" sx={{ display: 'flex', height: '750px', mb: 2, border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#363062" }}>
 
                                 <CardContent sx={{ flex: 1 }}>
 
@@ -296,7 +330,7 @@ const SignUp = () => {
                             </Card>
                         </Grid>
                         <Grid item xs={9}>
-                            <Card sx={{ display: 'flex', height: '675px', mb: 2 }}>
+                            <Card sx={{ display: 'flex', height: '850px', mb: 2 }}>
                                 <CardContent sx={{ flex: 1 }}>
 
 
@@ -330,7 +364,56 @@ const SignUp = () => {
                                             <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>4. Temporary credentials will be active ony for 90 days.</Typography> <br></br>
                                         </div>
 
-                                        <Grid container spacing={2} sx={{ mt: 3 }}>
+                                        <div style={{paddingTop: 25}}>
+                                            <FormControl>
+                                                <FormLabel id="demo-radio-buttons-group-label">
+                                                    <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Are you a SEBI registered Category-I & Category-II Alternative Investment Fund (AIF)</Typography>
+                                                </FormLabel>
+                                                <RadioGroup
+                                                    aria-labelledby="demo-radio-buttons-group-label"
+                                                    defaultValue="no"
+                                                    name="radio-buttons-group"
+                                                    value={registedWithSebi}
+                                                    onChange={handleChangeRegistedWithSebi}
+                                                >
+                                                    <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>
+                                                        <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                                                        <FormControlLabel value="no" control={<Radio />} label="No" />
+                                                    </Typography>
+                                                </RadioGroup>
+                                            </FormControl>
+                                        </div>
+                                        {registedWithSebi === "yes" && <Grid container spacing={2} sx={{ mt: 3 }}>
+                                            <Grid item xs={6}>
+                                                <TextField
+                                                    required
+                                                    id="sebiRegistration"
+                                                    label="Sebi Registration"
+                                                    //defaultValue={value["companyName"] === undefined ? "" : value["companyName"]}
+                                                    value={formData["sebiRegistration"] || ''}
+                                                    {...register("sebiRegistration")}
+                                                    error={(errors.sebiRegistration) ? true : false}
+                                                    onChange={handleChange}
+                                                    sx={{ display: 'flex' }}
+                                                />
+                                                <Typography variant="caption" color="error">
+                                                    <>{(errors.sebiRegistration)?errors.sebiRegistration.message : ''}</>
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DatePicker
+                                                        label="Sebi Registration Date"
+                                                        inputFormat='DD/MM/YYYY'
+                                                        value={sebiRegistrationDate || null}
+                                                        onChange={(newValue) => handleChangeRegistedWithSebiDate(newValue)} 
+                                                        renderInput={(params) => <TextField {...params} />}
+                                                    />
+                                                </LocalizationProvider>
+                                                <Typography variant="caption" color="error">
+                                                    <>{errorssebiRegistrationDate}</>
+                                                </Typography>
+                                            </Grid>
                                             <Grid item xs={6}>
                                                 <TextField
                                                     required
@@ -527,7 +610,7 @@ const SignUp = () => {
                                                     label="Captcha"
                                                     sx={{ display: 'flex' }}
                                                 />
-    </Grid>*/}
+                                            </Grid>*/}
 
                                             <Grid item xs={3} >
                                                 <Box display="flex"
@@ -569,7 +652,8 @@ const SignUp = () => {
                                                 </Box>
                                             </Grid>
 
-                                        </Grid>
+                                        </Grid>}
+                                        
 
                                         {/*
                                         <Grid item xs={12} >

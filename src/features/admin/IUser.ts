@@ -10,6 +10,9 @@ export interface IUser extends IEntity {
   address: string | undefined,
   city: string | undefined,
   state: string | undefined,
+  sebiRegistration: string | undefined,
+  sebiRegistrationDate: Date | undefined,
+  registeredOn: Date | undefined,
   role: undefined,
 }
 
@@ -24,7 +27,10 @@ export const defaultIUser : IUser = {
   state: undefined,
   title: undefined,
   city: undefined,
-  address: undefined
+  address: undefined,
+  sebiRegistration: undefined,
+  sebiRegistrationDate: undefined,
+  registeredOn: undefined,
 }
 
 export interface IUserApprove {
