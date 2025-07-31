@@ -388,7 +388,7 @@ const SignUp = () => {
                                                 <TextField
                                                     required
                                                     id="sebiRegistration"
-                                                    label="Sebi Registration"
+                                                    label="SEBI - Registration No."
                                                     //defaultValue={value["companyName"] === undefined ? "" : value["companyName"]}
                                                     value={formData["sebiRegistration"] || ''}
                                                     {...register("sebiRegistration")}
@@ -403,7 +403,7 @@ const SignUp = () => {
                                             <Grid item xs={6}>
                                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                     <DatePicker
-                                                        label="Sebi Registration Date"
+                                                        label="SEBI - Registration Date"
                                                         inputFormat='DD/MM/YYYY'
                                                         value={sebiRegistrationDate || null}
                                                         onChange={(newValue) => handleChangeRegistedWithSebiDate(newValue)} 
@@ -418,7 +418,7 @@ const SignUp = () => {
                                                 <TextField
                                                     required
                                                     id="companyName"
-                                                    label="Company Name"
+                                                    label="AIF Name"
                                                     //defaultValue={value["companyName"] === undefined ? "" : value["companyName"]}
                                                     value={formData["companyName"] || ''}
                                                     {...register("companyName")}
