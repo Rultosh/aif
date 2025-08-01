@@ -359,8 +359,9 @@ const SignUp = () => {
                                         <div>
                                             <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Note:</Typography> <br></br>
                                             <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>1. This registration is only for Alternative Investment Fund (AIF) registered in India. </Typography> <br></br>
-                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>2. Use your corporate e-mail address for sign up. A link to set your password will be sent.</Typography> <br></br>
-                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>3. Temporary credentials will be active only for 90 days.</Typography> <br></br>
+                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>2. SEBI Registration is mandatory for Sign-Up.</Typography> <br></br>
+                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>3. Use your corporate e-mail address for sign up. A link to set your password will be sent.</Typography> <br></br>
+                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>4. Temporary credentials will be active only for 90 days.</Typography> <br></br>
                                         </div>
 
                                         <div style={{paddingTop: 25}}>
