@@ -4,6 +4,13 @@ import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
 import { authenticate } from "./authenticationApi"
 import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
+import { Password } from "@mui/icons-material"
+
+type Password = {
+    ciphertext: String | undefined,
+    salt: String | undefined,
+    iv: String | undefined,
+}
 
 type InitialState = {
     token: String | undefined,
@@ -21,16 +28,14 @@ const initialState: InitialState = {
 export interface ILoginRequest {
     username: String | undefined,
     password: String | undefined,
-    salt: String | undefined,
-    iv: String | undefined,
+    passwordWithSaltAndIv: Password | undefined,
     captchaResponse: String | undefined,
 }
 
 export const defaultLoginRequest = {
     username: undefined,
+    passwordWithSaltAndIv: undefined,
     password: undefined,
-    salt: undefined,
-    iv: undefined,
     captchaResponse: undefined,
 }
 

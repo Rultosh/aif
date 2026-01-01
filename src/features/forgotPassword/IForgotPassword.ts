@@ -1,10 +1,17 @@
 import { IEntity } from "../../lib/api-wrappers/IEntity"
 
+type Password = {
+    ciphertext: String | undefined,
+    salt: String | undefined,
+    iv: String | undefined,
+}
+
 export interface IForgotPassword extends IEntity {
 
   token: string | undefined,
   password: string | undefined,
-  matchingPassword: string | undefined,
+  passwordWithSaltAndIv: Password | undefined,
+  matchingPassword: string | undefined
 }
 
 export const defaultIForgotPassword : IForgotPassword = {
@@ -12,5 +19,6 @@ export const defaultIForgotPassword : IForgotPassword = {
   parentId: undefined,
   token: undefined,
   password: undefined,
+  passwordWithSaltAndIv: undefined,
   matchingPassword: undefined
 }

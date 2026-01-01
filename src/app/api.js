@@ -16,7 +16,7 @@ client.interceptors.request.use(function(config) {
 client.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
-  if (error.response.status === 401 ){
+  if (error && error.response && error.response.status === 401 ){
     localStorage.clear();
     CheckAuth.setIsUnauthorized();
   }
