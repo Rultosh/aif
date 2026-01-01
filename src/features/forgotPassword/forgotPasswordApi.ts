@@ -2,13 +2,14 @@ import api from "../../app/api";
 import { IForgotPassword } from "./IForgotPassword";
 import {  IResetPassword } from "../resetPassword/IResetPassword"
 import {IChangePassword} from '../changePassword/IChangePassword'
-import encrypt from "../../components/auth/encrypt";
+import { encryptData } from "../../components/auth/encryption";
 
 
 
 export function setPassword(passwordDetails:IForgotPassword) {
-  passwordDetails.password = encrypt(passwordDetails.password);
-  passwordDetails.matchingPassword = encrypt(passwordDetails.matchingPassword);
+  passwordDetails.passwordWithSaltAndIv = encryptData(passwordDetails.password);
+  passwordDetails.password = undefined
+  passwordDetails.matchingPassword = undefined
   return api({
     method: 'post',
     data: passwordDetails,
@@ -25,9 +26,11 @@ export function resetForgotPassword(email:IResetPassword) {
 }
 
 export function changePassword(passwordDetails:IChangePassword) {
-  passwordDetails.oldPassword = encrypt(passwordDetails.oldPassword);
-  passwordDetails.password = encrypt(passwordDetails.password);
-  passwordDetails.matchingPassword = encrypt(passwordDetails.matchingPassword);
+  passwordDetails.oldPasswordWithSaltAndIv = encryptData(passwordDetails.oldPassword);
+  passwordDetails.oldPassword = undefined;
+  passwordDetails.passwordWithSaltAndIv = encryptData(passwordDetails.password);
+  passwordDetails.password = undefined;
+  passwordDetails.matchingPassword = undefined;
   return api({
     method: 'post',
     data: passwordDetails,

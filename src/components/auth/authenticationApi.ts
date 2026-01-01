@@ -1,10 +1,12 @@
 import api from "../../app/api";
 import { ILoginRequest } from "./authenticationSlice";
-import encrypt from "./encrypt";
+import { encryptData } from "./encryption";
 
 export function authenticate(loginRequest: ILoginRequest) {
 
-    loginRequest.password = encrypt(loginRequest.password);
+    let passwordWithSaltAndIv = encryptData(loginRequest.password);
+
+    loginRequest = {...loginRequest, passwordWithSaltAndIv, password: undefined};
 
     return api({
         method: 'post',
