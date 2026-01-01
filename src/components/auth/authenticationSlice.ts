@@ -21,12 +21,16 @@ const initialState: InitialState = {
 export interface ILoginRequest {
     username: String | undefined,
     password: String | undefined,
+    salt: String | undefined,
+    iv: String | undefined,
     captchaResponse: String | undefined,
 }
 
 export const defaultLoginRequest = {
     username: undefined,
     password: undefined,
+    salt: undefined,
+    iv: undefined,
     captchaResponse: undefined,
 }
 
