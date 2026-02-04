@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, Divider } from "@mui/material";
-import logo from '../../images/logo.png';
+import logo from '../../images/logo_nps.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
 import azadiLogo from '../../images/Azadi.png'
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +14,7 @@ import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
 import { ModalComponent } from '../../components/ModalComponent'
-import {CheckAuth} from '../../app/api';
+import { CheckAuth } from '../../app/api';
 
 import ReCAPTCHA from "react-google-recaptcha";
 import { env } from 'yargs';
@@ -43,8 +43,8 @@ const Landing = () => {
     useEffect(() => {
         // console.log(auth.token);
         // if(auth.token) navigate('/home')
-        if (localStorage.getItem('token')){
-            if (usersState.status.fetchStatus === FetchStatus.IDLE  && ['USERADMIN'].includes(usersState.role!= undefined? usersState.role : '')) {
+        if (localStorage.getItem('token')) {
+            if (usersState.status.fetchStatus === FetchStatus.IDLE && ['USERADMIN'].includes(usersState.role != undefined ? usersState.role : '')) {
                 navigate('/Admin')
             } else {
                 navigate('/home')
@@ -88,9 +88,9 @@ const Landing = () => {
         }
     }
     async function isUserValid() {
-        var captchaResponse:string|undefined|null;
+        var captchaResponse: string | undefined | null;
 
-        if(captchaRef && captchaRef.current) {
+        if (captchaRef && captchaRef.current) {
             var captchaTimeout = setTimeout(() => {
                 dispatch(setErrorMessage("Captcha not available. Please refresh the screen and try again."));
             }, 1000)
@@ -99,38 +99,38 @@ const Landing = () => {
             console.log("Captcha: " + captchaResponse);
         }
 
-        if(captchaResponse === null || captchaResponse === undefined) {
+        if (captchaResponse === null || captchaResponse === undefined) {
             captchaResponse = "BLANK";
         }
 
         console.log(captchaResponse);
 
         dispatch(authenticateThunk(wrapArgument(
-            actionId, {...value, captchaResponse}
+            actionId, { ...value, captchaResponse }
         )));
 
         captchaRef.current?.reset();
-        
+
     }
-  
+
     const validationSchema = Yup.object().shape({
         username: Yup.string()
-        .trim()
-        .test("email-regex", "Enter a valid Email", function (value: any) {
-            const EmailRegex =
-                /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-  
-            const IsValidEmail = EmailRegex.test(value);
+            .trim()
+            .test("email-regex", "Enter a valid Email", function (value: any) {
+                const EmailRegex =
+                    /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
-            if (!IsValidEmail) {
-                return false;
-            }else{
-                return true;
-            }
-        })
-        .required("Username is required"),
+                const IsValidEmail = EmailRegex.test(value);
+
+                if (!IsValidEmail) {
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+            .required("Username is required"),
         password: Yup.string().required("Password is required"),
-      });
+    });
 
     const {
         setValue,
@@ -139,182 +139,115 @@ const Landing = () => {
         reset,
         handleSubmit,
         formState: { errors },
-      } = useForm({
+    } = useForm({
         resolver: yupResolver(validationSchema),
-      });
-    
-      const onSubmit = (data: any) => {
+    });
+
+    const onSubmit = (data: any) => {
         isUserValid();
-      };
+    };
 
     return (
         <>
-        <ReCAPTCHA
-            ref={captchaRef}
-            size={'invisible'}
-            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
-        />
-        <div className="landingComp">
-            <Container sx={{ my: '90px', }}>
-                <Box sx={{ flexGrow: 1 }}>
-                    <Grid container direction="row" justifyContent="center" alignItems="center">
-                        <Grid item  xs={12} sm={12} md={12} xl={12}>
-                        <Card sx={{ display: 'flex', border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px'}}>
-                        <CardContent sx={{ flex: 1, p: 0, pb: '0 !important' }}>
-                            <Grid container>
-                                <Grid item xs={3} className="login_card_left">
-                                    {/* <Card className="login_card_left" sx={{ display: 'flex', height: '500px', border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#4A4C6F" }}>
+            <ReCAPTCHA
+                ref={captchaRef}
+                size={'invisible'}
+                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
+            />
+            <div className="landingComp" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
+                <Container maxWidth="lg">
+                    <Box sx={{ flexGrow: 1 }}>
+                        <Grid container direction="row" justifyContent="center" alignItems="center">
+                            <Grid item xs={12} sm={12} md={12} xl={12}>
+                                <Card sx={{ display: 'flex', border: 1, borderColor: "#363062", borderRadius: '8px' }}>
+                                    <CardContent sx={{ flex: 1, p: 0, pb: '0 !important' }}>
+                                        <Grid container>
+                                            <Grid item xs={3} className="login_card_left">
+                                                {/* <Card className="login_card_left" sx={{ display: 'flex', height: '500px', border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#4A4C6F" }}>
 
                                         <CardContent sx={{ flex: 1 }}> */}
 
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center"
-                                                sx={{ mt: 4 }}>
+                                                <Box display="flex"
+                                                    justifyContent="center"
+                                                    alignItems="center"
+                                                    sx={{ height: '100%' }}>
 
-                                                <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
-                                                    <Box
-                                                        component="img"
-                                                        sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                        alt="ffsLogo"
-                                                        src={ffsLogo}
-                                                    />
+                                                    <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
+                                                        <Box
+                                                            component="img"
+                                                            sx={{ width: '155px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block', padding: '10px' } }}
+                                                            alt="success"
+                                                            src={logo}
+                                                        />
 
-                                                </Toolbar>
+                                                    </Toolbar>
 
-                                            </Box>
+                                                </Box>
+                                                {/* </CardContent>
 
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center"
-                                                sx={{ mt: 4 }}>
+                                    </Card> */}
+                                            </Grid>
+                                            <Grid item xs={4.5}>
+                                                {/* <Card sx={{ display: 'flex', height: '500px', borderRight: 1, borderTop: 1, borderBottom: 1, borderColor: "#363062", borderRightColor: "#f2f2f2" }}>
+                                        <CardContent sx={{ flex: 1 }}> */}
 
-                                                <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
-                                                    <Box
-                                                        component="img"
-                                                        sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                        alt="success"
-                                                        src={logo}
-                                                    />
 
-                                                </Toolbar>
-
-                                            </Box>
-
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center"
-                                                className="loginIconImg"
-                                                sx={{ mt: 4, mb: 2 }}>
-
-                                                <Toolbar disableGutters sx={{ width: '80px', height: '80px', justifyContent: "center", backgroundColor: '#ffffff', borderRadius: '50px' }}>
-                                                    <Box
-                                                        component="img"
-                                                        sx={{ position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                        alt="success"
-                                                        src={loginIconImg}
-                                                    />
-
-                                                </Toolbar>
-
-                                            </Box>
-
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-
-                                                <Toolbar disableGutters sx={{ justifyContent: "center", color: "#ffffff" }}>
+                                                <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', borderRight: '1px solid #9596A9', minHeight: '40px !important' }}>
                                                     <Box display="flex"
                                                         justifyContent="center"
                                                         alignItems="center">
-                                                        <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Alternative Investment Fund</Typography>
+                                                        <Typography sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>If you already have an account</Typography>
 
                                                     </Box>
 
                                                 </Toolbar>
 
-                                            </Box>
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-
-                                                <Toolbar disableGutters sx={{ justifyContent: "center", color: "#ffffff" }}>
-                                                    <Box display="flex"
-                                                        justifyContent="center"
-                                                        alignItems="center"
-                                                    >
-                                                        <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Application Portal</Typography>
-
-                                                    </Box>
-
-                                                </Toolbar>
-
-                                            </Box>
-                                        {/* </CardContent>
-
-                                    </Card> */}
-                                </Grid>
-                                <Grid item xs={4.5}>
-                                    {/* <Card sx={{ display: 'flex', height: '500px', borderRight: 1, borderTop: 1, borderBottom: 1, borderColor: "#363062", borderRightColor: "#f2f2f2" }}>
-                                        <CardContent sx={{ flex: 1 }}> */}
-
-
-                                            <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#363062', textAlign: "center", justifyContent: "space-around", opacity: '0.8', borderRight: '1px solid #9596A9', minHeight: '40px !important' }}>
-                                                <Box display="flex"
-                                                    justifyContent="center"
-                                                    alignItems="center">
-                                                    <Typography sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>If you already have an account</Typography>
-
-                                                </Box>
-
-                                            </Toolbar>
-
-                                            <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ borderRight: '1px solid #9596A9', mt: 2, mb:2, py: 4 }}>
-                                                <Grid item  xs={12}>
-                                                <Box
-                                                    justifyContent="center"
-                                                    alignItems="center"
-                                                    sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', mx: 4 }}>
-
+                                                <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ borderRight: '1px solid #9596A9', mt: 2, mb: 2, py: 4 }}>
                                                     <Grid item xs={12}>
-                                                        <TextField
-                                                            required
-                                                            id="username"
-                                                            label="Email Id"
-                                                            defaultValue={""}
-                                                            value={value.username}
-                                                            {...register("username")}
-                                                            error={(errors.username) ? true : false}
-                                                            onChange={handleChange}
-                                                            sx={{ display: 'flex' }}
-                                                        />
-                                                        <Typography variant="caption" color="error">
-                                                            <>{(errors.username)?errors.username.message : ''}</>
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid item xs={12} >
-                                                        <TextField
-                                                            required
-                                                            id="password"
-                                                            label="Password"
-                                                            type="password"
-                                                            defaultValue={value["password"] === undefined ? "" : value["password"]}
-                                                            value={value["password"]}
-                                                            {...register("password")}
-                                                            error={(errors.password) ? true : false}
-                                                            onChange={handleChange}
-                                                            sx={{ display: 'flex', mt: 4 }}
-                                                            onKeyPress={(e) => handleKeyPress(e)}
-                                                        />
-                                                        <Typography variant="caption" color="error">
-                                                            <>{(errors.password)?errors.password.message : ''}</>
-                                                        </Typography>
-                                                    </Grid>
-                                                    {!isValidUser && errorMsg ?
-                                                        <Grid item xs={12} >
-                                                            <Typography variant="subtitle2" sx={{ flex: 1, ml: '10px', textAlign: "left", color: 'red' }}>{errorMsg}</Typography>
+                                                        <Box
+                                                            justifyContent="center"
+                                                            alignItems="center"
+                                                            sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', mx: 4 }}>
 
-                                                            {/* <Modal
+                                                            <Grid item xs={12}>
+                                                                <TextField
+                                                                    required
+                                                                    id="username"
+                                                                    label="Email Id"
+                                                                    defaultValue={""}
+                                                                    value={value.username}
+                                                                    {...register("username")}
+                                                                    error={(errors.username) ? true : false}
+                                                                    onChange={handleChange}
+                                                                    sx={{ display: 'flex' }}
+                                                                />
+                                                                <Typography variant="caption" color="error">
+                                                                    <>{(errors.username) ? errors.username.message : ''}</>
+                                                                </Typography>
+                                                            </Grid>
+                                                            <Grid item xs={12} >
+                                                                <TextField
+                                                                    required
+                                                                    id="password"
+                                                                    label="Password"
+                                                                    type="password"
+                                                                    defaultValue={value["password"] === undefined ? "" : value["password"]}
+                                                                    value={value["password"]}
+                                                                    {...register("password")}
+                                                                    error={(errors.password) ? true : false}
+                                                                    onChange={handleChange}
+                                                                    sx={{ display: 'flex', mt: 4 }}
+                                                                    onKeyPress={(e) => handleKeyPress(e)}
+                                                                />
+                                                                <Typography variant="caption" color="error">
+                                                                    <>{(errors.password) ? errors.password.message : ''}</>
+                                                                </Typography>
+                                                            </Grid>
+                                                            {!isValidUser && errorMsg ?
+                                                                <Grid item xs={12} >
+                                                                    <Typography variant="subtitle2" sx={{ flex: 1, ml: '10px', textAlign: "left", color: 'red' }}>{errorMsg}</Typography>
+
+                                                                    {/* <Modal
                                                                 open={open}
                                                                 onClose={handleClose}
                                                                 aria-labelledby="modal-modal-title"
@@ -322,9 +255,9 @@ const Landing = () => {
                                                             >
                                                                 <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>{errorMsg}</Typography>
                                                             </Modal>  */}
-                                                        </Grid>
-                                                        : null}
-                                                    {/*} <Grid item xs={12} >
+                                                                </Grid>
+                                                                : null}
+                                                            {/*} <Grid item xs={12} >
                                                         <TextField
                                                             required
                                                             id="outlined-required"
@@ -333,98 +266,98 @@ const Landing = () => {
                                                             sx={{ display: 'flex', mb: 2,mt: 2 }}
                                                         />
                                                         </Grid> */}
-                                                    <Grid item xs={12} >
-                                                        <div className="signInButton" style={{ width: 'fit-content' }}>
-                                                            <Button type="submit" variant="contained" disableElevation sx={{ mt: -4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#878ADD, #505282)', borderRadius: '10px', fontWeight: 600 }} 
-                                                            //onClick={isUserValid}
-                                                            onClick={handleSubmit(onSubmit)}
-                                                            >
-                                                                Sign In
-                                                            </Button>
-                                                            <span className="signInButtonArrow"></span>
-                                                        </div>
+                                                            <Grid item xs={12} >
+                                                                <div className="signInButton" style={{ width: 'fit-content' }}>
+                                                                    <Button type="submit" variant="contained" disableElevation sx={{ mt: -4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(to right, #435fa4, #7754a0, #904598, #b62d8f)', borderRadius: '10px', fontWeight: 600 }}
+                                                                        //onClick={isUserValid}
+                                                                        onClick={handleSubmit(onSubmit)}
+                                                                    >
+                                                                        Sign In
+                                                                    </Button>
+                                                                    <span className="signInButtonArrow"></span>
+                                                                </div>
+                                                            </Grid>
+
+                                                        </Box>
+                                                        <Typography sx={{ flex: 1, mt: 2, mb: "2px", mx: 4 }}>To reset your password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
                                                     </Grid>
-
-                                                </Box>
-                                                <Typography sx={{ flex: 1, mt: 2, mb: "2px", mx: 4 }}>To reset your password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
                                                 </Grid>
-                                            </Grid>
 
-                                        {/* </CardContent>
+                                                {/* </CardContent>
 
                                     </Card> */}
 
-                                </Grid>
+                                            </Grid>
 
-                                <Grid item xs={4.5}>
-                                    {/* <Card sx={{ display: 'flex', height: '500px', borderRight: 1, borderTop: 1, borderBottom: 1, borderColor: "#363062", borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}>
+                                            <Grid item xs={4.5}>
+                                                {/* <Card sx={{ display: 'flex', height: '500px', borderRight: 1, borderTop: 1, borderBottom: 1, borderColor: "#363062", borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}>
                                         <CardContent sx={{ flex: 1 }}> */}
 
 
-                                            <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#363062', textAlign: "center", justifyContent: "space-around", opacity: '0.8', minHeight: '40px!important' }}>
-                                                <Box display="flex"
-                                                    justifyContent="center"
-                                                    alignItems="center">
-                                                    <Typography sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Do not have an account</Typography>
+                                                <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', minHeight: '40px!important' }}>
+                                                    <Box display="flex"
+                                                        justifyContent="center"
+                                                        alignItems="center">
+                                                        <Typography sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Do not have an account</Typography>
 
-                                                </Box>
+                                                    </Box>
 
-                                            </Toolbar>
+                                                </Toolbar>
 
-                                            <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ borderRight: '1px solid #9596A9', py: 4 }}>
-                                                <Grid item xs={12}>
-                                                    <Typography sx={{ flex: 1, mt: 3, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
-                                                </Grid>
-                                                <Grid item xs={12}>
-                                                    <Toolbar disableGutters sx={{ justifyContent: "center",  mt: 2.5 }}>
-                                                        <Box
-                                                            component="img"
-                                                            sx={{ height: '122px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                            alt="success"
-                                                            src={azadiLogo}
-                                                        />
-                                                    </Toolbar>
-                                                </Grid>
+                                                <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ borderRight: '1px solid #9596A9', py: 4 }}>
+                                                    <Grid item xs={12}>
+                                                        <Typography sx={{ flex: 1, mt: 3, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <Toolbar disableGutters sx={{ justifyContent: "center", mt: 2.5 }}>
+                                                            <Box
+                                                                component="img"
+                                                                sx={{ height: '122px', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
+                                                                alt="success"
+                                                                src={azadiLogo}
+                                                            />
+                                                        </Toolbar>
+                                                    </Grid>
 
-                                                <Grid item xs={12} sx={{ mt: 3 }}>
-                                                    <div className="checkEligibilityButton" style={{ width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
-                                                        <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(#EC8D1C, #844F10)', borderRadius: '10px', fontWeight: 600 }} onClick={submitOnCheckEligibility} >
-                                                            Check Eligibility
-                                                        </Button>
-                                                        <span className="checkEligibilityButtonArrow"></span>
-                                                    </div>
+                                                    <Grid item xs={12} sx={{ mt: 3 }}>
+                                                        <div className="checkEligibilityButton" style={{ width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(to right, #00ff00, #2fc713, #86d917, #ffff00)', borderRadius: '10px', fontWeight: 600 }} onClick={submitOnCheckEligibility} >
+                                                                Check Eligibility
+                                                            </Button>
+                                                            <span className="checkEligibilityButtonArrow"></span>
+                                                        </div>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <Typography sx={{ flex: 1, mt: 3, ml: '10px', textAlign: "center" }}>Check your eligibility without Sign up</Typography>
+                                                    </Grid>
+
                                                 </Grid>
-                                                <Grid item xs={12}>
-                                                    <Typography sx={{ flex: 1, mt: 3, ml: '10px', textAlign: "center" }}>Check your eligibility without Sign up</Typography>
-                                                </Grid>
-                                               
-                                            </Grid>
-                                        {/* </CardContent>
+                                                {/* </CardContent>
 
                                     </Card> */}
-                                    <Grid item xs={12}>
-                                        <Box sx={{ mt: 2 }}>
-                                            {showResponse && state.response != undefined ? <>{state.response}</> : <></>}
-                                            <ModalComponent
-                                                open={showResponse}
-                                                close={handleClose}
-                                                aria-labelledby="modal-modal-title"
-                                                aria-describedby="modal-modal-description"
-                                                className="special_modal"
-                                                msg={state.response}
-                                                status={state.status.fetchStatus}
-                                            >
-                                            </ModalComponent>
-                                        </Box>
-                                    </Grid>
-                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Box sx={{ mt: 2 }}>
+                                                        {showResponse && state.response != undefined ? <>{state.response}</> : <></>}
+                                                        <ModalComponent
+                                                            open={showResponse}
+                                                            close={handleClose}
+                                                            aria-labelledby="modal-modal-title"
+                                                            aria-describedby="modal-modal-description"
+                                                            className="special_modal"
+                                                            msg={state.response}
+                                                            status={state.status.fetchStatus}
+                                                        >
+                                                        </ModalComponent>
+                                                    </Box>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </CardContent>
+                                </Card>
                             </Grid>
-                            </CardContent>
-</Card>
                         </Grid>
-                    </Grid>
-                </Box></Container>
-        </div>
+                    </Box></Container>
+            </div>
         </>
     )
 }

@@ -14,12 +14,11 @@ import logo from '../images/logo.png'
 import { Link } from 'react-router-dom'
 import Divider from '@mui/material/Divider';
 import MailIcon from '@mui/icons-material/Mail';
+import headerBg from '../images/header_bg.png';
 
 import loginRupeeIconImg from '../images/logo_rupee_symbol.png'
 import { useAppSelector } from '../app/hooks';
 import { selectUsers } from '../features/admin/adminSlice';
-
-
 
 const Header = (props: any) => {
 
@@ -27,64 +26,80 @@ const Header = (props: any) => {
   const usersState = useAppSelector(selectUsers)
 
   React.useEffect(() => {
-    if(usersState.me.role) setLoggedIn(true);
+    if (usersState.me.role) setLoggedIn(true);
     else setLoggedIn(false);
   }, [usersState.status.fetchStatus])
-  
+
 
   const navItems = ['FAQs', 'Help', 'vcfapplication@sidbi.in'];
   let count = 0;
   return (
-    <AppBar position="static" component='nav' sx={{ backgroundColor: '#363062' }}>
-      <Container maxWidth="xl">
-      <Toolbar disableGutters>
-        <Box
-          className='logoIconRupee'
-          component="img"
-          sx={{ position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-          alt="success"
-          src={loginRupeeIconImg}
-        />
+    <Box sx={{ flexGrow: 1 }} className={props.className}>
+      <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', background: 'rgb(0 0 0 / 20%)', top: 0, padding: '5px 0' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: { xs: '0.8rem', sm: '1rem' }, color: 'rgba(255,255,255,0.9)' }}>
+              Fund of Funds
+            </Typography>
 
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' ,fontWeight:'normal'} }}
-        >
-         {/* Alternative Investment Fund */}
-          <div id="Component_15__2" className="Component_15___2">
-            <div id="ALTERNATE_INVESTMENT_FUND__" style={{ fontSize: '40px', color: 'rgba(255,255,255,1)' }}>
-              <span>A</span>
-              <span style={{fontSize:'25px'}}>LTERNATIVE </span>
-              <span>I</span>
-              <span style={{fontSize:'25px'}}>NVESTMENT</span>
-              <span> F</span>
-              <span style={{fontSize:'25px'}}>UND</span>
-              <span>  </span>
-            </div>
-          </div>
-        </Typography>
-       
-        <div className='logoLineAnimation'></div>
-             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-               <Button
-                  href="/templates/FAQs.zip"
-                  disableElevation
-                  sx={{ color: '#FFFFFF', textTransform: 'none', mt: 3, mb: 3, ml: 2, height: '30px', borderRight: '1px solid white', borderRadius: '0' }} >
-                  {'FAQs'}
-              </Button>
-              <Button key={'help'} 
-                href={loggedIn?"/templates/vcf-help-complete.pptx":"/templates/vcf-help-minimal.pptx"}
-                sx={{ color: '#fff', pt: 0.5, pb: 0.5, borderRight: navItems.length == count? '0px solid white' : '1px solid white', borderRadius: '0', textTransform: navItems.length == count?'initial' : '' }}>
-                {'HELP'}
-              </Button>
-              <Button key={'support-email'} sx={{ color: '#fff', pt: 0.5, pb: 0.5, borderRight: navItems.length == count? '0px solid white' : '1px solid white', borderRadius: '0', textTransform: navItems.length == count?'initial' : '' }}>
-                <MailIcon sx={{ mr: 1 }}/>{'vcfapplication@sidbi.in'}
-              </Button>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500, color: '#ffffff' }}>
+                FAQ
+              </Typography>
+              <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500, color: '#ffffff' }}>
+                Help
+              </Typography>
             </Box>
-        </Toolbar >
-      </Container>
-    </AppBar>
+          </Box>
+        </Container>
+      </Box>
+      {/* Top Utility Bar Section */}
+      {/* <Box sx={{
+        bgcolor: 'rgba(54, 48, 98, 0.4)', // Semi-transparent version of #363062
+        backdropFilter: 'blur(10px)',
+        color: 'white',
+        py: 0.5,
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1100
+      }}>
+        <Container maxWidth="xl">
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: { xs: '0.8rem', sm: '1rem' }, color: 'rgba(255,255,255,0.9)' }}>
+              Fund of Funds
+            </Typography>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500 }}>
+                Skip to Main Content
+              </Typography>
+              <Box component="span" sx={{ opacity: 0.4 }}>|</Box>
+              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500 }}>
+                Screen Reader Access
+              </Typography>
+              <Box component="span" sx={{ opacity: 0.4 }}>|</Box>
+              <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500 }}>A-</Typography>
+                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500 }}>A</Typography>
+                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500 }}>A+</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center', ml: 0.5 }}>
+                <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'white', border: '1px solid #ccc', cursor: 'pointer', display: { xs: 'none', sm: 'block' } }} />
+                <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#00BCD4', cursor: 'pointer', display: { xs: 'none', sm: 'block' } }} />
+              </Box>
+              <Box component="span" sx={{ opacity: 0.4 }}>|</Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                  अ / A
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </Container>
+      </Box> */}
+    </Box>
   )
 }
 
