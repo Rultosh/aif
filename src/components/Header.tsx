@@ -25,7 +25,7 @@ const Header = (props: any) => {
   const token = localStorage.getItem('token')
   const [loggedIn, setLoggedIn] = React.useState<boolean>(token !== undefined && false);
   const usersState = useAppSelector(selectUsers)
-  
+
 
   React.useEffect(() => {
     console.log(JSON.stringify(usersState.me))
@@ -48,33 +48,37 @@ const Header = (props: any) => {
       <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', background: 'rgb(0 0 0 / 20%)', top: 0, padding: '5px 0' }}>
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {<Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
-                    <Box
-                        component="img"
-                        sx={{ width: '90px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "left", display: { xs: 'block', padding: '2px' } }}
-                        alt="success"
-                        src={"https://npstrust.org.in/sites/default/files/logo.png"}
-                    />
-                </Link>}
-            <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: { xs: '0.8rem', sm: '1rem' }, color: 'rgba(255,255,255,0.9)' }}>
-              Fund of Funds
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {<Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
+                <Box
+                  component="img"
+                  sx={{ width: '70px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "left", display: { xs: 'block' } }}
+                  alt="success"
+                  src={"https://npstrust.org.in/sites/default/files/logo.png"}
+                />
+              </Link>}
+              <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.8rem', color: 'rgba(255,255,255,0.9)' }}>
+                Fund of Funds
+              </Typography>
+            </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Typography>
-                <Link to={`/Preliminary`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
+              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+                <Link to={`/Preliminary`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
                   Preliminary
                 </Link>
               </Typography>
               <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
-              <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
+              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+                <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
                   Workflow
                 </Link>
+              </Typography>
               {token && <><Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
-                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500, color: '#ffffff' }}>
-                <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
-                  Logout
-                </div>
+                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+                  <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
+                    Logout
+                  </div>
                 </Typography></>}
             </Box>
           </Box>
