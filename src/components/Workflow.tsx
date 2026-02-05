@@ -18,7 +18,7 @@ const Workflow = (props:any) => {
     return (
         <div>
             <NavigationBar></NavigationBar>
-            <Container  maxWidth="xl" sx={{ py: '40px' }}>
+            <Container  maxWidth="xl" sx={{ py: '80px' }}>
                 <Paper elevation={0} sx={{ backgroundColor: '#ffffff', borderRadius: '10px', p: '40px' }}>
                     <Paper elevation={0} sx={{ backgroundImage: 'linear-gradient(#2f44cf, #0a20b6, #0a22bf, #2d3883)', height: '16px', borderRadius: '10px', mt:'20px', px: '20px', position: 'relative', top: '83px' }}>
                     </Paper>

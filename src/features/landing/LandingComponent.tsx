@@ -163,6 +163,7 @@ const Landing = () => {
                                     <CardContent sx={{ flex: 1, p: 0, pb: '0 !important' }}>
                                         <Grid container>
                                             <Grid item xs={3} className="login_card_left">
+                                            
                                                 {/* <Card className="login_card_left" sx={{ display: 'flex', height: '500px', border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#4A4C6F" }}>
 
                                         <CardContent sx={{ flex: 1 }}> */}
@@ -171,13 +172,16 @@ const Landing = () => {
                                                     justifyContent="center"
                                                     alignItems="center"
                                                     sx={{ height: '100%' }}>
+                                                        {/* <video muted={true} playsInline={true} loop={true} autoPlay={true}>
+                                                        <source src="https://npstrust.org.in/sites/default/files/banner_video/sample_0_2.mp4" type="video/mp4"/>
+                                                    </video> */}
 
-                                                    <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
+                                                    <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center" }}>
                                                         <Box
                                                             component="img"
                                                             sx={{ width: '155px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block', padding: '10px' } }}
                                                             alt="success"
-                                                            src={logo}
+                                                            src={"https://npstrust.org.in/sites/default/files/logo.png"}
                                                         />
 
                                                     </Toolbar>
@@ -268,13 +272,23 @@ const Landing = () => {
                                                         </Grid> */}
                                                             <Grid item xs={12} >
                                                                 <div className="signInButton" style={{ width: 'fit-content' }}>
-                                                                    <Button type="submit" variant="contained" disableElevation sx={{ mt: -4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(to right, #435fa4, #7754a0, #904598, #b62d8f)', borderRadius: '10px', fontWeight: 600 }}
+                                                                    <Button type="submit" variant="contained" disableElevation 
+                                                                        sx={{
+                                                                            textTransform: 'none',
+                                                                            marginTop: "30px",
+                                                                            backgroundColor : "#D01E06",
+                                                                            borderRadius: "100px",
+                                                                            color: "#fff",
+                                                                            fontWeight: "bold"
+                                                                            // height: "50px"
+                                                                        }}
+                                                                        // sx={{ mt: -4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(to right, #435fa4, #7754a0, #904598, #b62d8f)', borderRadius: '10px', fontWeight: 600 }}
                                                                         //onClick={isUserValid}
                                                                         onClick={handleSubmit(onSubmit)}
                                                                     >
                                                                         Sign In
                                                                     </Button>
-                                                                    <span className="signInButtonArrow"></span>
+                                                                    {/* <span className="signInButtonArrow"></span> */}
                                                                 </div>
                                                             </Grid>
 
@@ -321,10 +335,23 @@ const Landing = () => {
 
                                                     <Grid item xs={12} sx={{ mt: 3 }}>
                                                         <div className="checkEligibilityButton" style={{ width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
-                                                            <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(to right, #00ff00, #2fc713, #86d917, #ffff00)', borderRadius: '10px', fontWeight: 600 }} onClick={submitOnCheckEligibility} >
+                                                            <Button variant="contained" disableElevation 
+                                                                // sx={{ textTransform: 'none', width: 200, 
+                                                                // backgroundImage: 'linear-gradient(to right, #00ff00, #2fc713, #86d917, #ffff00)', 
+                                                                // borderRadius: '10px', fontWeight: 600 }} 
+                                                                sx={{
+                                                                    textTransform: 'none',
+                                                                    marginTop: "10px",
+                                                                    backgroundColor : "#2E4AB8",
+                                                                    borderRadius: "100px",
+                                                                    color: "#fff",
+
+                                                                    // height: "50px"
+                                                                }}
+                                                                onClick={submitOnCheckEligibility} >
                                                                 Check Eligibility
                                                             </Button>
-                                                            <span className="checkEligibilityButtonArrow"></span>
+                                                            {/* <span className="checkEligibilityButtonArrow"></span> */}
                                                         </div>
                                                     </Grid>
                                                     <Grid item xs={12}>

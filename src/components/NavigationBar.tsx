@@ -131,7 +131,7 @@ const NavigationBar = (props: any) => {
   return (
     <AppBar position="static" component='nav' sx={{ backgroundColor: 'white' }}>
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        {/* <Toolbar disableGutters>
 
         <Box
             component="img"
@@ -297,7 +297,7 @@ const NavigationBar = (props: any) => {
               ))}
             </Menu>
           </Box>
-        </Toolbar>
+        </Toolbar> */}
       </Container>
     </AppBar>
   )

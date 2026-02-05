@@ -37,14 +37,28 @@ body {
 
 .homeComp {
   /*background:RGB(213, 134, 247); /* #D586F7 */
-  background: #b499c7;
+  /* background: #b499c7; */
+  background: "white";
   font-family: Microsoft Sans Serif;
 
 }
 
 .login_card_left {
-  background-image: url('./images/login_card_20250808.png');
+  /* background-image: url('./images/login_card_20250808.png'); */
   background-position-x: center;
+}
+
+.orageBtn {
+  background: #D01E06;
+  border-radius: 100px;
+  color: #fff;
+  font-weight: 300;
+  height: 50px;
+  line-height: 48px;
+  padding: 0px 30px!Important;
+  margin-top: 30px;
+  display: inline-block;
+  text-decoration: none;
 }
 
 code {

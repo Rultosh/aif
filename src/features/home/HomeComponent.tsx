@@ -206,7 +206,7 @@ console.log(prelimApplications.prelimApplication);
         <div className="homeComp">
             <NavigationBar></NavigationBar>
             {prelimApplications.allStatus.fetchStatus === FetchStatus.IDLE ? <>
-                <Container maxWidth="xl" sx={{ py: '40px' }}>
+                <Container maxWidth="xl" sx={{ py: '80px' }}>
                     <Paper elevation={0} sx={{ backgroundColor: '#f6f6fb', borderRadius: '10px' }}>
                         <Grid container sx={{ flexDirection: 'row', justifyContent: 'center', py: '20px' }}>
                             <Grid item>
@@ -320,7 +320,7 @@ console.log(prelimApplications.prelimApplication);
                         <Grid container sx={{ flexDirection: 'row', justifyContent: 'center', py: '20px' }}>
                             <Grid item>
                                 <Box >
-                                    {pageInfo.pageNumber > 0 ? <Button variant='contained' sx={{ backgroundColor: "#34344b", color: 'white', fontWeight: 700, mr: '20px' }} onClick={previousPage}><KeyboardDoubleArrowLeftIcon /> Previous</Button> : <></>}
+                                    {(pageInfo.pageNumber) > Number(0) ? <Button variant='contained' sx={{ backgroundColor: "#34344b", color: 'white', fontWeight: 700, mr: '20px' }} onClick={previousPage}><KeyboardDoubleArrowLeftIcon /> Previous</Button> : <></>}
                                     {prelimApplications.prelimApplications.length >= 5 ? <Button variant='contained' sx={{ backgroundColor: "#34344b", color: 'white', fontWeight: 700 }} onClick={nextPage}>Next <KeyboardDoubleArrowRightIcon /></Button> : <></>}
                                 </Box>
                             </Grid>

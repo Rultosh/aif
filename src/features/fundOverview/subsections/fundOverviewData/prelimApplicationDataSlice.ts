@@ -14,8 +14,8 @@ export interface PrelimApplicationState {
 }
 
 export interface IPageInfo {
-  pageNumber: Number,
-  pageSize: Number
+  pageNumber: number,
+  pageSize: number
 }
 
 const initialState : PrelimApplicationState = {

@@ -90,7 +90,7 @@ const Admin = (props: any) => {
         <div className="homeComp" style={{ height: 670 }}>
             <NavigationBar></NavigationBar>
             {true ?
-                <Container maxWidth="xl" sx={{ pt: '40px' }}>
+                <Container maxWidth="xl" sx={{ pt: '80px' }}>
                     <Paper elevation={0} sx={{ backgroundColor: '#f6f6fb', borderRadius: '10px' }}>
                         <TableContainer component={Paper} sx={{ maxHeight: 540 }}>
                             <Table sx={{ minWidth: 700, mb: 1 }} aria-label="customized table">
