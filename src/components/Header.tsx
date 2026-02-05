@@ -49,7 +49,7 @@ const Header = (props: any) => {
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {<Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
+              {token && <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
                 <Box
                   component="img"
                   sx={{ width: '70px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "left", display: { xs: 'block' } }}
