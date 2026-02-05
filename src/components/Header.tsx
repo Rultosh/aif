@@ -48,7 +48,7 @@ const Header = (props: any) => {
       <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', background: 'rgb(0 0 0 / 20%)', top: 0, padding: '5px 0' }}>
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {token && <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
+            {<Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
                     <Box
                         component="img"
                         sx={{ width: '90px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "left", display: { xs: 'block', padding: '2px' } }}
@@ -60,34 +60,16 @@ const Header = (props: any) => {
               Fund of Funds
             </Typography>
 
-            {token && <Box sx={{ display: 'flex', alignItems: 'left', gap: { xs: 1, sm: 2 } }}>
-              {/* <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500, color: '#ffffff' }}>
-                <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
-                  Home
-                </Link>
-              </Typography>
-              <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box> */}
-              <Typography>
-                <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
-                  Workflow
-                </Link>
-              </Typography>
-              <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
               <Typography>
                 <Link to={`/Preliminary`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
                   Preliminary
                 </Link>
               </Typography>
-            </Box>}
-
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500, color: '#ffffff' }}>
-                FAQ
-              </Typography>
               <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
-              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500, color: '#ffffff' }}>
-                Help
-              </Typography>
+              <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
+                  Workflow
+                </Link>
               {token && <><Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
                 <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: { xs: '0.65rem', sm: '0.75rem' }, fontWeight: 500, color: '#ffffff' }}>
                 <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
