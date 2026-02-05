@@ -157,25 +157,16 @@ const Landing = () => {
             <div className="landingComp" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
                 <Container maxWidth="lg">
                     <Box sx={{ flexGrow: 1 }}>
-                        <Grid container direction="row" justifyContent="center" alignItems="center">
+                        <Grid container direction="row" justifyContent="flex-end" alignItems="center">
                             <Grid item xs={12} sm={12} md={12} xl={12}>
                                 <Card sx={{ display: 'flex', border: 0, backgroundColor: 'transparent', boxShadow: 'none !important' }}>
                                     <CardContent sx={{ flex: 1, p: 0, pb: '0 !important' }}>
-                                        <Grid container>
-                                            <Grid item xs={3} className="login_card_left">
-
-                                                {/* <Card className="login_card_left" sx={{ display: 'flex', height: '500px', border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#4A4C6F" }}>
-
-                                                <CardContent sx={{ flex: 1 }}> */}
-
+                                        <Grid container justifyContent="flex-end">
+                                            {/* <Grid item xs={3} className="login_card_left">
                                                 <Box display="flex"
                                                     justifyContent="center"
                                                     alignItems="center"
                                                     sx={{ height: '100%' }}>
-                                                    {/* <video muted={true} playsInline={true} loop={true} autoPlay={true}>
-                                                        <source src="https://npstrust.org.in/sites/default/files/banner_video/sample_0_2.mp4" type="video/mp4"/>
-                                                    </video> */}
-
                                                     <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center" }}>
                                                         <Box
                                                             component="img"
@@ -187,18 +178,16 @@ const Landing = () => {
                                                     </Toolbar>
 
                                                 </Box>
-                                                {/* </CardContent>
-                                                </Card> */}
-                                            </Grid>
+                                            </Grid> */}
 
-                                            <Grid item xs={8} style={{ backgroundColor: '#ffffff', border: 1, borderColor: "#363062", borderRadius: '8px' }}>
+                                            <Grid item xs={4} style={{ backgroundColor: '#ffffff', border: 1, borderColor: "#363062", borderRadius: '8px' }}>
                                                 <Grid container>
-                                                    <Grid item xs={6}>
+                                                    <Grid item xs={12}>
                                                         {/* <Card sx={{ display: 'flex', height: '500px', borderRight: 1, borderTop: 1, borderBottom: 1, borderColor: "#363062", borderRightColor: "#f2f2f2" }}>
                                                         <CardContent sx={{ flex: 1 }}> */}
 
 
-                                                        <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', borderRight: '1px solid #9596A9', minHeight: '40px !important', borderTopLeftRadius: '8px' }}>
+                                                        <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', minHeight: '40px !important', borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}>
                                                             <Box display="flex"
                                                                 justifyContent="center"
                                                                 alignItems="center">
@@ -305,11 +294,7 @@ const Landing = () => {
 
                                                     </Grid>
 
-                                                    <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                        {/* <Card sx={{ display: 'flex', height: '500px', borderRight: 1, borderTop: 1, borderBottom: 1, borderColor: "#363062", borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}>
-                                                        <CardContent sx={{ flex: 1 }}> */}
-
-
+                                                    {/* <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
                                                         <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', minHeight: '40px!important', borderTopRightRadius: '8px' }}>
                                                             <Box display="flex"
                                                                 justifyContent="center"
@@ -374,7 +359,7 @@ const Landing = () => {
                                                                 </Grid>
                                                             ) : null}
                                                         </Grid>
-                                                    </Grid>
+                                                    </Grid> */}
                                                 </Grid>
                                             </Grid>
                                         </Grid>

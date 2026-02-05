@@ -44,48 +44,41 @@ const Header = (props: any) => {
   const navItems = ['FAQs', 'Help', 'vcfapplication@sidbi.in'];
   let count = 0;
   return (
-    <Box sx={{ flexGrow: 1 }} className={props.className}>
-      <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', background: 'rgb(0 0 0 / 20%)', top: 0, padding: '5px 0' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {token && <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '16px' }}>
-                <Box
-                  component="img"
-                  sx={{ width: '70px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "left", display: { xs: 'block' } }}
-                  alt="success"
-                  src={"https://npstrust.org.in/sites/default/files/logo.png"}
-                />
-              </Link>}
-              <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.8rem', color: 'rgba(255,255,255,0.9)' }}>
-                Fund of Funds
-              </Typography>
-            </Box>
+    <>
+      <Box sx={{ flexGrow: 1 }} className={props.className}>
+        <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', background: 'rgb(0 0 0 / 20%)', top: 0, padding: '5px 0' }}>
+          <Container maxWidth="lg">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)' }}>
+                  Fund of Funds
+                </Typography>
+              </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
-                <Link to={`/Preliminary`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
-                  Preliminary
-                </Link>
-              </Typography>
-              <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
-              <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
-                <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
-                  Workflow
-                </Link>
-              </Typography>
-              {token && <><Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
                 <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
-                  <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
-                    Logout
-                  </div>
-                </Typography></>}
+                  <Link to={`/Preliminary`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
+                    Preliminary
+                  </Link>
+                </Typography>
+                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+                  <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
+                    Workflow
+                  </Link>
+                </Typography>
+                {token && <><Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+                  <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+                    <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
+                      Logout
+                    </div>
+                  </Typography></>}
+              </Box>
             </Box>
-          </Box>
-        </Container>
-      </Box>
-      {/* Top Utility Bar Section */}
-      {/* <Box sx={{
+          </Container>
+        </Box>
+        {/* Top Utility Bar Section */}
+        {/* <Box sx={{
         bgcolor: 'rgba(54, 48, 98, 0.4)', // Semi-transparent version of #363062
         backdropFilter: 'blur(10px)',
         color: 'white',
@@ -129,7 +122,30 @@ const Header = (props: any) => {
           </Box>
         </Container>
       </Box> */}
-    </Box>
+      </Box>
+      <Box sx={{ flexGrow: 1 }}>
+        <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', top: 0, padding: '5px 0' }}>
+          <Container maxWidth="lg">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)' }}>
+                  Fund of Funds
+                </Typography>
+                <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none' }}>
+                  <Box
+                    component="img"
+                    sx={{ width: '150px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "left", display: { xs: 'block' } }}
+                    alt="success"
+                    src={"https://npstrust.org.in/sites/default/files/logo.png"}
+                  />
+                </Link>
+              </Box>
+            </Box>
+          </Container>
+        </Box>
+      </Box>
+
+    </>
   )
 }
 
