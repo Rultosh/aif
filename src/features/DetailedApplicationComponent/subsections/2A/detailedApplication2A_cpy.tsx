@@ -20,7 +20,7 @@ export const DetailedApplication2A = () => {
 
     const handleClick = (ev: any, navTo: string) => {
         if (navTo === 'next') {
-            navigate("/preliminary/profile")
+            navigate("#/preliminary/profile")
         }
     }
 

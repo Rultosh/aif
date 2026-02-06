@@ -40,12 +40,12 @@ const Workflow = (props:any) => {
                         </Grid>
                         <Grid item xs={2}>
                             <div className="workflowCircle">
-                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>VC Investment committee</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Pension fund committee</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="workflowCircle">
-                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>SIDBI Executive committee</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Screening committee</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
@@ -85,7 +85,7 @@ const Workflow = (props:any) => {
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>Present to VC Investment committee</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>Present to Pension fund committee</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>

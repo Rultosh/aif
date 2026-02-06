@@ -49,6 +49,14 @@ const Header = (props: any) => {
         <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', background: 'rgb(0 0 0 / 20%)', top: 0, padding: '5px 0' }}>
           <Container maxWidth="lg">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {token && <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none' }}>
+                  <Box
+                    component="img"
+                    sx={{ width: '55px', aspectRatio: '16/9', objectFit: 'contain', justifyContent: "left" }}
+                    alt="success"
+                    src={"https://npstrust.org.in/sites/default/files/logo.png"}
+                  />
+                </Link>}
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)' }}>
                   Fund of Funds
@@ -123,7 +131,7 @@ const Header = (props: any) => {
         </Container>
       </Box> */}
       </Box>
-      <Box sx={{ flexGrow: 1 }}>
+      {!token && <Box sx={{ flexGrow: 1 }}>
         <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', top: 0, padding: '5px 0' }}>
           <Container maxWidth="lg">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -143,8 +151,7 @@ const Header = (props: any) => {
             </Box>
           </Container>
         </Box>
-      </Box>
-
+      </Box>}
     </>
   )
 }

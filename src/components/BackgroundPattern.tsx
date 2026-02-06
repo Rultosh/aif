@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 const BackgroundPattern = () => {
     const token = localStorage.getItem('token');
 
-    if (token) {
+    if (localStorage.getItem('token')) {
         // --- Authenticated State: Show SVG Pattern ---
         return (
             <Box
@@ -97,7 +97,7 @@ const BackgroundPattern = () => {
                     zIndex: -1
                 }}
             >
-                <source src="/videos/login_bg.mp4" type="video/mp4" />
+                <source src="https://npstrust.org.in/sites/default/files/banner_video/sample.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
             </video>
         </Box>

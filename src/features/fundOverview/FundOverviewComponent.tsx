@@ -41,7 +41,7 @@ export const FundOverview = (props:any) => {
 
     useEffect(() => {
         if (!id) {
-            navigate("/preliminary/NEW/fund")
+            navigate("#/preliminary/NEW/fund")
         }
     });
 

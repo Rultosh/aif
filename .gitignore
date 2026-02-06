@@ -9,7 +9,7 @@
 /coverage
 
 # production - Uncomment below line, once pipeline build is enabled
-#/build
+/build
 
 # misc
 .DS_Store

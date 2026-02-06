@@ -245,9 +245,9 @@ console.log(prelimApplications.prelimApplication);
                                             prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
                                                 return <TableRow key={`${row.nameOfTheFund}`} sx={{ backgroundColor: '#eeeefe', borderTop: '10px solid #f6f6fb', borderBottom: '10px solid #f6f6fb' }}>
                                                     {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row" sx={{ borderBottomWidth: 0 }}>
-                                                        {isGoodToShowApplication(row) ?<a href={`/preliminary/${row.id}/${String(getPath(row.status))}`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
+                                                        {isGoodToShowApplication(row) ?<a href={`#/preliminary/${row.id}/${String(getPath(row.status))}`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
                                                     </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ borderBottomWidth: 0 }}>
-                                                        {isGoodToShowApplication(row) ? <a href={`/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
+                                                        {isGoodToShowApplication(row) ? <a href={`#/detailed/${row.detailedApplicationId}/SidbiReference`}>{row.nameOfTheFund}</a> : <p>{row.nameOfTheFund}</p>}
                                                     </TableCell>}
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0 }}>{row.createdByName}</TableCell>
                                                     <TableCell align="center" sx={{ borderBottomWidth: 0, width: '150px' }}>{String(getStatusDescription(row.stage, row.status))}</TableCell>

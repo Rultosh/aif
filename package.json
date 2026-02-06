@@ -1,4 +1,5 @@
 {
+  "homepage": "https://ganesansays.github.io/vcf#",
   "name": "sidbi-aif-ts",
   "version": "0.1.0",
   "private": true,
@@ -62,7 +63,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "serve": "npx serve -s build",
-    "server": "json-server --watch db.json --port 5000"
+    "server": "json-server --watch db.json --port 5000",
+    "predeploy": "env-cmd -f .env.server npm run build-uat && cp ./build/index.html ./build/404.html",
+    "deploy": "env-cmd -f .env.server gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -83,6 +86,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-google-recaptcha": "^2.1.5"
+    "@types/react-google-recaptcha": "^2.1.5",
+    "gh-pages": "^6.3.0"
   }
 }
