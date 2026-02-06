@@ -20,6 +20,7 @@ export const FundOverview = (props:any) => {
     // const [user, setUser] = useState(shoppingList);
 
     const { id } = useParams();
+    const [localId, setLocalId] = useState<string>();
     const usersState = useAppSelector(selectUsers)
     const prelimApplicationState = useAppSelector(selectPrelimApplication);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
@@ -41,7 +42,7 @@ export const FundOverview = (props:any) => {
 
     useEffect(() => {
         if (!id) {
-            navigate("#/preliminary/NEW/fund")
+            navigate("/preliminary/NEW/fund")
         }
     });
 

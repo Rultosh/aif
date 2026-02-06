@@ -63,25 +63,25 @@ const Header = (props: any) => {
                 </Typography>
               </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+              {token && <><Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+                {usersState.role !== 'ADMIN' && <><Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
                   <Link to={`/Preliminary`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
                     Preliminary
                   </Link>
                 </Typography>
-                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box></>}
                 <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
                   <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
                     Workflow
                   </Link>
                 </Typography>
-                {token && <><Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
                   <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
                     <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
                       Logout
                     </div>
-                  </Typography></>}
-              </Box>
+                  </Typography>
+              </Box></>}
             </Box>
           </Container>
         </Box>
