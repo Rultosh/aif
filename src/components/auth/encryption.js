@@ -2,7 +2,7 @@
 import CryptoJS from "crypto-js";
 
 // Secret key (should be stored securely, not hardcoded in production)
-const SECRET_KEY = process.env.REACT_APP_SALT;
+const SECRET_KEY = process.env.REACT_RANDOM_KEY_HASH;
 
 export function encryptData(plainText) {
   // Generate random salt and IV
