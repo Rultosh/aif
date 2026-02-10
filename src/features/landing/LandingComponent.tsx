@@ -180,14 +180,14 @@ const Landing = () => {
                                                 </Box>
                                             </Grid> */}
 
-                                            <Grid item xs={4} style={{ backgroundColor: '#ffffff', border: 1, borderColor: "#363062", borderRadius: '8px' }}>
+                                            <Grid item xs={9} style={{ backgroundColor: '#ffffff', border: 1, borderColor: "#363062", borderRadius: '8px' }}>
                                                 <Grid container>
-                                                    <Grid item xs={12}>
+                                                    <Grid item xs={6}>
                                                         {/* <Card sx={{ display: 'flex', height: '500px', borderRight: 1, borderTop: 1, borderBottom: 1, borderColor: "#363062", borderRightColor: "#f2f2f2" }}>
                                                         <CardContent sx={{ flex: 1 }}> */}
 
 
-                                                        <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', minHeight: '40px !important', borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}>
+                                                        <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', minHeight: '40px !important', borderTopLeftRadius: '8px' }}>
                                                             <Box display="flex"
                                                                 justifyContent="center"
                                                                 alignItems="center">
@@ -294,7 +294,7 @@ const Landing = () => {
 
                                                     </Grid>
 
-                                                    {/* <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
                                                         <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', minHeight: '40px!important', borderTopRightRadius: '8px' }}>
                                                             <Box display="flex"
                                                                 justifyContent="center"
@@ -305,12 +305,12 @@ const Landing = () => {
 
                                                         </Toolbar>
 
-                                                        <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ pb: 4, flex: 1 }}>
+                                                        <Grid container direction="column" justifyContent="space-between" alignItems="center" sx={{ pb: 4, flex: 1 }}>
                                                             <Grid item>
-                                                                <Typography sx={{ flex: 1, mt: 1, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
+                                                                <Typography sx={{ flex: 1, mt: 5, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
                                                             </Grid>
 
-                                                            <Grid item>
+                                                            {/* <Grid item>
                                                                 <Toolbar disableGutters sx={{ justifyContent: "center" }}>
                                                                     <Box
                                                                         component="img"
@@ -319,26 +319,29 @@ const Landing = () => {
                                                                         src={azadiLogo}
                                                                     />
                                                                 </Toolbar>
-                                                            </Grid>
+                                                            </Grid> */}
 
                                                             <Grid item>
-                                                                <div className="checkEligibilityButton" style={{ width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
-                                                                    <Button variant="contained" disableElevation
-                                                                        sx={{
-                                                                            textTransform: 'none',
-                                                                            marginTop: "10px",
-                                                                            backgroundColor: "#2E4AB8",
-                                                                            borderRadius: "100px",
-                                                                            color: "#fff",
-                                                                        }}
-                                                                        onClick={submitOnCheckEligibility} >
-                                                                        Check Eligibility
-                                                                    </Button>
-                                                                </div>
-                                                            </Grid>
-                                                            <Grid item>
-
-                                                                <Typography sx={{ flex: 1, mt: 1, ml: '10px', textAlign: "center" }}>Check your eligibility without Sign up</Typography>
+                                                                <Grid container direction="column" justifyContent="space-between" alignItems="center" sx={{ flex: 1 }}>
+                                                                    <Grid item>
+                                                                        <div className="checkEligibilityButton" style={{ width: 'fit-content', marginLeft: 'auto', marginRight: 'auto' }}>
+                                                                            <Button variant="contained" disableElevation
+                                                                                sx={{
+                                                                                    textTransform: 'none',
+                                                                                    marginTop: "10px",
+                                                                                    backgroundColor: "#2E4AB8",
+                                                                                    borderRadius: "100px",
+                                                                                    color: "#fff",
+                                                                                }}
+                                                                                onClick={submitOnCheckEligibility} >
+                                                                                Check Eligibility
+                                                                            </Button>
+                                                                        </div>
+                                                                    </Grid>
+                                                                    <Grid item>
+                                                                        <Typography sx={{ flex: 1, mt: 2, ml: '10px', textAlign: "center" }}>Check your eligibility without Sign up</Typography>
+                                                                    </Grid>
+                                                                </Grid>
                                                             </Grid>
 
                                                             {showResponse && state.response ? (
@@ -359,7 +362,7 @@ const Landing = () => {
                                                                 </Grid>
                                                             ) : null}
                                                         </Grid>
-                                                    </Grid> */}
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
                                         </Grid>

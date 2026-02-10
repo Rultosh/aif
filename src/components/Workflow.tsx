@@ -58,39 +58,39 @@ const Workflow = (props:any) => {
                     <Grid container spacing={3} sx={{ px: '20px' }}>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'center'}}>
                                     
                                 </Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'center'}}>
                                     Preliminary Information Submission</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'center'}}>
                                     Comprehensive Assessment and Rating of AIF
                                 </Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>Shortlisting of AIFs</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'center'}}>Shortlisting of AIFs</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'center'}}>
                                     Expression of Interest by PFs
                                 </Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>Agreement Finalization</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'center'}}>Agreement Finalization</Typography>
                             </div>
                         </Grid>
                     </Grid>

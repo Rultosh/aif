@@ -83,7 +83,69 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
         setValue(ev.target.id,ev.target.value);
         setPrelimApplicationFormData(copiedValue)
+        // live update words for contribution field
+        if (ev.target.id === 'contributionSought') {
+            setContributionWords(numberToWordsIndian(ev.target.value));
+        }
     };
+
+    const [contributionWords, setContributionWords] = useState<string>('');
+
+    const numberToWordsIndian = (input: any) => {
+        if (input === null || input === undefined) return '';
+        const str = String(input).replace(/[, ]+/g, '').trim();
+        if (str === '') return '';
+        const num = Number(str);
+        if (Number.isNaN(num)) return '';
+        if (num === 0) return 'Zero';
+
+        const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+        const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+        const upTo999 = (n: number) => {
+            let word = '';
+            if (n > 99) {
+                word += ones[Math.floor(n / 100)] + ' Hundred';
+                n = n % 100;
+                if (n) word += ' ';
+            }
+            if (n > 19) {
+                word += tens[Math.floor(n / 10)];
+                if (n % 10) word += ' ' + ones[n % 10];
+            } else if (n > 0) {
+                word += ones[n];
+            }
+            return word;
+        }
+
+        let n = Math.floor(num);
+        const parts: string[] = [];
+
+        const crore = Math.floor(n / 10000000);
+        if (crore) {
+            parts.push(upTo999(crore) + ' Crore');
+            n = n % 10000000;
+        }
+
+        const lakh = Math.floor(n / 100000);
+        if (lakh) {
+            parts.push(upTo999(lakh) + ' Lakh');
+            n = n % 100000;
+        }
+
+        const thousand = Math.floor(n / 1000);
+        if (thousand) {
+            parts.push(upTo999(thousand) + ' Thousand');
+            n = n % 1000;
+        }
+
+        if (n) {
+            parts.push(upTo999(n));
+        }
+
+        const result = parts.join(' ').trim();
+        return result ? result + ' only' : '';
+    }
 
     const handleSelectChange = (id: String, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
@@ -430,7 +492,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                             (<DesktopDatePicker
                                                 inputFormat='DD/MM/YYYY'
                                                 disableFuture={true}
-                                                label="Date of Filling PPM with SEBI"
+                                                label="Date of Approval of PPM by SEBI"
                                                 value={prelimApplicationFormData.dateOfFilingWithSEBI || null}
                                                 minDate={Today.toString()}
                                                 onChange={(newValue: any) => {
@@ -474,9 +536,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             }}
                             inputProps={{ min: 0, max: 9999, step: 1 }}
                         />
+                        {((prelimApplicationFormData.contributionSought || '') !== '') && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                            {numberToWordsIndian(prelimApplicationFormData.contributionSought)}
+                        </Typography>}
                         {errors.contributionSought && <Typography variant="caption" color="error">
                            <>{errors.contributionSought?errors.contributionSought.message : ''}</>
                        </Typography>}
+                        {/* show number in words (Indian grouping) */}
                     </Grid>
                     <Grid item xs={4}>
                         <TextField
@@ -569,52 +635,34 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                     </Grid>
 
                     <Grid item xs={4}>
-                        <FormControl variant="standard" sx={{ display: 'flex' }}>
-                            <InputLabel id="demo-simple-select-standard-label">Deal Sector</InputLabel>
-                            {/* <Select
-                                labelId="dealSector"
-                                id="dealSector"
-                                value={prelimApplicationFormData.dealSector || ''}
-                                onChange={handleChange}
-                                name="dealSector"
-                            >
-
-                                <MenuItem key={"Fund of funds"} value={"Fund of funds Sampath"}>Fund of funds Sampath</MenuItem>
-                                <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups Sampath"}>Asipre for Start-ups Sampath</MenuItem>
-                                <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
-                            </Select> */}
-                            <MasterData propertyType="dealSector"
-                                propertyValue={prelimApplicationFormData.dealSector || 0}
-                                onChange={handleSelectChange} />
-                        </FormControl>
+                        <TextField
+                            id="dealSector"
+                            label="Deal Sector"
+                            value={prelimApplicationFormData.dealSector || ''}
+                            {...register("dealSector")}
+                            error={errors.dealSector && getValues("dealSector") ==  '' ? true : false}
+                            onChange={handleChange}
+                            variant="standard"
+                            sx={{ display: 'flex' }}
+                        />
+                        {errors.dealSector && <Typography variant="caption" color="error">
+                            <>{errors.dealSector && getValues("dealSector") ==  ''?errors.dealSector.message : ''}</>
+                        </Typography>}
                     </Grid>
                     <Grid item xs={4}>
-                        <FormControl variant="standard" sx={{ display: 'flex' }}>
-                            <InputLabel id="demo-simple-select-standard-label">Deal Sub Sector</InputLabel>
-                            <Select
-                                labelId="dealSubsector"
-                                id="dealSubsector"
-                                value={String(prelimApplicationFormData.dealSubsector || '')}
-                                {...register("dealSubsector")}
-                                error={(errors.dealSubsector && getValues("dealSubsector") == '') ? true : false}
-                                onChange={handleChange}
-                                name="dealSubsector"
-                            >
-                                {/* <MenuItem key={'test'} value={'test'} selected={String(prelimApplicationFormData.dealSubsector || '') === 'test'}>{'test'}</MenuItem> */}
-                                {prelimApplicationFormData.dealSector &&
-                                    (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)] &&
-                                    (dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)].values.map((item: string) => {
-                                        return <MenuItem key={item} value={item} selected={String(prelimApplicationFormData.dealSubsector || '') === item}>{item}</MenuItem>
-                                    })}
-                            </Select>
-                            {errors.dealSubsector && <Typography variant="caption" color="error">
-                            <>{(errors.dealSubsector && getValues("dealSubsector") == '')?errors.dealSubsector.message : ''}</>
-                            </Typography>}
-
-                            {/* <MasterData propertyType="dealSubsector" 
-                                propertyValue={prelimApplicationFormData.dealSubsector || 0}
-                                onChange={handleSelectChange} /> */}
-                        </FormControl>
+                        <TextField
+                            id="dealSubsector"
+                            label="Deal Sub Sector"
+                            value={prelimApplicationFormData.dealSubsector || ''}
+                            {...register("dealSubsector")}
+                            error={errors.dealSubsector && getValues("dealSubsector") ==  '' ? true : false}
+                            onChange={handleChange}
+                            variant="standard"
+                            sx={{ display: 'flex' }}
+                        />
+                        {errors.dealSubsector && <Typography variant="caption" color="error">
+                            <>{errors.dealSubsector && getValues("dealSubsector") ==  ''?errors.dealSubsector.message : ''}</>
+                        </Typography>}
                     </Grid>
                     <Grid item xs={4}>
                         <TextField
