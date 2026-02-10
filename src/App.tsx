@@ -84,7 +84,7 @@ function App() {
   return (
     // <ThemeProvider theme={THEME}>
     <div className="App"  >
-      <BackgroundPattern />
+      {/* <BackgroundPattern /> */}
       <Header className="App-header">
       </Header>
       <Routes>

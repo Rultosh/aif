@@ -46,20 +46,20 @@ const Header = (props: any) => {
   return (
     <>
       <Box sx={{ flexGrow: 1 }} className={props.className}>
-        <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', background: 'rgb(0 0 0 / 20%)', top: 0, padding: '5px 0' }}>
+        <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', background: '#013d7b', top: 0, padding: '5px 0' }}>
           <Container maxWidth="lg">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              {token && <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none' }}>
+              {token && <Link to={`/Home`} style={{ cursor: 'pointer', color: '#2C3E50', textDecoration: 'none' }}>
                   <Box
                     component="img"
-                    sx={{ width: '55px', aspectRatio: '16/9', objectFit: 'contain', justifyContent: "left" }}
+                    sx={{ width: '85px', aspectRatio: '16/9', objectFit: 'contain', justifyContent: "left" }}
                     alt="success"
                     src={"https://npstrust.org.in/sites/default/files/logo.png"}
                   />
                 </Link>}
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)' }}>
-                  Fund of Funds
+                  NPS Viksit Bharat Fund of Fund Portal
                 </Typography>
               </Box>
 
@@ -76,11 +76,17 @@ const Header = (props: any) => {
                   </Link>
                 </Typography>
                 <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
-                  <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
-                    <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
-                      Logout
-                    </div>
-                  </Typography>
+                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+                  <Link to={`/FAQ`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
+                    FAQ
+                  </Link>
+                </Typography>
+                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+                  <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
+                    Logout
+                  </div>
+                </Typography>
               </Box></>}
             </Box>
           </Container>
@@ -136,8 +142,8 @@ const Header = (props: any) => {
           <Container maxWidth="lg">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
-                <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)' }}>
-                  Fund of Funds
+                <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)', marginTop: '30px' }}>
+                  
                 </Typography>
                 <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none' }}>
                   <Box

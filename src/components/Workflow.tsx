@@ -25,32 +25,32 @@ const Workflow = (props:any) => {
                     <Grid container direction="row" justifyContent="center" alignItems="center" spacing={3} sx={{ pl: '40px', pr: '20px', zIndex: '999999', position: 'relative' }}>
                         <Grid item xs={2}>
                             <div className="workflowCircle">
-                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Eligibility Screener & Registration</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Registration</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="workflowCircle">
-                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Preliminary Application</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Stage-I Evaluation</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="workflowCircle">
-                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Detailed Application</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Stage-II Detailed Evaluation</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="workflowCircle">
-                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Pension fund committee</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Screening Committee</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="workflowCircle">
-                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Screening committee</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Pension Funds Investment Committee</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="workflowCircle">
-                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Onboarded for fund cycle</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ p: '10px', m: 'auto', textAlign: 'center', fontWeight: '500' }}>Onboarding of AIF</Typography>
                             </div>
                         </Grid>
                     </Grid>
@@ -59,47 +59,38 @@ const Workflow = (props:any) => {
                         <Grid item xs={2}>
                             <div className="">
                                 <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>
-                                    Eligibility Screener 
-                                    Registration
+                                    
                                 </Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
                                 <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>
-                                    Preliminary Application
-                                    Feedback
-                                    Go/ No-go 
-                                    First Meeting</Typography>
+                                    Preliminary Information Submission</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
                                 <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>
-                                    Due deiligence
-                                    Second Meeting
-                                    Terms Discussion
-                                    Appraisal memo submission
+                                    Comprehensive Assessment and Rating of AIF
                                 </Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>Present to Pension fund committee</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>Shortlisting of AIFs</Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
                                 <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>
-                                    Final Feedback - Post IC & EC
-                                    Issue of LOI
-                                    Agreement finalization
+                                    Expression of Interest by PFs
                                 </Typography>
                             </div>
                         </Grid>
                         <Grid item xs={2}>
                             <div className="">
-                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>Onboarding for Fund cycle</Typography>
+                                <Typography variant="subtitle2" gutterBottom sx={{ mt:'20px', px: '20px', textAlign: 'left'}}>Agreement Finalization</Typography>
                             </div>
                         </Grid>
                     </Grid>

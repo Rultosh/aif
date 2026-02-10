@@ -243,10 +243,25 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
     if (prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
         return (
             // <form onSubmit={savePrelimApplicationForm}>
-            <Box component="form">
+            <Box component="form" sx={{ p: 2}}>
                 <Grid container spacing={2} >
-                    <Grid item xs={4}>
-                        <FormControl variant="standard" sx={{ display: 'flex', ml: 2 }}>
+                    <Grid item xs={12}>
+                        <TextField
+                            required
+                            id="investmentStrategy"
+                            label="Investment Strategy"
+                            value={prelimApplicationFormData.investmentStrategy || ''}
+                            {...register("investmentStrategy")}
+                            error={errors.investmentStrategy ? true : false}
+                            onChange={handleChange}
+                            variant="standard"
+                            multiline
+                            sx={{ display: 'flex' }}
+                        />
+                        {errors.investmentStrategy && <Typography variant="caption" color="error">
+                            <>{errors.investmentStrategy?errors.investmentStrategy.message : ''}</>
+                        </Typography>}
+                        {/* <FormControl variant="standard" sx={{ display: 'flex', ml: 2 }}>
                             <InputLabel id="demo-simple-select-standard-label">Scheme</InputLabel>
                             <Select
                                 labelId="scheme"
@@ -267,10 +282,8 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             <Typography variant="caption" color="error">
                             <>{(errors.scheme && getValues("scheme") == '')?errors.scheme.message : ''}</>
                             </Typography>
-                        </FormControl>
+                        </FormControl> */}
                     </Grid>
-                    <Grid item xs={4}></Grid>
-                    <Grid item xs={4}></Grid>
                     <Grid item xs={4}>
                         <TextField
                             required
@@ -281,11 +294,11 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={errors.nameOfTheFund ? true : false}
                             onChange={handleChange}
                             variant="standard"
-                            sx={{ display: 'flex', ml: 2 }}
+                            sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                        {errors.nameOfTheFund && <Typography variant="caption" color="error">
                             <>{errors.nameOfTheFund ?errors.nameOfTheFund.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
                     <Grid item xs={4}>
                         <TextField
@@ -299,9 +312,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             variant="standard"
                             sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error">
+                        {errors.sponsor && <Typography variant="caption" color="error">
                             <>{errors.sponsor?errors.sponsor.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
 
                     <Grid item xs={4}>
@@ -314,15 +327,15 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={errors.investmentManager ? true : false}
                             onChange={handleChange}
                             variant="standard"
-                            sx={{ display: 'flex', mr: 2 }}
+                            sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error">
+                        {errors.investmentManager && <Typography variant="caption" color="error">
                            <>{errors.investmentManager?errors.investmentManager.message : ''}</>
-                       </Typography>
+                       </Typography>}
                     </Grid>
 
                     <Grid item xs={4}>
-                        <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
+                        <FormControl variant="standard" sx={{ display: 'flex' }}>
                             <InputLabel id="demo-simple-select-standard-label">Fund Manager</InputLabel>
                             {/* <Select
                                 labelId="fundManager"
@@ -341,21 +354,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                 onChange={handleSelectChange} />
                         </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    {/* <Grid item xs={4}>
                         <FormControl variant="standard" sx={{ display: 'flex' }}>
                             <InputLabel id="demo-simple-select-standard-label">Deal Type</InputLabel>
-                            {/* <Select
-                                labelId="dealType"
-                                id="dealType"
-                                value={prelimApplicationFormData.dealType || ''}
-                                onChange={handleChange}
-                                name="dealType"
-                            >
-
-                                <MenuItem key={"Fund of funds"} value={"Fund of funds Sampath"}>Fund of funds Sampath</MenuItem>
-                                <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups Sampath"}>Asipre for Start-ups Sampath</MenuItem>
-                                <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
-                            </Select> */}
                             <MasterData propertyType="dealType"
                                 propertyValue={prelimApplicationFormData.dealType || 0}
                                 onChange={handleSelectChange} />
@@ -367,27 +368,16 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
                         <FormControl variant="standard" sx={{ display: 'flex' }}>
                             <InputLabel id="demo-simple-select-standard-label">Impact Fund</InputLabel>
-                            {/* <Select
-                                labelId="impact"
-                                id="impact"
-                                value={prelimApplicationFormData.impact || ''}
-                                onChange={handleChange}
-                                name="impact"
-                            >
-                                <MenuItem key={"Fund of funds"} value={"Fund of funds Sampath"}>Fund of funds Sampath</MenuItem>
-                                <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups Sampath"}>Asipre for Start-ups Sampath</MenuItem>
-                                <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
-                            </Select> */}
                             <MasterData propertyType="impact"
                                 propertyValue={prelimApplicationFormData.impact || 0}
                                 onChange={handleSelectChange} />
                         </FormControl>
 
-                    </Grid>
+                    </Grid> */}
 
                     <Grid item xs={4}>
 
-                        <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
+                        <FormControl variant="standard" sx={{ display: 'flex' }}>
                             <InputLabel id="demo-simple-select-standard-label">AIF Category</InputLabel>
                             {/* <Select
                                 labelId="aifCategory"
@@ -419,13 +409,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             variant="standard"
                             sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error">
+                        {errors.nameOfTrustee && <Typography variant="caption" color="error">
                             <>{errors.nameOfTrustee?errors.nameOfTrustee.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
 
-                    <Grid item xs={4} >
-                        <Box sx={{ mr: 2 }}>
+                    <Grid item xs={4}>
+                        <Box>
                             <LocalizationProvider dateAdapter={AdapterDayjs} >
                                 <Stack spacing={3}>
                                     <Controller
@@ -476,7 +466,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             //     }}
                             // }
                             variant="standard"
-                            sx={{ display: 'flex', ml: 2 }}
+                            sx={{ display: 'flex' }}
                             onKeyUp={(e) => {
                                 if ((e.target as HTMLInputElement).value.length > 4) {
                                     (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
@@ -484,9 +474,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             }}
                             inputProps={{ min: 0, max: 9999, step: 1 }}
                         />
-                        <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                        {errors.contributionSought && <Typography variant="caption" color="error">
                            <>{errors.contributionSought?errors.contributionSought.message : ''}</>
-                       </Typography>
+                       </Typography>}
                     </Grid>
                     <Grid item xs={4}>
                         <TextField
@@ -502,9 +492,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             sx={{ display: 'flex' }}
                             inputProps={{ min: 0 }}
                         />
-                        <Typography variant="caption" color="error">
+                        {errors.termOfFund && <Typography variant="caption" color="error">
                             <>{errors.termOfFund && getValues("termOfFund") ==  ''?errors.termOfFund.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
 
                     <Grid item xs={4}>
@@ -518,11 +508,11 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={errors.commitmentPeriod && getValues("commitmentPeriod") ==  '' ? true : false}
                             onChange={handleChange}
                             variant="standard"
-                            sx={{ display: 'flex', mr: 2 }}
+                            sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error">
+                        {errors.commitmentPeriod && <Typography variant="caption" color="error">
                             <>{errors.commitmentPeriod && getValues("commitmentPeriod") ==  ''?errors.commitmentPeriod.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
 
                     <Grid item xs={4}>
@@ -536,11 +526,11 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={errors.preferredReturn && getValues("preferredReturn") ==  '' ? true : false}
                             onChange={handleChange}
                             variant="standard"
-                            sx={{ display: 'flex', ml: 2 }}
+                            sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                        {errors.preferredReturn && <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                             <>{errors.preferredReturn && getValues("preferredReturn") ==  ''?errors.preferredReturn.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
                     <Grid item xs={4}>
                         <TextField
@@ -555,9 +545,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             variant="standard"
                             sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error">
+                        {errors.managementFees && <Typography variant="caption" color="error">
                             <>{errors.managementFees && getValues("managementFees") ==  ''?errors.managementFees.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
 
                     <Grid item xs={4}>
@@ -571,15 +561,15 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={errors.carriedInterest && getValues("carriedInterest") ==  '' ? true : false}
                             onChange={handleChange}
                             variant="standard"
-                            sx={{ display: 'flex', mr: 2 }}
+                            sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error">
+                        {errors.carriedInterest && <Typography variant="caption" color="error">
                             <>{errors.carriedInterest && getValues("carriedInterest") ==  ''?errors.carriedInterest.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
 
                     <Grid item xs={4}>
-                        <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
+                        <FormControl variant="standard" sx={{ display: 'flex' }}>
                             <InputLabel id="demo-simple-select-standard-label">Deal Sector</InputLabel>
                             {/* <Select
                                 labelId="dealSector"
@@ -617,9 +607,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         return <MenuItem key={item} value={item} selected={String(prelimApplicationFormData.dealSubsector || '') === item}>{item}</MenuItem>
                                     })}
                             </Select>
-                            <Typography variant="caption" color="error">
+                            {errors.dealSubsector && <Typography variant="caption" color="error">
                             <>{(errors.dealSubsector && getValues("dealSubsector") == '')?errors.dealSubsector.message : ''}</>
-                            </Typography>
+                            </Typography>}
 
                             {/* <MasterData propertyType="dealSubsector" 
                                 propertyValue={prelimApplicationFormData.dealSubsector || 0}
@@ -636,14 +626,14 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={errors.description ? true : false}
                             onChange={handleChange}
                             variant="standard"
-                            sx={{ display: 'flex', mr: 2 }}
+                            sx={{ display: 'flex' }}
                         />
-                        <Typography variant="caption" color="error">
+                        {errors.description &&<Typography variant="caption" color="error">
                             <>{errors.description?errors.description.message : ''}</>
-                        </Typography>
+                        </Typography>}
                     </Grid>
 
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <TextField
                             required
                             id="investmentStrategy"
@@ -659,9 +649,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                         <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                             <>{errors.investmentStrategy?errors.investmentStrategy.message : ''}</>
                         </Typography>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12}>
-                        <Box sx={{ backgroundColor: 'white', borderRadius: 1, ml: 2, mb: 2, mr: 2 }}>
+                        <Box sx={{ backgroundColor: 'white', borderRadius: 1, mb: 2, mt: 2 }}>
                             <Card sx={{ display: 'flex', }}>
                                 <CardContent sx={{ flex: 1 }}>
                                     <Grid container spacing={2} >
@@ -685,9 +675,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                     }}
                                                     inputProps={{ min: 0, max: 9999, step: 1 }}
                                                 />
-                                                <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
+                                                {errors.sdDescription && <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
                                                     <>{errors.sdDescription && getValues("sdDescription") == ''?errors.sdDescription.message : ''}</>
-                                                </Typography>
+                                                </Typography>}
                                             </Grid>
                                         </Grid>
                                         <Grid item xs={12}>

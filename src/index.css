@@ -1,12 +1,25 @@
+:root {
+  --app-bg-color: #f0f3fc;
+}
+
+/* #fbe5cd */
+
 body {
   margin: 0;
   font-family: Microsoft Sans Serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--app-bg-color);
+  min-height: 100vh;
   /* background-image: url('./images/header_bg.png'); */
   /* background-repeat: no-repeat; */
   /* background-size: cover; */
   /* background-attachment: fixed; */
+}
+
+/* Ensure the app root fills the viewport so background covers entire page */
+html, #root {
+  height: 100%;
 }
 
 .arrow {

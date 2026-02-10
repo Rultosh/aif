@@ -207,7 +207,7 @@ console.log(prelimApplications.prelimApplication);
             <NavigationBar></NavigationBar>
             {prelimApplications.allStatus.fetchStatus === FetchStatus.IDLE ? <>
                 <Container maxWidth="xl" sx={{ py: '80px' }}>
-                    <Paper elevation={0} sx={{ backgroundColor: '#f6f6fb', borderRadius: '10px' }}>
+                    <Paper elevation={0} sx={{ backgroundColor: '#ffffff', borderRadius: '10px', boxShadow: '0px 0px 25px rgb(0 0 0 / 8%)' }}>
                         <Grid container sx={{ flexDirection: 'row', justifyContent: 'center', py: '20px' }}>
                             <Grid item>
                             <Typography variant="subtitle1" gutterBottom sx={{ display:  'inline-block', marginTop: '8px', marginRight: '10px' }}>
