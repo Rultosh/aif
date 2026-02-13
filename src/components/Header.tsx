@@ -15,6 +15,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Divider from '@mui/material/Divider';
 import MailIcon from '@mui/icons-material/Mail';
 import headerBg from '../images/header_bg.png';
+import logoNps from '../images/logo_nps.png';
 
 import loginRupeeIconImg from '../images/logo_rupee_symbol.png'
 import { useAppSelector } from '../app/hooks';
@@ -50,13 +51,13 @@ const Header = (props: any) => {
           <Container maxWidth="lg">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               {token && <Link to={`/Home`} style={{ cursor: 'pointer', color: '#2C3E50', textDecoration: 'none' }}>
-                  <Box
-                    component="img"
-                    sx={{ width: '85px', aspectRatio: '16/9', objectFit: 'contain', justifyContent: "left" }}
-                    alt="success"
-                    src={"https://npstrust.org.in/sites/default/files/logo.png"}
-                  />
-                </Link>}
+                <Box
+                  component="img"
+                  sx={{ width: '95px', aspectRatio: '16/9', objectFit: 'contain', justifyContent: "left" }}
+                  alt="success"
+                  src={logoNps}
+                />
+              </Link>}
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)' }}>
                   NPS Viksit Bharat Fund of Fund Portal
@@ -64,12 +65,12 @@ const Header = (props: any) => {
               </Box>
 
               {token && <><Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-                {usersState.role !== 'ADMIN' && <><Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
+                {/* {usersState.role !== 'ADMIN' && <><Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
                   <Link to={`/Preliminary`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
                     Preliminary
                   </Link>
                 </Typography>
-                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box></>}
+                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box></>} */}
                 <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
                   <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
                     Workflow
@@ -143,14 +144,14 @@ const Header = (props: any) => {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)', marginTop: '30px' }}>
-                  
+
                 </Typography>
                 <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none' }}>
                   <Box
                     component="img"
                     sx={{ width: '150px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "left", display: { xs: 'block' } }}
                     alt="success"
-                    src={"https://npstrust.org.in/sites/default/files/logo.png"}
+                    src={logoNps}
                   />
                 </Link>
               </Box>
