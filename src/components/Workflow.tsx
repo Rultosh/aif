@@ -108,7 +108,7 @@ const Workflow = (props:any) => {
                   underline="hover"
                   sx={{ display: 'flex', alignItems: 'center' }}
                   color="inherit"
-                  href="/home"
+                  href="#/home"
                 >
                   <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
                   Home
@@ -122,7 +122,7 @@ const Workflow = (props:any) => {
               </Breadcrumbs>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: '20px' }}>
-              <Button variant="contained" sx={{ backgroundColor: '#34344b', color: 'white', fontWeight: 600, textTransform: 'capitalize' }} startIcon={<KeyboardDoubleArrowLeftIcon />} className='btn-dark' href="#/home">Back To Application</Button>
+              <Button variant="contained" sx={{ backgroundColor: '#34344b', color: 'white', fontWeight: 600, textTransform: 'capitalize' }} startIcon={<KeyboardDoubleArrowLeftIcon />} className='btn-dark' href="#/home">Back To Application List</Button>
           </Box>
       </Box>
       <Box sx={{ p: 0, bgcolor: '#fdfdfd' }}>

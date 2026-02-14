@@ -104,19 +104,19 @@ export const Preview = (props: any) => {
     }
 
     async function handleClickSave(ev: any) {
-        
+
         setActionDateError(undefined);
-        
+
         // if (await checkAllDocsOk(id, "prelims")) {
-            console.log("prelimId", Number(id))
-            dispatch(
-                createApplicationAsync(
-                    wrapArgument(
-                        actionUid, { id: Number(id), statusComments: commentPreview, status: ev.target.id }
-                    )
+        console.log("prelimId", Number(id))
+        dispatch(
+            createApplicationAsync(
+                wrapArgument(
+                    actionUid, { id: Number(id), statusComments: commentPreview, status: ev.target.id }
                 )
-            );
-            navigate('/home')
+            )
+        );
+        navigate('/home')
         // }
         // else {
         //     setShowResponse(true);
@@ -128,18 +128,19 @@ export const Preview = (props: any) => {
 
         setActionDateError(undefined);
 
-        if(actionDate === null || actionDate == undefined) {
+        if (actionDate === null || actionDate == undefined) {
             setActionDateError("Please entre an action date.");
         } else {
             console.log("prelimId", Number(id))
             dispatch(
                 createApplicationAsync(
                     wrapArgument(
-                        actionUid, { 
-                            id: Number(id), 
-                            statusComments: commentPreview, 
-                            actionDate: actionDate,
-                            status: ev.target.id }
+                        actionUid, {
+                        id: Number(id),
+                        statusComments: commentPreview,
+                        actionDate: actionDate,
+                        status: ev.target.id
+                    }
                     )
                 )
             );
@@ -175,169 +176,225 @@ export const Preview = (props: any) => {
 
     return (
         <div className="formAnimation">
-            <Card sx={{ display: 'flex', mb: 2 }}>
-                <CardContent sx={{ flex: 1 }}>
+            <Card sx={{
+                display: 'flex',
+                mb: 3,
+                borderRadius: '16px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                border: '1px solid rgba(0,0,0,0.05)'
+            }}>
+                <CardContent sx={{ p: 4, width: '100%' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062', mb: 3 }}>
+                        Preview
+                    </Typography>
 
-                    <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Preview</Typography>
-                    <Card sx={{ display: 'flex', mt: 2, backgroundColor: "#f2f2f2" }}>
-                        <CardContent sx={{ flex: 1 }}>
-
-                            <Card>
-                                <CardContent>
-                                    {/* <object
-                                        width="100%"
-                                        height="600"
-                                        data={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`}
-                                        //data={`${client.getUri()}/api/prelims/${id}/preview`}
-                                        type="application/pdf">
-                                    </object> */}
-                                    {/* <embed 
-                                        src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`} 
-                                        width="800px" 
-                                        height="2100px" /> */}
-                                    <iframe src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`}
-                                        width="100%"
-                                        height="600"></iframe>
-                                </CardContent>
-                            </Card>
-
-
-
+                    <Card sx={{
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        mb: 4,
+                        border: '1px solid rgba(54, 48, 98, 0.1)'
+                    }}>
+                        <CardContent sx={{ p: 0 }}>
+                            <Box sx={{ p: 2, backgroundColor: 'rgba(54, 48, 98, 0.04)', borderBottom: '1px solid rgba(54, 48, 98, 0.1)' }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#363062' }}>
+                                    Application Document Preview
+                                </Typography>
+                            </Box>
+                            <iframe
+                                src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`}
+                                width="100%"
+                                height="600"
+                                style={{ border: 'none' }}
+                            ></iframe>
                         </CardContent>
                     </Card>
 
-                    <Card sx={{ display: 'flex', mt: 2, backgroundColor: "#f2f2f2" }}>
-                        <CardContent sx={{ flex: 1 }}>
-                            {usersState.role === 'USER' ? <>
-                                <Typography sx={{ flex: 1, mb: 1 }}>Please follow below steps:</Typography>
-                                <Divider color='#363062' sx={{ mb: 2 }} />
-                                <Card sx={{ mb: 2 }}>
-                                    <CardContent>
-                                        <Typography sx={{ flex: 1, mb: 1 }}>1. Download Application</Typography>
-                                        <Typography sx={{ flex: 1, mb: 1 }}>2. Either digitally sign the application and upload Digitally Signed Application</Typography>
-                                        <Typography sx={{ flex: 1, }}>3. Or Upload Digital Certificate and manually Signed application on letter head of IM/AMC</Typography>
+                    <Card sx={{
+                        mb: 4,
+                        borderRadius: '12px',
+                        backgroundColor: 'rgba(54, 48, 98, 0.02)',
+                        border: '1px solid rgba(54, 48, 98, 0.1)'
+                    }}>
+                        <CardContent sx={{ p: 3 }}>
+                            {usersState.role === 'USER' ? (
+                                <Box sx={{ mb: 4 }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#363062', mb: 2 }}>
+                                        Submission Steps:
+                                    </Typography>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} md={4}>
+                                            <Card sx={{ height: '100%', borderRadius: '12px' }}>
+                                                <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#D586F7', mb: 1, display: 'block' }}>STEP 1</Typography>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>Download Application</Typography>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                        <Grid item xs={12} md={4}>
+                                            <Card sx={{ height: '100%', borderRadius: '12px' }}>
+                                                <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#D586F7', mb: 1, display: 'block' }}>STEP 2</Typography>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>Digitally sign and upload application</Typography>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                        <Grid item xs={12} md={4}>
+                                            <Card sx={{ height: '100%', borderRadius: '12px' }}>
+                                                <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#D586F7', mb: 1, display: 'block' }}>STEP 3</Typography>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>OR manually sign on letterhead and upload</Typography>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                    </Grid>
 
-                                    </CardContent>
-                                </Card>
-
-                                <Box sx={{ display: 'flex' }}>
-                                    <div style={{ margin: '5px' }}>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 3, p: 2, backgroundColor: 'white', borderRadius: '12px', border: '1px dashed rgba(54, 48, 98, 0.2)' }}>
                                         <Chip
                                             icon={<FileDownloadIcon />}
-                                            label="Download Applicaton"
-                                            size="medium"
+                                            label="Download Application"
                                             component="a"
                                             href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
-                                            sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': { backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
-                                    </div>
-                                    <div style={{ margin: '5px' }}>
+                                            clickable
+                                            sx={{
+                                                backgroundColor: '#363062',
+                                                color: 'white',
+                                                '& .MuiChip-icon': { color: 'white' },
+                                                fontWeight: 600,
+                                                borderRadius: '8px',
+                                                height: '40px'
+                                            }}
+                                        />
                                         <Chip
                                             icon={<FileDownloadIcon />}
-                                            label="Download All as Zip"
-                                            size="medium"
+                                            label="Download All As Zip"
                                             component="a"
                                             href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
-                                            sx={{ backgroundColor: '#D586F7', width: 'fit-content', cursor: 'pointer', ':hover': { backgroundColor: 'rgba(0, 0, 0, 0.12)' } }} />
-                                    </div>
-                                    <div style={{ margin: '5px' }}>
-                                        <DocumentChip
-                                            label="Upload Digitally Signed Application"
-                                            id={`DigitallySignedApplication${id}`}
-                                            signed={true}
+                                            clickable
+                                            sx={{
+                                                backgroundColor: 'rgba(54, 48, 98, 0.1)',
+                                                color: '#363062',
+                                                fontWeight: 600,
+                                                borderRadius: '8px',
+                                                height: '40px'
+                                            }}
                                         />
-                                    </div>
-                                    <div style={{ margin: '5px' }}>
-                                        <DocumentChip
-                                            label="Upload Digital Certificates"
-                                            id={`DigitalCertificate${id}`} />
-                                    </div>
-                                    <div style={{ margin: '5px' }}>
-                                        <DocumentChip
-                                            label="Upload"
-                                            id={`unsignedDocument${id}`} />
-                                    </div>
-                                </Box></>
-                                : <></>
-                            }
-                            <TextField
-                                required
-                                id="previewComments"
-                                label="Leave a comment"
-                                variant="standard"
-                                multiline
-                                {...register("previewComments")}
-                                error={(errors.previewComments && getValues("previewComments") == '') ? true : false}
-                                onChange={handleChange}
+                                        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                                        <DocumentChip label="Upload Digitally Signed Application" id={`DigitallySignedApplication${id}`} signed={true} />
+                                        <DocumentChip label="Upload Digital Certificates" id={`DigitalCertificate${id}`} />
+                                        <DocumentChip label="Upload (Standard)" id={`unsignedDocument${id}`} />
+                                    </Box>
+                                </Box>
+                            ) : null}
 
-                                sx={{ display: 'flex', }}
-                            />
-                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
-                            </Typography>
+                            <Box sx={{ p: 2, backgroundColor: 'white', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062', mb: 2 }}>
+                                    Actions & Comments
+                                </Typography>
+                                <TextField
+                                    fullWidth
+                                    id="previewComments"
+                                    label="Leave a comment"
+                                    variant="outlined"
+                                    multiline
+                                    rows={3}
+                                    {...register("previewComments")}
+                                    error={!!errors.previewComments}
+                                    helperText={errors.previewComments?.message as string}
+                                    onChange={handleChange}
+                                    placeholder="Provide any context or feedback before processing..."
+                                    sx={{
+                                        mb: 3,
+                                        '& .MuiOutlinedInput-root': { borderRadius: '12px' }
+                                    }}
+                                />
+
+                                {usersState.role === 'ADMIN' && (
+                                    <Box sx={{ mb: 3, p: 2, backgroundColor: 'rgba(213, 134, 247, 0.05)', borderRadius: '12px', border: '1px solid rgba(213, 134, 247, 0.2)' }}>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Effective Action Date"
+                                                inputFormat='DD/MM/YYYY'
+                                                value={actionDate}
+                                                onChange={(newValue) => newValue && setActionDate(newValue)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        fullWidth
+                                                        error={!!actionDateError}
+                                                        helperText={actionDateError}
+                                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', backgroundColor: 'white' } }}
+                                                    />
+                                                )}
+                                            />
+                                        </LocalizationProvider>
+                                    </Box>
+                                )}
+
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                                    {(!(statusPrelims == 'SUBMITTED') && usersState.role == 'USER') && (
+                                        <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', px: 4, fontWeight: 700, backgroundColor: '#4caf50' }}>
+                                            Submit Application
+                                        </Button>
+                                    )}
+
+                                    {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'SUBMITTED') && (
+                                        <Box sx={{ display: 'flex', gap: 2 }}>
+                                            <Button color='success' id='approve' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Approve
+                                            </Button>
+                                            <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Revise
+                                            </Button>
+                                            <Button color='error' id='reject' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Reject
+                                            </Button>
+                                            <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                                            <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="outlined" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Temp Close
+                                            </Button>
+                                            <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="outlined" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Permanent Close
+                                            </Button>
+                                        </Box>
+                                    )}
+
+                                    {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'TEMP_CLOSED') && (
+                                        <Button color='primary' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                            Reopen Application
+                                        </Button>
+                                    )}
+                                </Box>
+                            </Box>
                         </CardContent>
                     </Card>
 
-                    <Button disabled={(statusPrelims == 'SUBMITTED') || usersState.role == 'ADMIN'} onClick={(e) => handleClick(e, "previous")} startIcon={<ArrowLeftIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                        Declaration
+                    <Button
+                        disabled={(statusPrelims == 'SUBMITTED') || usersState.role == 'ADMIN'}
+                        onClick={(e) => handleClick(e, "previous")}
+                        startIcon={<ArrowLeftIcon />}
+                        variant="outlined"
+                        sx={{
+                            textTransform: 'none',
+                            borderRadius: '8px',
+                            fontWeight: 600,
+                            color: '#363062',
+                            borderColor: '#363062'
+                        }}
+                    >
+                        Back to Declaration
                     </Button>
 
-                    {(!(statusPrelims == 'SUBMITTED') && usersState.role == 'USER') ? <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                        Submit
-                    </Button> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && statusPrelims == 'SUBMITTED') ? <>
-                        <Button color='success' id='approve' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Approve
-                        </Button>
-                        <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Revise
-                        </Button>
-                        <Button color='error' id='reject' onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Reject
-                        </Button>
-                    </> : <></>}
-
-                    <Card sx={{ display: 'flex', mt: 2, backgroundColor: "#f2f2f2" }}>
-                        <CardContent sx={{ flex: 1 }}>
-                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                <>{(errors.previewComments && getValues("previewComments") == '') ? errors.previewComments.message : ''}</>
-                            </Typography>
-                            {usersState.role == 'ADMIN' && <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                    label="Effective action date (Applicable & Mandatory for Temporary closure, Reopen and closure)"
-                                    inputFormat='DD/MM/YYYY'
-                                    value={actionDate}
-                                    onChange={(newValue) => newValue && setActionDate(newValue)}
-                                    renderInput={(params) => <TextField {...params} />}
-                                />
-                            </LocalizationProvider>}
-                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                <>{actionDateError}</>
-                            </Typography>
-                        </CardContent>
-                    </Card>
-
-                    {(['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && statusPrelims == 'SUBMITTED') ? <>
-                        <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Temp Close
-                        </Button>
-                        <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Close
-                        </Button>
-                    </> : (['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && statusPrelims == 'TEMP_CLOSED') ? 
-                        <Button color='error' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                            Reopen
-                        </Button> : <></>}
-
-                    {showResponse ? <ModalComponent
-                        open={showResponse}
-                        close={handleClose}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                        className="special_modal"
-                        msg={"Please upload all Documents before submitting the Application"}
-                        status={"error"}
-                    >
-                    </ModalComponent> : <></>}
-
+                    {showResponse && (
+                        <ModalComponent
+                            open={showResponse}
+                            close={handleClose}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                            className="special_modal"
+                            msg={"Please upload all Documents before submitting the Application"}
+                            status={"error"}
+                        />
+                    )}
                 </CardContent >
             </Card >
         </div>

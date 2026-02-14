@@ -1,5 +1,5 @@
-import { Box, Button, Card, CardContent, CardMedia, Container, Divider, Grid, Typography } from '@mui/material';
-import { Link, useNavigate, Outlet, useParams } from 'react-router-dom';
+import { Box, Button, Card, CardContent, CardMedia, Container, Divider, Grid, Typography, Breadcrumbs, Link as LinkMui } from '@mui/material';
+import { Link, useNavigate, Outlet, useParams, useLocation } from 'react-router-dom';
 import NavigationBar from '../../components/NavigationBar'
 import React, * as Rect from 'react'
 import { useState, useEffect, useContext } from "react"
@@ -14,8 +14,14 @@ import { selectPrelimApplication } from "../fundOverview/subsections/fundOvervie
 // import { UserContext } from '../../App';
 // import useCookie, { getCookie } from 'react-use-cookie';
 // import WarningIcon from '@mui/icons-material/Warning';
+import HomeIcon from '@mui/icons-material/Home';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import LockIcon from '@mui/icons-material/Lock';
+import GridViewIcon from '@mui/icons-material/GridView';
 
-export const FundOverview = (props:any) => {
+export const FundOverview = (props: any) => {
     // let { shoppingList } = useContext(UserContext);
     // const [user, setUser] = useState(shoppingList);
 
@@ -25,14 +31,14 @@ export const FundOverview = (props:any) => {
     const prelimApplicationState = useAppSelector(selectPrelimApplication);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
     const navigate = useNavigate();
-  
-    const pathname = (window.location.pathname).toLowerCase();  
+
+    const { pathname } = useLocation();
     // const selfRatingCookie = getCookie('selfRating') || '0';
     // const [selfRating, setSelfRating] = useCookie('selfRating', selfRatingCookie);
     // const [selfRatingLink, setSelfRatingLink] = useCookie('selfRatingLink', '0');
 
     useEffect(() => {
-        if(props.checkUnAuth){
+        if (props.checkUnAuth) {
             navigate('/login')
         }
         // if(selfRatingLink == '0'){
@@ -70,183 +76,145 @@ export const FundOverview = (props:any) => {
         };
 
     const isUserPermittedToView = () => {
-        if (usersState.role == 'USER' && !(['SUBMITTED' ,'APPROVED'].includes(statusPrelims.toString()))){
+        if (usersState.role == 'USER' && !(['SUBMITTED', 'APPROVED'].includes(statusPrelims.toString()))) {
             return true;
         }
         return false
     };
 
 
+    const currentStep = [
+        { label: 'Fund Overview', path: 'fund' },
+        { label: 'Profile', path: 'profile' },
+        { label: 'Self Rating', path: 'selfrating' },
+        { label: 'Declaration', path: 'declaration' },
+        { label: 'Preview', path: 'preview' },
+    ].find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
+
+    const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
+
     return (
-        <div className="homeComp">
+        <Container maxWidth="xl" sx={{ pt: '80px', pb: '50px' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '30px' }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#363062', mb: 0.5 }}>
+                        {pageTitle}
+                    </Typography>
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <LinkMui
+                            sx={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
+                            color="inherit"
+                            href="#/home"
+                        >
+                            <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                            Home
+                        </LinkMui>
+                        <LinkMui
+                            sx={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
+                            color="inherit"
+                            href="#/home"
+                        >
+                            Preliminary
+                        </LinkMui>
+                        <Typography variant="body2"
+                            sx={{ color: '#363062', fontWeight: 600, display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
+                        >
+                            {currentStep}
+                        </Typography>
+                    </Breadcrumbs>
+                </Box>
+                <Box>
+                    <Button variant="contained" sx={{ backgroundColor: '#34344b', color: 'white', fontWeight: 600, textTransform: 'capitalize' }} startIcon={<KeyboardDoubleArrowLeftIcon />} className='btn-dark' href="#/home">Back To Application List</Button>
+                </Box>
+            </Box>
+            <Box sx={{ flexGrow: 1 }}>
+                {/* Chevron Stepper */}
+                <Box sx={{ width: '100%', mb: 2, display: 'flex', gap: 0.5 }}>
+                    {[
+                        { label: 'Fund Overview', path: 'fund', subLabel: 'Information' },
+                        { label: 'Profile', path: 'profile', subLabel: 'Details' },
+                        { label: 'Self Rating', path: 'selfrating', subLabel: 'Assessment' },
+                        { label: 'Declaration', path: 'declaration', subLabel: 'Legal' },
+                        { label: 'Preview', path: 'preview', subLabel: 'Review' },
+                    ].map((s, index, array) => {
+                        const isNew = id?.toString() === 'NEW';
 
-            <NavigationBar></NavigationBar>
-            <div >
-                <Container maxWidth={false} sx={{ mt: '140px', color: "white" }} >
-                    {/* <div>
-                        <h2 style={{ color: "white" }}>Preliminary Application Process</h2>
-                        <span>
-                            Note: <a target="_blank" rel="noopener" href='/templates/SIDBI ASF-Preliminary Application.pdf'>Click</a> here, to view the Preliminary Application format to assess the data required for submission
-                        </span>
-                        <hr></hr>
-                    </div> */}
-                    <Box sx={{ flexGrow: 1 }}>
-                        <Grid container spacing={2}>
-                            {isUserPermittedToView() ?
-                                <Grid item xs={2}>
-                                    <Card sx={{ display: 'flex', borderRadius: '10px' }}>
-                                        <CardContent sx={{ flex: 1, alignContent: 'center', pb: '0 !important', p: 0, position: 'relative' }} >
-                                            <Box className={"prelimsNavTab " + (pathname.includes("fund")? "activeTab" : "")}>
-                                                <Link to="fund" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                    <IconButton onClick={() => navigate("fund")} className="prelimsNavTabIcon">
-                                                        <CardMedia
-                                                            component="img"
-                                                            width="20"
-                                                            //height="80"
-                                                            image={fundImg}
-                                                            alt="test-img"
-                                                        />
+                        const currentPath = pathname.toLowerCase();
+                        const activeIndex = array.findIndex(item => currentPath.includes(item.path.toLowerCase()));
+                        const isCompleted = index < activeIndex;
+                        const isActive = index === activeIndex;
+                        const isPending = index > activeIndex;
 
-                                                    </IconButton>
+                        const isDisabled = isNew && isPending;
 
-                                                    <Typography textAlign="center" sx={{ fontWeight: 700, pb: 3 }}>
-                                                        Fund Overview
-                                                    </Typography>
-                                                </Link>
-                                            </Box>
-                                        {/* </CardContent> */}
-                                    {/* </Card> */}
-                                    {id?.toString() != 'NEW' ? <>
-                                    <Divider sx={{ border: '1.5px solid #556ab1' }} />
-                                        <Box className={"prelimsNavTab " + (pathname.includes("profile")? "activeTab" : "")}>
-                                            <Link to="Profile" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                <IconButton onClick={() => navigate("Profile")} className="prelimsNavTabIcon">
-                                                    <CardMedia
-                                                        component="img"
-                                                        width="20"
-                                                        //height="80"
-                                                        image={profileImg}
-                                                        alt="test-img"
-                                                    />
+                        // Colors from reference
+                        const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#363062' : '#333');
 
-                                                </IconButton>
-
-                                                <Typography textAlign="center" sx={{ fontWeight: 700, pb: 3 }}>
-                                                        Profile
-                                                </Typography>
-                                            </Link>
+                        return (
+                            <Box
+                                key={s.path}
+                                onClick={() => !isDisabled && navigate(s.path)}
+                                sx={{
+                                    flex: 1,
+                                    height: '70px',
+                                    backgroundColor: bgColor,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    px: 4,
+                                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                    color: 'white',
+                                    position: 'relative',
+                                    opacity: isDisabled ? 0.6 : 1,
+                                    clipPath: index === 0 ? 'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)' :
+                                        (index === (array.length - 1) ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 20px 50%)' :
+                                            'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%, 20px 50%)'),
+                                    ml: index === 0 ? 0 : -2.5,
+                                    zIndex: array.length - index,
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': { opacity: isDisabled ? 0.6 : 0.9 }
+                                }}
+                            >
+                                {/* Left Icon */}
+                                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                                    {isCompleted ? (
+                                        <CheckCircleIcon sx={{ color: 'white', fontSize: 24 }} />
+                                    ) : isActive ? (
+                                        <Box sx={{
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '50%',
+                                            border: '2px solid white',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <Box sx={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'white' }} />
                                         </Box>
-                                        <Divider sx={{ border: '1.5px solid #556ab1' }} />
-                                        <Box className={"prelimsNavTab " + (pathname.includes("selfrating")? "activeTab" : "")}>
-                                            <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                {/* {selfRating == '1'? 
-                                                    <>
-                                                    <WarningIcon style={{ width: '-webkit-fill-available', height: '40px', marginTop: '28px', marginBottom: '24px', color: 'red' }} />
-                                                    <Typography textAlign="center" sx={{ color: 'red', fontWeight: 700, pb: 3 }}>
-                                                    Self Rating
-                                                    </Typography>
-                                                    </>
-                                                    :
-                                                    <> */}
-                                                    <IconButton onClick={() => navigate("selfRating")} className="prelimsNavTabIcon"> 
-                                                        <CardMedia
-                                                            component="img"
-                                                            width="20"
-                                                            //height="80"
-                                                            image={selfRatingImg}
-                                                            alt="test-img"
-                                                        />
-                                                    </IconButton>
-                                                    <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, pb: 3 }}>
-                                                    Self Rating
-                                                    </Typography>
-                                                    {/* </>
-                                                } */}
-                                            </Link>
-                                        </Box>
-                                        <Divider sx={{ border: '1.5px solid #556ab1' }} />
-                                        <Box className={"prelimsNavTab " + (pathname.includes("declaration")? "activeTab" : "")}>
-                                            <Link to="declaration" style={{ textDecoration: 'none', color: '#363062' }} 
-                                            // onClick={() => {setSelfRating('1'); setSelfRatingLink('1');}}
-                                            >
-                                                <IconButton onClick={() => {navigate("Declaration"); 
-                                                // setSelfRating('1'); setSelfRatingLink('1');
-                                                }} className="prelimsNavTabIcon">
-                                                    <CardMedia
-                                                        component="img"
-                                                        width="20"
-                                                        //height="80"
-                                                        image={decImg}
-                                                        alt="test-img"
-                                                    />
+                                    ) : (
+                                        <LockIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} />
+                                    )}
+                                </Box>
 
-                                                </IconButton>
+                                {/* Labels */}
+                                <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                    <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                                        {s.label}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ opacity: 0.7, fontSize: '0.7rem' }}>
+                                        {s.subLabel}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        );
+                    })}
+                </Box>
 
-                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, pb: 3 }}>
-                                                    Declaration
-                                                </Typography>
-                                            </Link>
-                                        </Box>
-                                        <Divider sx={{ border: '1.5px solid #556ab1' }} />
-                                        <Box className={"prelimsNavTab " + (pathname.includes("preview")? "activeTab" : "")}>
-                                            <Link to="preview" style={{ textDecoration: 'none', color: '#363062'}}>
-                                                <IconButton onClick={() => navigate("preview")} className="prelimsNavTabIcon">
-                                                    <CardMedia
-                                                        component="img"
-                                                        width="20"
-                                                        //height="80"
-                                                        image={selfRatingImg}
-                                                        alt="test-img"
-                                                    />
-
-                                                </IconButton>
-
-                                                <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700, pb: 3 }}>
-                                                    Preview
-                                                </Typography>
-                                            </Link>
-                                        </Box>
-                                    </>
-                                        : null}
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                                :
-                                <Grid item xs={2}>
-                                    <Card sx={{ display: 'flex', mb: 2 }}>
-                                        <CardContent sx={{ flex: 1, alignContent: 'center' }} >
-                                            <IconButton onClick={() => navigate("preview")} className="prelimsNavTabIcon">
-                                                <CardMedia
-                                                    component="img"
-                                                    width="20"
-                                                    //height="80"
-                                                    image={selfRatingImg}
-                                                    alt="test-img"
-                                                />
-
-                                            </IconButton>
-
-                                            <Typography textAlign="center" sx={{ color: '#363062', fontWeight: 700 }}>
-                                                <Link to="selfRating" style={{ textDecoration: 'none', color: '#363062' }}>
-                                                    Preview
-                                                </Link>
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                            }
-                            <Grid item xs={10}>
-                                <Outlet />
-
-
-                            </Grid>
-                        </Grid>
-
-                    </Box>
-                </Container>
-            </div>
-
-        </div>
+                {/* Sub-content Area */}
+                <Box sx={{ width: '100%', mt: 2 }}>
+                    <Outlet />
+                </Box>
+            </Box>
+        </Container>
     )
 }
 

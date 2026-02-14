@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Chip, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
 import UploadIcon from '@mui/icons-material/Upload';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { useState, useEffect } from "react"
@@ -12,7 +12,6 @@ import uuid from "react-uuid";
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import { Today } from "@mui/icons-material";
 import { Form } from "react-router-dom";
-import { margin } from "@mui/system";
 import DocumentChip from "../../../../components/DocumentChip";
 import MasterData from "../../../../components/master-data/MasterData";
 import { useForm, Controller } from "react-hook-form";
@@ -49,7 +48,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
         reset(prelimApplicationState.prelimApplication);
 
-        setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id))
+        if (prelimApplicationState.prelimApplication?.id) {
+            setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id));
+        }
     }, [prelimApplicationState.prelimApplication, prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
 
     const setDateValue = (key: String, value: any) => {
@@ -81,7 +82,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
             copiedValue[ev.target.name as keyof IPrelimApplicationData] = ev.target.value
         }
 
-        setValue(ev.target.id,ev.target.value);
+        setValue(ev.target.id || ev.target.name, ev.target.value);
         setPrelimApplicationFormData(copiedValue)
         // live update words for contribution field
         if (ev.target.id === 'contributionSought') {
@@ -180,7 +181,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                 "Apparel",
                 "Education",
                 "Food and Beverage Producers",
-                "Food Retailers",                
+                "Food Retailers",
                 "General Retailers",
                 "Healthcare",
                 "Home and Personal Care",
@@ -203,14 +204,14 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                 "Other",
                 "Construction and Building Equipment",
                 "Construction and Building Materials",
-                "Electronics", 
+                "Electronics",
                 "Farm and Agriculture",
-                "Industrial Consumables", 
-                "Medical Technology", 
+                "Industrial Consumables",
+                "Medical Technology",
                 "Paper, Packaging and Print",
-                "Power", 
-                "Transportation Equipment", 
-                "Water Waste Management", 
+                "Power",
+                "Transportation Equipment",
+                "Water Waste Management",
             ]
         },
         "30": {
@@ -220,22 +221,22 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         },
         "31": {
             values: [
-                "Other", "Hospitality", "Industrial", "Office", "Residential", "Retail", 
+                "Other", "Hospitality", "Industrial", "Office", "Residential", "Retail",
             ]
         },
         "32": {
             values: [
-                "Other", 
-                "Agribusiness", 
-                "Media", "Minerals, Oil and Gas", 
-                "Regional or Sector Funds", 
+                "Other",
+                "Agribusiness",
+                "Media", "Minerals, Oil and Gas",
+                "Regional or Sector Funds",
                 "Telecoms"
             ]
         }
     }
 
-    console.log((dealSubSectorValues as any)[String(prelimApplicationFormData.dealSector || 0)]?.values, prelimApplicationFormData.dealSubsector);
-    
+    console.log((dealSubSectorValues as any)[String(prelimApplicationFormData?.dealSector || 0)]?.values, prelimApplicationFormData?.dealSubsector);
+
     const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
     const htmlTagsNotAllowed = "Tags not allowed in input.";
 
@@ -256,10 +257,10 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
             let contributionSoughtVal = Number(prelimApplicationFormData.contributionSought || '0');
             let sdTotalTargetCorpusValCalc = sdTotalTargetCorpusVal * 0.25; // Not more than 25%
             if (sdTotalTargetCorpusValCalc < contributionSoughtVal) {
-              return false;
+                return false;
             }
             return true;
-          }),
+        }),
         termOfFund: Yup.string().required("Term of Fund is required"),
         commitmentPeriod: Yup.string().required("Commitment Period is required"),
         preferredReturn: Yup.string().required("Preferred Return is required"),
@@ -288,7 +289,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         setValue,
         reset,
         formState: { errors },
-    } = useForm({
+    } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
         // defaultValues: prelimApplicationFormData
     });
@@ -299,31 +300,37 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         // setPrelimApplicationFormData(data);
         savePrelimApplicationForm();
     };
-    
+
     console.log(getValues());
 
     if (prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
         return (
             // <form onSubmit={savePrelimApplicationForm}>
-            <Box component="form" sx={{ p: 2}}>
-                <Grid container spacing={2} >
+            <Box component="form" sx={{ p: 0 }}>
+                <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <TextField
                             required
+                            fullWidth
                             id="investmentStrategy"
                             label="Investment Strategy"
+                            placeholder="Enter the investment strategy..."
                             value={prelimApplicationFormData.investmentStrategy || ''}
                             {...register("investmentStrategy")}
-                            error={errors.investmentStrategy ? true : false}
+                            error={!!errors.investmentStrategy}
+                            helperText={errors.investmentStrategy?.message as string}
                             onChange={handleChange}
-                            variant="standard"
+                            variant="outlined"
                             multiline
-                            sx={{ display: 'flex' }}
+                            rows={3}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '8px',
+                                },
+                            }}
                         />
-                        {errors.investmentStrategy && <Typography variant="caption" color="error">
-                            <>{errors.investmentStrategy?errors.investmentStrategy.message : ''}</>
-                        </Typography>}
-                        {/* <FormControl variant="standard" sx={{ display: 'flex', ml: 2 }}>
+                    </Grid>
+                    {/* <FormControl variant="standard" sx={{ display: 'flex', ml: 2 }}>
                             <InputLabel id="demo-simple-select-standard-label">Scheme</InputLabel>
                             <Select
                                 labelId="scheme"
@@ -345,72 +352,56 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             <>{(errors.scheme && getValues("scheme") == '')?errors.scheme.message : ''}</>
                             </Typography>
                         </FormControl> */}
-                    </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             id="nameOfTheFund"
                             label="Name of the Fund"
                             value={prelimApplicationFormData.nameOfTheFund || ''}
                             {...register("nameOfTheFund")}
-                            error={errors.nameOfTheFund ? true : false}
+                            error={!!errors.nameOfTheFund}
+                            helperText={errors.nameOfTheFund?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.nameOfTheFund && <Typography variant="caption" color="error">
-                            <>{errors.nameOfTheFund ?errors.nameOfTheFund.message : ''}</>
-                        </Typography>}
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             id="sponsor"
                             label="Sponsor"
                             value={prelimApplicationFormData.sponsor || ''}
                             {...register("sponsor")}
-                            error={errors.sponsor ? true : false}
+                            error={!!errors.sponsor}
+                            helperText={errors.sponsor?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.sponsor && <Typography variant="caption" color="error">
-                            <>{errors.sponsor?errors.sponsor.message : ''}</>
-                        </Typography>}
                     </Grid>
 
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             id="investmentManager"
                             label="Investment Manager (IM)/AMC"
                             value={prelimApplicationFormData.investmentManager || ''}
                             {...register("investmentManager")}
-                            error={errors.investmentManager ? true : false}
+                            error={!!errors.investmentManager}
+                            helperText={errors.investmentManager?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.investmentManager && <Typography variant="caption" color="error">
-                           <>{errors.investmentManager?errors.investmentManager.message : ''}</>
-                       </Typography>}
                     </Grid>
 
-                    <Grid item xs={4}>
-                        <FormControl variant="standard" sx={{ display: 'flex' }}>
-                            <InputLabel id="demo-simple-select-standard-label">Fund Manager</InputLabel>
-                            {/* <Select
-                                labelId="fundManager"
-                                id="fundManager"
-                                value={prelimApplicationFormData.fundManager || ''}
-                                onChange={handleChange}
-                                name="fundManager"
-                            >
-
-                                <MenuItem key={"Fund of funds"} value={"1"}>First Time Fund Manager</MenuItem>
-                                <MenuItem key={"Asipre for Start-ups"} value={"2"}>Existing but new to SIDBI</MenuItem>
-                                <MenuItem key={"Up Start-up Fund"} value={"3"}>Existing with SIDBI</MenuItem>
-                            </Select> */}
+                    <Grid item xs={12} md={4}>
+                        <FormControl fullWidth variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}>
+                            <InputLabel id="fundManager-label" sx={{ backgroundColor: 'white', px: 0.5 }}>Fund Manager</InputLabel>
                             <MasterData propertyType="fundManager"
                                 propertyValue={prelimApplicationFormData.fundManager || 0}
                                 onChange={handleSelectChange} />
@@ -437,248 +428,213 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
                     </Grid> */}
 
-                    <Grid item xs={4}>
-
-                        <FormControl variant="standard" sx={{ display: 'flex' }}>
-                            <InputLabel id="demo-simple-select-standard-label">AIF Category</InputLabel>
-                            {/* <Select
-                                labelId="aifCategory"
-                                id="aifCategory"
-                                value={prelimApplicationFormData.aifCategory || ''}
-                                onChange={handleChange}
-                                name="aifCategory"
-                            >
-
-                                <MenuItem key={"Fund of funds"} value={"Fund of funds Sampath"}>Fund of funds Sampath</MenuItem>
-                                <MenuItem key={"Asipre for Start-ups"} value={"Asipre for Start-ups Sampath"}>Asipre for Start-ups Sampath</MenuItem>
-                                <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
-                            </Select> */}
+                    <Grid item xs={12} md={4}>
+                        <FormControl fullWidth variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}>
+                            <InputLabel id="aifCategory-label" sx={{ backgroundColor: 'white', px: 0.5 }}>AIF Category</InputLabel>
                             <MasterData propertyType="aifCategory"
                                 propertyValue={prelimApplicationFormData.aifCategory || 0}
                                 onChange={handleSelectChange} />
                         </FormControl>
-
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             id="nameOfTrustee"
                             label="Name Of The Trustee"
                             value={prelimApplicationFormData.nameOfTrustee || ''}
                             {...register("nameOfTrustee")}
-                            error={errors.nameOfTrustee ? true : false}
+                            error={!!errors.nameOfTrustee}
+                            helperText={errors.nameOfTrustee?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.nameOfTrustee && <Typography variant="caption" color="error">
-                            <>{errors.nameOfTrustee?errors.nameOfTrustee.message : ''}</>
-                        </Typography>}
                     </Grid>
 
-                    <Grid item xs={4}>
-                        <Box>
-                            <LocalizationProvider dateAdapter={AdapterDayjs} >
-                                <Stack spacing={3}>
-                                    <Controller
-                                        name="dateOfFilingWithSEBI"
-                                        control={control}
-                                        // defaultValue={null}
-                                        render={({
-                                            field: { onChange, value },
-                                            fieldState: { error, invalid }
-                                        }) => (
-                                            // console.log(invalid),
-                                            (<DesktopDatePicker
-                                                inputFormat='DD/MM/YYYY'
-                                                disableFuture={true}
-                                                label="Date of Approval of PPM by SEBI"
-                                                value={prelimApplicationFormData.dateOfFilingWithSEBI || null}
-                                                minDate={Today.toString()}
-                                                onChange={(newValue: any) => {
-                                                    setValue('dateOfFilingWithSEBI', newValue);
-                                                    setDateValue("dateOfFilingWithSEBI", newValue);
-                                                }}
-                                                renderInput={(params) => <TextField
-                                                    helperText={(invalid && getValues("dateOfFilingWithSEBI") == null && (prelimApplicationFormData.dateOfFilingWithSEBI || '') == '') ? <Typography variant="caption" {...register('dateOfFilingWithSEBI')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
+                    <Grid item xs={12} md={4}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Controller
+                                name="dateOfFilingWithSEBI"
+                                control={control}
+                                render={({
+                                    field: { onChange, value },
+                                    fieldState: { error, invalid }
+                                }) => (
+                                    <DesktopDatePicker
+                                        inputFormat="DD/MM/YYYY"
+                                        disableFuture={true}
+                                        label="Date of Approval of PPM by SEBI"
+                                        value={prelimApplicationFormData.dateOfFilingWithSEBI || null}
+                                        onChange={(newValue: any) => {
+                                            setValue('dateOfFilingWithSEBI', newValue);
+                                            setDateValue("dateOfFilingWithSEBI", newValue);
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                fullWidth
+                                                variant="outlined"
+                                                {...params}
+                                                error={invalid}
+                                                helperText={invalid ? "This value is required" : null}
+                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                                             />
-                                            )
                                         )}
                                     />
-                                </Stack>
-                            </LocalizationProvider>
-                        </Box>
+                                )}
+                            />
+                        </LocalizationProvider>
                     </Grid>
 
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             type="number"
                             id="contributionSought"
-                            label="Contribution sought(₹ crores)"
+                            label="Contribution sought (₹ Crore)"
                             value={prelimApplicationFormData.contributionSought || ''}
                             {...register("contributionSought")}
-                            error={errors.contributionSought ? true : false}
+                            error={!!errors.contributionSought}
+                            helperText={
+                                errors.contributionSought
+                                    ? (errors.contributionSought.message as string)
+                                    : (prelimApplicationFormData?.contributionSought
+                                        ? numberToWordsIndian(prelimApplicationFormData.contributionSought)
+                                        : '')
+                            }
                             onChange={handleChange}
-                            //  onKeyUp={(val) =>{
-                            //     if(val === '4'){
-                            //         return '';
-                            //     } else {
-                            //         return val;
-                            //     }}
-                            // }
-                            variant="standard"
-                            sx={{ display: 'flex' }}
-                            onKeyUp={(e) => {
-                                if ((e.target as HTMLInputElement).value.length > 4) {
-                                    (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
-                                }
-                            }}
-                            inputProps={{ min: 0, max: 9999, step: 1 }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {((prelimApplicationFormData.contributionSought || '') !== '') && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                            {numberToWordsIndian(prelimApplicationFormData.contributionSought)}
-                        </Typography>}
-                        {errors.contributionSought && <Typography variant="caption" color="error">
-                           <>{errors.contributionSought?errors.contributionSought.message : ''}</>
-                       </Typography>}
-                        {/* show number in words (Indian grouping) */}
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             type="number"
                             id="termOfFund"
-                            label="Term of the Fund (No. of months from first closing)"
+                            label="Term of the Fund (Months)"
                             {...register("termOfFund")}
-                            error={errors.termOfFund && getValues("termOfFund") ==  '' ? true : false}
+                            error={!!errors.termOfFund}
+                            helperText={errors.termOfFund?.message as string}
                             value={prelimApplicationFormData.termOfFund || ''}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                             inputProps={{ min: 0 }}
                         />
-                        {errors.termOfFund && <Typography variant="caption" color="error">
-                            <>{errors.termOfFund && getValues("termOfFund") ==  ''?errors.termOfFund.message : ''}</>
-                        </Typography>}
                     </Grid>
 
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             type="number"
                             id="commitmentPeriod"
-                            label="Commitment Period (No. of months from first closing)"
+                            label="Commitment Period (Months)"
                             value={prelimApplicationFormData.commitmentPeriod || ''}
                             {...register("commitmentPeriod")}
-                            error={errors.commitmentPeriod && getValues("commitmentPeriod") ==  '' ? true : false}
+                            error={!!errors.commitmentPeriod}
+                            helperText={errors.commitmentPeriod?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.commitmentPeriod && <Typography variant="caption" color="error">
-                            <>{errors.commitmentPeriod && getValues("commitmentPeriod") ==  ''?errors.commitmentPeriod.message : ''}</>
-                        </Typography>}
                     </Grid>
 
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             type="number"
                             id="preferredReturn"
-                            label="Preferred Return/Hurdle Rate p.a. Pre Tax(%)"
+                            label="Preferred Return/Hurdle Rate p.a. (%)"
                             value={prelimApplicationFormData.preferredReturn || ''}
                             {...register("preferredReturn")}
-                            error={errors.preferredReturn && getValues("preferredReturn") ==  '' ? true : false}
+                            error={!!errors.preferredReturn}
+                            helperText={errors.preferredReturn?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.preferredReturn && <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                            <>{errors.preferredReturn && getValues("preferredReturn") ==  ''?errors.preferredReturn.message : ''}</>
-                        </Typography>}
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             type="number"
                             id="managementFees"
-                            label="Management Fee(%)"
+                            label="Management Fee (%)"
                             value={prelimApplicationFormData.managementFees || ''}
                             {...register("managementFees")}
-                            error={errors.managementFees && getValues("managementFees") ==  '' ? true : false}
+                            error={!!errors.managementFees}
+                            helperText={errors.managementFees?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.managementFees && <Typography variant="caption" color="error">
-                            <>{errors.managementFees && getValues("managementFees") ==  ''?errors.managementFees.message : ''}</>
-                        </Typography>}
                     </Grid>
-
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             type="number"
                             id="carriedInterest"
-                            label="Carried Interest(%)"
+                            label="Carried Interest (%)"
                             value={prelimApplicationFormData.carriedInterest || ''}
                             {...register("carriedInterest")}
-                            error={errors.carriedInterest && getValues("carriedInterest") ==  '' ? true : false}
+                            error={!!errors.carriedInterest}
+                            helperText={errors.carriedInterest?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.carriedInterest && <Typography variant="caption" color="error">
-                            <>{errors.carriedInterest && getValues("carriedInterest") ==  ''?errors.carriedInterest.message : ''}</>
-                        </Typography>}
                     </Grid>
 
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
+                            fullWidth
                             id="dealSector"
                             label="Deal Sector"
                             value={prelimApplicationFormData.dealSector || ''}
                             {...register("dealSector")}
-                            error={errors.dealSector && getValues("dealSector") ==  '' ? true : false}
+                            error={!!errors.dealSector}
+                            helperText={errors.dealSector?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.dealSector && <Typography variant="caption" color="error">
-                            <>{errors.dealSector && getValues("dealSector") ==  ''?errors.dealSector.message : ''}</>
-                        </Typography>}
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
+                            fullWidth
                             id="dealSubsector"
                             label="Deal Sub Sector"
                             value={prelimApplicationFormData.dealSubsector || ''}
                             {...register("dealSubsector")}
-                            error={errors.dealSubsector && getValues("dealSubsector") ==  '' ? true : false}
+                            error={!!errors.dealSubsector}
+                            helperText={errors.dealSubsector?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.dealSubsector && <Typography variant="caption" color="error">
-                            <>{errors.dealSubsector && getValues("dealSubsector") ==  ''?errors.dealSubsector.message : ''}</>
-                        </Typography>}
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
+                            fullWidth
                             id="description"
-                            label="Sector Description(Stage of investment like pre revenue, pre growth, seed stage, series A, Series B etc)"
+                            label="Sector Description/Stage"
+                            placeholder="e.g. Seed, Series A..."
                             value={prelimApplicationFormData.description || ''}
                             {...register("description")}
-                            error={errors.description ? true : false}
+                            error={!!errors.description}
+                            helperText={errors.description?.message as string}
                             onChange={handleChange}
-                            variant="standard"
-                            sx={{ display: 'flex' }}
+                            variant="outlined"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
-                        {errors.description &&<Typography variant="caption" color="error">
-                            <>{errors.description?errors.description.message : ''}</>
-                        </Typography>}
                     </Grid>
 
                     {/* <Grid item xs={12}>
@@ -699,344 +655,323 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                         </Typography>
                     </Grid> */}
                     <Grid item xs={12}>
-                        <Box sx={{ backgroundColor: 'white', borderRadius: 1, mb: 2, mt: 2 }}>
-                            <Card sx={{ display: 'flex', }}>
-                                <CardContent sx={{ flex: 1 }}>
-                                    <Grid container spacing={2} >
-                                        <Grid item xs={12}>
-                                            <Grid item xs={4}>
-                                                <TextField
-                                                    required
-                                                    type="number"
-                                                    id="sdDescription"
-                                                    label="Capital raised till date (₹ Crore)"
-                                                    value={prelimApplicationFormData.sdDescription || ''}
-                                                    {...register("sdDescription")}
-                                                    error={errors.sdDescription && getValues("sdDescription") == '' ? true : false}
-                                                    onChange={handleChange}
-                                                    variant="standard"
-                                                    sx={{ display: 'flex', ml: 2 }}
-                                                    onKeyUp={(e) => {
-                                                        if ((e.target as HTMLInputElement).value.length > 4) {
-                                                            (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
-                                                        }
+                        <Box sx={{ mt: 3 }}>
+                            <Typography variant="body1" sx={{ fontWeight: 700, color: '#363062', mb: 3 }}>
+                                Capital & Funding Details
+                            </Typography>
+
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdDescription"
+                                        label="Capital raised till date (₹ Crore)"
+                                        value={prelimApplicationFormData.sdDescription || ''}
+                                        {...register("sdDescription")}
+                                        error={!!errors.sdDescription}
+                                        helperText={errors.sdDescription?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Divider sx={{ my: 2 }}>
+                                        <Chip label="Target Corpus" sx={{ fontWeight: 700, backgroundColor: 'rgba(54, 48, 98, 0.05)', color: '#363062' }} />
+                                    </Divider>
+                                </Grid>
+
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdTargetCorpusDomestic"
+                                        label="Domestic (₹ Crore)"
+                                        value={prelimApplicationFormData.sdTargetCorpusDomestic || ''}
+                                        {...register("sdTargetCorpusDomestic")}
+                                        error={!!errors.sdTargetCorpusDomestic}
+                                        helperText={errors.sdTargetCorpusDomestic?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdTargetCorpusOverseas"
+                                        label="Overseas (₹ Crore)"
+                                        value={prelimApplicationFormData.sdTargetCorpusOverseas || ''}
+                                        {...register("sdTargetCorpusOverseas")}
+                                        error={!!errors.sdTargetCorpusOverseas}
+                                        helperText={errors.sdTargetCorpusOverseas?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdTotalTargetCorpus"
+                                        label="Total Target Corpus (₹ Crore)"
+                                        value={prelimApplicationFormData.sdTotalTargetCorpus || ''}
+                                        {...register("sdTotalTargetCorpus")}
+                                        error={!!errors.sdTotalTargetCorpus}
+                                        helperText={errors.sdTotalTargetCorpus?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Divider sx={{ my: 2 }}>
+                                        <Chip label="Target Corpus (Green Shoe)" sx={{ fontWeight: 700, backgroundColor: 'rgba(54, 48, 98, 0.05)', color: '#363062' }} />
+                                    </Divider>
+                                </Grid>
+
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdGreenShoeTargetCorpusDomestic"
+                                        label="Domestic (Green Shoe) (₹ Crore)"
+                                        value={prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic || ''}
+                                        {...register("sdGreenShoeTargetCorpusDomestic")}
+                                        error={!!errors.sdGreenShoeTargetCorpusDomestic}
+                                        helperText={errors.sdGreenShoeTargetCorpusDomestic?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdGreenShoeTargetCorpusOverseas"
+                                        label="Overseas (Green Shoe) (₹ Crore)"
+                                        value={prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas || ''}
+                                        {...register("sdGreenShoeTargetCorpusOverseas")}
+                                        error={!!errors.sdGreenShoeTargetCorpusOverseas}
+                                        helperText={errors.sdGreenShoeTargetCorpusOverseas?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdGreenShoeTotalTargetCorpus"
+                                        label="Total (Green Shoe) (₹ Crore)"
+                                        value={prelimApplicationFormData.sdGreenShoeTotalTargetCorpus || ''}
+                                        {...register("sdGreenShoeTotalTargetCorpus")}
+                                        error={!!errors.sdGreenShoeTotalTargetCorpus}
+                                        helperText={errors.sdGreenShoeTotalTargetCorpus?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        p: 2,
+                                        borderRadius: '12px',
+                                        backgroundColor: 'rgba(54, 48, 98, 0.02)',
+                                        border: '1px dashed rgba(54, 48, 98, 0.2)',
+                                        mt: 2
+                                    }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062' }}>
+                                            First Closing Confirmed?
+                                        </Typography>
+                                        <FormControlLabel
+                                            control={<Switch checked={!!prelimApplicationFormData.firstClosing} onChange={handleToggle} />}
+                                            label={prelimApplicationFormData.firstClosing ? "Yes" : "No"}
+                                            sx={{ mr: 0 }}
+                                        />
+                                    </Box>
+                                </Grid>
+
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdFirstClosingDomesticAmount"
+                                        label={prelimApplicationFormData.firstClosing ? "Domestic Amount (₹ Crore)" : "Expected Domestic Amount (₹ Crore)"}
+                                        value={prelimApplicationFormData.sdFirstClosingDomesticAmount || ''}
+                                        {...register("sdFirstClosingDomesticAmount")}
+                                        error={!!errors.sdFirstClosingDomesticAmount}
+                                        helperText={errors.sdFirstClosingDomesticAmount?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <Controller
+                                            name="sdFirstClosingDomesticAmountDate"
+                                            control={control}
+                                            render={({ fieldState: { invalid } }) => (
+                                                <DesktopDatePicker
+                                                    inputFormat="DD/MM/YYYY"
+                                                    label="Closing Date (Domestic)"
+                                                    value={prelimApplicationFormData.sdFirstClosingDomesticAmountDate || null}
+                                                    onChange={(newValue: any) => {
+                                                        setValue('sdFirstClosingDomesticAmountDate', newValue);
+                                                        setDateValue("sdFirstClosingDomesticAmountDate", newValue);
                                                     }}
-                                                    inputProps={{ min: 0, max: 9999, step: 1 }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            fullWidth
+                                                            variant="outlined"
+                                                            {...params}
+                                                            error={invalid}
+                                                            helperText={invalid ? "This value is required" : null}
+                                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                                        />
+                                                    )}
                                                 />
-                                                {errors.sdDescription && <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                                    <>{errors.sdDescription && getValues("sdDescription") == ''?errors.sdDescription.message : ''}</>
-                                                </Typography>}
-                                            </Grid>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Typography variant="subtitle2" sx={{ mt: 5, flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Target Corpus</Typography>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <TextField
-                                                required
-                                                type="number"
-                                                id="sdTargetCorpusDomestic"
-                                                label="Domestic (₹ Crore)"
-                                                value={prelimApplicationFormData.sdTargetCorpusDomestic || ''}
-                                                {...register("sdTargetCorpusDomestic")}
-                                                error={errors.sdTargetCorpusDomestic && getValues("sdTargetCorpusDomestic") ==  '' ? true : false}
-                                                onChange={handleChange}
-                                                variant="standard"
-                                                sx={{ display: 'flex', ml: 2 }}
-                                            />
-                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                                <>{errors.sdTargetCorpusDomestic && getValues("sdTargetCorpusDomestic") ==  ''?errors.sdTargetCorpusDomestic.message : ''}</>
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <TextField
-                                                required
-                                                type="number"
-                                                id="sdTargetCorpusOverseas"
-                                                label="Overseas, if any (₹ Crore)"
-                                                value={prelimApplicationFormData.sdTargetCorpusOverseas || ''}
-                                                {...register("sdTargetCorpusOverseas")}
-                                                error={errors.sdTargetCorpusOverseas && getValues("sdTargetCorpusOverseas") ==  '' ? true : false}
-                                                onChange={handleChange}
-                                                variant="standard"
-                                                sx={{ display: 'flex' }}
-                                                onKeyUp={(e) => {
-                                                    if ((e.target as HTMLInputElement).value.length > 4) {
-                                                        (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
-                                                    }
-                                                }}
-                                                inputProps={{ min: 0, max: 9999, step: 1 }}
-                                            />
-                                            <Typography variant="caption" color="error">
-                                                <>{errors.sdTargetCorpusOverseas && getValues("sdTargetCorpusOverseas") ==  ''?errors.sdTargetCorpusOverseas.message : ''}</>
-                                            </Typography>
-                                        </Grid>
+                                            )}
+                                        />
+                                    </LocalizationProvider>
+                                </Grid>
 
-                                        <Grid item xs={4}>
-                                            <TextField
-                                                required
-                                                type="number"
-                                                id="sdTotalTargetCorpus"
-                                                label="Total Target Corpus (₹ Crore)"
-                                                value={prelimApplicationFormData.sdTotalTargetCorpus || ''}
-                                                {...register("sdTotalTargetCorpus")}
-                                                error={errors.sdTotalTargetCorpus && getValues("sdTotalTargetCorpus") ==  '' ? true : false}
-                                                onChange={handleChange}
-                                                variant="standard"
-                                                sx={{ display: 'flex', mr: 2 }}
-                                                onKeyUp={(e) => {
-                                                    if ((e.target as HTMLInputElement).value.length > 4) {
-                                                        (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
-                                                    }
-                                                }}
-                                                inputProps={{ min: 0, max: 9999, step: 1 }}
-                                            />
-                                            <Typography variant="caption" color="error">
-                                                <>{errors.sdTotalTargetCorpus && getValues("sdTotalTargetCorpus") ==  ''?errors.sdTotalTargetCorpus.message : ''}</>
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Typography variant="subtitle2" sx={{ mt: 5, flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Target Corpus (Green Shoe)</Typography>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <TextField
-                                                required
-                                                type="number"
-                                                id="sdGreenShoeTargetCorpusDomestic"
-                                                label="Domestic (₹ Crore)"
-                                                value={prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic || ''}
-                                                {...register("sdGreenShoeTargetCorpusDomestic")}
-                                                error={errors.sdGreenShoeTargetCorpusDomestic && getValues("sdGreenShoeTargetCorpusDomestic") ==  '' ? true : false}
-                                                onChange={handleChange}
-                                                variant="standard"
-                                                sx={{ display: 'flex', ml: 2 }}
-                                            />
-                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                                <>{errors.sdGreenShoeTargetCorpusDomestic && getValues("sdGreenShoeTargetCorpusDomestic") ==  ''?errors.sdGreenShoeTargetCorpusDomestic.message : ''}</>
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <TextField
-                                                required
-                                                type="number"
-                                                id="sdGreenShoeTargetCorpusOverseas"
-                                                label="Overseas, if any (₹ Crore)"
-                                                value={prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas || ''}
-                                                {...register("sdGreenShoeTargetCorpusOverseas")}
-                                                error={errors.sdGreenShoeTargetCorpusOverseas && getValues("sdGreenShoeTargetCorpusOverseas") ==  '' ? true : false}
-                                                onChange={handleChange}
-                                                variant="standard"
-                                                sx={{ display: 'flex' }}
-                                                onKeyUp={(e) => {
-                                                    if ((e.target as HTMLInputElement).value.length > 4) {
-                                                        (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
-                                                    }
-                                                }}
-                                                inputProps={{ min: 0, max: 9999, step: 1 }}
-                                            />
-                                            <Typography variant="caption" color="error">
-                                                <>{errors.sdGreenShoeTargetCorpusOverseas && getValues("sdGreenShoeTargetCorpusOverseas") ==  ''?errors.sdGreenShoeTargetCorpusOverseas.message : ''}</>
-                                            </Typography>
-                                        </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number"
+                                        id="sdFirstClosingOverseasAmount"
+                                        label={prelimApplicationFormData.firstClosing ? "Overseas Amount (₹ Crore)" : "Expected Overseas Amount (₹ Crore)"}
+                                        value={prelimApplicationFormData.sdFirstClosingOverseasAmount || ''}
+                                        {...register("sdFirstClosingOverseasAmount")}
+                                        error={!!errors.sdFirstClosingOverseasAmount}
+                                        helperText={errors.sdFirstClosingOverseasAmount?.message as string}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <Controller
+                                            name="sdFirstCorpusOverseasAmountDate"
+                                            control={control}
+                                            render={({ fieldState: { invalid } }) => (
+                                                <DesktopDatePicker
+                                                    inputFormat="DD/MM/YYYY"
+                                                    label="Closing Date (Overseas)"
+                                                    value={prelimApplicationFormData.sdFirstCorpusOverseasAmountDate || null}
+                                                    onChange={(newValue: any) => {
+                                                        setValue('sdFirstCorpusOverseasAmountDate', newValue);
+                                                        setDateValue("sdFirstCorpusOverseasAmountDate", newValue);
+                                                    }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            fullWidth
+                                                            variant="outlined"
+                                                            {...params}
+                                                            error={invalid}
+                                                            helperText={invalid ? "This value is required" : null}
+                                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                                        />
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                    </LocalizationProvider>
+                                </Grid>
 
-                                        <Grid item xs={4}>
-                                            <TextField
-                                                required
-                                                type="number"
-                                                id="sdGreenShoeTotalTargetCorpus"
-                                                label="Total Target Corpus (₹ Crore)"
-                                                value={prelimApplicationFormData.sdGreenShoeTotalTargetCorpus || ''}
-                                                {...register("sdGreenShoeTotalTargetCorpus")}
-                                                error={errors.sdGreenShoeTotalTargetCorpus && getValues("sdGreenShoeTotalTargetCorpus") ==  '' ? true : false}
-                                                onChange={handleChange}
-                                                variant="standard"
-                                                sx={{ display: 'flex', mr: 2 }}
-                                                onKeyUp={(e) => {
-                                                    if ((e.target as HTMLInputElement).value.length > 4) {
-                                                        (e.target as HTMLInputElement).value = (e.target as HTMLInputElement).value.substring(0, 4);
-                                                    }
-                                                }}
-                                                inputProps={{ min: 0, max: 9999, step: 1 }}
-                                            />
-                                            <Typography variant="caption" color="error">
-                                                <>{errors.sdGreenShoeTotalTargetCorpus && getValues("sdGreenShoeTotalTargetCorpus") ==  ''?errors.sdGreenShoeTotalTargetCorpus.message : ''}</>
-                                            </Typography>
+                                <Grid item xs={12}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            onClick={handleSubmit(onSubmit)}
+                                            sx={{
+                                                backgroundColor: '#363062',
+                                                px: 6,
+                                                py: 1.5,
+                                                borderRadius: '8px',
+                                                textTransform: 'none',
+                                                fontWeight: 700,
+                                                '&:hover': {
+                                                    backgroundColor: '#2a254d'
+                                                }
+                                            }}
+                                        >
+                                            Save Changes
+                                        </Button>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Box sx={{ mt: 5 }}>
+                            <Typography variant="body1" sx={{ fontWeight: 700, color: '#363062', mb: 3 }}>
+                                Supporting Documents
+                            </Typography>
+
+                            <Box sx={{
+                                p: 3,
+                                border: '1px solid rgba(0,0,0,0.08)',
+                                borderRadius: '16px',
+                                backgroundColor: '#fafafa'
+                            }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                                    <UploadIcon sx={{ color: '#363062', mr: 2 }} />
+                                    <Typography variant="subtitle2" sx={{ color: '#666' }}>
+                                        (Max. file size 5 MB each)
+                                    </Typography>
+                                </Box>
+
+                                {Number(prelimAppicationId) ? (
+                                    <Grid container spacing={2}>
+                                        <Grid item xs="auto">
+                                            <DocumentChip label="Pvt. Placement Memorandum" id={`sdPvtPlacementMemorandum${prelimAppicationId}`} />
                                         </Grid>
-                                        <Grid item xs={9}>
-                                            <Typography variant="subtitle2" sx={{ mt: 5, flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>First Closing</Typography>
-
+                                        <Grid item xs="auto">
+                                            <DocumentChip label="IM Agreement" id={`sdImAgreement${prelimAppicationId}`} />
                                         </Grid>
-                                        <Grid item xs={3}>
-                                            <FormControlLabel sx={{ mt: 5 }} control={<
-                                                Switch checked={!!prelimApplicationFormData.firstClosing}
-                                                onChange={handleToggle} />}
-                                                label={prelimApplicationFormData.firstClosing ? "Yes" : "No"} />
+                                        <Grid item xs="auto">
+                                            <DocumentChip label="Trust Deed" id={`sdTrustDeal${prelimAppicationId}`} />
                                         </Grid>
-                                        <Grid item xs={3}>
-                                            <TextField
-                                                required
-                                                type="number"
-                                                id="sdFirstClosingDomesticAmount"
-                                                label={prelimApplicationFormData.firstClosing ? "Domestic Amount (₹ Crore)" : "Expected Domestic Amount (₹ Crore)"}
-                                                value={prelimApplicationFormData.sdFirstClosingDomesticAmount || ''}
-                                                {...register("sdFirstClosingDomesticAmount")}
-                                                error={errors.sdFirstClosingDomesticAmount && getValues("sdFirstClosingDomesticAmount") ==  '' ? true : false}
-                                                onChange={handleChange}
-                                                variant="standard"
-                                                sx={{ display: 'flex', ml: 2 }}
-                                            />
-                                            <Typography variant="caption" color="error" sx={{ ml: '20px' }}>
-                                                <>{errors.sdFirstClosingDomesticAmount && getValues("sdFirstClosingDomesticAmount") ==  ''?errors.sdFirstClosingDomesticAmount.message : ''}</>
-                                            </Typography>
-                                        </Grid>
-
-                                        <Grid item xs={3}>
-                                            <LocalizationProvider dateAdapter={AdapterDayjs} >
-                                                <Stack spacing={3}>
-                                                    <Controller
-                                                        name="sdFirstClosingDomesticAmountDate"
-                                                        control={control}
-                                                        // defaultValue={null}
-                                                        render={({
-                                                            field: { onChange, value },
-                                                            fieldState: { error, invalid }
-                                                        }) => (
-                                                            // console.log(invalid),
-                                                            (<DesktopDatePicker
-                                                                inputFormat='DD/MM/YYYY'
-                                                                label="Date"
-                                                                value={prelimApplicationFormData.sdFirstClosingDomesticAmountDate || null}
-                                                                minDate={Today.toString()}
-                                                                onChange={(newValue: any) => {
-                                                                    setValue('sdFirstClosingDomesticAmountDate', newValue);
-                                                                    setDateValue("sdFirstClosingDomesticAmountDate", newValue);
-                                                                }}
-                                                                renderInput={(params) => <TextField
-                                                                    helperText={(invalid && getValues("sdFirstClosingDomesticAmountDate") == null) ? <Typography variant="caption" {...register('sdFirstClosingDomesticAmountDate')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
-                                                            />
-                                                            )
-                                                        )}
-                                                    />
-                                                </Stack>
-                                            </LocalizationProvider>
-                                        </Grid>
-
-                                        <Grid item xs={3}>
-                                            <TextField
-                                                required
-                                                type="number"
-                                                id="sdFirstClosingOverseasAmount"
-                                                label={prelimApplicationFormData.firstClosing ? "Overseas Amount (₹ Crore)" : "Expected Overseas Amount (₹ Crore)"}
-                                                value={prelimApplicationFormData.sdFirstClosingOverseasAmount || ''}
-                                                {...register("sdFirstClosingOverseasAmount")}
-                                                error={errors.sdFirstClosingOverseasAmount && getValues("sdFirstClosingOverseasAmount") ==  '' ? true : false}
-                                                onChange={handleChange}
-                                                variant="standard"
-                                                sx={{ display: 'flex' }}
-                                            />
-                                            <Typography variant="caption" color="error">
-                                                <>{errors.sdFirstClosingOverseasAmount && getValues("sdFirstClosingOverseasAmount") ==  ''?errors.sdFirstClosingOverseasAmount.message : ''}</>
-                                            </Typography>
-                                        </Grid>
-
-
-
-                                        <Grid item xs={3}>
-                                            <LocalizationProvider dateAdapter={AdapterDayjs}  >
-                                                <Stack spacing={3}>
-                                                    <Controller
-                                                        name="sdFirstCorpusOverseasAmountDate"
-                                                        control={control}
-                                                        // defaultValue={null}
-                                                        render={({
-                                                            field: { onChange, value },
-                                                            fieldState: { error, invalid }
-                                                        }) => (
-                                                            // console.log(invalid),
-                                                            (<DesktopDatePicker
-                                                                inputFormat='DD/MM/YYYY'
-                                                                label="Date"
-                                                                value={prelimApplicationFormData.sdFirstCorpusOverseasAmountDate || null}
-                                                                minDate={Today.toString()}
-                                                                onChange={(newValue: any) => {
-                                                                    setValue('sdFirstCorpusOverseasAmountDate', newValue);
-                                                                    setDateValue("sdFirstCorpusOverseasAmountDate", newValue);
-                                                                }}
-                                                                renderInput={(params) => <TextField
-                                                                    helperText={(invalid && getValues("sdFirstCorpusOverseasAmountDate") == null) ? <Typography variant="caption" {...register('sdFirstCorpusOverseasAmountDate')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
-                                                            />
-                                                            )
-                                                        )}
-                                                    />
-                                                </Stack>
-                                            </LocalizationProvider>
-                                        </Grid>
-
-                                        <Grid item xs={2} >
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Button
-                                                    type="submit"
-                                                    variant="contained"
-                                                    disableElevation sx={{ textTransform: 'none', width: 200 }}
-                                                    onClick={handleSubmit(onSubmit)}
-                                                    // onClick={savePrelimApplicationForm}
-                                                >
-                                                    Save
-                                                </Button>
-                                            </Box>
-                                        </Grid  >
-                                    </Grid>
-                                </CardContent>
-                            </Card>
-                            <Card sx={{ display: 'flex', }}>
-                                <CardContent sx={{ flex: 1 }}>
-                                    <Grid container spacing={2} >
-                                        <Grid item xs={12}>
-                                            <Box sx={{ display: 'inline-flex' }}>
-                                                <UploadIcon />
-                                                <Typography
-                                                    variant="subtitle1"
-                                                    sx={{ flex: 1, ml: '10px', mb: '10px', textAlign: "left", fontWeight: 'bold' }}>
-                                                    Supporting Documents
-                                                    <span style={{ fontWeight: "normal" }}>
-                                                        (Max. file size 5 MB each)</span> </Typography>
-                                            </Box>
-                                            {Number(prelimAppicationId) ?
-                                                <Grid item xs={12}>
-                                                    <Grid container spacing={2}>
-                                                        <Grid item xs="auto">
-                                                            <DocumentChip
-                                                                label="Pvt. Placement Memorandum"
-                                                                id={`sdPvtPlacementMemorandum${prelimAppicationId}`} /> 
-                                                        </Grid>
-                                                        <Grid item xs="auto">
-                                                            <DocumentChip
-                                                                label="IM Agreement"
-                                                                id={`sdImAgreement${prelimAppicationId}`} />
-                                                        </Grid>
-                                                        <Grid item xs="auto">
-                                                            <DocumentChip
-                                                                label="Trust Deed"
-                                                                id={`sdTrustDeal${prelimAppicationId}`} />
-                                                        </Grid>
-                                                        <Grid item xs="auto">
-                                                            <DocumentChip
-                                                                label="SEBI Certificate"
-                                                                id={`sdSEBICertificate${prelimAppicationId}`} />
-                                                        </Grid>
-                                                    </Grid>
-                                                </Grid> : <Grid item xs={12}>Please save the form to upload documents</Grid>}
-
+                                        <Grid item xs="auto">
+                                            <DocumentChip label="SEBI Certificate" id={`sdSEBICertificate${prelimAppicationId}`} />
                                         </Grid>
                                     </Grid>
-                                </CardContent>
-                            </Card>
+                                ) : (
+                                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                        Please save the form to upload documents.
+                                    </Typography>
+                                )}
+                            </Box>
                         </Box>
                     </Grid>
                 </Grid>
-            </Box>
+            </Box >
             // </form>
         );
     else

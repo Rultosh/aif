@@ -45,8 +45,29 @@ export const TeamMemberList = (props: any) => {
             teamMembersState.teamMembers.map((teamMember: ITeamMember) => {
                 return (<TeamMemberRow teamMember={teamMember} />)
             }) : <></>}
-        <Button onClick={openModel} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-            Add new team member
+        <Button
+            onClick={openModel}
+            variant="outlined"
+            sx={{
+                textTransform: 'none',
+                mt: 2,
+                borderRadius: '8px',
+                fontWeight: 600,
+                color: '#363062',
+                borderColor: 'rgba(54, 48, 98, 0.4)',
+                borderStyle: 'dashed',
+                borderWidth: '2px',
+                width: '100%',
+                py: 2,
+                '&:hover': {
+                    borderColor: '#363062',
+                    backgroundColor: 'rgba(54, 48, 98, 0.04)',
+                    borderStyle: 'dashed',
+                    borderWidth: '2px',
+                }
+            }}
+        >
+            + Add New Team Member
         </Button>
         <TeamMemberModel
             teamMember={defaultTeamMember}

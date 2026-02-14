@@ -23,7 +23,7 @@ type InitialState = {
     selfRatingData: any
 }
 
-export const SelfRating = (props:any) => {
+export const SelfRating = (props: any) => {
 
     const { id } = useParams();
     const [actionUid] = useState(uuid());
@@ -40,7 +40,7 @@ export const SelfRating = (props:any) => {
     // const [selfRating, setSelfRating] = useCookie('selfRating', selfRatingCookie);
 
     useEffect(() => {
-        if(props.checkUnAuth){
+        if (props.checkUnAuth) {
             navigate('/login')
         }
 
@@ -48,7 +48,7 @@ export const SelfRating = (props:any) => {
         //     handleClickSave();
         // }
     })
-    
+
     useEffect(() => {
         dispatch(
             fetchSelfRatingAsync(
@@ -154,7 +154,7 @@ export const SelfRating = (props:any) => {
     // const validationSchema = Yup.object().shape({
     //     comments: Yup.string().required("Comments is required")
     //   });
-    
+
     //   const {
     //     control,
     //     register,
@@ -166,72 +166,80 @@ export const SelfRating = (props:any) => {
     //   } = useForm({
     //     resolver: yupResolver(validationSchema),
     //   });
-    
+
     //   const onSubmit = (data: any) => {
     //     console.log(data);
     //     handleClickSave();
     //   };
-    
+
     for (let i = 0; i < selfQuestions.length; i++) {
         let qes = selfQuestions[i].id.toString().concat('. ', selfQuestions[i].text);
         let idxVal = i;
         if (selfQuestions[i] && (selfRatingState.status.fetchStatus === FetchStatus.IDLE) || (id?.toString() == 'NEW')) {
             selfRatingQuestionComponents.push(
-                <React.Fragment >
-                    < Card sx={{ display: 'flex', mt: 2, backgroundColor: "#f2f2f2" }}>
-                        <CardContent sx={{ flex: 1 }}>
-                            <Grid container spacing={2}>
+                <React.Fragment key={i}>
+                    <Card sx={{
+                        display: 'flex',
+                        mt: 3,
+                        borderRadius: '12px',
+                        boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                        border: '1px solid rgba(0,0,0,0.05)',
+                        transition: 'transform 0.2s, box-shadow 0.2s',
+                        '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                        }
+                    }}>
+                        <CardContent sx={{ p: 3, width: '100%' }}>
+                            <Grid container spacing={3}>
                                 <Grid item xs={12}>
-                                    <Box sx={{ justifyContent: 'left', ml: 1, mt: 1 }}>
-                                        <FormControl >
-                                            <Box >
-                                                <FormLabel >{qes}</FormLabel>
-                                            </Box>
-                                            <RadioGroup
-                                                row
-                                                value={getValue("q" + (i + 1).toString())}
-                                                //defaultValue= ">=5% but less than 10% of corpus"
-                                                name="position"
-                                                onChange={(e) => handleChange(e, i + 1)}
-                                            >
-                                                {selfQuestions[i].options.map((val, index) => (
-                                                    <Grid item xs={selfQuestions[idxVal].size}>
-                                                        <FormControlLabel onChange={() => calculateScore(selfQuestions[i], val, idxVal)}
-                                                            value={val} control={<Radio />}
-                                                            label={val} />
-                                                    </Grid>
-                                                ))}
-                                            </RadioGroup>
+                                    <FormControl fullWidth>
+                                        <Box sx={{ mb: 2 }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062' }}>
+                                                {qes}
+                                            </Typography>
+                                        </Box>
+                                        <RadioGroup
+                                            row
+                                            value={getValue("q" + (i + 1).toString())}
+                                            name={"q" + (i + 1).toString()}
+                                            onChange={(e) => handleChange(e, i + 1)}
+                                            sx={{ mb: 2 }}
+                                        >
+                                            {selfQuestions[i].options.map((val, index) => (
+                                                <Grid item xs={selfQuestions[idxVal].size} key={index}>
+                                                    <FormControlLabel
+                                                        onChange={() => calculateScore(selfQuestions[i], val, idxVal)}
+                                                        value={val}
+                                                        control={<Radio color="primary" />}
+                                                        label={<Typography variant="body2">{val}</Typography>}
+                                                    />
+                                                </Grid>
+                                            ))}
+                                        </RadioGroup>
+                                    </FormControl>
 
-                                        </FormControl>
-                                        <Grid container >
-                                            <Grid item xs={12}>
-                                                <TextField
-                                                    required
-                                                    id={"q" + (i + 1).toString() + "Comments"}
-                                                    label="Comments if any"
-                                                    // {...register("comments")}
-                                                    // error={(errors.comments && getValues("comments") == '') ? true : false}
-                                                    //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
-                                                    //value={selfRatingValue["q" + (i + 1).toString()+"Comments" as key of  as keyof ISelfRating]] || ''}
-                                                    value={getValue("q" + (i + 1).toString() + "Comments") || ''}
+                                    <Divider sx={{ mb: 3, opacity: 0.6 }} />
 
-                                                    variant="standard"
-                                                    multiline
-                                                    onChange={(e) => handleChange(e, (i + 1).toString() + "Comments")}
-
-                                                    sx={{ display: 'flex', ml: 2 }}
-                                                />
-                                                {/* <Typography variant="caption" color="error">
-                                                  <>{(errors.comments && getValues("comments") == '') ? errors.comments.message : ''}</>
-                                                </Typography> */}
-                                            </Grid>
-                                        </Grid>
-
-                                    </Box>
+                                    <TextField
+                                        fullWidth
+                                        id={"q" + (i + 1).toString() + "Comments"}
+                                        label="Comments (Optional)"
+                                        value={getValue("q" + (i + 1).toString() + "Comments") || ''}
+                                        variant="outlined"
+                                        multiline
+                                        rows={2}
+                                        onChange={(e) => handleChange(e, (i + 1).toString() + "Comments")}
+                                        placeholder="Add any additional context here..."
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '8px',
+                                                backgroundColor: 'rgba(54, 48, 98, 0.01)'
+                                            }
+                                        }}
+                                    />
                                 </Grid>
                             </Grid>
-
                         </CardContent>
                     </Card>
                 </React.Fragment>)
@@ -240,49 +248,104 @@ export const SelfRating = (props:any) => {
 
     return (
         <div className="formAnimation">
-            <Card sx={{ display: 'flex', mb: 2 }}>
-                <CardContent sx={{ flex: 1 }}>
-                    <Grid container spacing={2} >
-                        <Grid item xs={11}>
-                            <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Self Rating</Typography>
-                        </Grid>
-                        <Grid item xs={1}>
-                            {['ADMIN','USERADMIN'].includes(usersState.role!= undefined? usersState.role : '') ?
-                                <Box sx={{ position: 'fixed', backgroundColor: '#D586F7' }}>
-                                    <Box sx={{ display: 'flex', flexDirection: 'column-reverse', flexWrap: 'wrap', justifyContent: 'center', alignContent: 'flex-end', }}>
-                                        <Typography sx={{ flex: 1, fontWeight: 'bold' }}>Score:{selfRatingValue.score || 0}</Typography>
-                                    </Box>
-                                </Box>:<></>
-                                }
-                        </Grid>
-                    </Grid>
+            <Card sx={{
+                display: 'flex',
+                mb: 3,
+                borderRadius: '16px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                border: '1px solid rgba(0,0,0,0.05)'
+            }}>
+                <CardContent sx={{ p: 4, width: '100%' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062' }}>
+                            Self Rating
+                        </Typography>
 
-                    {selfRatingQuestionComponents}
-                    <Button
-                        onClick={(e) => handleClick(e, "previous")}
-                        startIcon={<ArrowLeftIcon />}
-                        variant="contained"
-                        disableElevation
-                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                        Profile
-                    </Button>
-                    <Button
-                        color='success'
-                        onClick={handleClickSave}
-                        // onClick={handleSubmit(onSubmit)}
-                        variant="contained"
-                        disableElevation
-                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                        Save
-                    </Button>
-                    <Button
-                        onClick={(e) => handleClick(e, "next")}
-                        endIcon={<ArrowRightIcon />}
-                        variant="contained"
-                        disableElevation
-                        sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                        Declaration
-                    </Button>
+                        {['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && (
+                            <Box sx={{
+                                backgroundColor: '#D586F7',
+                                color: 'white',
+                                px: 3,
+                                py: 1.5,
+                                borderRadius: '12px',
+                                boxShadow: '0 4px 12px rgba(213, 134, 247, 0.3)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1
+                            }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 600, opacity: 0.9 }}>Total Score:</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 800 }}>{selfRatingValue.score || 0}</Typography>
+                            </Box>
+                        )}
+                    </Box>
+
+                    <Box sx={{ mb: 4 }}>
+                        {selfRatingQuestionComponents}
+                    </Box>
+
+                    <Divider sx={{ mb: 4 }} />
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Button
+                            onClick={(e) => handleClick(e, "previous")}
+                            startIcon={<ArrowLeftIcon />}
+                            variant="outlined"
+                            sx={{
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                px: 3,
+                                fontWeight: 600,
+                                color: '#363062',
+                                borderColor: '#363062',
+                                '&:hover': {
+                                    borderColor: '#4d4585',
+                                    backgroundColor: 'rgba(54, 48, 98, 0.04)'
+                                }
+                            }} >
+                            Back to Profile
+                        </Button>
+
+                        <Box>
+                            <Button
+                                color='success'
+                                onClick={handleClickSave}
+                                variant="contained"
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: '8px',
+                                    px: 4,
+                                    fontWeight: 600,
+                                    backgroundColor: '#363062',
+                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
+                                    '&:hover': {
+                                        backgroundColor: '#4d4585',
+                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                    },
+                                    mr: 2
+                                }} >
+                                Save
+                            </Button>
+                            <Button
+                                onClick={(e) => handleClick(e, "next")}
+                                endIcon={<ArrowRightIcon />}
+                                variant="contained"
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: '8px',
+                                    px: 4,
+                                    fontWeight: 600,
+                                    backgroundColor: '#D586F7',
+                                    color: 'white',
+                                    boxShadow: '0 4px 12px rgba(213, 134, 247, 0.2)',
+                                    '&:hover': {
+                                        backgroundColor: '#c466e8',
+                                        boxShadow: '0 6px 16px rgba(213, 134, 247, 0.3)'
+                                    }
+                                }} >
+                                Declaration
+                            </Button>
+                        </Box>
+                    </Box>
                 </CardContent >
             </Card >
         </div>
