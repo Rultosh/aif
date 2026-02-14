@@ -3,17 +3,33 @@ export interface IInvestmentPast {
     prelimApplicationId: Number | undefined,
     nameOfCompany: String | undefined,
     sector: String | undefined,
-    amountInvested : Number | undefined,
-    dateOfInvestment : String | undefined,
-    briefProfile: String | undefined
+    briefProfile: String | undefined,
+    dateOfInvestment: Date | undefined,
+    amountInvested: Number | undefined,
+    currentStatus: String | undefined,
+    instrumentType: String | undefined,
+    shareholdingInvestee: String | undefined,
+    moic: String | undefined,
+    grossIrr: String | undefined,
+    conflictOfInterest: String | undefined,
+    stakeOfEmployee: String | undefined,
+    investmentStageFundingRound: String | undefined
 }
 
-export const defaultInvestmentPast : IInvestmentPast = {
+export const defaultInvestmentPast: IInvestmentPast = {
     id: undefined,
     prelimApplicationId: undefined,
     nameOfCompany: undefined,
     sector: undefined,
-    amountInvested: undefined,
+    briefProfile: undefined,
     dateOfInvestment: undefined,
-    briefProfile: undefined
-}  
+    amountInvested: undefined,
+    currentStatus: undefined,
+    instrumentType: undefined,
+    shareholdingInvestee: undefined,
+    moic: undefined,
+    grossIrr: undefined,
+    conflictOfInterest: undefined,
+    stakeOfEmployee: undefined,
+    investmentStageFundingRound: undefined
+}

@@ -59,7 +59,7 @@ export default function ListFiles(props: ListFilesProps) {
       padding: '10px'
     },
   }));
-  
+
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(odd)': {
       backgroundColor: theme.palette.action.hover,
@@ -69,14 +69,13 @@ export default function ListFiles(props: ListFilesProps) {
       border: 0,
     },
   }));
-console.log(files);
-  return <div style={{margin: "10px 0px"}}>
-    {files.length > 0? 
+  console.log(files);
+  return <>{files.length > 0 ? <div style={{ margin: "10px 0px" }}>
     <TableContainer component={Paper}>
       <Table aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell align="center">File Name</StyledTableCell>
+            <StyledTableCell align="left">File Name</StyledTableCell>
             <StyledTableCell align="center">Actions</StyledTableCell>
           </TableRow>
         </TableHead>
@@ -84,17 +83,17 @@ console.log(files);
           {
             files.map((file) => {
               return <StyledTableRow>
-                <StyledTableCell sx={{ textAlign:"justify !important" }}>{file.name}</StyledTableCell>
+                <StyledTableCell sx={{ textAlign: "justify !important" }}>{file.name}</StyledTableCell>
                 <StyledTableCell align="right">
-                  <div onClick={(event) => {event.stopPropagation(); deleteFile(file)}} style={{display: "flex"}}>
+                  <div onClick={(event) => { event.stopPropagation(); deleteFile(file) }} style={{ display: "flex" }}>
                     <Tooltip title="Download">
-                      <IconButton href={`${file.url}?access_token=${localStorage.getItem('token')}`} onClick={(event) => {event.stopPropagation()}}>
-                        <DownloadIcon style={{fontSize: "20px", color: "green", fontWeight: "bold", verticalAlign: "bottom"}} />
+                      <IconButton href={`${file.url}?access_token=${localStorage.getItem('token')}`} onClick={(event) => { event.stopPropagation() }}>
+                        <DownloadIcon style={{ fontSize: "20px", color: "green", fontWeight: "bold", verticalAlign: "bottom" }} />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Delete">
                       <IconButton>
-                        <DeleteIcon style={{fontSize: "19px", color: "red", fontWeight: "bold", verticalAlign: "bottom"}}/>
+                        <DeleteIcon style={{ fontSize: "19px", color: "red", fontWeight: "bold", verticalAlign: "bottom" }} />
                       </IconButton>
                     </Tooltip>
                   </div>
@@ -102,9 +101,10 @@ console.log(files);
               </StyledTableRow>
             })
           }
-          
-    </TableBody>
+
+        </TableBody>
       </Table>
-    </TableContainer> : ''}
-  </div>
+    </TableContainer>
+  </div> : ''}
+  </>
 }

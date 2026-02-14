@@ -24,11 +24,11 @@ export const InvestmentPastRow = (props: InvestmentPastRowPros) => {
   const handleClose = () => setOpen(false);
 
   function handleDelete() {
-      dispatch(
-        deleteInvestmentPastAsync(
-          wrapArgument(
-            actionUid, props.row)
-        ))
+    dispatch(
+      deleteInvestmentPastAsync(
+        wrapArgument(
+          actionUid, props.row)
+      ))
   }
 
   return <TableRow key={`${props.row.nameOfCompany}`}>
@@ -40,14 +40,14 @@ export const InvestmentPastRow = (props: InvestmentPastRowPros) => {
     <TableCell align="center">{Moment(String(props.row.dateOfInvestment)).format("DD/MM/YYYY")}</TableCell>
     <TableCell align="center">{String(props.row.briefProfile)}</TableCell>
     <TableCell align="center">
-      <Edit onClick={handleOpen}/>&nbsp;
+      <Edit onClick={handleOpen} />&nbsp;
       <Delete onClick={handleDelete}></Delete>
     </TableCell>
-    {open?<InvestmentPastModel 
-            investmentPastFormData={props.row} 
-            open={open} 
-            handleClose={handleClose} 
-            prelimApplicationId={props.row.prelimApplicationId}/>
-          :<></>}
+    {open ? <InvestmentPastModel
+      investmentPastFormData={props.row}
+      open={open}
+      handleClose={handleClose}
+      prelimApplicationId={props.row.prelimApplicationId} />
+      : <></>}
   </TableRow>
 }

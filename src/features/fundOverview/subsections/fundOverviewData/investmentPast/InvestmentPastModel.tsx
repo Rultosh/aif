@@ -1,16 +1,17 @@
-import { Box, Button, Card, CardContent, Grid, Modal, Stack, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
 import { createInvestmentPastAsync, updateInvestmentPastAsync } from './investmentPastSlice'
 import { useAppDispatch } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultInvestmentPast, IInvestmentPast } from "./IInvestmentPast";
-import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-
+import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 interface InvestmentPastModelProps {
   investmentPastFormData: IInvestmentPast,
@@ -22,21 +23,12 @@ interface InvestmentPastModelProps {
 export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
 
   const [actionUid] = useState(uuid())
-  const [investmentPastFormData, setinvestmentPastFormData] = useState(defaultInvestmentPast)
+  const [investmentPastFormData, setInvestmentPastFormData] = useState(defaultInvestmentPast)
 
   const dispatch = useAppDispatch();
 
-
-  const setDateValue = (key: String, value: any) => {
-    let copiedValue: IInvestmentPast = { ...investmentPastFormData };
-
-    copiedValue[key as keyof IInvestmentPast] = value;
-
-    setinvestmentPastFormData(copiedValue)
-  };
-
   function handleSubmitForm() {
-    console.log("Saving Past investment ", investmentPastFormData)
+    console.log("Saving investment Past", investmentPastFormData)
     if (investmentPastFormData.id) {
       dispatch(
         updateInvestmentPastAsync(
@@ -44,13 +36,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
         )
       )
     } else {
-      console.log(investmentPastFormData)
       dispatch(
         createInvestmentPastAsync(
           wrapArgument(actionUid, investmentPastFormData)
         )
       )
-      setinvestmentPastFormData({ ...props.investmentPastFormData, prelimApplicationId: props.prelimApplicationId })
     }
     handleCloseModal();
   }
@@ -61,28 +51,51 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
   }
 
   useEffect(() => {
-    setinvestmentPastFormData({ ...props.investmentPastFormData, prelimApplicationId: props.prelimApplicationId })
-
-    reset(props.investmentPastFormData);
-
-    console.log({ ...props.investmentPastFormData, prelimApplicationId: props.prelimApplicationId })
-  }, [])
+    const data = { ...props.investmentPastFormData, prelimApplicationId: props.prelimApplicationId };
+    setInvestmentPastFormData(data)
+    reset(data);
+  }, [props.investmentPastFormData, props.open])
 
   const handleChange = (ev: any) => {
     ev.preventDefault();
-    console.log('handle change', ev.target.id, ev.target.value);
-    // if(ev.target.id = "dateOfInvestment"){
-    //   ev.target.value = moment(ev.target.value).utc().format('YYYY-MM-DD')
-    // }
+    let value = ev.target.value;
+    const name = ev.target.name || ev.target.id;
+
+    if (name === 'grossIrr') {
+      if (value !== '') {
+        const numVal = parseFloat(value);
+        if (numVal > 100) value = '100';
+        if (value.includes('.')) {
+          const parts = value.split('.');
+          if (parts[1].length > 2) {
+            value = parts[0] + '.' + parts[1].slice(0, 2);
+          }
+        }
+      }
+    }
 
     let copiedValue: IInvestmentPast = { ...investmentPastFormData };
+    copiedValue[name as keyof IInvestmentPast] = value;
 
-    copiedValue[ev.target.id as keyof IInvestmentPast] =
-      ev.target.id !== undefined ? ev.target.value : ev.target.value
+    setValue(name as any, value);
+    setInvestmentPastFormData(copiedValue)
+  };
 
-    console.log(copiedValue, props.prelimApplicationId)
-    setValue(ev.target.name, ev.target.value);
-    setinvestmentPastFormData(copiedValue)
+  const handleBlur = (ev: any) => {
+    const name = ev.target.name || ev.target.id;
+    let value = ev.target.value;
+
+    if (name === 'grossIrr' && value !== '') {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        const formattedValue = numValue.toFixed(2);
+        setValue(name as any, formattedValue);
+        setInvestmentPastFormData(prev => ({
+          ...prev,
+          [name]: formattedValue
+        }));
+      }
+    }
   };
 
   const style = {
@@ -92,28 +105,38 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     transform: 'translate(-50%, -50%)',
     width: '80%',
     bgcolor: 'background.paper',
-    border: '2px solid #000',
+    border: 'none',
     boxShadow: 24,
     p: 4,
-    maxHeight: '70vh',
-    overflow: 'auto'
+    borderRadius: '12px',
+    maxHeight: '80vh',
+    overflowY: 'auto' as 'auto',
+    outline: 'none'
   };
-    
+
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
   const htmlTagsNotAllowed = "Tags not allowed in input.";
 
   const validationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name of Company is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    amountInvested: Yup.string().required("Amount Invested is required"),
-    briefProfile: Yup.string().required("Brief Profile is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    dateOfInvestment: Yup.string().required("Date of Investment is required"),
+    briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    dateOfInvestment: Yup.string().required("Investment Date is required").nullable(),
+    amountInvested: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("Deal Size is required"),
+    currentStatus: Yup.string().required("Current Status is required").nullable(),
+    instrumentType: Yup.string().required("Instrument Type is required").nullable(),
+    shareholdingInvestee: Yup.string().required("Shareholding in investee company is required").nullable(),
+    moic: Yup.string().required("MOIC is required").nullable(),
+    grossIrr: Yup.string().required("Gross IRR is required").nullable(),
+    conflictOfInterest: Yup.string().nullable(),
+    stakeOfEmployee: Yup.string().nullable(),
+    investmentStageFundingRound: Yup.string().nullable(),
   });
 
   const {
     control,
-    getValues,
     setValue,
+    getValues,
     register,
     reset,
     handleSubmit,
@@ -123,10 +146,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
   });
 
   const onSubmit = (data: any) => {
-    console.log(data);
-    setinvestmentPastFormData(data);
+    setInvestmentPastFormData(data);
     handleSubmitForm();
   };
+
+  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
 
   return <Modal
     open={props.open}
@@ -135,120 +159,248 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     aria-describedby="modal-modal-description"
   >
     <Box sx={style}>
-      <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-        <Grid container spacing={2} >
-          <Grid item xs={9}>
-            <Box sx={{ display: 'inline-flex' }}>
-              <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Add Investment</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={4.5}>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details Of Past Investment</Typography>
+      <Box component="form">
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
             <TextField
               required
+              fullWidth
               id="nameOfCompany"
-              label="Name Of Company"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPastFormData.nameOfCompany}
+              label="Name of the investee company"
+              value={investmentPastFormData.nameOfCompany || ''}
               {...register("nameOfCompany")}
-              error={(errors.nameOfCompany) ? true : false}
-              variant="standard"
+              error={!!errors.nameOfCompany}
+              helperText={errors.nameOfCompany?.message as string}
+              variant="outlined"
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.nameOfCompany)?errors.nameOfCompany.message : ''}</>
-            </Typography>
           </Grid>
-          <Grid item xs={3.5}>
-            <TextField
-              required
-              id="sector"
-              label="Sector"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPastFormData.sector}
-              {...register("sector")}
-              error={(errors.sector) ? true : false}
-              variant="standard"
-              onChange={handleChange}
-
-              sx={{ display: 'flex' }}
-            />
-            <Typography variant="caption" color="error">
-              <>{(errors.sector)?errors.sector.message : ''}</>
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              required
-              type="number"
-              id="amountInvested"
-              label="Amount Invested (₹ Crore)"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPastFormData.amountInvested}
-              {...register("amountInvested")}
-              error={(errors.amountInvested && getValues("amountInvested") == '') ? true : false}
-              variant="standard"
-              onChange={handleChange}
-
-              sx={{ display: 'flex' }}
-            />
-            <Typography variant="caption" color="error">
-              <>{(errors.amountInvested && getValues("amountInvested") == '')?errors.amountInvested.message : ''}</>
-            </Typography>
-          </Grid>
-          <Grid item xs={7.5}>
-            <TextField
-              required
-              id="briefProfile"
-              label="Brief Profile"
-              value={investmentPastFormData.briefProfile}
-              {...register("briefProfile")}
-              error={(errors.briefProfile) ? true : false}
-              variant="standard"
-              multiline
-              onChange={handleChange}
-
-              sx={{ display: 'flex' }}
-            />
-            <Typography variant="caption" color="error">
-              <>{(errors.briefProfile)?errors.briefProfile.message : ''}</>
-            </Typography>
-          </Grid>
-          <Grid item xs={4.5}>
-            <LocalizationProvider dateAdapter={AdapterDayjs} >
-              <Stack spacing={3}>
-                <Controller
-                  name="dateOfInvestment"
-                  control={control}
-                  defaultValue={null}
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error, invalid }
-                  }) => (
-                    // console.log(invalid),
-                    (<DesktopDatePicker
-                      inputFormat='DD/MM/YYYY'
-                      disableFuture={true}
-                      label="Date Of Investment"
-                      value={investmentPastFormData.dateOfInvestment || null}
-                      // minDate={Today.toString()}
-                      onChange={(newValue) => {
-                        setValue('dateOfInvestment', newValue);
-                        setDateValue("dateOfInvestment", newValue);
-                      }}
-                      renderInput={(params) => <TextField
-                        helperText={(invalid && getValues("dateOfInvestment") == null) ? <Typography variant="caption" {...register('dateOfInvestment')} color="error">This value is required</Typography> : null} error={invalid} {...params} />}
-                    />
-                    )
-                  )}
-                />
-              </Stack>
+          <Grid item xs={12} md={6}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Controller
+                name="dateOfInvestment"
+                control={control}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <DesktopDatePicker
+                    label="Investment Date"
+                    inputFormat="DD/MM/YYYY"
+                    value={value || null}
+                    onChange={(newValue) => {
+                      onChange(newValue);
+                      setInvestmentPastFormData(prev => ({ ...prev, dateOfInvestment: newValue }));
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={!!error}
+                        helperText={error?.message}
+                        sx={fieldSx}
+                      />
+                    )}
+                  />
+                )}
+              />
             </LocalizationProvider>
           </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              required
+              fullWidth
+              id="sector"
+              label="Sector"
+              value={investmentPastFormData.sector || ''}
+              variant="outlined"
+              {...register("sector")}
+              error={!!errors.sector}
+              helperText={errors.sector?.message as string}
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              required
+              fullWidth
+              type="number"
+              id="amountInvested"
+              label="Deal Size / Amount Invested (in Rs. Cr)"
+              value={investmentPastFormData.amountInvested || ''}
+              {...register("amountInvested")}
+              error={!!errors.amountInvested}
+              helperText={errors.amountInvested?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              id="briefProfile"
+              label="Business Introduction of the company"
+              value={investmentPastFormData.briefProfile || ''}
+              variant="outlined"
+              multiline
+              rows={3}
+              {...register("briefProfile")}
+              error={!!errors.briefProfile}
+              helperText={errors.briefProfile?.message as string}
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              required
+              fullWidth
+              id="shareholdingInvestee"
+              label="Shareholding in the investee company"
+              value={investmentPastFormData.shareholdingInvestee || ''}
+              {...register("shareholdingInvestee")}
+              error={!!errors.shareholdingInvestee}
+              helperText={errors.shareholdingInvestee?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <FormControl fullWidth variant="outlined" error={!!errors.currentStatus} sx={fieldSx}>
+              <InputLabel id="currentStatus-label">Current Status</InputLabel>
+              <Controller
+                name="currentStatus"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    labelId="currentStatus-label"
+                    label="Current Status"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleChange(e);
+                    }}
+                  >
+                    <MenuItem value="Exited">Exited</MenuItem>
+                    <MenuItem value="Partially Exited">Partially Exited</MenuItem>
+                    <MenuItem value="Active">Active</MenuItem>
+                    <MenuItem value="Write-off">Write-off</MenuItem>
+                  </Select>
+                )}
+              />
+              {errors.currentStatus && <FormHelperText>{errors.currentStatus.message as string}</FormHelperText>}
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              required
+              fullWidth
+              id="instrumentType"
+              label="Instrument Type"
+              value={investmentPastFormData.instrumentType || ''}
+              {...register("instrumentType")}
+              error={!!errors.instrumentType}
+              helperText={errors.instrumentType?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              required
+              fullWidth
+              id="moic"
+              label="MOIC"
+              value={investmentPastFormData.moic || ''}
+              {...register("moic")}
+              error={!!errors.moic}
+              helperText={errors.moic?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              required
+              fullWidth
+              type="number"
+              id="grossIrr"
+              label="Gross IRR (%)"
+              value={investmentPastFormData.grossIrr || ''}
+              {...register("grossIrr")}
+              error={!!errors.grossIrr}
+              helperText={errors.grossIrr?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              id="conflictOfInterest"
+              label="Conflict of interest, if any"
+              value={investmentPastFormData.conflictOfInterest || ''}
+              {...register("conflictOfInterest")}
+              error={!!errors.conflictOfInterest}
+              helperText={errors.conflictOfInterest?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              id="stakeOfEmployee"
+              label="Was there any Stake of any employee/relative of AMC/Fund in said Investee company?"
+              value={investmentPastFormData.stakeOfEmployee || ''}
+              variant="outlined"
+              multiline
+              rows={2}
+              {...register("stakeOfEmployee")}
+              error={!!errors.stakeOfEmployee}
+              helperText={errors.stakeOfEmployee?.message as string}
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              id="investmentStageFundingRound"
+              label="What is the investment stage funding round level in said Investee company?"
+              value={investmentPastFormData.investmentStageFundingRound || ''}
+              variant="outlined"
+              multiline
+              rows={2}
+              {...register("investmentStageFundingRound")}
+              error={!!errors.investmentStageFundingRound}
+              helperText={errors.investmentStageFundingRound?.message as string}
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
 
-          <Grid item xs={12} >
-            <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+          <Grid item xs={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
+            <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>Investment Committee Note*</Typography>
+              <UploadComponents id={`sdInvestmentCommitteeNote${investmentPastFormData.id || uuid()}`} signed={false} />
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+            <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
               Submit
             </Button>
           </Grid>

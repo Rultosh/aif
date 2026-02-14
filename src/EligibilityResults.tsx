@@ -29,7 +29,7 @@ const EligibilityResults = (props: any) => {
                                     </Toolbar>
                                 
                                 <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Congratulations!</Typography>
-                                <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Based on your size and structure you may be eligible for applying for contribution through SIDBI's Fund of Funds</Typography>
+                                <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Based on your size and structure you may be eligible for applying for contribution through NPS Trust's Fund of Funds</Typography>
                                 <Typography sx={{ flex: 1, ml: '10px',mb:'50px', textAlign: "center" }}>Please Login/Sign-up to be directed to the application</Typography>
                                 </Box>
                             </CardContent>

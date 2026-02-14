@@ -1,13 +1,14 @@
-import { Box, Button, Card, CardContent, FormControl, Grid, InputLabel, MenuItem, Modal, Select, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
 import { createInvestmentTeamsAssociateLevelAsync, updateInvestmentTeamsAssociateLevelAsync } from './investmentAssociateSlice'
 import { useAppDispatch } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultInvestmentAssociate, IInvestmentAssociate } from "./IInvestmentAssociate";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
 
 interface InvestmentAssociateModelProps {
   investmentAssociateFormData: IInvestmentAssociate,
@@ -24,7 +25,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
   const dispatch = useAppDispatch();
 
   function handleSubmitForm() {
-    console.log("Saving investpment Associate", investmentAssociateFormData)
+    console.log("Saving investment Associate", investmentAssociateFormData)
     if (investmentAssociateFormData.id) {
       dispatch(
         updateInvestmentTeamsAssociateLevelAsync(
@@ -32,13 +33,11 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
         )
       )
     } else {
-      console.log(investmentAssociateFormData)
       dispatch(
         createInvestmentTeamsAssociateLevelAsync(
           wrapArgument(actionUid, investmentAssociateFormData)
         )
       )
-      setInvestmentAssociateFormData({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
     }
     handleCloseModal();
   }
@@ -50,29 +49,20 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
 
   useEffect(() => {
-    setInvestmentAssociateFormData({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
-
-    reset(props.investmentAssociateFormData);
-
-    console.log({ ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId })
-  }, [])
+    const data = { ...props.investmentAssociateFormData, prelimApplicationId: props.prelimApplicationId };
+    setInvestmentAssociateFormData(data)
+    reset(data);
+  }, [props.investmentAssociateFormData, props.open])
 
   const handleChange = (ev: any) => {
     ev.preventDefault();
-    console.log('handle change', ev.target.id, ev.target.value);
+    let value = ev.target.value;
+    const name = ev.target.name || ev.target.id;
 
     let copiedValue: IInvestmentAssociate = { ...investmentAssociateFormData };
+    copiedValue[name as keyof IInvestmentAssociate] = value;
 
-    if (ev.target.id !== undefined) {
-      copiedValue[ev.target.id as keyof IInvestmentAssociate] =
-        ev.target.id !== undefined ? ev.target.value : ev.target.value
-    } else {
-      copiedValue[ev.target.name as keyof IInvestmentAssociate] = ev.target.value;
-    }
-
-
-    console.log(copiedValue, props.prelimApplicationId)
-    setValue(ev.target.name, ev.target.value);
+    setValue(name as any, value);
     setInvestmentAssociateFormData(copiedValue)
   };
 
@@ -83,26 +73,30 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     transform: 'translate(-50%, -50%)',
     width: '80%',
     bgcolor: 'background.paper',
-    border: '2px solid #000',
+    border: 'none',
     boxShadow: 24,
     p: 4,
-    maxHeight: '70vh',
-    overflow: 'auto'
+    borderRadius: '12px',
+    maxHeight: '80vh',
+    overflowY: 'auto' as 'auto',
+    outline: 'none'
   };
-    
+
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
   const htmlTagsNotAllowed = "Tags not allowed in input.";
-  
+
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     age: Yup.string().required("Age is required"),
     qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     investmentExperience: Yup.string().required("Investment Experience is required"),
-    description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable()
+    description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
   });
 
   const {
+    control,
     setValue,
     getValues,
     register,
@@ -114,10 +108,11 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
   });
 
   const onSubmit = (data: any) => {
-    console.log(data);
     setInvestmentAssociateFormData(data);
     handleSubmitForm();
   };
+
+  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
 
   return <Modal
     open={props.open}
@@ -126,145 +121,152 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     aria-describedby="modal-modal-description"
   >
     <Box sx={style}>
-      <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-        <Grid container spacing={2} >
-          <Grid item xs={9}>
-            <Box sx={{ display: 'inline-flex' }}>
-              <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details of Investment Team (At Associate Level)</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={4.5}>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details of Investment Team (At Associate Level)</Typography>
+      <Box component="form">
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
             <TextField
               required
+              fullWidth
               id="name"
               label="Name"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentAssociateFormData.name}
+              value={investmentAssociateFormData.name || ''}
               {...register("name")}
-              error={(errors.name) ? true : false}
-              variant="standard"
+              error={!!errors.name}
+              helperText={errors.name?.message as string}
+              variant="outlined"
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.name)?errors.name.message : ''}</>
-            </Typography>
           </Grid>
-          <Grid item xs={3.5}>
+          <Grid item xs={12} md={6}>
             <TextField
               required
+              fullWidth
               id="designation"
               label="Designation"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentAssociateFormData.designation}
+              value={investmentAssociateFormData.designation || ''}
               {...register("designation")}
-              error={(errors.designation) ? true : false}
-              variant="standard"
+              error={!!errors.designation}
+              helperText={errors.designation?.message as string}
+              variant="outlined"
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.designation)?errors.designation.message : ''}</>
-            </Typography>
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={12} md={3}>
             <TextField
               required
+              fullWidth
               type="number"
               id="age"
               label="Age"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentAssociateFormData.age}
+              value={investmentAssociateFormData.age || ''}
               {...register("age")}
-              error={(errors.age && getValues("age") == '') ? true : false}
-              variant="standard"
+              error={!!errors.age}
+              helperText={errors.age?.message as string}
+              variant="outlined"
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.age && getValues("age") == '')?errors.age.message : ''}</>
-            </Typography>
           </Grid>
-          <Grid item xs={4.5}>
+          <Grid item xs={12} md={9}>
             <TextField
               required
+              fullWidth
               id="qualification"
               label="Qualification"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentAssociateFormData.qualification}
+              value={investmentAssociateFormData.qualification || ''}
               {...register("qualification")}
-              error={(errors.qualification) ? true : false}
-              variant="standard"
+              error={!!errors.qualification}
+              helperText={errors.qualification?.message as string}
+              variant="outlined"
               onChange={handleChange}
-              name="qualification"
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.qualification)?errors.qualification.message : ''}</>
-            </Typography>
           </Grid>
-          <Grid item xs={4.5}>
-            <FormControl variant="standard" sx={{ display: 'flex' }}>
-              <InputLabel id="demo-simple-select-standard-label">Investment Experience</InputLabel>
-              <Select
-                labelId="investmentExperience"
-                id="investmentExperience"
-                value={investmentAssociateFormData["investmentExperience"] || ''}
-                {...register("investmentExperience")}
-                error={(errors.investmentExperience && getValues("investmentExperience") == '') ? true : false}
-                onChange={handleChange}
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="outlined" error={!!errors.investmentExperience} sx={fieldSx}>
+              <InputLabel id="investmentExperience-label">Investment Experience</InputLabel>
+              <Controller
                 name="investmentExperience"
-                // defaultValue={investmentAssociateFormData["investmentExperience"] === undefined ? " " : investmentAssociateFormData["investmentExperience"]}
-              >
-
-                <MenuItem key={"0-5 years"} value={"0-5 years"}>0-5 years</MenuItem>
-                <MenuItem key={"5-10 years"} value={"5-10 years"}>5-10 years</MenuItem>
-                <MenuItem key={"10-15 years"} value={"10-15 years"}>10-15 years</MenuItem>
-                <MenuItem key={"15+ years"} value={"15+ years"}>15+ years</MenuItem>
-              </Select>
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    labelId="investmentExperience-label"
+                    label="Investment Experience"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleChange(e);
+                    }}
+                  >
+                    <MenuItem value="0-5 years">0-5 years</MenuItem>
+                    <MenuItem value="5-10 years">5-10 years</MenuItem>
+                    <MenuItem value="10-15 years">10-15 years</MenuItem>
+                    <MenuItem value="15+ years">15+ years</MenuItem>
+                  </Select>
+                )}
+              />
+              {errors.investmentExperience && <FormHelperText>{errors.investmentExperience.message as string}</FormHelperText>}
             </FormControl>
-            <Typography variant="caption" color="error">
-              <>{(errors.investmentExperience && getValues("investmentExperience") == '')? errors.investmentExperience.message : ''}</>
-            </Typography>
-
-            {/*<TextField
-              required
-              type="number"
-              id="investmentExperience"
-              label="Investment Experience"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentAssociateFormData.investmentExperience}
-              variant="standard"
-              onChange={handleChange}
-
-              sx={{ display: 'flex' }}
-/>*/}
           </Grid>
-          <Grid item xs={9}>
+          <Grid item xs={12}>
             <TextField
               required
+              fullWidth
               id="description"
               label="Brief details of VC/PE Experience"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentAssociateFormData.description}
+              value={investmentAssociateFormData.description || ''}
               {...register("description")}
-              error={(errors.description) ? true : false}
-              variant="standard"
+              error={!!errors.description}
+              helperText={errors.description?.message as string}
+              variant="outlined"
               multiline
+              rows={3}
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.description)?errors.description.message : ''}</>
-            </Typography>
           </Grid>
-          <Grid item xs={12} >
-          <Button type="submit" color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} onClick={handleSubmit(onSubmit)} >
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              id="areaOfExpertise"
+              label="Area of Expertise"
+              value={investmentAssociateFormData.areaOfExpertise || ''}
+              {...register("areaOfExpertise")}
+              error={!!errors.areaOfExpertise}
+              helperText={errors.areaOfExpertise?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                  <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Bio-Data</Typography>
+                  <UploadComponents id={`sdAssociateResume${investmentAssociateFormData.id || uuid()}`} signed={false} />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                  <Typography variant="body2" sx={{ mb: 1 }}>Experience supporting document</Typography>
+                  <UploadComponents id={`sdAssociateExperience${investmentAssociateFormData.id || uuid()}`} signed={false} />
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+            <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
               Submit
             </Button>
           </Grid>

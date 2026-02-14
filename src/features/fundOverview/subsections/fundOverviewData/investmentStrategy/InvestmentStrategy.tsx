@@ -1,0 +1,263 @@
+import { Box, Button, Divider, FormControl, FormControlLabel, Grid, Radio, RadioGroup, TextField, Typography, FormHelperText } from "@mui/material";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
+import { getPrelimApplicationData, PrelimApplicationState, selectPrelimApplication, updatePrelimApplicationAsync } from "../prelimApplicationDataSlice";
+import { IPrelimApplicationData } from "../IPrelimApplicationData";
+import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
+import uuid from "react-uuid";
+import { FetchStatus } from "../../../../../lib/api-status/IStatus";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
+
+interface PrelimApplicationProps {
+    prelimApplicationId: String | undefined,
+    setPrelimApplicationId: (id: String | undefined) => void;
+}
+
+const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
+    const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
+    const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
+    const [actionUid] = useState(uuid());
+    const prelimAppicationId = props.prelimApplicationId;
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        if (Number(prelimAppicationId)) {
+            dispatch(getPrelimApplicationData(
+                wrapArgument(actionUid, Number(prelimAppicationId))
+            ));
+        }
+    }, [prelimAppicationId, actionUid, dispatch]);
+
+    useEffect(() => {
+        if (prelimApplicationState.prelimApplication) {
+            setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
+            reset(prelimApplicationState.prelimApplication);
+        }
+    }, [prelimApplicationState.prelimApplication]);
+
+    const validationSchema = Yup.object().shape({
+        isStrategyBasis: Yup.string().required("This field is required").nullable(),
+        isFocusSectors: Yup.string().required("This field is required").nullable(),
+        isComparisonPast: Yup.string().required("This field is required").nullable(),
+        isSignificantChange: Yup.string().required("This field is required").nullable(),
+        isSectorSituations: Yup.string().required("This field is required").nullable(),
+        isControlsRights: Yup.string().required("This field is required").nullable(),
+        isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
+        isRisksMitigation: Yup.string().required("This field is required").nullable(),
+        isRolledOverInvestments: Yup.string().required("This field is required").nullable(),
+        isGrossReturnObjective: Yup.string().required("This field is required").nullable(),
+    });
+
+    const {
+        control,
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm<IPrelimApplicationData>({
+        resolver: yupResolver(validationSchema),
+        defaultValues: prelimApplicationState.prelimApplication || {}
+    });
+
+    const onSubmit = (data: IPrelimApplicationData) => {
+        dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+    };
+
+    useImperativeHandle(ref, () => ({
+        submit: async () => {
+            let isValid = false;
+            await handleSubmit(
+                (data) => {
+                    onSubmit(data);
+                    isValid = true;
+                },
+                () => {
+                    isValid = false;
+                }
+            )();
+            return isValid;
+        }
+    }));
+
+    const qSx = { mb: 3 };
+    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
+
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
+        return (
+            <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>1. What is your investment strategy and what is its basis?</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isStrategyBasis")}
+                            error={!!errors.isStrategyBasis}
+                            helperText={errors.isStrategyBasis?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>2. What are the focus investment sectors for the fund?</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isFocusSectors")}
+                            error={!!errors.isFocusSectors}
+                            helperText={errors.isFocusSectors?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>3. How does the investment strategy compare to the past fund strategies (if applicable)?</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isComparisonPast")}
+                            error={!!errors.isComparisonPast}
+                            helperText={errors.isComparisonPast?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>4. Explain the reason for any significant change in your strategy?</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isSignificantChange")}
+                            error={!!errors.isSignificantChange}
+                            helperText={errors.isSignificantChange?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>5. Are there any sectors or types of transactions/situations you would not invest in? If yes, please give details and reasons</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isSectorSituations")}
+                            error={!!errors.isSectorSituations}
+                            helperText={errors.isSectorSituations?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>6. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isControlsRights")}
+                            error={!!errors.isControlsRights}
+                            helperText={errors.isControlsRights?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>7. If you have any investment policy please share?</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isInvestmentPolicy")}
+                            error={!!errors.isInvestmentPolicy}
+                            helperText={errors.isInvestmentPolicy?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>8. Risks in the investments planned & risk mitigation efforts</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isRisksMitigation")}
+                            error={!!errors.isRisksMitigation}
+                            helperText={errors.isRisksMitigation?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>9. Have you had any investments rolled over from previous fund(s)? Please give details.</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={3}
+                            {...register("isRolledOverInvestments")}
+                            error={!!errors.isRolledOverInvestments}
+                            helperText={errors.isRolledOverInvestments?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>10. Describe the following investment considerations:</Typography>
+                        <FormControl component="fieldset" error={!!errors.isGrossReturnObjective} fullWidth>
+                            <Controller
+                                name="isGrossReturnObjective"
+                                control={control}
+                                render={({ field }) => (
+                                    <RadioGroup {...field} row={false}>
+                                        <FormControlLabel value="a" control={<Radio />} label="a) Gross return objective of the overall fund" />
+                                        <FormControlLabel value="b" control={<Radio />} label="b) Target investment size and percentage stake" />
+                                        <FormControlLabel value="c" control={<Radio />} label="c) Target number of investments planned" />
+                                        <FormControlLabel value="d" control={<Radio />} label="d) Average holding period for a typical investment" />
+                                        <FormControlLabel value="e" control={<Radio />} label="e) Exit strategy" />
+                                    </RadioGroup>
+                                )}
+                            />
+                            {errors.isGrossReturnObjective && <FormHelperText>{errors.isGrossReturnObjective.message as string}</FormHelperText>}
+                        </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12} sx={{ mt: 2, mb: 4 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#363062' }}>Supporting Documents</Typography>
+                        <Box sx={{ p: 3, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                            <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>Investment Policy</Typography>
+                            <UploadComponents id={`sdInvestmentPolicy${prelimAppicationId}`} signed={false} />
+                        </Box>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, gap: 2 }}>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: '#363062',
+                                    '&:hover': { backgroundColor: '#2a254d' },
+                                    px: 4,
+                                    py: 1,
+                                    borderRadius: '8px',
+                                    fontWeight: 600
+                                }}
+                            >
+                                Save
+                            </Button>
+                        </Box>
+                    </Grid>
+                </Grid>
+            </Box>
+        );
+    }
+
+    return <Box sx={{ p: 3 }}><Typography>Loading...</Typography></Box>;
+});
+
+export default InvestmentStrategy;

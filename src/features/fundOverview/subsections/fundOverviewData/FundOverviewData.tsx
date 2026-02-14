@@ -218,7 +218,7 @@ export const FundOverviewData = () => {
 
                 <Grid item xs={4}>
 
-                <FormControl variant="standard" sx={{ display: 'flex' }}>
+                    <FormControl variant="standard" sx={{ display: 'flex' }}>
                         <InputLabel id="demo-simple-select-standard-label">Impact</InputLabel>
                         <Select
                             labelId="impact"
@@ -234,7 +234,7 @@ export const FundOverviewData = () => {
                             <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
                         </Select>
                     </FormControl>
-                   {/*} <TextField
+                    {/*} <TextField
                         required
                         id="impact"
                         label="Impact"
@@ -248,7 +248,7 @@ export const FundOverviewData = () => {
 
                 <Grid item xs={4}>
 
-                <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
+                    <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
                         <InputLabel id="demo-simple-select-standard-label">AIF Category</InputLabel>
                         <Select
                             labelId="aifCategory"
@@ -264,7 +264,7 @@ export const FundOverviewData = () => {
                             <MenuItem key={"Up Start-up Fund"} value={"Up Start-up Fund Sampath"}>Up Start-up Fund Sampath</MenuItem>
                         </Select>
                     </FormControl>
-                   {/*} <TextField
+                    {/*} <TextField
                         required
                         id="aifCategory"
                         label="AIF Category"
@@ -383,7 +383,7 @@ export const FundOverviewData = () => {
                 </Grid>
 
                 <Grid item xs={4}>
-                <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
+                    <FormControl variant="standard" sx={{ ml: 2, display: 'flex' }}>
                         <InputLabel id="demo-simple-select-standard-label">Deal Sector</InputLabel>
                         <Select
                             labelId="dealSector"
@@ -411,7 +411,7 @@ export const FundOverviewData = () => {
                                 />*/}
                 </Grid>
                 <Grid item xs={4}>
-                <FormControl variant="standard" sx={{ display: 'flex' }}>
+                    <FormControl variant="standard" sx={{ display: 'flex' }}>
                         <InputLabel id="demo-simple-select-standard-label">Deal Sub Sector</InputLabel>
                         <Select
                             labelId="dealSubSector"

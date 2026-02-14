@@ -1,18 +1,22 @@
 import { Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button } from "@mui/material";
 import FundOverviewData from "./subsections/fundOverviewData/FundOverviewData";
 import InvestmentPartner from "./subsections/fundOverviewData/investmentPartner/InvestmentPartner";
+import InvestmentStrategy from "./subsections/fundOverviewData/investmentStrategy/InvestmentStrategy";
 import ContributorDetails from "./subsections/fundOverviewData/contributorDetails/ContributorDetails";
 import InvestmentAssociate from "./subsections/fundOverviewData/investmentAssociate/InvestmentAssociate";
 import InvestmentPast from "./subsections/fundOverviewData/investmentPast/InvestmentPast";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useState, useEffect } from "react"
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import { useState, useEffect, useRef } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
 import PrelimApplicationData from "./subsections/fundOverviewData/PrelimApplication";
 import { clearPrelimApplication, selectPrelimApplication } from "./subsections/fundOverviewData/prelimApplicationDataSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { FetchStatus } from "../../lib/api-status/IStatus";
 import UploadComponents from "../DetailedApplicationComponent/subsections/uploadComponents";
+import DealFlow from "./subsections/fundOverviewData/dealFlow/DealFlow";
+import MIS from "./subsections/fundOverviewData/mis/MIS";
+import Others from "./subsections/fundOverviewData/others/Others";
+import SaveIcon from '@mui/icons-material/Save';
 
 export const Fund = (props: any) => {
 
@@ -66,13 +70,112 @@ export const Fund = (props: any) => {
         };
 
 
-    const handleClick = (ev: any, navTo: string) => {
+    const prelimRef = useRef<any>(null);
+    const strategyRef = useRef<any>(null);
+    const dealFlowRef = useRef<any>(null);
+    const othersRef = useRef<any>(null);
+    const misRef = useRef<any>(null);
+
+    const handleClick = async (ev: any, navTo: string) => {
         if (navTo === 'next') {
-            navigate(`/preliminary/${prelimApplicationId}/profile`)
+            const results = await Promise.all([
+                prelimRef.current?.submit(),
+                strategyRef.current?.submit(),
+                dealFlowRef.current?.submit(),
+                othersRef.current?.submit(),
+                misRef.current?.submit()
+            ]);
+
+            const allValid = results.every(res => res === true);
+
+            if (allValid) {
+                navigate(`/preliminary/${prelimApplicationId}/profile`)
+            } else {
+                // Find first invalid section and expand it
+                const firstInvalidIndex = results.findIndex(res => res === false);
+                const panels = ["1", "2", "7", "9", "10"];
+                if (firstInvalidIndex !== -1) {
+                    setExpanded(panels[firstInvalidIndex]);
+                    // Scroll to top to show errors
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
         }
     }
     return (
         <Box className="formAnimation" sx={{ pb: 5 }}>
+            {/* {Number(prelimApplicationId) ? (
+                <Button
+                    onClick={(e) => handleClick(e, "next")}
+                    variant="contained"
+                    sx={{
+                        position: 'fixed',
+                        right: 0,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        zIndex: 2000,
+                        backgroundColor: '#363062',
+                        color: 'white',
+                        px: 3,
+                        py: 2,
+                        borderRadius: '20px 0 0 20px',
+                        textTransform: 'none',
+                        fontWeight: 800,
+                        fontSize: '1rem',
+                        boxShadow: '-4px 0 15px rgba(54, 48, 98, 0.4)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 1,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            backgroundColor: '#2a254d',
+                            paddingRight: 4,
+                            boxShadow: '-6px 0 20px rgba(54, 48, 98, 0.6)',
+                        }
+                    }}
+                >
+                    <ArrowRightIcon sx={{ fontSize: '2rem', mb: -0.5 }} />
+                    <Box sx={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
+                        Save and Continue
+                    </Box>
+                </Button>
+            ) : null} */}
+
+            {Number(prelimApplicationId) ? (
+                <Button
+                    onClick={(e) => handleClick(e, "next")}
+                    variant="contained"
+                    sx={{
+                        position: 'fixed',
+                        right: 0,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        zIndex: 2000,
+                        backgroundColor: '#363062',
+                        color: 'white',
+                        px: 3,
+                        py: 2,
+                        borderRadius: '20px 0 0 20px',
+                        textTransform: 'none',
+                        fontWeight: 800,
+                        fontSize: '1rem',
+                        boxShadow: '-4px 0 15px rgba(54, 48, 98, 0.4)',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            backgroundColor: '#2a254d',
+                            paddingRight: 4,
+                            boxShadow: '-6px 0 20px rgba(54, 48, 98, 0.6)',
+                        }
+                    }}
+                >
+                    <SaveIcon />
+                </Button>
+            ) : null}
             <Card sx={{
                 borderRadius: '16px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
@@ -142,6 +245,7 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <PrelimApplicationData
+                                            ref={prelimRef}
                                             prelimApplicationId={prelimApplicationId}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                         />
@@ -193,13 +297,17 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "2" ? '#363062' : '#444'
                                         }}>
-                                            Details of Investment team (At partner level)
+                                            Investment Strategy
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)} />
+                                        <InvestmentStrategy
+                                            ref={strategyRef}
+                                            prelimApplicationId={prelimApplicationId}
+                                            setPrelimApplicationId={handleApplicationIdCreation}
+                                        />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
@@ -303,13 +411,13 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "4" ? '#363062' : '#444'
                                         }}>
-                                            Details of Investment team (at Associate level)
+                                            Details of Key Investment team (At Partner Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)} />
+                                        <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)} />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
@@ -358,13 +466,13 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "5" ? '#363062' : '#444'
                                         }}>
-                                            Investments made, if any from the current Fund
+                                            Details of Key Investment team (At Associate Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <InvestmentPast prelimApplicationId={Number(prelimApplicationId)} />
+                                        <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)} />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
@@ -413,54 +521,253 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "6" ? '#363062' : '#444'
                                         }}>
+                                            Investments made, if any from the current Fund
+                                        </Typography>
+                                    </Box>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
+                                    <Box sx={{ pt: 2 }}>
+                                        <InvestmentPast prelimApplicationId={Number(prelimApplicationId)} />
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion
+                                elevation={0}
+                                sx={{
+                                    border: '1px solid rgba(0,0,0,0.08)',
+                                    borderRadius: '12px !important',
+                                    mb: 2,
+                                    overflow: 'hidden',
+                                    '&:before': { display: 'none' },
+                                    '&.Mui-expanded': {
+                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                                        borderColor: '#363062',
+                                        borderLeft: '6px solid #363062'
+                                    }
+                                }}
+                                expanded={expanded === "7"}
+                                onChange={handleChange("7")}
+                            >
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "7" ? '#363062' : '#666' }} />}
+                                    sx={{
+                                        px: 3,
+                                        py: 1,
+                                        backgroundColor: expanded === "7" ? 'rgba(54, 48, 98, 0.02)' : 'transparent',
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Box sx={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            backgroundColor: expanded === "7" ? '#363062' : '#f0f0f0',
+                                            color: expanded === "7" ? 'white' : '#666',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            mr: 2,
+                                            fontWeight: 700,
+                                            fontSize: '0.9rem'
+                                        }}>7</Box>
+                                        <Typography sx={{
+                                            fontWeight: 700,
+                                            color: expanded === "7" ? '#363062' : '#444'
+                                        }}>
+                                            Deal Flow
+                                        </Typography>
+                                    </Box>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
+                                    <Box sx={{ pt: 2 }}>
+                                        <DealFlow
+                                            ref={dealFlowRef}
+                                            prelimApplicationId={String(prelimApplicationId)}
+                                            setPrelimApplicationId={handleApplicationIdCreation}
+                                        />
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion
+                                elevation={0}
+                                sx={{
+                                    border: '1px solid rgba(0,0,0,0.08)',
+                                    borderRadius: '12px !important',
+                                    mb: 2,
+                                    overflow: 'hidden',
+                                    '&:before': { display: 'none' },
+                                    '&.Mui-expanded': {
+                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                                        borderColor: '#363062',
+                                        borderLeft: '6px solid #363062'
+                                    }
+                                }}
+                                expanded={expanded === "8"}
+                                onChange={handleChange("8")}
+                            >
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "8" ? '#363062' : '#666' }} />}
+                                    sx={{
+                                        px: 3,
+                                        py: 1,
+                                        backgroundColor: expanded === "8" ? 'rgba(54, 48, 98, 0.02)' : 'transparent',
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Box sx={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            backgroundColor: expanded === "8" ? '#363062' : '#f0f0f0',
+                                            color: expanded === "8" ? 'white' : '#666',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            mr: 2,
+                                            fontWeight: 700,
+                                            fontSize: '0.9rem'
+                                        }}>8</Box>
+                                        <Typography sx={{
+                                            fontWeight: 700,
+                                            color: expanded === "8" ? '#363062' : '#444'
+                                        }}>
                                             Past investment track record of the AMC
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <Box sx={{ border: '1px dashed #ccc', borderRadius: '8px', p: 2, mb: 2, backgroundColor: '#fafafa' }}>
-                                            <Button
-                                                variant="text"
-                                                href="/templates/SASF_Fund Track Record Template.xlsx"
-                                                sx={{ color: '#363062', fontWeight: 600 }}
-                                            >
-                                                Download Template
-                                            </Button>
-                                        </Box>
-                                        <Box>
-                                            <UploadComponents id={`pastInvestmentTrackRecord${id}`} signed={false} />
-                                        </Box>
+
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
+
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion
+                                elevation={0}
+                                sx={{
+                                    border: '1px solid rgba(0,0,0,0.08)',
+                                    borderRadius: '12px !important',
+                                    mb: 2,
+                                    overflow: 'hidden',
+                                    '&:before': { display: 'none' },
+                                    '&.Mui-expanded': {
+                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                                        borderColor: '#363062',
+                                        borderLeft: '6px solid #363062'
+                                    }
+                                }}
+                                expanded={expanded === "9"}
+                                onChange={handleChange("9")}
+                            >
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "9" ? '#363062' : '#666' }} />}
+                                    sx={{
+                                        px: 3,
+                                        py: 1,
+                                        backgroundColor: expanded === "9" ? 'rgba(54, 48, 98, 0.02)' : 'transparent',
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Box sx={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            backgroundColor: expanded === "9" ? '#363062' : '#f0f0f0',
+                                            color: expanded === "9" ? 'white' : '#666',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            mr: 2,
+                                            fontWeight: 700,
+                                            fontSize: '0.9rem'
+                                        }}>9</Box>
+                                        <Typography sx={{
+                                            fontWeight: 700,
+                                            color: expanded === "9" ? '#363062' : '#444'
+                                        }}>
+                                            Others
+                                        </Typography>
+                                    </Box>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
+                                    <Box sx={{ pt: 2 }}>
+                                        <Others
+                                            ref={othersRef}
+                                            prelimApplicationId={String(prelimApplicationId)}
+                                            setPrelimApplicationId={handleApplicationIdCreation}
+                                        />
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid> : <></>}
+
+                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                            <Accordion
+                                elevation={0}
+                                sx={{
+                                    border: '1px solid rgba(0,0,0,0.08)',
+                                    borderRadius: '12px !important',
+                                    mb: 2,
+                                    overflow: 'hidden',
+                                    '&:before': { display: 'none' },
+                                    '&.Mui-expanded': {
+                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                                        borderColor: '#363062',
+                                        borderLeft: '6px solid #363062'
+                                    }
+                                }}
+                                expanded={expanded === "10"}
+                                onChange={handleChange("10")}
+                            >
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "10" ? '#363062' : '#666' }} />}
+                                    sx={{
+                                        px: 3,
+                                        py: 1,
+                                        backgroundColor: expanded === "10" ? 'rgba(54, 48, 98, 0.02)' : 'transparent',
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Box sx={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            backgroundColor: expanded === "10" ? '#363062' : '#f0f0f0',
+                                            color: expanded === "10" ? 'white' : '#666',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            mr: 2,
+                                            fontWeight: 700,
+                                            fontSize: '0.9rem'
+                                        }}>10</Box>
+                                        <Typography sx={{
+                                            fontWeight: 700,
+                                            color: expanded === "10" ? '#363062' : '#444'
+                                        }}>
+                                            MIS
+                                        </Typography>
+                                    </Box>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
+                                    <Box sx={{ pt: 2 }}>
+                                        <MIS
+                                            ref={misRef}
+                                            prelimApplicationId={String(prelimApplicationId)}
+                                            setPrelimApplicationId={handleApplicationIdCreation}
+                                        />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
                     </Grid>
 
-                    {Number(prelimApplicationId) ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
-                            <Button
-                                onClick={(e) => handleClick(e, "next")}
-                                endIcon={<ArrowRightIcon />}
-                                variant="contained"
-                                sx={{
-                                    backgroundColor: '#363062',
-                                    px: 4,
-                                    py: 1.2,
-                                    borderRadius: '8px',
-                                    textTransform: 'none',
-                                    fontWeight: 700,
-                                    fontSize: '1rem',
-                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.3)',
-                                    '&:hover': {
-                                        backgroundColor: '#2a254d'
-                                    }
-                                }}
-                            >
-                                Profile
-                            </Button>
-                        </Box>
-                    ) : <></>}
                 </CardContent>
             </Card>
         </Box>

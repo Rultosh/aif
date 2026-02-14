@@ -1,5 +1,6 @@
 import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SaveIcon from '@mui/icons-material/Save';
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
@@ -135,7 +136,7 @@ export const Declaration = (props: any) => {
                                         <Box sx={{ mb: 3 }}>
                                             <Typography variant="body1" sx={{ display: 'flex', gap: 2, mb: 1, fontWeight: 600, color: '#363062' }}>
                                                 <span>D.</span>
-                                                I / We have no objection if SIDBI furnishes the information submitted by me/us to other banks / FIs / CIBIL / RBI / any other agency as may be deemed fit in connection with consideration of my/our application for capital commitment to the proposed venture capital fund.
+                                                I / We have no objection if NPS Trust furnishes the information submitted by me/us to other banks / FIs / CIBIL / RBI / any other agency as may be deemed fit in connection with consideration of my/our application for capital commitment to the proposed venture capital fund.
                                             </Typography>
                                             <Divider sx={{ my: 2, opacity: 0.5 }} />
                                         </Box>
@@ -143,7 +144,7 @@ export const Declaration = (props: any) => {
                                         <Box sx={{ mb: 4 }}>
                                             <Typography variant="body1" sx={{ display: 'flex', gap: 2, mb: 1, fontWeight: 600, color: '#363062' }}>
                                                 <span>E.</span>
-                                                I / We have no objection if SIDBI and/or its representatives making necessary enquiries/verification (including in CIBIL or any other credit information agencies database) while considering my/our application for capital contribution. I / We undertake to furnish all other information that may be required by SIDBI in connection with my/our application for capital commitment.
+                                                I / We have no objection if NPS Trust and/or its representatives making necessary enquiries/verification (including in CIBIL or any other credit information agencies database) while considering my/our application for capital contribution. I / We undertake to furnish all other information that may be required by NPS Trust in connection with my/our application for capital commitment.
                                             </Typography>
                                         </Box>
 
@@ -189,6 +190,38 @@ export const Declaration = (props: any) => {
                             Back to Self Rating
                         </Button>
 
+                        <Button
+                            onClick={handleClickSave}
+                            disabled={!agreed}
+                            variant="contained"
+                            sx={{
+                                position: 'fixed',
+                                right: 0,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                zIndex: 1100,
+                                borderRadius: '12px 0 0 12px',
+                                minWidth: 'auto',
+                                px: 2,
+                                py: 2,
+                                fontWeight: 700,
+                                backgroundColor: '#363062',
+                                boxShadow: '0 4px 20px rgba(54, 48, 98, 0.3)',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    backgroundColor: '#4d4585',
+                                    boxShadow: '0 6px 24px rgba(54, 48, 98, 0.4)',
+                                    pr: 3,
+                                    transition: 'all 0.2s'
+                                },
+                                '&.Mui-disabled': {
+                                    backgroundColor: 'rgba(0,0,0,0.12)'
+                                },
+                                transition: 'all 0.2s'
+                            }} >
+                            <SaveIcon />
+                        </Button>
+
                         <Box>
                             <Button
                                 color='success'
@@ -198,10 +231,11 @@ export const Declaration = (props: any) => {
                                 sx={{
                                     textTransform: 'none',
                                     borderRadius: '8px',
-                                    px: 4,
+                                    px: 2,
                                     fontWeight: 600,
                                     backgroundColor: '#363062',
                                     boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
+                                    minWidth: 'auto',
                                     '&:hover': {
                                         backgroundColor: '#4d4585',
                                         boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
@@ -211,7 +245,7 @@ export const Declaration = (props: any) => {
                                         backgroundColor: 'rgba(0,0,0,0.12)'
                                     }
                                 }} >
-                                Save
+                                <SaveIcon />
                             </Button>
 
                             <Button

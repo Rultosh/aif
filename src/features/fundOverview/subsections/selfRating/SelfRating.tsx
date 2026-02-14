@@ -4,6 +4,7 @@ import { questions } from './selfRatingQuestions'
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import SaveIcon from '@mui/icons-material/Save';
 import React, * as Rect from 'react'
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
 import { ISelfRating } from "./ISelfRating";
@@ -305,6 +306,34 @@ export const SelfRating = (props: any) => {
                             Back to Profile
                         </Button>
 
+                        <Button
+                            onClick={handleClickSave}
+                            variant="contained"
+                            sx={{
+                                position: 'fixed',
+                                right: 0,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                zIndex: 1100,
+                                borderRadius: '12px 0 0 12px',
+                                minWidth: 'auto',
+                                px: 2,
+                                py: 2,
+                                fontWeight: 700,
+                                backgroundColor: '#363062',
+                                boxShadow: '0 4px 20px rgba(54, 48, 98, 0.3)',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    backgroundColor: '#4d4585',
+                                    boxShadow: '0 6px 24px rgba(54, 48, 98, 0.4)',
+                                    pr: 3,
+                                    transition: 'all 0.2s'
+                                },
+                                transition: 'all 0.2s'
+                            }} >
+                            <SaveIcon />
+                        </Button>
+
                         <Box>
                             <Button
                                 color='success'
@@ -313,17 +342,18 @@ export const SelfRating = (props: any) => {
                                 sx={{
                                     textTransform: 'none',
                                     borderRadius: '8px',
-                                    px: 4,
+                                    px: 2,
                                     fontWeight: 600,
                                     backgroundColor: '#363062',
                                     boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
+                                    minWidth: 'auto',
                                     '&:hover': {
                                         backgroundColor: '#4d4585',
                                         boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
                                     },
                                     mr: 2
                                 }} >
-                                Save
+                                <SaveIcon />
                             </Button>
                             <Button
                                 onClick={(e) => handleClick(e, "next")}

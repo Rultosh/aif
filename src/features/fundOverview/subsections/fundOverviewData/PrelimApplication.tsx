@@ -1,7 +1,7 @@
-import { Box, Button, Card, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Stack, Switch, TextField, Typography } from "@mui/material";
 import UploadIcon from '@mui/icons-material/Upload';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import { useState, useEffect } from "react"
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
@@ -10,8 +10,7 @@ import { defaultIPrelimApplicationData, IPrelimApplicationData } from "./IPrelim
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
-import { Today } from "@mui/icons-material";
-import { Form } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DocumentChip from "../../../../components/DocumentChip";
 import MasterData from "../../../../components/master-data/MasterData";
 import { useForm, Controller } from "react-hook-form";
@@ -25,7 +24,7 @@ interface PrelimApplicationProps {
     setPrelimApplicationId: (id: String | undefined) => void;
 }
 
-export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) => {
+const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) => {
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
@@ -71,22 +70,67 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
-        console.log('handle change', ev, ev.target.id, ev.target.value);
+
+        let value = ev.target.value;
+        const id = ev.target.id || ev.target.name;
+
+        if (monthFields.includes(id)) {
+            value = value.replace(/[^0-9]/g, '');
+        }
+
+        if (percentageFields.includes(id)) {
+            if (value !== '') {
+                const numVal = parseFloat(value);
+                if (numVal > 100) value = '100';
+                if (value.includes('.')) {
+                    const parts = value.split('.');
+                    if (parts[1].length > 2) {
+                        value = parts[0] + '.' + parts[1].slice(0, 2);
+                    }
+                }
+            }
+        }
+
+        if (numericFields.includes(id) && !monthFields.includes(id) && !percentageFields.includes(id)) {
+            if (value.includes('.')) {
+                const parts = value.split('.');
+                if (parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].slice(0, 2);
+                }
+            }
+        }
 
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
 
         if (ev.target.id) {
-            copiedValue[ev.target.id as keyof IPrelimApplicationData] =
-                ev.target.id !== undefined ? ev.target.value : ev.target.value
+            copiedValue[ev.target.id as keyof IPrelimApplicationData] = value
         } else {
-            copiedValue[ev.target.name as keyof IPrelimApplicationData] = ev.target.value
+            copiedValue[ev.target.name as keyof IPrelimApplicationData] = value
         }
 
-        setValue(ev.target.id || ev.target.name, ev.target.value);
+        setValue((ev.target.id || ev.target.name) as any, value);
+
+        if (id === 'sdTargetCorpusDomestic' || id === 'sdTargetCorpusOverseas') {
+            const domestic = id === 'sdTargetCorpusDomestic' ? value : (copiedValue.sdTargetCorpusDomestic || 0);
+            const overseas = id === 'sdTargetCorpusOverseas' ? value : (copiedValue.sdTargetCorpusOverseas || 0);
+            const total = (parseFloat(domestic as string) || 0) + (parseFloat(overseas as string) || 0);
+            copiedValue.sdTotalTargetCorpus = total;
+            setValue('sdTotalTargetCorpus', total as any);
+        }
+
+        if (id === 'sdGreenShoeTargetCorpusDomestic' || id === 'sdGreenShoeTargetCorpusOverseas') {
+            const domestic = id === 'sdGreenShoeTargetCorpusDomestic' ? value : (copiedValue.sdGreenShoeTargetCorpusDomestic || 0);
+            const overseas = id === 'sdGreenShoeTargetCorpusOverseas' ? value : (copiedValue.sdGreenShoeTargetCorpusOverseas || 0);
+            const total = (parseFloat(domestic as string) || 0) + (parseFloat(overseas as string) || 0);
+            copiedValue.sdGreenShoeTotalTargetCorpus = total;
+            setValue('sdGreenShoeTotalTargetCorpus', total as any);
+        }
+
         setPrelimApplicationFormData(copiedValue)
         // live update words for contribution field
         if (ev.target.id === 'contributionSought') {
-            setContributionWords(numberToWordsIndian(ev.target.value));
+            const numValue = parseFloat(value) || 0;
+            setContributionWords(numberToWordsIndian(numValue * 10000000));
         }
     };
 
@@ -145,7 +189,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         }
 
         const result = parts.join(' ').trim();
-        return result ? result + ' only' : '';
+        return result ? result + ' Rupees only' : '';
     }
 
     const handleSelectChange = (id: String, value: any) => {
@@ -160,6 +204,87 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         setPrelimApplicationFormData(copiedValue);
         setfirstClosingSwitch(!firstClosingSwitch)
     }
+
+    const percentageFields = [
+        'preferredReturn', 'targetReturnIRR', 'managementFees',
+        'carriedInterest', 'hurdleCarryInterestRate'
+    ];
+
+    const monthFields = [
+        'termOfFund', 'commitmentPeriod'
+    ];
+
+    const numericFields = [
+        'contributionSought',
+        'sdDescription', 'sdTargetCorpusDomestic', 'sdTargetCorpusOverseas',
+        'sdTotalTargetCorpus', 'sdGreenShoeTargetCorpusDomestic',
+        'sdGreenShoeTargetCorpusOverseas', 'sdGreenShoeTotalTargetCorpus',
+        'sdFirstClosingDomesticAmount', 'sdFirstClosingOverseasAmount',
+        'fundSetupCost',
+        ...percentageFields,
+        ...monthFields
+    ];
+
+    const numericSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '&.Mui-readOnly, & .MuiInputBase-input[readOnly]': {
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
+            }
+        },
+        '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+            '-webkit-appearance': 'none',
+            margin: 0,
+        },
+        '& input[type=number]': {
+            '-moz-appearance': 'textfield',
+        },
+    };
+
+    const handleBlur = (ev: any) => {
+        const id = ev.target.id || ev.target.name;
+        let value = ev.target.value;
+
+        if (monthFields.includes(id)) {
+            return; // No formatting for months
+        }
+
+        if (numericFields.includes(id) && value !== '') {
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue)) {
+                const formattedValue = numValue.toFixed(2);
+                setValue(id as any, formattedValue);
+                if (id === 'contributionSought') {
+                    setContributionWords(numberToWordsIndian(parseFloat(formattedValue) * 10000000));
+                }
+
+                const updateTotals = (valId: string, totalId: string, domesticId: string, overseasId: string) => {
+                    const values = getValues();
+                    const domestic = valId === domesticId ? formattedValue : (values[domesticId as keyof IPrelimApplicationData] || 0);
+                    const overseas = valId === overseasId ? formattedValue : (values[overseasId as keyof IPrelimApplicationData] || 0);
+                    const total = (parseFloat(domestic as string) || 0) + (parseFloat(overseas as string) || 0);
+                    const formattedTotal = total.toFixed(2);
+                    setValue(totalId as any, formattedTotal as any);
+                    setPrelimApplicationFormData(prev => ({
+                        ...prev,
+                        [valId]: Number(formattedValue),
+                        [totalId]: Number(formattedTotal)
+                    }));
+                };
+
+                if (id === 'sdTargetCorpusDomestic' || id === 'sdTargetCorpusOverseas') {
+                    updateTotals(id, 'sdTotalTargetCorpus', 'sdTargetCorpusDomestic', 'sdTargetCorpusOverseas');
+                } else if (id === 'sdGreenShoeTargetCorpusDomestic' || id === 'sdGreenShoeTargetCorpusOverseas') {
+                    updateTotals(id, 'sdGreenShoeTotalTargetCorpus', 'sdGreenShoeTargetCorpusDomestic', 'sdGreenShoeTargetCorpusOverseas');
+                } else {
+                    setPrelimApplicationFormData(prev => ({
+                        ...prev,
+                        [id]: Number(formattedValue)
+                    }));
+                }
+            }
+        }
+    };
 
     const dealSubSectorValues = {
         "26": {
@@ -271,7 +396,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         sdDescription: Yup.string().required("Capital raised till date is required"),
         sdTargetCorpusDomestic: Yup.string().required("Domestic is required"),
         sdTargetCorpusOverseas: Yup.string().required("Overseas is required"),
-        sdTotalTargetCorpus: Yup.string().required("Total Target Corpus is required"),
+        sdTotalTargetCorpus: Yup.number().required("Total Target Corpus is required").min(100, "Value less than Rs. 100 crores shall not be allowed"),
         sdGreenShoeTargetCorpusDomestic: Yup.string().required("Domestic (Green Shoe) is required"),
         sdGreenShoeTargetCorpusOverseas: Yup.string().required("Overseas (Green Shoe) is required"),
         sdGreenShoeTotalTargetCorpus: Yup.string().required("Total Target Corpus (Green Shoe) is required"),
@@ -279,6 +404,10 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         sdFirstClosingOverseasAmount: Yup.string().required("Overseas Amount is required"),
         sdFirstClosingDomesticAmountDate: Yup.string().required("This value is required").nullable(),
         sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
+        aifCategoryType: Yup.string().required("AIF Category Type is required"),
+        targetReturnIRR: Yup.string().required("Target Return is required"),
+        fundSetupCost: Yup.string().required("Fund set up cost is required"),
+        hurdleCarryInterestRate: Yup.string().required("Hurdle and carry interest rate is required"),
     });
 
     const {
@@ -301,7 +430,21 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         savePrelimApplicationForm();
     };
 
-    console.log(getValues());
+    useImperativeHandle(ref, () => ({
+        submit: async () => {
+            let isValid = false;
+            await handleSubmit(
+                (data) => {
+                    onSubmit(data);
+                    isValid = true;
+                },
+                () => {
+                    isValid = false;
+                }
+            )();
+            return isValid;
+        }
+    }));
 
     if (prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
         return (
@@ -437,6 +580,37 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} md={4}>
+                        <FormControl component="fieldset" fullWidth>
+                            <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>AIF Category Type</Typography>
+                            <Controller
+                                name="aifCategoryType"
+                                control={control}
+                                render={({ field }) => (
+                                    <RadioGroup
+                                        {...field}
+                                        row
+                                        value={prelimApplicationFormData.aifCategoryType || ''}
+                                        onChange={(e) => {
+                                            field.onChange(e);
+                                            handleChange({
+                                                preventDefault: () => { },
+                                                target: { name: 'aifCategoryType', value: e.target.value }
+                                            });
+                                        }}
+                                    >
+                                        <FormControlLabel value="1" control={<Radio size="small" />} label="Equity oriented AIF" />
+                                        <FormControlLabel value="2" control={<Radio size="small" />} label="Debt oriented AIF" />
+                                    </RadioGroup>
+                                )}
+                            />
+                            {errors.aifCategoryType && (
+                                <FormHelperText error>{errors.aifCategoryType.message as string}</FormHelperText>
+                            )}
+                        </FormControl>
+                    </Grid>
+
+
+                    <Grid item xs={12} md={4}>
                         <TextField
                             required
                             fullWidth
@@ -500,12 +674,13 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                 errors.contributionSought
                                     ? (errors.contributionSought.message as string)
                                     : (prelimApplicationFormData?.contributionSought
-                                        ? numberToWordsIndian(prelimApplicationFormData.contributionSought)
+                                        ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.contributionSought)) * 10000000)
                                         : '')
                             }
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={numericSx}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -520,8 +695,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             helperText={errors.termOfFund?.message as string}
                             value={prelimApplicationFormData.termOfFund || ''}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={numericSx}
                             inputProps={{ min: 0 }}
                         />
                     </Grid>
@@ -538,8 +714,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={!!errors.commitmentPeriod}
                             helperText={errors.commitmentPeriod?.message as string}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={numericSx}
                         />
                     </Grid>
 
@@ -555,8 +732,26 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={!!errors.preferredReturn}
                             helperText={errors.preferredReturn?.message as string}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={numericSx}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <TextField
+                            required
+                            fullWidth
+                            type="number"
+                            id="targetReturnIRR"
+                            label="Target Return in the fund (IRR in %)"
+                            value={prelimApplicationFormData.targetReturnIRR || ''}
+                            {...register("targetReturnIRR")}
+                            error={!!errors.targetReturnIRR}
+                            helperText={errors.targetReturnIRR?.message as string}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            variant="outlined"
+                            sx={numericSx}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -571,8 +766,26 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={!!errors.managementFees}
                             helperText={errors.managementFees?.message as string}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={numericSx}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <TextField
+                            required
+                            fullWidth
+                            type="number"
+                            id="fundSetupCost"
+                            label="Fund set up cost and other expenses"
+                            value={prelimApplicationFormData.fundSetupCost || ''}
+                            {...register("fundSetupCost")}
+                            error={!!errors.fundSetupCost}
+                            helperText={errors.fundSetupCost?.message as string}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            variant="outlined"
+                            sx={numericSx}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -587,8 +800,26 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                             error={!!errors.carriedInterest}
                             helperText={errors.carriedInterest?.message as string}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={numericSx}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <TextField
+                            required
+                            fullWidth
+                            type="number"
+                            id="hurdleCarryInterestRate"
+                            label="Hurdle and carry interest rate"
+                            value={prelimApplicationFormData.hurdleCarryInterestRate || ''}
+                            {...register("hurdleCarryInterestRate")}
+                            error={!!errors.hurdleCarryInterestRate}
+                            helperText={errors.hurdleCarryInterestRate?.message as string}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            variant="outlined"
+                            sx={numericSx}
                         />
                     </Grid>
 
@@ -673,8 +904,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdDescription}
                                         helperText={errors.sdDescription?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
                                     />
                                 </Grid>
 
@@ -696,8 +928,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdTargetCorpusDomestic}
                                         helperText={errors.sdTargetCorpusDomestic?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -712,8 +945,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdTargetCorpusOverseas}
                                         helperText={errors.sdTargetCorpusOverseas?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -728,8 +962,10 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdTotalTargetCorpus}
                                         helperText={errors.sdTotalTargetCorpus?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
+                                        InputProps={{ readOnly: true }}
                                     />
                                 </Grid>
 
@@ -751,8 +987,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdGreenShoeTargetCorpusDomestic}
                                         helperText={errors.sdGreenShoeTargetCorpusDomestic?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -767,8 +1004,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdGreenShoeTargetCorpusOverseas}
                                         helperText={errors.sdGreenShoeTargetCorpusOverseas?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -783,8 +1021,10 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdGreenShoeTotalTargetCorpus}
                                         helperText={errors.sdGreenShoeTotalTargetCorpus?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
+                                        InputProps={{ readOnly: true }}
                                     />
                                 </Grid>
 
@@ -810,7 +1050,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                     </Box>
                                 </Grid>
 
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={4}>
                                     <TextField
                                         required
                                         fullWidth
@@ -822,11 +1062,12 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdFirstClosingDomesticAmount}
                                         helperText={errors.sdFirstClosingDomesticAmount?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={4}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <Controller
                                             name="sdFirstClosingDomesticAmountDate"
@@ -855,8 +1096,9 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         />
                                     </LocalizationProvider>
                                 </Grid>
+                                <Grid item xs={12} md={4}></Grid>
 
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={4}>
                                     <TextField
                                         required
                                         fullWidth
@@ -868,11 +1110,12 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                         error={!!errors.sdFirstClosingOverseasAmount}
                                         helperText={errors.sdFirstClosingOverseasAmount?.message as string}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                        sx={numericSx}
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={4}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <Controller
                                             name="sdFirstCorpusOverseasAmountDate"
@@ -915,8 +1158,11 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                                 borderRadius: '8px',
                                                 textTransform: 'none',
                                                 fontWeight: 700,
+                                                border: '1px solid #2a254d',
                                                 '&:hover': {
-                                                    backgroundColor: '#2a254d'
+                                                    backgroundColor: '#ffffff',
+                                                    color: '#2a254d',
+                                                    border: '1px solid #2a254d'
                                                 }
                                             }}
                                         >
@@ -950,7 +1196,10 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                 {Number(prelimAppicationId) ? (
                                     <Grid container spacing={2}>
                                         <Grid item xs="auto">
-                                            <DocumentChip label="Pvt. Placement Memorandum" id={`sdPvtPlacementMemorandum${prelimAppicationId}`} />
+                                            <DocumentChip label="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${prelimAppicationId}`} />
+                                        </Grid>
+                                        <Grid item xs="auto">
+                                            <DocumentChip label="Latest Investor Presentation" id={`sdLatestInvestorPresentation${prelimAppicationId}`} />
                                         </Grid>
                                         <Grid item xs="auto">
                                             <DocumentChip label="IM Agreement" id={`sdImAgreement${prelimAppicationId}`} />
@@ -959,7 +1208,16 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
                                             <DocumentChip label="Trust Deed" id={`sdTrustDeal${prelimAppicationId}`} />
                                         </Grid>
                                         <Grid item xs="auto">
-                                            <DocumentChip label="SEBI Certificate" id={`sdSEBICertificate${prelimAppicationId}`} />
+                                            <DocumentChip label="SEBI Registration Certificate" id={`sdSEBICertificate${prelimAppicationId}`} />
+                                        </Grid>
+                                        <Grid item xs="auto">
+                                            <DocumentChip label="Shareholding Pattern of Sponsor/IM" id={`sdShareholdingPattern${prelimAppicationId}`} />
+                                        </Grid>
+                                        <Grid item xs="auto">
+                                            <DocumentChip label="Policy of Carry" id={`sdPolicyOfCarry${prelimAppicationId}`} />
+                                        </Grid>
+                                        <Grid item xs="auto">
+                                            <DocumentChip label="Contribution Agreement" id={`sdContributionAgreement${prelimAppicationId}`} />
                                         </Grid>
                                     </Grid>
                                 ) : (
@@ -976,7 +1234,7 @@ export const PrelimApplicationData: React.FC<PrelimApplicationProps> = (props) =
         );
     else
         return <div>Loading...</div>
-}
+});
 
 
 

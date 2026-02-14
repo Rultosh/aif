@@ -35,10 +35,10 @@ const EligibilityResults = () => {
     }
 
     let resultText = {
-        "Fund of funds": ["SIDBI's Fund of Funds for Startups (FFS) is intended to support AIFs to invest in startups.", "Based on Your size and/or structure, you do not meet the minimum eligible requirement for contribution under FFS."],
-        "Aspire for MSME": ["SIDBI’s ASPIRE fund is intended to support AIFs to invest in MSME.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under ASPIRE fund scheme."],
-        "UP Start-up Fund": ["SIDBI’s UP Startup fund is intended to support AIFs to invest in startups.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under UP Startup fund scheme."],
-        "Odisha Startup Fund": ["SIDBI’s UP Startup fund is intended to support AIFs to invest in startups.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under UP Startup fund scheme."]
+        "Fund of funds": ["NPS Trust's Fund of Funds for Startups (FFS) is intended to support AIFs to invest in startups.", "Based on Your size and/or structure, you do not meet the minimum eligible requirement for contribution under FFS."],
+        "Aspire for MSME": ["NPS Trust’s ASPIRE fund is intended to support AIFs to invest in MSME.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under ASPIRE fund scheme."],
+        "UP Start-up Fund": ["NPS Trust’s UP Startup fund is intended to support AIFs to invest in startups.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under UP Startup fund scheme."],
+        "Odisha Startup Fund": ["NPS Trust’s UP Startup fund is intended to support AIFs to invest in startups.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under UP Startup fund scheme."]
     }
 
 
@@ -75,12 +75,12 @@ const EligibilityResults = () => {
                                         {isEligible ?
                                             <div>
                                                 <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Congratulations!</Typography>
-                                                <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Based on your size and structure you may be eligible for applying for contribution through SIDBI's {scheme}</Typography>
+                                                <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>Based on your size and structure you may be eligible for applying for contribution through NPS Trust's {scheme}</Typography>
                                                 <Typography sx={{ flex: 1, ml: '10px', mb: '50px', textAlign: "center" }}>Please <a href="/" style={{ color: 'blue' }}>Login</a>/
                                                     <a href="/" style={{ color: 'blue' }}>Sign-up</a> to be directed to the application</Typography>
                                             </div>
                                             : <div><Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>We are Sorry!</Typography>
-                                                {/*} <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>SIDBI's Fund of Funds for Startups (FFS) is intended to support AIFs to invest in startups.</Typography>
+                                                {/*} <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>NPS Trust's Fund of Funds for Startups (FFS) is intended to support AIFs to invest in startups.</Typography>
                                                 <Typography sx={{ flex: 1, ml: '10px', mb: '50px', textAlign: "center" }}>Based on Your size and/or structure, you do not meet the minimum eligible requirement for contribution under FFS.</Typography>
                                         */}
                                                 <Typography sx={{ flex: 1, ml: '10px', textAlign: "center" }}>{resultText[scheme as keyof typeof resultText][0]}</Typography>

@@ -148,7 +148,7 @@ export const FundOverview = (props: any) => {
                         const isDisabled = isNew && isPending;
 
                         // Colors from reference
-                        const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#363062' : '#333');
+                        const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#363062' : '#818181');
 
                         return (
                             <Box

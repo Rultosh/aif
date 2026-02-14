@@ -17,49 +17,64 @@ interface IFileUploadInfo {
 export default function DocumentChip(props: DocumentChipProps) {
 
   const [open, setOpen] = React.useState(false);
-  
+
   const [fileInfo, setFileInfo] = useState({ file: null } as IFileUploadInfo);
   const [progress, setProgress] = useState(0.0);
   const [error, setError] = useState('');
 
-  const onDrop = useCallback((acceptedFiles: any) => {
+  const onDrop = useCallback((acceptedFiles: any, fileRejections: any) => {
+    if (fileRejections.length > 0) {
+      setError("Only Excel, Word, and PDF files are allowed.");
+      return;
+    }
+
     acceptedFiles.forEach((file: File) => {
       console.log(file);
       setFileInfo({ "file": file });
 
       console.log('uploading...', file);
-    FileUploadService.upload(
-      props.id,
-      file,
-      props.signed,
-      (event: any) => {
-        let uploadProgress = Math.round((100 * event.loaded) / event.total);
-        setProgress(progress)
-      }).then((response) => {
-        console.log(response);
-        setOpen(false);
-        setFileInfo({ file: null });
-        setError('');
-        props.onSuccess(
-          props.id,
-          response.data['message']
-        )
-      }).catch((error) => {
-        setError("Error uploading file.");
-      });
+      FileUploadService.upload(
+        props.id,
+        file,
+        props.signed,
+        (event: any) => {
+          let uploadProgress = Math.round((100 * event.loaded) / event.total);
+          setProgress(progress)
+        }).then((response) => {
+          console.log(response);
+          setOpen(false);
+          setFileInfo({ file: null });
+          setError('');
+          props.onSuccess(
+            props.id,
+            response.data['message']
+          )
+        }).catch((error) => {
+          setError("Error uploading file.");
+        });
     })
   }, [])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+    },
+    multiple: false
+  })
 
   return (<>
-  
+
     <div {...getRootProps()}>
       <input {...getInputProps()} />
-        <div style={{display: "inline"}}>
-          {props.children}
-          <div style={{ color: "red", display: "inline-block", marginLeft: '10px' }}>{error}</div>
-        </div>
+      <div style={{ display: "inline" }}>
+        {props.children}
+        <div style={{ color: "red", display: "inline-block", marginLeft: '10px', fontSize: '12px' }}>{error}</div>
+      </div>
     </div>
   </>
   )

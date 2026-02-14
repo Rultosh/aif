@@ -1,64 +1,73 @@
 import { Box, Paper, Typography, Container, Breadcrumbs, Link, Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
-import LightbulbIcon from '@mui/icons-material/Lightbulb'
+import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import HomeIcon from '@mui/icons-material/Home';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
-import PanoramaHorizontalSelectIcon from '@mui/icons-material/PanoramaHorizontalSelect';
-import DnsIcon from '@mui/icons-material/Dns';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import DomainVerificationIcon from '@mui/icons-material/DomainVerification';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import GroupsIcon from '@mui/icons-material/Groups';
 
 const steps = [
   {
     title: 'Registration',
     icon: <AppRegistrationIcon sx={{ fontSize: 20, color: 'rgb(6 203 213)' }} />,
-    description: '',
+    description: 'Using SEBI registration',
     titlebgcolor: '#a6e9e1',
     titlecolor: '#333',
     number: 1
   },
   {
-    title: 'Stage-I Evaluation',
-    icon: <PanoramaHorizontalSelectIcon sx={{ fontSize: 20, color: 'rgb(223 223 8)' }} />,
-    description: 'Preliminary Information Submission',
+    title: 'Initial-Assessment',
+    icon: <AssignmentIcon sx={{ fontSize: 20, color: 'rgb(223 223 8)' }} />,
+    description: 'Go/No-Go Decision/Feedback',
     titlebgcolor: '#f7f771',
     titlecolor: '#333',
     number: 2
   },
   {
-    title: 'Stage-II Detailed Evaluation',
-    icon: <DnsIcon sx={{ fontSize: 20, color: '#f7b900' }} />,
-    description: 'Comprehensive Assessment and Rating of AIF',
-    titlebgcolor: '#f5d576',
+    title: 'Submission of Application',
+    icon: <DomainVerificationIcon sx={{ fontSize: 20, color: '#30ab48' }} />,
+    description: 'Interaction with GP & AIF Appraisal',
+    titlebgcolor: '#82f398',
     titlecolor: '#333',
     number: 3
   },
   {
-    title: 'Screening Committee',
+    title: 'AIF Screening Committee',
     icon: <FitScreenIcon sx={{ fontSize: 20, color: '#6d18dd' }} />,
-    description: 'Shortlisting of AIFs',
+    description: 'Appraisal Submission & Shortlisting/Feedback',
     titlebgcolor: '#aca9f5',
     titlecolor: '#333',
     number: 4
   },
   {
     title: 'Pension Funds Investment Committee',
-    icon: <InsertChartIcon sx={{ fontSize: 20, color: '#30ab48' }} />,
-    description: 'Expression of Interest by PFs',
-    titlebgcolor: '#82f398',
+    icon: <InsertChartIcon sx={{ fontSize: 20, color: '#f7b900' }} />,
+    description: 'EOI by Pension Funds',
+    titlebgcolor: '#f5d576',
     titlecolor: '#333',
     number: 5
   },
   {
-    title: 'Onboarding of AIF',
-    icon: <LightbulbIcon sx={{ fontSize: 20, color: '#1e7d6f' }} />,
-    description: 'Agreement Finalization',
+    title: 'Documentation',
+    icon: <DocumentScannerIcon sx={{ fontSize: 20, color: '#1e7d6f' }} />,
+    description: 'Finalization of Legal Documents, Commercials & Execution of Documents',
     titlebgcolor: '#1cebcc',
     titlecolor: '#333',
     number: 6
+  },
+  {
+    title: 'Onboarding of AIFs',
+    icon: <GroupsIcon sx={{ fontSize: 20, color: '#00bd31' }} />,
+    description: 'Capital Drawdown Monitoring',
+    titlebgcolor: '#1ceb52e3',
+    titlecolor: '#333',
+    number: 7
   }
 ]
 
@@ -73,7 +82,7 @@ const Workflow = (props:any) => {
   })
   
   const cardWidth = 150
-  const horizontalGap = 200 // Increased to prevent overlapping
+  const horizontalGap = 180 // Increased to prevent overlapping
   const n = steps.length
   const totalWidth = (n - 1) * horizontalGap + cardWidth + 60
   const svgWidth = totalWidth
@@ -82,7 +91,7 @@ const Workflow = (props:any) => {
   // Marker positions
   const markers = steps.map((_, i) => ({
     x: 100 + i * horizontalGap,
-    y: i % 2 === 0 ? 70 : 260, // Even at top, Odd at bottom
+    y: i % 2 === 0 ? 70 : 220, // Even at top, Odd at bottom
     num: i + 1
   }))
 

@@ -1,26 +1,14 @@
-import { Box, Button, Card, CardContent, CardHeader, Chip, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Modal, Paper, Select, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import UploadIcon from '@mui/icons-material/Upload';
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import dayjs, { Dayjs } from 'dayjs';
+import { Box, Button, Card, CardContent, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { saveFormData, submitResults, fetchTableData, fetchInvestmentTeamsPartnerLevelAsync, selectInvestmentPartners, createInvestmentTeamsPartnerLevelAsync, deleteInvestmentTeamPartnerLevelAsync, updateInvestmentTeamsPartnerLevelAsync } from './investmentPartnerSlice'
-import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
-import React, * as Rect from 'react'
-import { createInvestmentTeamsPartnerLevel, fetchInvestmentTeamsPartnerLevel } from "./investmentPartnerApi";
-import { ActionWrapper, wrapArgument } from "../../../../../lib/api-status/actionWrapper";
+import { createInvestmentTeamsPartnerLevelAsync, updateInvestmentTeamsPartnerLevelAsync } from './investmentPartnerSlice'
+import { useAppDispatch } from '../../../../../app/hooks'
+import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultInvestmentPartner, IInvestmentPartner } from "./IInvestmentPartner";
-import { FetchStatus } from "../../../../../lib/api-status/IStatus";
-import { Delete, Edit, SettingsPowerRounded } from '@mui/icons-material';
-import { InvestmentPartnerRow } from "./InvestmentPartnerRow";
-import { selectPrelimApplication } from "../prelimApplicationDataSlice";
-import { AsyncThunkAction } from "@reduxjs/toolkit";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
 
 
 interface InvestmentPartnerModelProps {
@@ -38,7 +26,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   const dispatch = useAppDispatch();
 
   function handleSubmitForm() {
-    console.log("Saving investpment partner", investmentPartnerFormData)
+    console.log("Saving investment partner", investmentPartnerFormData)
     if (investmentPartnerFormData.id) {
       dispatch(
         updateInvestmentTeamsPartnerLevelAsync(
@@ -46,13 +34,11 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
         )
       )
     } else {
-      console.log(investmentPartnerFormData)
       dispatch(
         createInvestmentTeamsPartnerLevelAsync(
           wrapArgument(actionUid, investmentPartnerFormData)
         )
       )
-      setInvestmentPartnerFormData({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
     }
     handleCloseModal();
   }
@@ -63,27 +49,24 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   }
 
   useEffect(() => {
-    setInvestmentPartnerFormData({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
-
-    reset(props.investmentPartnerFormData);
-
-    console.log({ ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId })
-  }, [])
+    const data = { ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId };
+    setInvestmentPartnerFormData(data)
+    reset(data);
+  }, [props.investmentPartnerFormData, props.open])
 
   const handleChange = (ev: any) => {
     ev.preventDefault();
-    console.log('handle change', ev.target.id, ev.target.value);
+    let value = ev.target.value;
+    const name = ev.target.name || ev.target.id;
+
+    if (name === 'yearsWorkedTogether') {
+      value = value.replace(/[^0-9]/g, '');
+    }
 
     let copiedValue: IInvestmentPartner = { ...investmentPartnerFormData };
+    copiedValue[name as keyof IInvestmentPartner] = value;
 
-    if (ev.target.id !== undefined) {
-      copiedValue[ev.target.id as keyof IInvestmentPartner] =
-        ev.target.id !== undefined ? ev.target.value : ev.target.value
-    } else {
-      copiedValue[ev.target.name as keyof IInvestmentPartner] = ev.target.value;
-    }
-    console.log(copiedValue, props.prelimApplicationId)
-    setValue(ev.target.name, ev.target.value);
+    setValue(name as any, value);
     setInvestmentPartnerFormData(copiedValue)
   };
 
@@ -94,26 +77,32 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     transform: 'translate(-50%, -50%)',
     width: '80%',
     bgcolor: 'background.paper',
-    border: '2px solid #000',
+    border: 'none',
     boxShadow: 24,
     p: 4,
-    maxHeight: '70vh',
-    overflow: 'auto'
+    borderRadius: '12px',
+    maxHeight: '80vh',
+    overflowY: 'auto' as 'auto',
+    outline: 'none'
   };
-    
+
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
   const htmlTagsNotAllowed = "Tags not allowed in input.";
-  
+
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     age: Yup.string().required("Age is required"),
     qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     description: Yup.string().required("Brief details of VC/PE Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    vcpeExperience: Yup.string().required("VC/PE Experience is required")
+    vcpeExperience: Yup.string().required("VC/PE Experience is required"),
+    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    yearsWorkedTogether: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("This field is required"),
+    legalCasesPending: Yup.string().test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
   });
 
   const {
+    control,
     setValue,
     getValues,
     register,
@@ -125,175 +114,196 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   });
 
   const onSubmit = (data: any) => {
-    console.log(data);
     setInvestmentPartnerFormData(data);
     handleSubmitForm();
   };
-  
-  function getModalStyle() {
-    const top = 50
-    const left = 50
 
-    return {
-        top: `${top}%`,
-        left: `${left}%`,
-        transform: `translate(-${top}%, -${left}%)`,
-        overflow: "scroll"
-    };
-  }
+  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
 
   return <Modal
     open={props.open}
     onClose={handleCloseModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
-    disableScrollLock
   >
     <Box sx={style}>
-      <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-        <Grid container spacing={2} >
-          <Grid item xs={9}>
-            <Box sx={{ display: 'inline-flex' }}>
-              <Typography variant="subtitle1" sx={{ flex: 1, ml: '10px', textAlign: "left", fontWeight: 'bold' }}>Details Of Investment Team (At Partner Level)</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={4.5}>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details Of Investment Team (At Partner Level)</Typography>
+      <Box component="form">
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
             <TextField
               required
+              fullWidth
               id="name"
               label="Name"
+              value={investmentPartnerFormData.name || ''}
               {...register("name")}
-              error={(errors.name) ? true : false}
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPartnerFormData.name}
-              variant="standard"
+              error={!!errors.name}
+              helperText={errors.name?.message as string}
+              variant="outlined"
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.name)?errors.name.message : ''}</>
-            </Typography>
-
           </Grid>
-          <Grid item xs={3.5}>
+          <Grid item xs={12} md={6}>
             <TextField
               required
+              fullWidth
               id="designation"
               label="Designation"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPartnerFormData.designation}
+              value={investmentPartnerFormData.designation || ''}
               {...register("designation")}
-              error={(errors.designation)? true : false}
-              variant="standard"
+              error={!!errors.designation}
+              helperText={errors.designation?.message as string}
+              variant="outlined"
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.designation)?errors.designation.message : ''}</>
-            </Typography>
-
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={12} md={3}>
             <TextField
               required
+              fullWidth
               type="number"
               id="age"
               label="Age"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPartnerFormData.age}
+              value={investmentPartnerFormData.age || ''}
               {...register("age")}
-              error={(errors.age && getValues("age") == '') ? true : false}
-              variant="standard"
+              error={!!errors.age}
+              helperText={errors.age?.message as string}
+              variant="outlined"
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.age && getValues("age") == '')?errors.age.message : ''}</>
-            </Typography>
           </Grid>
-          <Grid item xs={4.5}>
+          <Grid item xs={12} md={9}>
             <TextField
               required
+              fullWidth
               id="qualification"
               label="Qualification"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPartnerFormData.qualification}
+              value={investmentPartnerFormData.qualification || ''}
               {...register("qualification")}
-              error={(errors.qualification) ? true : false}
-              variant="standard"
+              error={!!errors.qualification}
+              helperText={errors.qualification?.message as string}
+              variant="outlined"
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.qualification)?errors.qualification.message : ''}</>
-            </Typography>
-
           </Grid>
-          <Grid item xs={4.5}>
-            <FormControl variant="standard" sx={{  display: 'flex' }}>
-              <InputLabel id="demo-simple-select-standard-label">VC/PE Experience in investing</InputLabel>
-              <Select
-              required
-                labelId="vcpeExperience"
-                id="vcpeExperience"
-                value={investmentPartnerFormData.vcpeExperience || ''}
-                {...register("vcpeExperience")}
-                error={(errors.vcpeExperience && getValues("vcpeExperience") =='') ? true : false}
-                onChange={handleChange}
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="outlined" error={!!errors.vcpeExperience} sx={fieldSx}>
+              <InputLabel id="vcpeExperience-label">VC/PE Experience in investing</InputLabel>
+              <Controller
                 name="vcpeExperience"
-                // defaultValue={investmentPartnerFormData["vcpeExperience"] === undefined ? " " : investmentPartnerFormData["vcpeExperience"]}
-              >
-
-                <MenuItem key={"0-5 years"} value="0-5 years" selected={String(investmentPartnerFormData.vcpeExperience) == "0-5 years"}>0-5 years</MenuItem>
-                <MenuItem key={"5-10 years"} value="5-10 years" selected={String(investmentPartnerFormData.vcpeExperience) == "5-10 years"}>5-10 years</MenuItem>
-                <MenuItem key={"10-15 years"} value="10-15 years" selected={String(investmentPartnerFormData.vcpeExperience) == "10-15 years"}>10-15 years</MenuItem>
-                <MenuItem key={"15+ years"} value="15+ years" selected={String(investmentPartnerFormData.vcpeExperience) == "15+ years"}>15+ years</MenuItem>
-              </Select>
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    labelId="vcpeExperience-label"
+                    label="VC/PE Experience in investing"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleChange(e);
+                    }}
+                  >
+                    <MenuItem value="0-5 years">0-5 years</MenuItem>
+                    <MenuItem value="5-10 years">5-10 years</MenuItem>
+                    <MenuItem value="10-15 years">10-15 years</MenuItem>
+                    <MenuItem value="15+ years">15+ years</MenuItem>
+                  </Select>
+                )}
+              />
+              {errors.vcpeExperience && <FormHelperText>{errors.vcpeExperience.message as string}</FormHelperText>}
             </FormControl>
-            <Typography variant="caption" color="error">
-              <>{(errors.vcpeExperience && getValues("vcpeExperience") == '')?errors.vcpeExperience.message : ''}</>
-            </Typography>
-
-
-            {/*<TextField
-              required
-              id="vcpeExperience"
-              label="VC/PE Experience in investing"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPartnerFormData.vcpeExperience}
-              variant="standard"
-              onChange={handleChange}
-
-              sx={{ display: 'flex' }}
-/> */}
-
           </Grid>
-          <Grid item xs={9}>
+          <Grid item xs={12}>
             <TextField
               required
+              fullWidth
               id="description"
               label="Brief details of VC/PE Experience"
-              //defaultValue={formValue["NameOfTheFund"] === undefined ? " " : formValue["NameOfTheFund"]}
-              value={investmentPartnerFormData.description}
-              variant="standard"
+              value={investmentPartnerFormData.description || ''}
+              variant="outlined"
               multiline
+              rows={3}
               {...register("description")}
-              error={(errors.description) ? true : false}
+              error={!!errors.description}
+              helperText={errors.description?.message as string}
               onChange={handleChange}
-
-              sx={{ display: 'flex' }}
+              sx={fieldSx}
             />
-            <Typography variant="caption" color="error">
-              <>{(errors.description)?errors.description.message : ''}</>
-            </Typography>
-
           </Grid>
-          <Grid item xs={12} >
-            <Button type="submit" onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ textTransform: 'none' }} >
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              id="areaOfExpertise"
+              label="Area of Expertise"
+              value={investmentPartnerFormData.areaOfExpertise || ''}
+              {...register("areaOfExpertise")}
+              error={!!errors.areaOfExpertise}
+              helperText={errors.areaOfExpertise?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              required
+              fullWidth
+              type="number"
+              id="yearsWorkedTogether"
+              label="No. of years worked together among partners"
+              value={investmentPartnerFormData.yearsWorkedTogether || ''}
+              {...register("yearsWorkedTogether")}
+              error={!!errors.yearsWorkedTogether}
+              helperText={errors.yearsWorkedTogether?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            // inputProps={{ step: "1", onKeyDown: (e) => (e.key === '.' || e.key === 'e') && e.preventDefault() }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              id="legalCasesPending"
+              label="Details of Legal cases pending if any in court of law"
+              value={investmentPartnerFormData.legalCasesPending || ''}
+              {...register("legalCasesPending")}
+              error={!!errors.legalCasesPending}
+              helperText={errors.legalCasesPending?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                  <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Bio-Data</Typography>
+                  <UploadComponents id={`sdPartnerResume${investmentPartnerFormData.id || uuid()}`} signed={false} />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                  <Typography variant="body2" sx={{ mb: 1 }}>Experience supporting document</Typography>
+                  <UploadComponents id={`sdPartnerExperience${investmentPartnerFormData.id || uuid()}`} signed={false} />
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+            <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
               Submit
             </Button>
           </Grid>

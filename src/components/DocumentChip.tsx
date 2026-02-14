@@ -23,15 +23,23 @@ export default function DocumentChip(props: DocumentChipProps) {
   }
 
   return (<DocumentUpload id={props.id} onSuccess={onUploadSuccess} signed={props.signed}>
-      <div>
-        <Chip
-          icon={<Upload />}
-          label={props.label}
-          size="medium"
-          onClick={() => setOpen(!open)}
-          sx={{ backgroundColor: '#D586F7', width: 'fit-content' }} />
-        <ListFiles id={props.id} refreshId={refreshId}/>
-      </div>
-    </DocumentUpload>
+    <div>
+      <Chip
+        icon={<Upload sx={{ color: '#ffffff !important' }} />}
+        label={props.label}
+        size="medium"
+        onClick={() => setOpen(!open)}
+        sx={{
+          backgroundColor: '#0295c9',
+          color: '#ffffff',
+          width: 'fit-content',
+          '&:hover': {
+            backgroundColor: '#808080',
+            color: '#ffffff'
+          }
+        }} />
+      <ListFiles id={props.id} refreshId={refreshId} />
+    </div>
+  </DocumentUpload>
   )
 }
