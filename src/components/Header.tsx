@@ -53,7 +53,7 @@ const Header = (props: any) => {
           width: '100%', 
           transition: 'all 0.3s ease', 
           // background: '#013d7b', 
-          background: 'linear-gradient(90deg, #012d5a, #0457ab, #00b4d8)',
+          background: 'linear-gradient(90deg, #02274c, #0457ab, #00b4d8)',
           // background: 'linear-gradient(90deg, #003049, #005f73, #0a9396)',
           top: 0, 
           padding: '5px 0' 
