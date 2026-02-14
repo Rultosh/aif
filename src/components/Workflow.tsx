@@ -99,7 +99,7 @@ const Workflow = (props:any) => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ pt: '80px', pb: '50px' }}>
+    <Container maxWidth="xl" sx={{ pt: '120px', pb: '50px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ mb: '30px' }}>
               <Typography variant="h5" sx={{ fontWeight: 600, color: '#013d7b' }}>Workflow</Typography>

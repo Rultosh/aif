@@ -94,7 +94,7 @@ export const FundOverview = (props: any) => {
     const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 
     return (
-        <Container maxWidth="xl" sx={{ pt: '80px', pb: '50px' }}>
+        <Container maxWidth="xl" sx={{ pt: '120px', pb: '50px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '30px' }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: '#363062', mb: 0.5 }}>

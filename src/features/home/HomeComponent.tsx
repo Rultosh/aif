@@ -214,7 +214,7 @@ export const Home = (pros: any) => {
         <div className="homeComp">
             <NavigationBar></NavigationBar>
             {prelimApplications.allStatus.fetchStatus === FetchStatus.IDLE ? <>
-                <Container maxWidth="xl" sx={{ py: '80px' }}>
+                <Container maxWidth="xl" sx={{ pt: '120px', pb: '80px' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box sx={{ mb: '30px' }}>
                             <Typography variant="h5" sx={{ fontWeight: 600, color: '#013d7b' }}>Applications</Typography>
