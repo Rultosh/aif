@@ -2,7 +2,8 @@
   "eligibilityQuestions": [
     {
       "id": 1,
-      "text":"Are you a Category I or II Alternative Investment Funds (AIF) registered with Securities and Exchange Board of India (SEBI) or have applied for the same with SEBI?" 
+      "text":"Are you a Category I or II Alternative Investment Funds (AIF) registered with Securities and Exchange Board of India (SEBI) or have applied for the same with SEBI?",
+      "options": [{"id":1,"text":"<= Rs 300 crore"},{"id":2,"text":">Rs 300 & <= Rs 500 crore"},{"id":3,"text":">Rs 500 & <= Rs 750 crore"},{"id":4,"text":">Rs 750 & <= Rs 1000 crore"},{"id":5,"text":">Rs 1000 crore"}]
     },
     {
       "id": 2,

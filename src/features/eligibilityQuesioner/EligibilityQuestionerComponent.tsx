@@ -18,7 +18,7 @@ type resultSchema = {
 const EligibilityQuestioner = () => {
 
     //const { question, results } = props;
-    const [scheme, setScheme] = React.useState(undefined);
+    const [scheme, setScheme] = React.useState(0);
     const question = useAppSelector(state => state.eligibilityQuestioner.questions)
     const results = useAppSelector(state => state.eligibilityQuestioner.results)
     const dispatch = useAppDispatch()
@@ -57,13 +57,10 @@ const EligibilityQuestioner = () => {
 
     const handleSelectChange = (e: any) => {
         setFormData({} as resultSchema);
-        console.log('e.target.value', e.target.value)
-        console.log('e.target.key', e.target.key)
         setScheme(e.target.value);
-        console.log('scheme', scheme)
     }
     function updateCheckButton() {
-        if (scheme !== undefined && question[schemeNames[scheme]].length === Object.keys(formData).length) {
+        if (scheme !== undefined && question[schemeNames[scheme]]?.length === Object.keys(formData).length) {
             setEnableCheck(true)
         }
         else {
@@ -72,7 +69,6 @@ const EligibilityQuestioner = () => {
     }
 
     function submitOnCheckEligibility() {
-        console.log(results);
         dispatch(selected(formData));
         dispatch(schemName(schemeNames[scheme || 0]));
         navigate('/eligibilityResults')
@@ -81,7 +77,7 @@ const EligibilityQuestioner = () => {
     let outputComponents = []
 
 
-    for (let i = 0; scheme !== undefined && i < question[schemeNames[scheme]].length; i++) {
+    for (let i = 0; scheme !== undefined && i < question[schemeNames[scheme]]?.length; i++) {
         let quest = question[schemeNames[scheme]];
         let qes = quest[i].id.toString().concat('. ', quest[i].text);
         let qesId = quest[i].id.toString();
@@ -239,7 +235,7 @@ const EligibilityQuestioner = () => {
                         </Link>
                     </Grid>
 
-                    <Grid item xs={12} md={12}>
+                    {/* <Grid item xs={12} md={12}>
                         <FormControl sx={{ minWidth: 300 }}>
                             <InputLabel id="scheme-select-label">Select Scheme</InputLabel>
                             <Select
@@ -261,7 +257,7 @@ const EligibilityQuestioner = () => {
                                 <MenuItem key={"Odisha Startup Fund"} value={3}>Odisha Startup Fund</MenuItem>
                             </Select>
                         </FormControl>
-                    </Grid>
+                    </Grid> */}
                 </Grid>
             </Paper>
 

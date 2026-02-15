@@ -911,7 +911,7 @@ export const Fund = (props: any) => {
                                     backgroundColor: 'rgba(54, 48, 98, 0.04)'
                                 }
                             }} >
-                            Back to Self Rating
+                            Back to Initail-Assesment
                         </Button>
 
                         <Button

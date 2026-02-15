@@ -39,7 +39,7 @@ export const HistoryModal = (props: any) => {
     };
 
     const tableHeaders = [
-        "Stage",
+        // "Stage",
         "Status",
         "Created On",
         "Remarks"]
@@ -72,7 +72,7 @@ export const HistoryModal = (props: any) => {
                          <TableBody>
                             {state?.histories? state?.histories?.map((row: IHistory) => (
                                <TableRow key={`${row.id}`}>
-                                   <TableCell align="center">{row.stage}</TableCell>
+                                   {/* <TableCell align="center">{row.stage}</TableCell> */}
                                    <TableCell align="center">{row.status}</TableCell>
                                    <TableCell align="center">{row.createdOn}</TableCell>
                                    <TableCell align="center">{row.remarks}</TableCell>

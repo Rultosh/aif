@@ -148,7 +148,7 @@ export const ProfileNew = (props: any) => {
                     boxShadow: '0 6px 16px rgba(213, 134, 247, 0.3)'
                   }
                 }} >
-                Self Rating
+                Initail-Assesment
               </Button>
             </Box>
           </Box>

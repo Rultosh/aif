@@ -2,36 +2,36 @@ export const questions = {
     "selfRatingQuestions": [
       {
         "id": 1,
-        "text":"Sponsor's (only those Sponsor(s) having direct involvement in the Fund) / IM's Commitment to the proposed Fund" ,
+        "text":"Sponsor's Commitment to the proposed Fund" ,
         "options":[">=10% of corpus", ">=5% but less than 10% of corpus", ">=2.50% but less than 5% corpus", "Lower of 2.50% or Rs.5 Cr of corpus as per SEBI Regulations"],
         "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
         "id": 2,
-        "text":"Share of employees(other than the Partners/Directors) in Carry" ,
-        "options":[">=50%", ">=40% & <50%", ">=30% & <40%", "< 30%"],
+        "text":"Age Profile of key members" ,
+        "options":["Average age is less than 45 years", "Average age is between 45 and 55 years", "Average age is between 55 and 60 years", "Average age is more than 60 years"],
         "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
         "id": 3,
-        "text":"Aggregate Investment / Entreprenuership experience of investment team members(other than Partners / Directors) of Fund Manager" ,
-        "options":["More than 10 years", "More than 5 years but upto 10 years", "More than 3 years but upto 5 years", "Upto 3 years / No related experience"],
+        "text":"Average Investment experience of Partners / Directors of Fund Manager" ,
+        "options":["More than 20 years", "More than 15 years but upto 20 years", "More than 10 years but upto 15 years", "Upto 10 years / No related experience"],
         "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
         "id": 4,
-        "text":"Average Investment experience of Partners/Directors of Fund Manager" ,
-        "options":["More than 20 years", "More than 15 years but upto 20 years", "More than 10 years but upto 15 years", "Upto 10 years/No related experience"],
+        "text":"Average Investment experience of investment team members (other than Partners / Directors) of Fund Manager" ,
+        "options":["More than 10 years", "More than 5 years but upto 10 years", "More than 3 years but upto 5 years", "Upto 3 years/No related experience"],
         "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
         "id": 5,
-        "text":"Age Profile of key members" ,
-        "options":[ "Average age is less than 50 years / institutional AMC", "Average age is between 50 and 60 years", "Average age is more than 60 years"],
+        "text":"Share of employees (other than the Partners/ Directors) in Carry" ,
+        "options":[ ">=40", ">=30 & <40%", ">=20% & <30%", "<20%"],
         "size":6,
         'weightage':[1,0.6,0.3]
     },
@@ -51,27 +51,122 @@ export const questions = {
     },
     {
         "id": 8,
-        "text":"Advisory Board / Governance Board, LP Advisory Committee, etc." ,
+        "text":"LP Advisory Committee/Advisory Board" ,
         "options":[
-            "The Fund shall have a full fledged Advisory Board / Governance Board,LP Advisory Committee, etc. with representation from major investors", 
-            "The Fund shall have an Advisory Board / Governance Board, LP Advisory Committee, etc. with representation from a few investors", "The Fund do not propose to have such committees"],
+                "The Fund shall have an Advisory Board/LP Advisory Committee with representation from major investors with 50% of total Corpus",
+                "The Fund shall have a Advisory Board/LP Advisory Committee with representation from a few investors.",
+                "The Fund do not propose to have such Board/Committee"
+            ],
         "size":12,
-        'weightage':[1,0.6,0.3]
+        'weightage':[1,0.5,0]
     },
     {
         "id": 9,
         "text":"Profile of Auditors engaged/proposed to be engaged by the Fund" ,
-        "options":["Big 5 Auditors/propose to engage one of Big 5 auditors", "Not from Big 5 list, but reputed auditors", "Not so reputed names"],
+        "options":[
+            "Big 5 Auditors / propose to engage one of Big 5 auditors",
+            "Not from Big 5 list, but reputed auditors with atleast 20 partners",
+            "Other than above"
+        ],
         "size":6,
-        'weightage':[1,0.6,0.3]
+        'weightage':[1,0.5,0]
     },
     {
         "id": 10,
-        "text":"Exit status of investments from previous Funds(by value)" ,
-        "options":["More than 75%", "More than 50% but upto 75%", "More than 25% but upto 50%", "Upto 25%", "Not applicable being first time Fund"],
+        "text":"Level of commitments raised excluding sponsor" ,
+        "options":[
+            "Confirmed commitments of more than 40% of targeted corpus already raised", 
+            "Confirmed commitments of more than 25% of targeted corpus already raised", 
+            " Confirmed commitments of more than 15% of targeted corpus already raised", 
+            "Confirmed commitments of less than 15% of targeted corpus already raised / No confirmed commitments raised so far"
+        ],
         "size":4,
-        'weightage':[1,0.8,0.6,0.4,0.2]
+        'weightage':[1,0.75,0.5,0.25]
     },
+    {
+        "id": 11,
+        "text":"Exit status of investments from previous Funds (by value)" ,
+        "options":[
+            "More than 75%",
+            "More than 50% but upto 75%",
+            "More than 25% but upto 50%",
+            "Upto 25%"
+        ],
+        "size":4,
+        'weightage':[1,0.75,0.5,0.25]
+    },
+    {
+        "id": 12,
+        "text":"First Closing in % of target corpus in previous Funds" ,
+        "options":[
+            "More than 30%",
+            "More than 20% but upto 30%",
+            "More than 10% but upto 20%",
+            "Upto 10%"
+        ],
+        "size":4,
+        'weightage':[1,0.75,0.5,0.25]
+    },
+    {
+        "id": 13,
+        "text":"Extension of Commitment period in the previous Funds" ,
+        "options":[
+            "No Extension",
+            "12 Months",
+            "24 Months",
+            "More then 24 Months"
+        ],
+        "size":4,
+        'weightage':[1,0.75,0.5,0.25]
+    },
+    {
+        "id": 14,
+        "text":"Average net IRR generated by Previous Funds" ,
+        "options":[
+            ">=25%",
+            ">=18 & < 25%",
+            ">=10% & <18%",
+            "<10%"
+        ],
+        "size":4,
+        'weightage':[1,0.75,0.5,0.25]
+    },
+    {
+        "id": 15,
+        "text":"Target IRR of the current Fund" ,
+        "options":[
+            ">=25%",
+            ">=18 & < 25%",
+            ">=10% & <18%",
+            "<10%"
+        ],
+        "size":4,
+        'weightage':[1,0.75,0.5,0.25]
+    },
+    {
+        "id": 16,
+        "text":"Distributions to Paid-in-Capital in Previous Funds" ,
+        "options":[
+            ">=3x",
+            ">= 2x & < 3x",
+            ">=1x  & <2x",
+            "<1 x"
+        ],
+        "size":4,
+        'weightage':[1,0.75,0.5,0.25]
+    },
+    {
+        "id": 17,
+        "text":"Number of LPs with exposure >5% of previous fund corpus who continue to invest in the proposed fund." ,
+        "options":[
+            ">= 5",
+            ">= 3 & < 5",
+            ">=1  & < 3",
+            "LP show interest"
+        ],
+        "size":4,
+        'weightage':[1,0.75,0.5,0.25]
+    }
     ]
   }
  

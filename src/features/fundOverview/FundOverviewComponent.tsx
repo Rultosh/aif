@@ -48,8 +48,8 @@ export const FundOverview = (props: any) => {
 
     useEffect(() => {
         if (!id) {
-            // navigate("/preliminary/NEW/fund")
-            navigate("/preliminary/1/selfrating")
+            navigate("/preliminary/NEW/selfrating")
+            // navigate("/preliminary/1/selfrating")
         }
     });
 
@@ -85,7 +85,7 @@ export const FundOverview = (props: any) => {
 
 
     const currentStep = [
-        { label: 'Self Rating', path: 'selfrating' },
+        { label: 'Initail-Assesment', path: 'selfrating' },
         { label: 'Fund Overview', path: 'fund' },
         { label: 'Profile', path: 'profile' },
         { label: 'Declaration', path: 'declaration' },
@@ -132,7 +132,7 @@ export const FundOverview = (props: any) => {
                 {/* Chevron Stepper */}
                 <Box sx={{ width: '100%', mb: 2, display: 'flex', gap: 0.5 }}>
                     {[
-                        { label: 'Self Rating', path: 'selfrating', subLabel: 'Assessment' },
+                        { label: 'Initail-Assesment', path: 'selfrating', subLabel: 'Assessment' },
                         { label: 'Fund Overview', path: 'fund', subLabel: 'Information' },
                         { label: 'Profile', path: 'profile', subLabel: 'Details' },
                         { label: 'Declaration', path: 'declaration', subLabel: 'Legal' },

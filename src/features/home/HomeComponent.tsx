@@ -192,19 +192,19 @@ export const Home = (pros: any) => {
 
         switch (status) {
             case "CREATED":
-                return "Pending submission - " + stageDescription;
+                return "Pending submission";
             case "SUBMITTED":
-                return "Pending review - " + stageDescription;
+                return "Pending review";
             case "REVISE":
-                return "Pending revision - " + stageDescription;
+                return "Pending revision";
             case "APPROVED":
-                return "Approved - " + stageDescription;
+                return "Approved";
             case "REJECTED":
-                return "Rejected - " + stageDescription;
+                return "Rejected";
             case "TEMP_CLOSED":
-                return "Temporarily Closed - " + stageDescription;
+                return "Temporarily Closed";
             case "CLOSED":
-                return "Closed - " + stageDescription;
+                return "Closed";
             default:
                 return "Invalid Status";
         }
@@ -301,7 +301,7 @@ export const Home = (pros: any) => {
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                                                        <Tooltip title={`Prelim: ${row.stage === 'PRELIM' ? row.status : 'APPROVED'}`}>
+                                                        <Tooltip title={`${row.stage === 'PRELIM' ? row.status : 'APPROVED'}`}>
                                                             <Box sx={{
                                                                 width: 10,
                                                                 height: 10,
@@ -312,7 +312,7 @@ export const Home = (pros: any) => {
                                                             }} />
                                                         </Tooltip>
                                                         {row.stage === 'DETAILED' && (
-                                                            <Tooltip title={`Detailed: ${row.status}`}>
+                                                            <Tooltip title={`${row.status}`}>
                                                                 <Box sx={{
                                                                     width: 10,
                                                                     height: 10,

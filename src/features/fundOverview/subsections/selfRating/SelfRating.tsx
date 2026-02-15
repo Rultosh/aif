@@ -259,7 +259,7 @@ export const SelfRating = (props: any) => {
                 <CardContent sx={{ p: 4, width: '100%' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                         <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062' }}>
-                            Self Rating
+                            Initail-Assesment
                         </Typography>
 
                         {['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && (
