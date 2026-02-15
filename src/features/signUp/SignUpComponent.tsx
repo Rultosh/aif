@@ -1,5 +1,5 @@
 import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, FormControlLabel, FormLabel } from "@mui/material";
-import logo from '../../images/logo.png';
+// import logo from '../../images/logo.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -266,7 +266,7 @@ const SignUp = () => {
                                         alignItems="center"
                                         sx={{ mt: 4 }}>
 
-                                        <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
+                                        {/* <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
                                             <Box
                                                 component="img"
                                                 sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
@@ -274,7 +274,7 @@ const SignUp = () => {
                                                 src={logo}
                                             />
 
-                                        </Toolbar>
+                                        </Toolbar> */}
 
                                     </Box>
 

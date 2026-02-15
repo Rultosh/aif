@@ -307,7 +307,7 @@ const Landing = () => {
 
                                                         <Grid container direction="column" justifyContent="space-between" alignItems="center" sx={{ pb: 4, flex: 1 }}>
                                                             <Grid item>
-                                                                <Typography sx={{ flex: 1, mt: 5, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="/signUp" style={{ color: 'blue' }}>here</a></Typography>
+                                                                <Typography sx={{ flex: 1, mt: 5, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="#/signUp" style={{ color: 'blue' }}>here</a></Typography>
                                                             </Grid>
 
                                                             {/* <Grid item>
