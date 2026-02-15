@@ -86,12 +86,12 @@ const Header = (props: any) => {
                     Workflow
                   </Link>
                 </Typography>
-                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
+                {/* <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
                 <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '14px', fontWeight: 500, color: '#ffffff' }}>
                   <Link to={`/FAQ`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '14px' }}>
                     FAQ
                   </Link>
-                </Typography>
+                </Typography> */}
                 <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
                 <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '14px', fontWeight: 500, color: '#ffffff' }}>
                   <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '14px' }}>

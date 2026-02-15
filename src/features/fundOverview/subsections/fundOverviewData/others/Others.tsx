@@ -13,6 +13,7 @@ import * as Yup from "yup";
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
     setPrelimApplicationId: (id: String | undefined) => void;
+    onSaveSuccess?: () => void;
 }
 
 const Others = forwardRef((props: PrelimApplicationProps, ref) => {
@@ -46,6 +47,10 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
         otDecisionApprovals: Yup.string().required("This field is required").nullable(),
         otEmployeeCost: Yup.string().required("This field is required").nullable(),
         otReportingStructure: Yup.string().required("This field is required").nullable(),
+        otConsolidatedInfo: Yup.string().required("This field is required").nullable(),
+        otNAVFrequency: Yup.string().required("This field is required").nullable(),
+        otValuationReport: Yup.string().required("This field is required").nullable(),
+        otNAVGuidelines: Yup.string().required("This field is required").nullable(),
     });
 
     const {
@@ -59,8 +64,11 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    const onSubmit = (data: IPrelimApplicationData) => {
-        dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+    const onSubmit = async (data: IPrelimApplicationData) => {
+        await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+        if (props.onSaveSuccess) {
+            props.onSaveSuccess();
+        }
     };
 
     useImperativeHandle(ref, () => ({
@@ -179,21 +187,56 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
 
                     <Grid item xs={12} sx={qSx}>
                         <Typography variant="body1" sx={labelSx}>8. What is the reporting structure/procedure for the contributors (quarterly/ half-yearly/annual)</Typography>
-                        <FormControl component="fieldset" error={!!errors.otReportingStructure} fullWidth>
-                            <Controller
-                                name="otReportingStructure"
-                                control={control}
-                                render={({ field }) => (
-                                    <RadioGroup {...field} row={false}>
-                                        <FormControlLabel value="a" control={<Radio />} label="a) Consolidated information of investee companies" />
-                                        <FormControlLabel value="b" control={<Radio />} label="b) Frequency of NAV reporting" />
-                                        <FormControlLabel value="c" control={<Radio />} label="c) Detailed valuation report" />
-                                        <FormControlLabel value="d" control={<Radio />} label="d) Guidelines for calculating NAV" />
-                                    </RadioGroup>
-                                )}
+
+                        <Box sx={{ ml: 2 }}>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Consolidated information of investee companies</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("otConsolidatedInfo")}
+                                error={!!errors.otConsolidatedInfo}
+                                helperText={errors.otConsolidatedInfo?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
                             />
-                            {errors.otReportingStructure && <FormHelperText>{errors.otReportingStructure.message as string}</FormHelperText>}
-                        </FormControl>
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("otNAVFrequency")}
+                                error={!!errors.otNAVFrequency}
+                                helperText={errors.otNAVFrequency?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("otValuationReport")}
+                                error={!!errors.otValuationReport}
+                                helperText={errors.otValuationReport?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("otNAVGuidelines")}
+                                error={!!errors.otNAVGuidelines}
+                                helperText={errors.otNAVGuidelines?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+                        </Box>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -210,7 +253,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                                     fontWeight: 600
                                 }}
                             >
-                                Save
+                                Save and Continue
                             </Button>
                         </Box>
                     </Grid>

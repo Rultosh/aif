@@ -13,6 +13,7 @@ import * as Yup from "yup";
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
     setPrelimApplicationId: (id: String | undefined) => void;
+    onSaveSuccess?: () => void;
 }
 
 const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
@@ -55,8 +56,11 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    const onSubmit = (data: IPrelimApplicationData) => {
-        dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+    const onSubmit = async (data: IPrelimApplicationData) => {
+        await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+        if (props.onSaveSuccess) {
+            props.onSaveSuccess();
+        }
     };
 
     useImperativeHandle(ref, () => ({
@@ -161,7 +165,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                     fontWeight: 600
                                 }}
                             >
-                                Save
+                                Save and Continue
                             </Button>
                         </Box>
                     </Grid>

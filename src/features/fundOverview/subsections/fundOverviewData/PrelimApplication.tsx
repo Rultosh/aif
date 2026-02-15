@@ -22,6 +22,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
     setPrelimApplicationId: (id: String | undefined) => void;
+    onSaveSuccess?: () => void;
 }
 
 const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) => {
@@ -60,13 +61,17 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         setPrelimApplicationFormData(copiedValue)
     };
 
-    const savePrelimApplicationForm = () => {
+    const savePrelimApplicationForm = async () => {
+        // console.log("onSubmit called", prelimApplicationFormData);
         if (prelimApplicationFormData.id) {
-            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationFormData)));
+            await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationFormData)));
+            if (props.onSaveSuccess) {
+                props.onSaveSuccess();
+            }
         } else {
             dispatch(createPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationFormData)));
         }
-    }
+    };
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -140,55 +145,23 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         if (input === null || input === undefined) return '';
         const str = String(input).replace(/[, ]+/g, '').trim();
         if (str === '') return '';
-        const num = Number(str);
+        const num = Math.floor(Number(str));
         if (Number.isNaN(num)) return '';
         if (num === 0) return 'Zero';
 
         const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
         const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
-        const upTo999 = (n: number) => {
-            let word = '';
-            if (n > 99) {
-                word += ones[Math.floor(n / 100)] + ' Hundred';
-                n = n % 100;
-                if (n) word += ' ';
-            }
-            if (n > 19) {
-                word += tens[Math.floor(n / 10)];
-                if (n % 10) word += ' ' + ones[n % 10];
-            } else if (n > 0) {
-                word += ones[n];
-            }
-            return word;
+        const convert = (n: number): string => {
+            if (n < 20) return ones[n];
+            if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? ' ' + ones[n % 10] : '');
+            if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
+            if (n < 100000) return convert(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
+            if (n < 10000000) return convert(Math.floor(n / 100000)) + ' Lakh' + (n % 100000 ? ' ' + convert(n % 100000) : '');
+            return convert(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + convert(n % 10000000) : '');
         }
 
-        let n = Math.floor(num);
-        const parts: string[] = [];
-
-        const crore = Math.floor(n / 10000000);
-        if (crore) {
-            parts.push(upTo999(crore) + ' Crore');
-            n = n % 10000000;
-        }
-
-        const lakh = Math.floor(n / 100000);
-        if (lakh) {
-            parts.push(upTo999(lakh) + ' Lakh');
-            n = n % 100000;
-        }
-
-        const thousand = Math.floor(n / 1000);
-        if (thousand) {
-            parts.push(upTo999(thousand) + ' Thousand');
-            n = n % 1000;
-        }
-
-        if (n) {
-            parts.push(upTo999(n));
-        }
-
-        const result = parts.join(' ').trim();
+        const result = convert(num).trim();
         return result ? result + ' Rupees only' : '';
     }
 
@@ -902,7 +875,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdDescription || ''}
                                         {...register("sdDescription")}
                                         error={!!errors.sdDescription}
-                                        helperText={errors.sdDescription?.message as string}
+                                        helperText={
+                                            errors.sdDescription
+                                                ? (errors.sdDescription.message as string)
+                                                : (prelimApplicationFormData?.sdDescription
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdDescription)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -926,7 +905,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdTargetCorpusDomestic || ''}
                                         {...register("sdTargetCorpusDomestic")}
                                         error={!!errors.sdTargetCorpusDomestic}
-                                        helperText={errors.sdTargetCorpusDomestic?.message as string}
+                                        helperText={
+                                            errors.sdTargetCorpusDomestic
+                                                ? (errors.sdTargetCorpusDomestic.message as string)
+                                                : (prelimApplicationFormData?.sdTargetCorpusDomestic
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdTargetCorpusDomestic)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -943,7 +928,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdTargetCorpusOverseas || ''}
                                         {...register("sdTargetCorpusOverseas")}
                                         error={!!errors.sdTargetCorpusOverseas}
-                                        helperText={errors.sdTargetCorpusOverseas?.message as string}
+                                        helperText={
+                                            errors.sdTargetCorpusOverseas
+                                                ? (errors.sdTargetCorpusOverseas.message as string)
+                                                : (prelimApplicationFormData?.sdTargetCorpusOverseas
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdTargetCorpusOverseas)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -960,7 +951,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdTotalTargetCorpus || ''}
                                         {...register("sdTotalTargetCorpus")}
                                         error={!!errors.sdTotalTargetCorpus}
-                                        helperText={errors.sdTotalTargetCorpus?.message as string}
+                                        helperText={
+                                            errors.sdTotalTargetCorpus
+                                                ? (errors.sdTotalTargetCorpus.message as string)
+                                                : (prelimApplicationFormData?.sdTotalTargetCorpus
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdTotalTargetCorpus)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -985,7 +982,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic || ''}
                                         {...register("sdGreenShoeTargetCorpusDomestic")}
                                         error={!!errors.sdGreenShoeTargetCorpusDomestic}
-                                        helperText={errors.sdGreenShoeTargetCorpusDomestic?.message as string}
+                                        helperText={
+                                            errors.sdGreenShoeTargetCorpusDomestic
+                                                ? (errors.sdGreenShoeTargetCorpusDomestic.message as string)
+                                                : (prelimApplicationFormData?.sdGreenShoeTargetCorpusDomestic
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -1002,7 +1005,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas || ''}
                                         {...register("sdGreenShoeTargetCorpusOverseas")}
                                         error={!!errors.sdGreenShoeTargetCorpusOverseas}
-                                        helperText={errors.sdGreenShoeTargetCorpusOverseas?.message as string}
+                                        helperText={
+                                            errors.sdGreenShoeTargetCorpusOverseas
+                                                ? (errors.sdGreenShoeTargetCorpusOverseas.message as string)
+                                                : (prelimApplicationFormData?.sdGreenShoeTargetCorpusOverseas
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -1019,7 +1028,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdGreenShoeTotalTargetCorpus || ''}
                                         {...register("sdGreenShoeTotalTargetCorpus")}
                                         error={!!errors.sdGreenShoeTotalTargetCorpus}
-                                        helperText={errors.sdGreenShoeTotalTargetCorpus?.message as string}
+                                        helperText={
+                                            errors.sdGreenShoeTotalTargetCorpus
+                                                ? (errors.sdGreenShoeTotalTargetCorpus.message as string)
+                                                : (prelimApplicationFormData?.sdGreenShoeTotalTargetCorpus
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdGreenShoeTotalTargetCorpus)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -1060,7 +1075,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdFirstClosingDomesticAmount || ''}
                                         {...register("sdFirstClosingDomesticAmount")}
                                         error={!!errors.sdFirstClosingDomesticAmount}
-                                        helperText={errors.sdFirstClosingDomesticAmount?.message as string}
+                                        helperText={
+                                            errors.sdFirstClosingDomesticAmount
+                                                ? (errors.sdFirstClosingDomesticAmount.message as string)
+                                                : (prelimApplicationFormData?.sdFirstClosingDomesticAmount
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdFirstClosingDomesticAmount)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -1108,7 +1129,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         value={prelimApplicationFormData.sdFirstClosingOverseasAmount || ''}
                                         {...register("sdFirstClosingOverseasAmount")}
                                         error={!!errors.sdFirstClosingOverseasAmount}
-                                        helperText={errors.sdFirstClosingOverseasAmount?.message as string}
+                                        helperText={
+                                            errors.sdFirstClosingOverseasAmount
+                                                ? (errors.sdFirstClosingOverseasAmount.message as string)
+                                                : (prelimApplicationFormData?.sdFirstClosingOverseasAmount
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdFirstClosingOverseasAmount)) * 10000000)
+                                                    : '')
+                                        }
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
@@ -1166,7 +1193,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                                 }
                                             }}
                                         >
-                                            Save Changes
+                                            Save and Continue
                                         </Button>
                                     </Box>
                                 </Grid>

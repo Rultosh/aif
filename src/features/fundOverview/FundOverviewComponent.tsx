@@ -48,7 +48,8 @@ export const FundOverview = (props: any) => {
 
     useEffect(() => {
         if (!id) {
-            navigate("/preliminary/NEW/fund")
+            // navigate("/preliminary/NEW/fund")
+            navigate("/preliminary/1/selfrating")
         }
     });
 
@@ -84,9 +85,9 @@ export const FundOverview = (props: any) => {
 
 
     const currentStep = [
+        { label: 'Self Rating', path: 'selfrating' },
         { label: 'Fund Overview', path: 'fund' },
         { label: 'Profile', path: 'profile' },
-        { label: 'Self Rating', path: 'selfrating' },
         { label: 'Declaration', path: 'declaration' },
         { label: 'Preview', path: 'preview' },
     ].find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
@@ -114,7 +115,7 @@ export const FundOverview = (props: any) => {
                             color="inherit"
                             href="#/home"
                         >
-                            Preliminary
+                            Application
                         </LinkMui>
                         <Typography variant="body2"
                             sx={{ color: '#363062', fontWeight: 600, display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
@@ -131,9 +132,9 @@ export const FundOverview = (props: any) => {
                 {/* Chevron Stepper */}
                 <Box sx={{ width: '100%', mb: 2, display: 'flex', gap: 0.5 }}>
                     {[
+                        { label: 'Self Rating', path: 'selfrating', subLabel: 'Assessment' },
                         { label: 'Fund Overview', path: 'fund', subLabel: 'Information' },
                         { label: 'Profile', path: 'profile', subLabel: 'Details' },
-                        { label: 'Self Rating', path: 'selfrating', subLabel: 'Assessment' },
                         { label: 'Declaration', path: 'declaration', subLabel: 'Legal' },
                         { label: 'Preview', path: 'preview', subLabel: 'Review' },
                     ].map((s, index, array) => {

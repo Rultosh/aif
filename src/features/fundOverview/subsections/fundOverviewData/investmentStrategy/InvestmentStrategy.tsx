@@ -14,6 +14,7 @@ import UploadComponents from "../../../../DetailedApplicationComponent/subsectio
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
     setPrelimApplicationId: (id: String | undefined) => void;
+    onSaveSuccess?: () => void;
 }
 
 const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
@@ -49,6 +50,10 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         isRisksMitigation: Yup.string().required("This field is required").nullable(),
         isRolledOverInvestments: Yup.string().required("This field is required").nullable(),
         isGrossReturnObjective: Yup.string().required("This field is required").nullable(),
+        isTargetInvestmentSize: Yup.string().required("This field is required").nullable(),
+        isTargetNumberInvestments: Yup.string().required("This field is required").nullable(),
+        isAverageHoldingPeriod: Yup.string().required("This field is required").nullable(),
+        isExitStrategy: Yup.string().required("This field is required").nullable(),
     });
 
     const {
@@ -62,8 +67,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    const onSubmit = (data: IPrelimApplicationData) => {
-        dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+    const onSubmit = async (data: IPrelimApplicationData) => {
+        await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+        if (props.onSaveSuccess) {
+            props.onSaveSuccess();
+        }
     };
 
     useImperativeHandle(ref, () => ({
@@ -208,22 +216,68 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
 
                     <Grid item xs={12} sx={qSx}>
                         <Typography variant="body1" sx={labelSx}>10. Describe the following investment considerations:</Typography>
-                        <FormControl component="fieldset" error={!!errors.isGrossReturnObjective} fullWidth>
-                            <Controller
-                                name="isGrossReturnObjective"
-                                control={control}
-                                render={({ field }) => (
-                                    <RadioGroup {...field} row={false}>
-                                        <FormControlLabel value="a" control={<Radio />} label="a) Gross return objective of the overall fund" />
-                                        <FormControlLabel value="b" control={<Radio />} label="b) Target investment size and percentage stake" />
-                                        <FormControlLabel value="c" control={<Radio />} label="c) Target number of investments planned" />
-                                        <FormControlLabel value="d" control={<Radio />} label="d) Average holding period for a typical investment" />
-                                        <FormControlLabel value="e" control={<Radio />} label="e) Exit strategy" />
-                                    </RadioGroup>
-                                )}
+
+                        <Box sx={{ ml: 2 }}>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Gross return objective of the overall fund</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("isGrossReturnObjective")}
+                                error={!!errors.isGrossReturnObjective}
+                                helperText={errors.isGrossReturnObjective?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
                             />
-                            {errors.isGrossReturnObjective && <FormHelperText>{errors.isGrossReturnObjective.message as string}</FormHelperText>}
-                        </FormControl>
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Target investment size and percentage stake</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("isTargetInvestmentSize")}
+                                error={!!errors.isTargetInvestmentSize}
+                                helperText={errors.isTargetInvestmentSize?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Target number of investments planned</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("isTargetNumberInvestments")}
+                                error={!!errors.isTargetNumberInvestments}
+                                helperText={errors.isTargetNumberInvestments?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Average holding period for a typical investment</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("isAverageHoldingPeriod")}
+                                error={!!errors.isAverageHoldingPeriod}
+                                helperText={errors.isAverageHoldingPeriod?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>e) Exit strategy</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                {...register("isExitStrategy")}
+                                error={!!errors.isExitStrategy}
+                                helperText={errors.isExitStrategy?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+                        </Box>
                     </Grid>
 
                     <Grid item xs={12} sx={{ mt: 2, mb: 4 }}>
@@ -248,7 +302,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                     fontWeight: 600
                                 }}
                             >
-                                Save
+                                Save and Continue
                             </Button>
                         </Box>
                     </Grid>

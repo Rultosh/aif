@@ -66,19 +66,19 @@ export const Profile = () => {
         dispatch(fetchTeamMember("1"))
     }
 
-    
+
     const handleClick = (ev: any, navTo: string) => {
         if (navTo === 'previous') {
             navigate(`/preliminary/${id}/fund`)
         } else {
-            navigate(`/preliminary/${id}/selfRating`)
+            navigate(`/preliminary/${id}/declaration`)
         }
     }
 
     function handleClickSave() {
 
     }
-    
+
     return (
         <Card sx={{ display: 'flex', mb: 2 }}>
             <CardContent sx={{ flex: 1 }}>
@@ -241,7 +241,7 @@ export const Profile = () => {
                 </Box>
 
                 <Button onClick={(e) => handleClick(e, "previous")} startIcon={<ArrowLeftIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                    Details Of the Funds
+                    Fund Overview
                 </Button>
 
                 <Button onClick={handleClickSave} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
@@ -249,7 +249,7 @@ export const Profile = () => {
                 </Button>
 
                 <Button onClick={(e) => handleClick(e, "next")} endIcon={<ArrowRightIcon />} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                    Self Rating
+                    Declaration
                 </Button>
 
             </CardContent >

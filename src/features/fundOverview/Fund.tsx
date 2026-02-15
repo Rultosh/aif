@@ -17,6 +17,8 @@ import DealFlow from "./subsections/fundOverviewData/dealFlow/DealFlow";
 import MIS from "./subsections/fundOverviewData/mis/MIS";
 import Others from "./subsections/fundOverviewData/others/Others";
 import SaveIcon from '@mui/icons-material/Save';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 export const Fund = (props: any) => {
 
@@ -67,6 +69,14 @@ export const Fund = (props: any) => {
     const handleChange =
         (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
             setExpanded(isExpanded ? panel : false);
+            if (isExpanded) {
+                setTimeout(() => {
+                    const nextAccordion = accordionRefs[panel as keyof typeof accordionRefs]?.current;
+                    if (nextAccordion) {
+                        nextAccordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 300);
+            }
         };
 
 
@@ -76,29 +86,72 @@ export const Fund = (props: any) => {
     const othersRef = useRef<any>(null);
     const misRef = useRef<any>(null);
 
-    const handleClick = async (ev: any, navTo: string) => {
-        if (navTo === 'next') {
-            const results = await Promise.all([
-                prelimRef.current?.submit(),
-                strategyRef.current?.submit(),
-                dealFlowRef.current?.submit(),
-                othersRef.current?.submit(),
-                misRef.current?.submit()
-            ]);
+    const accordionRefs = {
+        "1": useRef<HTMLDivElement>(null),
+        "2": useRef<HTMLDivElement>(null),
+        "3": useRef<HTMLDivElement>(null),
+        "4": useRef<HTMLDivElement>(null),
+        "5": useRef<HTMLDivElement>(null),
+        "6": useRef<HTMLDivElement>(null),
+        "7": useRef<HTMLDivElement>(null),
+        "8": useRef<HTMLDivElement>(null),
+        "9": useRef<HTMLDivElement>(null),
+        "10": useRef<HTMLDivElement>(null),
+    };
 
+    const handleAccordionSaveAndContinue = async (currentPanel: string, nextPanel: string | null, ref: any) => {
+        let isSectionValid = true;
+        if (ref && ref.current && ref.current.submit) {
+            isSectionValid = await ref.current.submit();
+        }
+
+        if (isSectionValid) {
+            if (nextPanel) {
+                setExpanded(nextPanel);
+                // Scroll to the next accordion header
+                setTimeout(() => {
+                    const nextAccordion = accordionRefs[nextPanel as keyof typeof accordionRefs]?.current;
+                    if (nextAccordion) {
+                        nextAccordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 300);
+            } else {
+                // If it's the last panel, go to next page
+                navigate(`/preliminary/${prelimApplicationId}/profile`);
+            }
+        }
+    };
+
+    const handleClickSave = async () => {
+        const results = await Promise.all([
+            prelimRef.current?.submit(),
+            strategyRef.current?.submit(),
+            dealFlowRef.current?.submit(),
+            othersRef.current?.submit(),
+            misRef.current?.submit()
+        ]);
+
+        const allValid = results.every(res => res === true);
+        if (!allValid) {
+            const firstInvalidIndex = results.findIndex(res => res === false);
+            const panels = ["1", "2", "7", "9", "10"];
+            if (firstInvalidIndex !== -1) {
+                setExpanded(panels[firstInvalidIndex]);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        return results;
+    };
+
+    const handleClick = async (ev: any, navTo: string) => {
+        if (navTo === 'previous') {
+            navigate(`/preliminary/${prelimApplicationId}/selfrating`)
+        } else if (navTo === 'next') {
+            const results = await handleClickSave();
             const allValid = results.every(res => res === true);
 
             if (allValid) {
                 navigate(`/preliminary/${prelimApplicationId}/profile`)
-            } else {
-                // Find first invalid section and expand it
-                const firstInvalidIndex = results.findIndex(res => res === false);
-                const panels = ["1", "2", "7", "9", "10"];
-                if (firstInvalidIndex !== -1) {
-                    setExpanded(panels[firstInvalidIndex]);
-                    // Scroll to top to show errors
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
             }
         }
     }
@@ -196,6 +249,7 @@ export const Fund = (props: any) => {
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["1"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -248,6 +302,7 @@ export const Fund = (props: any) => {
                                             ref={prelimRef}
                                             prelimApplicationId={prelimApplicationId}
                                             setPrelimApplicationId={handleApplicationIdCreation}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("1", "2", null)}
                                         />
                                     </Box>
                                 </AccordionDetails>
@@ -255,6 +310,7 @@ export const Fund = (props: any) => {
                         </Grid>
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["2"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -307,6 +363,7 @@ export const Fund = (props: any) => {
                                             ref={strategyRef}
                                             prelimApplicationId={prelimApplicationId}
                                             setPrelimApplicationId={handleApplicationIdCreation}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("2", "3", null)}
                                         />
                                     </Box>
                                 </AccordionDetails>
@@ -314,6 +371,7 @@ export const Fund = (props: any) => {
                         </Grid> : <></>}
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["3"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -363,12 +421,22 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <ContributorDetails prelimApplicationId={Number(prelimApplicationId)} />
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleAccordionSaveAndContinue("3", "4", null)}
+                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                            >
+                                                Save and Continue
+                                            </Button>
+                                        </Box>
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["4"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -418,12 +486,22 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)} />
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleAccordionSaveAndContinue("4", "5", null)}
+                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                            >
+                                                Save and Continue
+                                            </Button>
+                                        </Box>
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["5"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -473,12 +551,22 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)} />
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleAccordionSaveAndContinue("5", "6", null)}
+                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                            >
+                                                Save and Continue
+                                            </Button>
+                                        </Box>
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["6"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -528,12 +616,22 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentPast prelimApplicationId={Number(prelimApplicationId)} />
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleAccordionSaveAndContinue("6", "7", null)}
+                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                            >
+                                                Save and Continue
+                                            </Button>
+                                        </Box>
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["7"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -586,6 +684,7 @@ export const Fund = (props: any) => {
                                             ref={dealFlowRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("7", "8", null)}
                                         />
                                     </Box>
                                 </AccordionDetails>
@@ -593,6 +692,7 @@ export const Fund = (props: any) => {
                         </Grid> : <></>}
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["8"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -641,7 +741,27 @@ export const Fund = (props: any) => {
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-
+                                        <Box sx={{ border: '1px dashed #ccc', borderRadius: '8px', p: 2, mb: 2, backgroundColor: '#fafafa' }}>
+                                            <Button
+                                                variant="text"
+                                                href="/templates/SASF_Fund Track Record Template.xlsx"
+                                                sx={{ color: '#363062', fontWeight: 600 }}
+                                            >
+                                                Download Template
+                                            </Button>
+                                        </Box>
+                                        <Box>
+                                            <UploadComponents id={`pastInvestmentTrackRecord${id}`} signed={false} />
+                                        </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleAccordionSaveAndContinue("8", "9", null)}
+                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                            >
+                                                Save and Continue
+                                            </Button>
+                                        </Box>
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
@@ -649,6 +769,7 @@ export const Fund = (props: any) => {
 
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["9"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -701,6 +822,7 @@ export const Fund = (props: any) => {
                                             ref={othersRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("9", "10", null)}
                                         />
                                     </Box>
                                 </AccordionDetails>
@@ -709,6 +831,7 @@ export const Fund = (props: any) => {
 
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
+                                ref={accordionRefs["10"]}
                                 elevation={0}
                                 sx={{
                                     border: '1px solid rgba(0,0,0,0.08)',
@@ -761,12 +884,105 @@ export const Fund = (props: any) => {
                                             ref={misRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("10", null, null)}
                                         />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
                     </Grid>
+
+
+                    <Divider sx={{ mb: 3 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Button
+                            onClick={(e) => handleClick(e, "previous")}
+                            startIcon={<ArrowLeftIcon />}
+                            variant="outlined"
+                            sx={{
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                px: 3,
+                                fontWeight: 600,
+                                color: '#363062',
+                                borderColor: '#363062',
+                                '&:hover': {
+                                    borderColor: '#4d4585',
+                                    backgroundColor: 'rgba(54, 48, 98, 0.04)'
+                                }
+                            }} >
+                            Back to Self Rating
+                        </Button>
+
+                        <Button
+                            onClick={handleClickSave}
+                            variant="contained"
+                            sx={{
+                                position: 'fixed',
+                                right: 0,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                zIndex: 1100,
+                                borderRadius: '12px 0 0 12px',
+                                minWidth: 'auto',
+                                px: 2,
+                                py: 2,
+                                fontWeight: 700,
+                                backgroundColor: '#363062',
+                                boxShadow: '0 4px 20px rgba(54, 48, 98, 0.3)',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    backgroundColor: '#4d4585',
+                                    boxShadow: '0 6px 24px rgba(54, 48, 98, 0.4)',
+                                    pr: 3,
+                                    transition: 'all 0.2s'
+                                },
+                                transition: 'all 0.2s'
+                            }} >
+                            <SaveIcon />
+                        </Button>
+
+                        <Box>
+                            <Button
+                                onClick={handleClickSave}
+                                variant="contained"
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: '8px',
+                                    px: 2, // Reduced padding for icon-only
+                                    fontWeight: 600,
+                                    backgroundColor: '#363062',
+                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
+                                    minWidth: 'auto', // Icon-only look
+                                    '&:hover': {
+                                        backgroundColor: '#4d4585',
+                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                    },
+                                    mr: 2
+                                }} >
+                                <SaveIcon /> Save
+                            </Button>
+                            <Button
+                                onClick={(e) => handleClick(e, "next")}
+                                endIcon={<ArrowRightIcon />}
+                                variant="contained"
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: '8px',
+                                    px: 4,
+                                    fontWeight: 600,
+                                    backgroundColor: '#D586F7',
+                                    color: 'white',
+                                    boxShadow: '0 4px 12px rgba(213, 134, 247, 0.2)',
+                                    '&:hover': {
+                                        backgroundColor: '#c466e8',
+                                        boxShadow: '0 6px 16px rgba(213, 134, 247, 0.3)'
+                                    }
+                                }} >
+                                Profile
+                            </Button>
+                        </Box>
+                    </Box>
 
                 </CardContent>
             </Card>

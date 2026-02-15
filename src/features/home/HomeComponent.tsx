@@ -105,8 +105,8 @@ export const Home = (pros: any) => {
         "Fund Name",
         "Contact Person",
         "Status",
-        "Prelim Date",
-        "Detailed Date",
+        "Start Date",
+        // "Detailed Date",
         "Target Corpus",
         "Contribution",
         "Download",
@@ -235,7 +235,7 @@ export const Home = (pros: any) => {
                                 startIcon={<AddCircleIcon />}
                                 href="#/Preliminary"
                             >
-                                Add Application
+                                Initial Assessment
                             </Button>
                         </Box>
                     </Box>
@@ -264,14 +264,15 @@ export const Home = (pros: any) => {
                                                 }}
                                             >
                                                 {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
-                                                    {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/${String(getPath(row.status))}`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+                                                    {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/selfrating`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+                                                    {/* {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/${String(getPath(row.status))}`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>} */}
                                                 </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
                                                     {isGoodToShowApplication(row) ? <a href={`#/detailed/${row.detailedApplicationId}/SidbiReference`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
                                                 </TableCell>}
                                                 <TableCell align="center" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
                                                 <TableCell align="center" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
                                                 <TableCell align="center" sx={{ color: '#64748b' }}>{row.applicationSubmissionDate ? Moment(String(row.applicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>
-                                                <TableCell align="center" sx={{ color: '#64748b' }}>{row.detailedApplicationSubmissionDate ? Moment(String(row.detailedApplicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>
+                                                {/* <TableCell align="center" sx={{ color: '#64748b' }}>{row.detailedApplicationSubmissionDate ? Moment(String(row.detailedApplicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell> */}
                                                 <TableCell align="center" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.sdTotalTargetCorpus)}</TableCell>
                                                 <TableCell align="center" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
                                                 <TableCell align="center">

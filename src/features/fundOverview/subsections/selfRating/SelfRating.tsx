@@ -79,9 +79,9 @@ export const SelfRating = (props: any) => {
         handleClickSave();
 
         if (navTo === 'previous') {
-            navigate(`/preliminary/${id}/profile`)
+            // No back button from first step
         } else {
-            navigate(`/preliminary/${id}/declaration`)
+            navigate(`/preliminary/${id}/fund`)
         }
     }
 
@@ -287,24 +287,7 @@ export const SelfRating = (props: any) => {
                     <Divider sx={{ mb: 4 }} />
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Button
-                            onClick={(e) => handleClick(e, "previous")}
-                            startIcon={<ArrowLeftIcon />}
-                            variant="outlined"
-                            sx={{
-                                textTransform: 'none',
-                                borderRadius: '8px',
-                                px: 3,
-                                fontWeight: 600,
-                                color: '#363062',
-                                borderColor: '#363062',
-                                '&:hover': {
-                                    borderColor: '#4d4585',
-                                    backgroundColor: 'rgba(54, 48, 98, 0.04)'
-                                }
-                            }} >
-                            Back to Profile
-                        </Button>
+                        <Box></Box>
 
                         <Button
                             onClick={handleClickSave}
@@ -353,7 +336,7 @@ export const SelfRating = (props: any) => {
                                     },
                                     mr: 2
                                 }} >
-                                <SaveIcon />
+                                <SaveIcon /> Save
                             </Button>
                             <Button
                                 onClick={(e) => handleClick(e, "next")}
@@ -372,7 +355,7 @@ export const SelfRating = (props: any) => {
                                         boxShadow: '0 6px 16px rgba(213, 134, 247, 0.3)'
                                     }
                                 }} >
-                                Declaration
+                                Fund Overview
                             </Button>
                         </Box>
                     </Box>

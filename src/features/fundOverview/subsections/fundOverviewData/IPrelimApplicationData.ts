@@ -85,6 +85,10 @@ export interface IPrelimApplicationData {
   otDecisionApprovals: String | undefined,
   otEmployeeCost: String | undefined,
   otReportingStructure: String | undefined,
+  otConsolidatedInfo: String | undefined,
+  otNAVFrequency: String | undefined,
+  otValuationReport: String | undefined,
+  otNAVGuidelines: String | undefined,
   otConflictsOfInterest: String | undefined,
   otInternalCapital: String | undefined,
   // MIS
@@ -182,6 +186,10 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   otDecisionApprovals: undefined,
   otEmployeeCost: undefined,
   otReportingStructure: undefined,
+  otConsolidatedInfo: undefined,
+  otNAVFrequency: undefined,
+  otValuationReport: undefined,
+  otNAVGuidelines: undefined,
   otConflictsOfInterest: undefined,
   otInternalCapital: undefined,
   // MIS
