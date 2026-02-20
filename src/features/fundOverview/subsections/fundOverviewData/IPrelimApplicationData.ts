@@ -96,7 +96,7 @@ export interface IPrelimApplicationData {
   otInternalCapital: String | undefined,
   // MIS
   msMeetingFrequency: String | undefined,
-  // msOrgStructure: String | undefined,
+  msOrgStructure: String | undefined,
   msInvestigationDetails: String | undefined,
   msExclusiveVC: String | undefined,
   msDirectorshipsPolicy: String | undefined,
@@ -198,7 +198,7 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   otInternalCapital: undefined,
   // MIS
   msMeetingFrequency: undefined,
-  // msOrgStructure: undefined,
+  msOrgStructure: undefined,
   msInvestigationDetails: undefined,
   msExclusiveVC: undefined,
   msDirectorshipsPolicy: undefined,
