@@ -32,7 +32,7 @@ export const questions = {
         "id": 5,
         "text":"Share of employees (other than the Partners/ Directors) in Carry" ,
         "options":[ ">=40", ">=30 & <40%", ">=20% & <30%", "<20%"],
-        "size":6,
+        "size":3,
         'weightage':[1,0.6,0.3]
     },
     {
@@ -80,7 +80,7 @@ export const questions = {
             " Confirmed commitments of more than 15% of targeted corpus already raised", 
             "Confirmed commitments of less than 15% of targeted corpus already raised / No confirmed commitments raised so far"
         ],
-        "size":4,
+        "size":6,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
@@ -92,7 +92,7 @@ export const questions = {
             "More than 25% but upto 50%",
             "Upto 25%"
         ],
-        "size":4,
+        "size":3,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
@@ -104,7 +104,7 @@ export const questions = {
             "More than 10% but upto 20%",
             "Upto 10%"
         ],
-        "size":4,
+        "size":3,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
@@ -116,7 +116,7 @@ export const questions = {
             "24 Months",
             "More then 24 Months"
         ],
-        "size":4,
+        "size":3,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
@@ -128,7 +128,7 @@ export const questions = {
             ">=10% & <18%",
             "<10%"
         ],
-        "size":4,
+        "size":3,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
@@ -140,7 +140,7 @@ export const questions = {
             ">=10% & <18%",
             "<10%"
         ],
-        "size":4,
+        "size":3,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
@@ -152,7 +152,7 @@ export const questions = {
             ">=1x  & <2x",
             "<1 x"
         ],
-        "size":4,
+        "size":3,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
@@ -164,7 +164,7 @@ export const questions = {
             ">=1  & < 3",
             "LP show interest"
         ],
-        "size":4,
+        "size":3,
         'weightage':[1,0.75,0.5,0.25]
     }
     ]

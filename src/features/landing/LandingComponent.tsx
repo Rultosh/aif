@@ -158,7 +158,8 @@ const Landing = () => {
                 <Container maxWidth="lg">
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container direction="row" justifyContent="flex-end" alignItems="center">
-                            <Grid item xs={12} sm={12} md={12} xl={12}>
+                            {/* <Grid item xs={12} sm={12} md={12} xl={12}> */}
+                            <Grid item xs={12} sm={12} md={6} xl={6}>
                                 <Card sx={{ display: 'flex', border: 0, backgroundColor: 'transparent', boxShadow: 'none !important' }}>
                                     <CardContent sx={{ flex: 1, p: 0, pb: '0 !important' }}>
                                         <Grid container justifyContent="flex-end">
@@ -180,9 +181,9 @@ const Landing = () => {
                                                 </Box>
                                             </Grid> */}
 
-                                            <Grid item xs={9} style={{ backgroundColor: '#ffffff', border: 1, borderColor: "#363062", borderRadius: '8px' }}>
+                                            <Grid item xs={9} style={{ backgroundColor: '#ffffff', borderRadius: '8px' }}>
                                                 <Grid container>
-                                                    <Grid item xs={6}>
+                                                    <Grid item xs={12}>
                                                         {/* <Card sx={{ display: 'flex', height: '500px', borderRight: 1, borderTop: 1, borderBottom: 1, borderColor: "#363062", borderRightColor: "#f2f2f2" }}>
                                                         <CardContent sx={{ flex: 1 }}> */}
 
@@ -197,7 +198,7 @@ const Landing = () => {
 
                                                         </Toolbar>
 
-                                                        <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ borderRight: '1px solid #9596A9', py: 4 }}>
+                                                        <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ py: 4 }}>
                                                             <Grid item xs={12}>
                                                                 <Box
                                                                     justifyContent="center"
@@ -262,7 +263,8 @@ const Landing = () => {
                                                                 />
                                                                 </Grid> */}
                                                                     <Grid item xs={12} >
-                                                                        <div className="signInButton" style={{ width: 'fit-content' }}>
+                                                                        <div className="signInButton">
+                                                                             {/* style={{ width: 'fit-content' }} */}
                                                                             <Button type="submit" variant="contained" disableElevation
                                                                                 sx={{
                                                                                     textTransform: 'none',
@@ -270,7 +272,8 @@ const Landing = () => {
                                                                                     backgroundColor: "#D01E06",
                                                                                     borderRadius: "100px",
                                                                                     color: "#fff",
-                                                                                    fontWeight: "bold"
+                                                                                    fontWeight: "bold",
+                                                                                    width: "100% !important"
                                                                                     // height: "50px"
                                                                                 }}
                                                                                 // sx={{ mt: -4, textTransform: 'none', width: 200, backgroundImage: 'linear-gradient(to right, #435fa4, #7754a0, #904598, #b62d8f)', borderRadius: '10px', fontWeight: 600 }}
@@ -284,7 +287,15 @@ const Landing = () => {
                                                                     </Grid>
 
                                                                 </Box>
-                                                                <Typography sx={{ flex: 1, mt: 2, mb: "2px", mx: 4 }}>To reset your password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
+                                                                <Typography sx={{ flex: 1, mt: 2, mb: "2px", mx: 4, color: '#858487', textAlign: 'center' }}  variant="body2">To reset your password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
+
+                                                                <Box
+                                                                    justifyContent="center"
+                                                                    alignItems="center"
+                                                                    sx={{ p: 2 }}>
+                                                                    <Divider>Or</Divider>
+                                                                </Box>
+                                                                <Typography sx={{ flex: 1, mt: 1, mb: "2px", mx: 4, color: '#858487', textAlign: 'center' }}  variant="body2">Create a new account by clicking <a href="#/signUp" style={{ color: 'blue' }}>here</a></Typography>
                                                             </Grid>
                                                         </Grid>
 
@@ -294,7 +305,7 @@ const Landing = () => {
 
                                                     </Grid>
 
-                                                    <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                    {/* <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
                                                         <Toolbar className="tooltipHeadLogin" disableGutters sx={{ color: 'white', backgroundColor: '#233DA2', textAlign: "center", justifyContent: "space-around", opacity: '0.8', minHeight: '40px!important', borderTopRightRadius: '8px' }}>
                                                             <Box display="flex"
                                                                 justifyContent="center"
@@ -310,7 +321,7 @@ const Landing = () => {
                                                                 <Typography sx={{ flex: 1, mt: 5, ml: '10px', textAlign: "center" }}>Create a new account by clicking <a href="#/signUp" style={{ color: 'blue' }}>here</a></Typography>
                                                             </Grid>
 
-                                                            {/* <Grid item>
+                                                            <Grid item>
                                                                 <Toolbar disableGutters sx={{ justifyContent: "center" }}>
                                                                     <Box
                                                                         component="img"
@@ -319,7 +330,7 @@ const Landing = () => {
                                                                         src={azadiLogo}
                                                                     />
                                                                 </Toolbar>
-                                                            </Grid> */}
+                                                            </Grid>
 
                                                             <Grid item>
                                                                 <Grid container direction="column" justifyContent="space-between" alignItems="center" sx={{ flex: 1 }}>
@@ -362,7 +373,7 @@ const Landing = () => {
                                                                 </Grid>
                                                             ) : null}
                                                         </Grid>
-                                                    </Grid>
+                                                    </Grid> */}
                                                 </Grid>
                                             </Grid>
                                         </Grid>

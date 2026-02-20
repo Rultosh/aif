@@ -152,9 +152,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     shareholdingInvestee: Yup.string().required("Shareholding in investee company is required").nullable(),
     moic: Yup.string().required("MOIC is required").nullable(),
     grossIrr: Yup.string().required("Gross IRR is required").nullable(),
+    timeTakenFromSourcingToClosure: Yup.string().required("Time taken from sourcing to closure is required").nullable(),
     conflictOfInterest: Yup.string().nullable(),
     stakeOfEmployee: Yup.string().nullable(),
     investmentStageFundingRound: Yup.string().nullable(),
+    investmentStageDealSourced: Yup.string().nullable(),
   });
 
   const {
@@ -271,11 +273,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               required
               fullWidth
               id="briefProfile"
-              label="Business Introduction of the company"
+              label="Business Introduction and basis for the valuation of company"
               value={investmentPastFormData.briefProfile || ''}
               variant="outlined"
               multiline
-              rows={3}
+              maxRows={4}
               {...register("briefProfile")}
               error={!!errors.briefProfile}
               helperText={errors.briefProfile?.message as string}
@@ -318,6 +320,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                     <MenuItem value="Partially Exited">Partially Exited</MenuItem>
                     <MenuItem value="Active">Active</MenuItem>
                     <MenuItem value="Write-off">Write-off</MenuItem>
+                    <MenuItem value="Write Down">Write Down</MenuItem>
                   </Select>
                 )}
               />
@@ -393,7 +396,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               value={investmentPastFormData.stakeOfEmployee || ''}
               variant="outlined"
               multiline
-              rows={2}
+              maxRows={4}
               {...register("stakeOfEmployee")}
               error={!!errors.stakeOfEmployee}
               helperText={errors.stakeOfEmployee?.message as string}
@@ -405,15 +408,48 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <TextField
               fullWidth
               id="investmentStageFundingRound"
-              label="What is the investment stage funding round level in said Investee company?"
+              label="What is the funding stage or round of investment in the said investee company?"
               value={investmentPastFormData.investmentStageFundingRound || ''}
               variant="outlined"
               multiline
-              rows={2}
+              maxRows={4}
               {...register("investmentStageFundingRound")}
               error={!!errors.investmentStageFundingRound}
               helperText={errors.investmentStageFundingRound?.message as string}
               onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              id="investmentStageDealSourced"
+              label="How was the deal sourced either through Investment Banks, Networking, direct etc."
+              value={investmentPastFormData.investmentStageDealSourced || ''}
+              variant="outlined"
+              multiline
+              maxRows={4}
+              {...register("investmentStageDealSourced")}
+              error={!!errors.investmentStageDealSourced}
+              helperText={errors.investmentStageDealSourced?.message as string}
+              onChange={handleChange}
+              sx={fieldSx}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              required
+              fullWidth
+              type="number"
+              id="timeTakenFromSourcingToClosure"
+              label="Time taken from sourcing to closure"
+              value={investmentPastFormData.timeTakenFromSourcingToClosure || ''}
+              {...register("timeTakenFromSourcingToClosure")}
+              error={!!errors.timeTakenFromSourcingToClosure}
+              helperText={errors.timeTakenFromSourcingToClosure?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              onBlur={handleBlur}
               sx={fieldSx}
             />
           </Grid>

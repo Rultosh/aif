@@ -189,78 +189,6 @@ const EligibilityQuestioner = () => {
     return (
         <Container maxWidth="lg" sx={{ pt: '140px', pb: '60px' }}>
 
-            <Paper
-                elevation={0}
-                sx={{
-                    p: 3,
-                    borderRadius: '16px',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
-                    background: '#ffffff',
-                    mb: 3
-                }}
-            >
-                <Grid container spacing={3} alignItems="flex-start">
-                    <Grid item xs={12} md={6}>
-                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#0B3C6F' }}>
-                            Eligibility Check
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
-                            Verify your scheme eligibility by answering a few questions.
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
-                        <Link
-                            href="#/home"
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                color: '#0B3C6F',
-                                // width: '100%',
-                                justifyContent: 'flex-end',
-                                textDecoration: 'none',
-                                fontWeight: 700,
-                                fontSize: '0.875rem',
-                                mb: 1,
-                                width: 'fit-content',
-                                transition: 'all 0.2s',
-                                '&:hover': {
-                                    color: '#092d54',
-                                    transform: 'translateX(-4px)'
-                                }
-                            }}
-                        >
-                            <KeyboardDoubleArrowLeftIcon sx={{ fontSize: '1.2rem', mr: 0.5 }} />
-                            Back To Login
-                        </Link>
-                    </Grid>
-
-                    {/* <Grid item xs={12} md={12}>
-                        <FormControl sx={{ minWidth: 300 }}>
-                            <InputLabel id="scheme-select-label">Select Scheme</InputLabel>
-                            <Select
-                                labelId="scheme-select-label"
-                                id="scheme-select"
-                                value={scheme}
-                                label="Select Scheme"
-                                onChange={handleSelectChange}
-                                sx={{
-                                    borderRadius: '10px',
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#e2e8f0'
-                                    }
-                                }}
-                            >
-                                <MenuItem key={"Fund of funds"} value={0}>Fund of Funds for Startups</MenuItem>
-                                <MenuItem key={"Aspire for MSME"} value={1}>Aspire for MSME</MenuItem>
-                                <MenuItem key={"UP Start-up Fund"} value={2}>UP Start-up Fund</MenuItem>
-                                <MenuItem key={"Odisha Startup Fund"} value={3}>Odisha Startup Fund</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid> */}
-                </Grid>
-            </Paper>
-
             {scheme !== undefined ? (
                 <Paper
                     elevation={0}
@@ -272,7 +200,43 @@ const EligibilityQuestioner = () => {
                         background: '#ffffff'
                     }}
                 >
-                    <Box sx={{ mt: 2 }}>
+                    
+                    <Grid container spacing={3} alignItems="flex-start">
+                        <Grid item xs={12} md={6}>
+                            <Typography variant="h5" sx={{ fontWeight: 800, color: '#0B3C6F' }}>
+                                Eligibility Check
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+                                Verify your scheme eligibility by answering a few questions.
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                            <Link
+                                href="#/home"
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    color: '#0B3C6F',
+                                    // width: '100%',
+                                    justifyContent: 'flex-end',
+                                    textDecoration: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '0.875rem',
+                                    mb: 1,
+                                    width: 'fit-content',
+                                    transition: 'all 0.2s',
+                                    '&:hover': {
+                                        color: '#092d54',
+                                        transform: 'translateX(-4px)'
+                                    }
+                                }}
+                            >
+                                <KeyboardDoubleArrowLeftIcon sx={{ fontSize: '1.2rem', mr: 0.5 }} />
+                                Back To Login
+                            </Link>
+                        </Grid>
+                    </Grid>
+                    <Box sx={{ mt: 3 }}>
                         {outputComponents}
                     </Box>
 

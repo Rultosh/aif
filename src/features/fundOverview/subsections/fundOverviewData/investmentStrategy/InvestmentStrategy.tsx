@@ -98,11 +98,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>1. What is your investment strategy and what is its basis?</Typography>
+                        <Typography variant="body1" sx={labelSx}>1. What is your investment strategy and What are the focus investment sectors for the fund?</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("isStrategyBasis")}
                             error={!!errors.isStrategyBasis}
                             helperText={errors.isStrategyBasis?.message as string}
@@ -111,24 +111,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>2. What are the focus investment sectors for the fund?</Typography>
+                        <Typography variant="body1" sx={labelSx}>2. How does the investment strategy compare to the past fund strategies (if applicable) and Explain the reason for any significant change in your strategy?</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
-                            {...register("isFocusSectors")}
-                            error={!!errors.isFocusSectors}
-                            helperText={errors.isFocusSectors?.message as string}
-                            variant="outlined"
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. How does the investment strategy compare to the past fund strategies (if applicable)?</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("isComparisonPast")}
                             error={!!errors.isComparisonPast}
                             helperText={errors.isComparisonPast?.message as string}
@@ -137,24 +124,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. Explain the reason for any significant change in your strategy?</Typography>
+                        <Typography variant="body1" sx={labelSx}>3. Are there any sectors or types of transactions/situations you would not invest in? If yes, please give details and reasons for the same.</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
-                            {...register("isSignificantChange")}
-                            error={!!errors.isSignificantChange}
-                            helperText={errors.isSignificantChange?.message as string}
-                            variant="outlined"
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. Are there any sectors or types of transactions/situations you would not invest in? If yes, please give details and reasons</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("isSectorSituations")}
                             error={!!errors.isSectorSituations}
                             helperText={errors.isSectorSituations?.message as string}
@@ -163,11 +137,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>6. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
+                        <Typography variant="body1" sx={labelSx}>4. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("isControlsRights")}
                             error={!!errors.isControlsRights}
                             helperText={errors.isControlsRights?.message as string}
@@ -176,24 +150,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>7. If you have any investment policy please share?</Typography>
+                        <Typography variant="body1" sx={labelSx}>5. What are the Risks in the investments planned for this fund & what are the risk mitigation plans and how you plan to mitigate such risks?</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
-                            {...register("isInvestmentPolicy")}
-                            error={!!errors.isInvestmentPolicy}
-                            helperText={errors.isInvestmentPolicy?.message as string}
-                            variant="outlined"
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>8. Risks in the investments planned & risk mitigation efforts</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("isRisksMitigation")}
                             error={!!errors.isRisksMitigation}
                             helperText={errors.isRisksMitigation?.message as string}
@@ -202,11 +163,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>9. Have you had any investments rolled over from previous fund(s)? Please give details.</Typography>
+                        <Typography variant="body1" sx={labelSx}>6. Have any investments been carried forward or rolled over from previous fund(s)? If yes, please provide the relevant details.</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("isRolledOverInvestments")}
                             error={!!errors.isRolledOverInvestments}
                             helperText={errors.isRolledOverInvestments?.message as string}
@@ -215,14 +176,14 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>10. Describe the following investment considerations:</Typography>
+                        <Typography variant="body1" sx={labelSx}>7. Describe the following investment considerations:</Typography>
 
                         <Box sx={{ ml: 2 }}>
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Gross return objective of the overall fund</Typography>
                             <TextField
                                 fullWidth
                                 multiline
-                                rows={2}
+                                maxRows={4}
                                 {...register("isGrossReturnObjective")}
                                 error={!!errors.isGrossReturnObjective}
                                 helperText={errors.isGrossReturnObjective?.message as string}
@@ -234,7 +195,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             <TextField
                                 fullWidth
                                 multiline
-                                rows={2}
+                                maxRows={4}
                                 {...register("isTargetInvestmentSize")}
                                 error={!!errors.isTargetInvestmentSize}
                                 helperText={errors.isTargetInvestmentSize?.message as string}
@@ -242,11 +203,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 sx={{ mb: 2 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Target number of investments planned</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Target number of investments planned and Average holding period for a typical investment</Typography>
                             <TextField
                                 fullWidth
                                 multiline
-                                rows={2}
+                                maxRows={4}
                                 {...register("isTargetNumberInvestments")}
                                 error={!!errors.isTargetNumberInvestments}
                                 helperText={errors.isTargetNumberInvestments?.message as string}
@@ -254,23 +215,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 sx={{ mb: 2 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Average holding period for a typical investment</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Exit strategy</Typography>
                             <TextField
                                 fullWidth
                                 multiline
-                                rows={2}
-                                {...register("isAverageHoldingPeriod")}
-                                error={!!errors.isAverageHoldingPeriod}
-                                helperText={errors.isAverageHoldingPeriod?.message as string}
-                                variant="outlined"
-                                sx={{ mb: 2 }}
-                            />
-
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>e) Exit strategy</Typography>
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={2}
+                                maxRows={4}
                                 {...register("isExitStrategy")}
                                 error={!!errors.isExitStrategy}
                                 helperText={errors.isExitStrategy?.message as string}
@@ -283,7 +232,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     <Grid item xs={12} sx={{ mt: 2, mb: 4 }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#363062' }}>Supporting Documents</Typography>
                         <Box sx={{ p: 3, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                            <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>Investment Policy</Typography>
+                            <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>Investment and Other Policies</Typography>
                             <UploadComponents id={`sdInvestmentPolicy${prelimAppicationId}`} signed={false} />
                         </Box>
                     </Grid>

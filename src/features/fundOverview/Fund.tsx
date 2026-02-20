@@ -151,7 +151,7 @@ export const Fund = (props: any) => {
             const allValid = results.every(res => res === true);
 
             if (allValid) {
-                navigate(`/preliminary/${prelimApplicationId}/profile`)
+                navigate(`/preliminary/${prelimApplicationId}/declaration`)
             }
         }
     }
@@ -195,40 +195,7 @@ export const Fund = (props: any) => {
                 </Button>
             ) : null} */}
 
-            {Number(prelimApplicationId) ? (
-                <Button
-                    onClick={(e) => handleClick(e, "next")}
-                    variant="contained"
-                    sx={{
-                        position: 'fixed',
-                        right: 0,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        zIndex: 2000,
-                        backgroundColor: '#363062',
-                        color: 'white',
-                        px: 3,
-                        py: 2,
-                        borderRadius: '20px 0 0 20px',
-                        textTransform: 'none',
-                        fontWeight: 800,
-                        fontSize: '1rem',
-                        boxShadow: '-4px 0 15px rgba(54, 48, 98, 0.4)',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 1.5,
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                            backgroundColor: '#2a254d',
-                            paddingRight: 4,
-                            boxShadow: '-6px 0 20px rgba(54, 48, 98, 0.6)',
-                        }
-                    }}
-                >
-                    <SaveIcon />
-                </Button>
-            ) : null}
+
             <Card sx={{
                 borderRadius: '16px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
@@ -414,13 +381,13 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "3" ? '#363062' : '#444'
                                         }}>
-                                            Details of Contributor to the Fund
+                                            Details of Key Investment team (At Partner Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <ContributorDetails prelimApplicationId={Number(prelimApplicationId)} />
+                                        <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)} />
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
@@ -479,13 +446,13 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "4" ? '#363062' : '#444'
                                         }}>
-                                            Details of Key Investment team (At Partner Level)
+                                            Details of Key Investment team (At Associate Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)} />
+                                        <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)} />
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
@@ -544,13 +511,13 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "5" ? '#363062' : '#444'
                                         }}>
-                                            Details of Key Investment team (At Associate Level)
+                                            Details of Contributor to the Fund
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)} />
+                                        <ContributorDetails prelimApplicationId={Number(prelimApplicationId)} />
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
@@ -812,14 +779,14 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "9" ? '#363062' : '#444'
                                         }}>
-                                            Others
+                                            MIS
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <Others
-                                            ref={othersRef}
+                                        <MIS
+                                            ref={misRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("9", "10", null)}
@@ -828,7 +795,6 @@ export const Fund = (props: any) => {
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
-
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["10"]}
@@ -874,14 +840,14 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "10" ? '#363062' : '#444'
                                         }}>
-                                            MIS
+                                            Others
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <MIS
-                                            ref={misRef}
+                                        <Others
+                                            ref={othersRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("10", null, null)}
@@ -911,57 +877,12 @@ export const Fund = (props: any) => {
                                     backgroundColor: 'rgba(54, 48, 98, 0.04)'
                                 }
                             }} >
-                            Back to Initail-Assesment
+                            Back to Initial Assessment
                         </Button>
 
-                        <Button
-                            onClick={handleClickSave}
-                            variant="contained"
-                            sx={{
-                                position: 'fixed',
-                                right: 0,
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                zIndex: 1100,
-                                borderRadius: '12px 0 0 12px',
-                                minWidth: 'auto',
-                                px: 2,
-                                py: 2,
-                                fontWeight: 700,
-                                backgroundColor: '#363062',
-                                boxShadow: '0 4px 20px rgba(54, 48, 98, 0.3)',
-                                textTransform: 'none',
-                                '&:hover': {
-                                    backgroundColor: '#4d4585',
-                                    boxShadow: '0 6px 24px rgba(54, 48, 98, 0.4)',
-                                    pr: 3,
-                                    transition: 'all 0.2s'
-                                },
-                                transition: 'all 0.2s'
-                            }} >
-                            <SaveIcon />
-                        </Button>
 
-                        <Box>
-                            <Button
-                                onClick={handleClickSave}
-                                variant="contained"
-                                sx={{
-                                    textTransform: 'none',
-                                    borderRadius: '8px',
-                                    px: 2, // Reduced padding for icon-only
-                                    fontWeight: 600,
-                                    backgroundColor: '#363062',
-                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
-                                    minWidth: 'auto', // Icon-only look
-                                    '&:hover': {
-                                        backgroundColor: '#4d4585',
-                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
-                                    },
-                                    mr: 2
-                                }} >
-                                <SaveIcon /> Save
-                            </Button>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                             <Button
                                 onClick={(e) => handleClick(e, "next")}
                                 endIcon={<ArrowRightIcon />}
@@ -970,16 +891,17 @@ export const Fund = (props: any) => {
                                     textTransform: 'none',
                                     borderRadius: '8px',
                                     px: 4,
-                                    fontWeight: 600,
-                                    backgroundColor: '#D586F7',
+                                    py: 1.5,
+                                    fontWeight: 700,
+                                    backgroundColor: '#363062',
                                     color: 'white',
-                                    boxShadow: '0 4px 12px rgba(213, 134, 247, 0.2)',
+                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                     '&:hover': {
-                                        backgroundColor: '#c466e8',
-                                        boxShadow: '0 6px 16px rgba(213, 134, 247, 0.3)'
+                                        backgroundColor: '#4d4585',
+                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
                                     }
                                 }} >
-                                Profile
+                                Save & Continue to Declaration
                             </Button>
                         </Box>
                     </Box>

@@ -42,7 +42,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable(),
         dfCurrentPipeline: Yup.string().required("This field is required").nullable(),
         dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
-        dfConversionRatio: Yup.string().required("This field is required").nullable(),
+        // dfConversionRatio: Yup.string().required("This field is required").nullable(),
     });
 
     const {
@@ -81,12 +81,21 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const qSx = { mb: 3 };
     const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
 
+    const numericSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '&.Mui-readOnly, & .MuiInputBase-input[readOnly]': {
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
+            }
+        },
+    };
+
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
         return (
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since fund inception</Typography>
+                        <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since fund inception and Conversion ratio for transactions sourced to those completed</Typography>
                         <TextField
                             fullWidth
                             {...register("dfTotalDealsEvaluated")}
@@ -108,21 +117,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. Break-up of sourcing of the deals – investment banks, Networking, direct etc.</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={3}
-                            {...register("dfSourcingBreakdown")}
-                            error={!!errors.dfSourcingBreakdown}
-                            helperText={errors.dfSourcingBreakdown?.message as string}
-                            variant="outlined"
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. Conversion ratio for transactions sourced to those completed. </Typography>
-                        <TextField
+                        <Typography variant="body1" sx={labelSx}>3. Conversion ratio for transactions sourced to those completed. </Typography>
+                        {/* <TextField
                             fullWidth
                             multiline
                             rows={3}
@@ -130,6 +126,19 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.dfConversionRatio}
                             helperText={errors.dfConversionRatio?.message as string}
                             variant="outlined"
+                        /> */}
+                        
+                        <TextField
+                            required
+                            fullWidth
+                            type="number"
+                            id="dfConversionRatio"
+                            {...register("dfConversionRatio")}
+                            error={!!errors.dfConversionRatio}
+                            helperText={errors.dfConversionRatio?.message as string}
+                            variant="outlined"
+                            sx={numericSx}
+                            inputProps={{ min: 0 }}
                         />
                     </Grid>
 

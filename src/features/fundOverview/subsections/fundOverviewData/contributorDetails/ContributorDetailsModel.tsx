@@ -233,21 +233,23 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               sx={fieldSx}
             />
           </Grid>
-          <TextField
-            type="number"
-            required
-            fullWidth
-            id="percentOfCorpus"
-            label="% of Corpus"
-            value={contributorDetailsFormData.percentOfCorpus || ''}
-            {...register("percentOfCorpus")}
-            error={!!errors.percentOfCorpus}
-            helperText={errors.percentOfCorpus?.message as string}
-            variant="outlined"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            sx={fieldSx}
-          />
+          <Grid item xs={12} md={4}>
+            <TextField
+              type="number"
+              required
+              fullWidth
+              id="percentOfCorpus"
+              label="% of Corpus"
+              value={contributorDetailsFormData.percentOfCorpus || ''}
+              {...register("percentOfCorpus")}
+              error={!!errors.percentOfCorpus}
+              helperText={errors.percentOfCorpus?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              sx={fieldSx}
+            />
+          </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth variant="outlined" error={!!errors.contributionType} sx={fieldSx}>
               <InputLabel id="contributionType-label">Type</InputLabel>

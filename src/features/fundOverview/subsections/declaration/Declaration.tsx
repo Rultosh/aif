@@ -33,10 +33,11 @@ export const Declaration = (props: any) => {
 
     const [actionUid] = useState(uuid());
 
-    const handleClick = (ev: any, navTo: string) => {
+    const handleClick = async (ev: any, navTo: string) => {
         if (navTo === 'previous') {
             navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/selfRating`)
         } else {
+            await handleClickSave();
             navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
         }
     }
@@ -65,16 +66,16 @@ export const Declaration = (props: any) => {
         setAgreed(!agreed)
     }
 
-    function handleClickSave() {
+    async function handleClickSave() {
         console.log("prelimId", Number(id))
         const obj = { value: agreed }
-        dispatch(
+        await dispatch(
             updatePrelimApplicationAsync(
                 wrapArgument(
                     actionUid, { ...defaultIPrelimApplicationData, id: Number(id), declarationAccepted: agreed }
                 )
             )
-        );
+        ).unwrap();
     }
 
 
@@ -187,67 +188,10 @@ export const Declaration = (props: any) => {
                                     backgroundColor: 'rgba(54, 48, 98, 0.04)'
                                 }
                             }} >
-                            Back to Initail-Assesment
-                        </Button>
-
-                        <Button
-                            onClick={handleClickSave}
-                            disabled={!agreed}
-                            variant="contained"
-                            sx={{
-                                position: 'fixed',
-                                right: 0,
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                zIndex: 1100,
-                                borderRadius: '12px 0 0 12px',
-                                minWidth: 'auto',
-                                px: 2,
-                                py: 2,
-                                fontWeight: 700,
-                                backgroundColor: '#363062',
-                                boxShadow: '0 4px 20px rgba(54, 48, 98, 0.3)',
-                                textTransform: 'none',
-                                '&:hover': {
-                                    backgroundColor: '#4d4585',
-                                    boxShadow: '0 6px 24px rgba(54, 48, 98, 0.4)',
-                                    pr: 3,
-                                    transition: 'all 0.2s'
-                                },
-                                '&.Mui-disabled': {
-                                    backgroundColor: 'rgba(0,0,0,0.12)'
-                                },
-                                transition: 'all 0.2s'
-                            }} >
-                            <SaveIcon />
+                            Back to Initial Assessment
                         </Button>
 
                         <Box>
-                            <Button
-                                color='success'
-                                onClick={handleClickSave}
-                                disabled={!agreed}
-                                variant="contained"
-                                sx={{
-                                    textTransform: 'none',
-                                    borderRadius: '8px',
-                                    px: 2,
-                                    fontWeight: 600,
-                                    backgroundColor: '#363062',
-                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
-                                    minWidth: 'auto',
-                                    '&:hover': {
-                                        backgroundColor: '#4d4585',
-                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
-                                    },
-                                    mr: 2,
-                                    '&.Mui-disabled': {
-                                        backgroundColor: 'rgba(0,0,0,0.12)'
-                                    }
-                                }} >
-                                <SaveIcon />
-                            </Button>
-
                             <Button
                                 onClick={(e) => handleClick(e, "next")}
                                 disabled={!agreed}
@@ -257,19 +201,20 @@ export const Declaration = (props: any) => {
                                     textTransform: 'none',
                                     borderRadius: '8px',
                                     px: 4,
-                                    fontWeight: 600,
-                                    backgroundColor: '#D586F7',
+                                    py: 1.5,
+                                    fontWeight: 700,
+                                    backgroundColor: '#363062',
                                     color: 'white',
-                                    boxShadow: '0 4px 12px rgba(213, 134, 247, 0.2)',
+                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                     '&:hover': {
-                                        backgroundColor: '#c466e8',
-                                        boxShadow: '0 6px 16px rgba(213, 134, 247, 0.3)'
+                                        backgroundColor: '#4d4585',
+                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
                                     },
                                     '&.Mui-disabled': {
                                         backgroundColor: 'rgba(0,0,0,0.12)'
                                     }
                                 }} >
-                                Preview
+                                Save & Continue to Preview
                             </Button>
                         </Box>
                     </Box>

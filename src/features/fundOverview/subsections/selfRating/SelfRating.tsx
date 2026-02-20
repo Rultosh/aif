@@ -74,9 +74,9 @@ export const SelfRating = (props: any) => {
         window.scrollTo(0, 0)
     }, [])
 
-    const handleClick = (ev: any, navTo: string) => {
+    const handleClick = async (ev: any, navTo: string) => {
 
-        handleClickSave();
+        await handleClickSave();
 
         if (navTo === 'previous') {
             // No back button from first step
@@ -85,20 +85,20 @@ export const SelfRating = (props: any) => {
         }
     }
 
-    function handleClickSave() {
+    async function handleClickSave() {
         console.log(selfRatingValue.id)
         if (!selfRatingValue.id) {
-            dispatch(
+            await dispatch(
                 createSelfRatingAsync(
                     wrapArgument(actionUid, { ...selfRatingValue, prelimApplicationId: Number(id) })
                 )
-            )
+            ).unwrap();
         } else {
-            dispatch(
+            await dispatch(
                 updateSelfRatingAsync(
                     wrapArgument(actionUid, { ...selfRatingValue, prelimApplicationId: Number(id) })
                 )
-            )
+            ).unwrap();
         }
         // if(selfRatingValue){
         // setSelfRating('0');
@@ -229,7 +229,7 @@ export const SelfRating = (props: any) => {
                                         value={getValue("q" + (i + 1).toString() + "Comments") || ''}
                                         variant="outlined"
                                         multiline
-                                        rows={2}
+                                        maxRows={4}
                                         onChange={(e) => handleChange(e, (i + 1).toString() + "Comments")}
                                         placeholder="Add any additional context here..."
                                         sx={{
@@ -259,7 +259,7 @@ export const SelfRating = (props: any) => {
                 <CardContent sx={{ p: 4, width: '100%' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                         <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062' }}>
-                            Initail-Assesment
+                            Initial Assessment
                         </Typography>
 
                         {['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && (
@@ -281,6 +281,46 @@ export const SelfRating = (props: any) => {
                     </Box>
 
                     <Box sx={{ mb: 4 }}>
+                        <Card sx={{
+                            display: 'flex',
+                            mt: 3,
+                            borderRadius: '12px',
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                            border: '1px solid rgba(0,0,0,0.05)',
+                            transition: 'transform 0.2s, box-shadow 0.2s',
+                            '&:hover': {
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                            }
+                        }}>
+                            <CardContent sx={{ p: 3, width: '100%' }}>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12}>
+                                        <FormControl fullWidth>
+                                            <RadioGroup
+                                                row
+                                                defaultValue="First Time Fund Manager"
+                                            >
+                                                <Grid item xs={3}>
+                                                    <FormControlLabel
+                                                        value={"First Time Fund Manager"}
+                                                        control={<Radio color="primary" />}
+                                                        label={<Typography variant="body2">First Time Fund Manager</Typography>}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <FormControlLabel
+                                                        value={"Multiple Time >= One Fund"}
+                                                        control={<Radio color="primary" />}
+                                                        label={<Typography variant="body2">Multiple Time {'>'}= One Fund</Typography>}
+                                                    />
+                                                </Grid>
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
                         {selfRatingQuestionComponents}
                     </Box>
 
@@ -289,55 +329,7 @@ export const SelfRating = (props: any) => {
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box></Box>
 
-                        <Button
-                            onClick={handleClickSave}
-                            variant="contained"
-                            sx={{
-                                position: 'fixed',
-                                right: 0,
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                zIndex: 1100,
-                                borderRadius: '12px 0 0 12px',
-                                minWidth: 'auto',
-                                px: 2,
-                                py: 2,
-                                fontWeight: 700,
-                                backgroundColor: '#363062',
-                                boxShadow: '0 4px 20px rgba(54, 48, 98, 0.3)',
-                                textTransform: 'none',
-                                '&:hover': {
-                                    backgroundColor: '#4d4585',
-                                    boxShadow: '0 6px 24px rgba(54, 48, 98, 0.4)',
-                                    pr: 3,
-                                    transition: 'all 0.2s'
-                                },
-                                transition: 'all 0.2s'
-                            }} >
-                            <SaveIcon />
-                        </Button>
-
-                        <Box>
-                            <Button
-                                color='success'
-                                onClick={handleClickSave}
-                                variant="contained"
-                                sx={{
-                                    textTransform: 'none',
-                                    borderRadius: '8px',
-                                    px: 2,
-                                    fontWeight: 600,
-                                    backgroundColor: '#363062',
-                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
-                                    minWidth: 'auto',
-                                    '&:hover': {
-                                        backgroundColor: '#4d4585',
-                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
-                                    },
-                                    mr: 2
-                                }} >
-                                <SaveIcon /> Save
-                            </Button>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                             <Button
                                 onClick={(e) => handleClick(e, "next")}
                                 endIcon={<ArrowRightIcon />}
@@ -346,16 +338,17 @@ export const SelfRating = (props: any) => {
                                     textTransform: 'none',
                                     borderRadius: '8px',
                                     px: 4,
-                                    fontWeight: 600,
-                                    backgroundColor: '#D586F7',
+                                    py: 1.5,
+                                    fontWeight: 700,
+                                    backgroundColor: '#363062',
                                     color: 'white',
-                                    boxShadow: '0 4px 12px rgba(213, 134, 247, 0.2)',
+                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                     '&:hover': {
-                                        backgroundColor: '#c466e8',
-                                        boxShadow: '0 6px 16px rgba(213, 134, 247, 0.3)'
+                                        backgroundColor: '#4d4585',
+                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
                                     }
                                 }} >
-                                Fund Overview
+                                Save & Continue to Fund Overview
                             </Button>
                         </Box>
                     </Box>

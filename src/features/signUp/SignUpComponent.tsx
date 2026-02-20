@@ -1,4 +1,4 @@
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, FormControlLabel, FormLabel } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, FormControlLabel, FormLabel, Paper, Link } from "@mui/material";
 import logo from '../../images/logo.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,7 @@ import { Controller } from "../../lib/api-wrappers/Controller";
 import { signupUsersAsync } from './signUpSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { selectedSignup } from './signUpSlice'
-import {ModalComponent} from '../../components/ModalComponent'
+import { ModalComponent } from '../../components/ModalComponent'
 import { state, city } from "./stateAndCity";
 
 import { getError } from "../../lib/api-status/errorHandler"
@@ -25,9 +25,38 @@ import * as Yup from "yup";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 
 const SignUp = () => {
+    const fieldSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '12px',
+            backgroundColor: '#f8fafc',
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+                backgroundColor: '#f1f5f9',
+            },
+            '&.Mui-focused': {
+                backgroundColor: '#ffffff',
+                boxShadow: '0 4px 12px rgba(54, 48, 98, 0.1)',
+            }
+        },
+        '& .MuiInputLabel-root': {
+            color: '#64748b',
+        }
+    };
+
+    const sectionHeaderSx = {
+        mb: 3,
+        mt: 4,
+        pb: 1,
+        borderBottom: '1px solid #e2e8f0',
+        color: '#363062',
+        fontWeight: 600,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1
+    };
 
     const { id } = useParams()
     const [formData, setFormData] = useState(defaultISignup);
@@ -45,19 +74,19 @@ const SignUp = () => {
 
     async function handleSubmitForm() {
 
-        if(sebiRegistrationDate === undefined || sebiRegistrationDate === null) {
+        if (sebiRegistrationDate === undefined || sebiRegistrationDate === null) {
             seterrorssebiRegistrationDate("SEBI Registration Date is required")
         } else {
             seterrorssebiRegistrationDate(undefined)
             const captchaResponse = await captchaRef.current?.executeAsync();
             console.log("recaptcha", captchaResponse);
             // dispatch(validateUser(value))
-            if(captchaResponse !== null && captchaResponse !== undefined) {
-            console.log(formData)
+            if (captchaResponse !== null && captchaResponse !== undefined) {
+                console.log(formData)
                 setShowResponse(true)
                 dispatch(
                     signupUsersAsync(
-                        wrapArgument(actionUid, {...formData, sebiRegistrationDate, registeredOn: new Date(), captchaResponse})
+                        wrapArgument(actionUid, { ...formData, sebiRegistrationDate, registeredOn: new Date(), captchaResponse })
                     )
                 )
             }
@@ -75,17 +104,17 @@ const SignUp = () => {
 
 
     const handleChange = (ev: any) => {
-        
-        if(ev.target.id == 'username'){
+
+        if (ev.target.id == 'username') {
             let username = ev.target.value;
             username = username && username.toLowerCase();
-            if(username != '' && 
-                ((username.substring(username.indexOf('@')) != '@gmail.com') && 
-                (username.substring(username.indexOf('@')) != '@yahoo.com') && 
-                (username.substring(username.indexOf('@')) != '@yahoo.co.in') && 
-                (username.substring(username.indexOf('@')) != '@rediffmail.com') && 
-                (username.substring(username.indexOf('@')) != '@hotmail.com') && 
-                (username.substring(username.indexOf('@')) != '@yahoomail.com'))){
+            if (username != '' &&
+                ((username.substring(username.indexOf('@')) != '@gmail.com') &&
+                    (username.substring(username.indexOf('@')) != '@yahoo.com') &&
+                    (username.substring(username.indexOf('@')) != '@yahoo.co.in') &&
+                    (username.substring(username.indexOf('@')) != '@rediffmail.com') &&
+                    (username.substring(username.indexOf('@')) != '@hotmail.com') &&
+                    (username.substring(username.indexOf('@')) != '@yahoomail.com'))) {
                 setFormDataEmail(true);
                 ev.preventDefault();
                 let copiedValue = { ...formData }
@@ -108,41 +137,41 @@ const SignUp = () => {
             setFormData(copiedValue);
         }
     };
-    
+
     const handleReset = () => {
         setShowResponse(false)
         setFormData(defaultISignup)
     };
 
 
-    const handleClose= () => {
+    const handleClose = () => {
         setShowResponse(false)
         //setFormData(defaultISignup)
     };
 
-    const checkPublicMailsIds = (email : string) => {
+    const checkPublicMailsIds = (email: string) => {
 
         const domain = email && email.toLowerCase().substring(email.indexOf('@'));
 
-        return (domain == "@gmail.com" || 
+        return (domain == "@gmail.com" ||
             domain == "@yahoo.com" ||
             domain == "@yahoo.co.in" ||
             domain == "@rediffmail.com" ||
             domain == "@hotmail.com" ||
             domain == "@yahoomail.com"
-            )
+        )
     }
-  
+
     const validationSchema = Yup.object().shape({
         companyName: Yup
             .string()
             .trim()
-            .test("Invalid input entered", function (value:any){
+            .test("Invalid input entered", function (value: any) {
                 const pattern = /[<>\/]/;
                 const isNotValidInput = pattern.test(value);
-                if(isNotValidInput){
+                if (isNotValidInput) {
                     return false;
-                }else{
+                } else {
                     return true;
                 }
             })
@@ -150,12 +179,12 @@ const SignUp = () => {
         sebiRegistration: Yup
             .string()
             .trim()
-            .test("Invalid input entered", function (value:any){
+            .test("Invalid input entered", function (value: any) {
                 const pattern = /[<>\/]/;
                 const isNotValidInput = pattern.test(value);
-                if(isNotValidInput){
+                if (isNotValidInput) {
                     return false;
-                }else{
+                } else {
                     return true;
                 }
             })
@@ -170,17 +199,17 @@ const SignUp = () => {
             .test("email-regex", "Enter a valid Email", function (value: any) {
                 const EmailRegex =
                     /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-      
+
                 const IsValidEmail = EmailRegex.test(value);
 
-            if (!IsValidEmail) {
-              return false;
-            }
-            return true;
-          })
-        .test("organization-email", "Enter your official email id", function(value: any) {
-            return !checkPublicMailsIds(value);
-        }),
+                if (!IsValidEmail) {
+                    return false;
+                }
+                return true;
+            })
+            .test("organization-email", "Enter your official email id", function (value: any) {
+                return !checkPublicMailsIds(value);
+            }),
         title: Yup
             .string()
             .matches(/^[A-Za-z ]*$/, 'Please enter valid title')
@@ -189,10 +218,10 @@ const SignUp = () => {
             const PhoneRegex = /^[0-9]{10}$/; // Change This Regex Based On Requirement
             const IsValidPhone = PhoneRegex.test(value);
             if (!IsValidPhone) {
-              return false;
+                return false;
             }
             return true;
-          }),
+        }),
         state: Yup
             .string()
             .required("State is required"),
@@ -201,17 +230,17 @@ const SignUp = () => {
             .required("City is required"),
         address: Yup.string()
             .trim()
-            .test("Invalid input entered", function (value:any){
+            .test("Invalid input entered", function (value: any) {
                 const pattern = /[<>'=()[\]@$%*]/;
                 const isNotValidInput = pattern.test(value);
-                if(isNotValidInput){
+                if (isNotValidInput) {
                     return false;
-                }else{
+                } else {
                     return true;
                 }
             })
-             .required("Address is required")
-      });
+            .required("Address is required")
+    });
 
     const {
         setValue,
@@ -220,465 +249,356 @@ const SignUp = () => {
         reset,
         handleSubmit,
         formState: { errors },
-      } = useForm({
+    } = useForm({
         resolver: yupResolver(validationSchema),
-      });
-    
-      const onSubmit = (data: any) => {
+    });
+
+    const onSubmit = (data: any) => {
         handleSubmitForm();
-      };
+    };
 
     return (
         <>
-          <ReCAPTCHA
-                ref={captchaRef}
-                size={'invisible'}
-                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
-            />
-        <div >
-            <Container sx={{ mt: '5px', }}>
-                <Box sx={{ flexGrow: 1 }}>
-                    <Grid container >
-                        <Grid item xs={3}>
-                            <Card className="login_card_left" sx={{ display: 'flex', height: '750px', mb: 2, border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#363062" }}>
+            <Container maxWidth="lg" sx={{ pt: '140px', pb: '60px' }}>
 
-                                <CardContent sx={{ flex: 1 }}>
-
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4 }}>
-
-                                        <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="ffsLogo"
-                                                src={ffsLogo}
-                                            />
-
-                                        </Toolbar>
-
-                                    </Box>
-
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4 }}>
-
-                                        <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="success"
-                                                src={logo}
-                                            />
-
-                                        </Toolbar>
-
-                                    </Box>
-
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4, mb: 2 }}>
-
-                                        <Toolbar disableGutters sx={{ width: '80px', height: '80px', justifyContent: "center", backgroundColor: '#ffffff', borderRadius: '50px' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{ position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="success"
-                                                src={loginIconImg}
-                                            />
-
-                                        </Toolbar>
-
-                                    </Box>
-
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center">
-
-                                        <Toolbar disableGutters sx={{ justifyContent: "center", color: "#ffffff" }}>
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Alternative Investment Fund</Typography>
-
-                                            </Box>
-
-                                        </Toolbar>
-
-                                    </Box>
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center">
-
-                                        <Toolbar disableGutters sx={{ justifyContent: "center", color: "#ffffff" }}>
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Application Portal</Typography>
-
-                                            </Box>
-
-                                        </Toolbar>
-
-                                    </Box>
-                                </CardContent>
-
-                            </Card>
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: 3,
+                        borderRadius: '16px',
+                        border: '1px solid #e2e8f0',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+                        background: '#ffffff',
+                        mb: 3
+                    }}
+                >
+                    <Grid container spacing={3} alignItems="center">
+                        <Grid item xs={12} md={6}>
+                            <Typography variant="h5" sx={{ fontWeight: 800, color: '#0B3C6F' }}>
+                                Sign Up
+                            </Typography>
                         </Grid>
-                        <Grid item xs={9}>
-                            <Card sx={{ display: 'flex', height: '850px', mb: 2 }}>
-                                <CardContent sx={{ flex: 1 }}>
-
-
-                                    <Toolbar disableGutters sx={{ opacity: '0.8', mt: -2, ml: -2, mr: -2, color: 'white', backgroundColor: '#363062', textAlign: "center", justifyContent: "space-around" }}>
-                                        <Grid container xs={12}>
-                                            <Grid item xs={11}>
-                                                <Box display="flex"
-                                                    justifyContent="center"
-                                                    alignItems="center">
-                                                    <Typography sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Sign-Up here</Typography>
-
-                                                </Box>
-                                            </Grid>
-                                            <Grid item xs={1}>
-                                                <Box onClick={() => navigate('/')} sx={{ color: 'white', cursor: 'pointer' }} >
-                                                    <CloseIcon ></CloseIcon>
-                                                </Box>
-                                            </Grid>
-                                        </Grid>
-                                    </Toolbar>
-
-                                    <Box
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 3 }}>
-                                        <div>
-                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Note:</Typography> <br></br>
-                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>1. This registration is only for Alternative Investment Fund (AIF) registered in India. </Typography> <br></br>
-                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>2. SEBI Registration is mandatory for Sign-Up.</Typography> <br></br>
-                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>3. Use your corporate e-mail address for sign up. A link to set your password will be sent.</Typography> <br></br>
-                                            <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>4. Temporary credentials will be active only for 90 days.</Typography> <br></br>
-                                        </div>
-
-                                        <div style={{paddingTop: 25}}>
-                                            <FormControl>
-                                                <FormLabel id="demo-radio-buttons-group-label">
-                                                    <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Are you a SEBI registered Category-I & Category-II Alternative Investment Fund (AIF)</Typography>
-                                                </FormLabel>
-                                                <RadioGroup
-                                                    aria-labelledby="demo-radio-buttons-group-label"
-                                                    defaultValue="no"
-                                                    name="radio-buttons-group"
-                                                    value={registedWithSebi}
-                                                    onChange={handleChangeRegistedWithSebi}
-                                                >
-                                                    <Typography variant="caption" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>
-                                                        <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-                                                        <FormControlLabel value="no" control={<Radio />} label="No" />
-                                                    </Typography>
-                                                </RadioGroup>
-                                            </FormControl>
-                                        </div>
-                                        {registedWithSebi === "yes" && <Grid container spacing={2} sx={{ mt: 3 }}>
-                                            <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    id="sebiRegistration"
-                                                    label="SEBI - Registration No."
-                                                    //defaultValue={value["companyName"] === undefined ? "" : value["companyName"]}
-                                                    value={formData["sebiRegistration"] || ''}
-                                                    {...register("sebiRegistration")}
-                                                    error={(errors.sebiRegistration) ? true : false}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.sebiRegistration)?errors.sebiRegistration.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                    <DatePicker
-                                                        label="SEBI - Registration Date"
-                                                        inputFormat='DD/MM/YYYY'
-                                                        value={sebiRegistrationDate || null}
-                                                        onChange={(newValue) => handleChangeRegistedWithSebiDate(newValue)} 
-                                                        renderInput={(params) => <TextField {...params} />}
-                                                    />
-                                                </LocalizationProvider>
-                                                <Typography variant="caption" color="error">
-                                                    <>{errorssebiRegistrationDate}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    id="companyName"
-                                                    label="AIF Name"
-                                                    //defaultValue={value["companyName"] === undefined ? "" : value["companyName"]}
-                                                    value={formData["companyName"] || ''}
-                                                    {...register("companyName")}
-                                                    error={(errors.companyName) ? true : false}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.companyName)?errors.companyName.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    id="contactPerson"
-                                                    label="Contact Person Name"
-                                                    value={formData["contactPerson"] || ''}
-                                                    {...register("contactPerson")}
-                                                    error={(errors.contactPerson) ? true : false}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.contactPerson)?errors.contactPerson.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    id="username"
-                                                    label="Email"
-                                                    // value={formData["username"] || ''}
-                                                    {...register("username")}
-                                                    error={(errors.username) ? true : false}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.username)?errors.username.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    id="title"
-                                                    label="Title"
-                                                    value={formData["title"] || ''}
-                                                    {...register("title")}
-                                                    error={(errors.title) ? true : false}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.title)?errors.title.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    type='number'
-                                                    id="phoneNumber"
-                                                    label="Phone Number"
-                                                    value={formData["phoneNumber"] || ''}
-                                                    {...register("phoneNumber")}
-                                                    error={(errors.phoneNumber) ? true : false}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.phoneNumber)?errors.phoneNumber.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                {/* <TextField
-                                                    required
-                                                    id="state"
-                                                    label="State"
-                                                    value={formData["state"] || ''}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                /> */}
-                                                <FormControl fullWidth>
-                                                    <InputLabel id="demo-simple-select-state">State</InputLabel>
-                                                    <Select
-                                                        key="state"
-                                                        required
-                                                        labelId="demo-simple-select-state"
-                                                        id="state"
-                                                        // name="state"
-                                                        label="State"
-                                                        // value={formData["state"] || ''}
-                                                        {...register("state")}
-                                                        error={(errors.state) ? true : false}
-                                                        onChange={handleChange}
-                                                    >
-                                                        {
-                                                            state.categoryData.map((item: any) => {
-                                                                // console.log('CB', props.propertyValue, item.id, props.propertyValue === item.id);
-                                                                return <MenuItem 
-                                                                value={item.ID}
-                                                                // selected={formData["state"] === item.ID} 
-                                                                >
-                                                                    {item.VALUE}
-                                                                </MenuItem>
-                                                            })
-                                                        }
-                                                    </Select>
-                                                </FormControl>
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.state)?errors.state.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                {/* <TextField
-                                                    required
-                                                    id="city"
-                                                    label="City"
-                                                    value={formData["city"] || ''}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                /> */}
-                                                <FormControl fullWidth>
-                                                    <InputLabel id="demo-simple-select-city">City</InputLabel>
-                                                    <Select
-                                                        key="city"
-                                                        required
-                                                        labelId="demo-simple-select-city"
-                                                        id="city"
-                                                        // name="city"
-                                                        label="City"
-                                                        // value={formData["city"] || ''}
-                                                        {...register("city")}
-                                                        error={(errors.city) ? true : false}
-                                                        onChange={handleChange}
-                                                    >
-                                                        {
-                                                            city.categoryData.map((item: any) => {
-                                                                // console.log('CB', props.propertyValue, item.id, props.propertyValue === item.id);
-                                                                if(item.STATE_ID === formData["state"]){
-                                                                    return <MenuItem 
-                                                                    value={item.ID}
-                                                                    // selected={formData["city"] === item.ID} 
-                                                                    >
-                                                                        {item.VALUE}
-                                                                    </MenuItem>
-                                                                } else {
-                                                                    return <MenuItem 
-                                                                    value={item.ID}
-                                                                    // selected={formData["city"] === item.ID} 
-                                                                    >
-                                                                        {item.VALUE}
-                                                                    </MenuItem>
-                                                                }
-                                                            })
-                                                        }
-                                                    </Select>
-                                                </FormControl>
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.city)?errors.city.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    id="address"
-                                                    label="Address"
-                                                    value={formData["address"] || ''}
-                                                    {...register("address")}
-                                                    error={(errors.address) ? true : false}
-                                                    onChange={handleChange}
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                                <Typography variant="caption" color="error">
-                                                    <>{(errors.address)?errors.address.message : ''}</>
-                                                </Typography>
-                                            </Grid>
-                                            {/*} <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    id="outlined-required"
-                                                    label="Captcha"
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <TextField
-                                                    required
-                                                    id="outlined-required"
-                                                    label="Captcha"
-                                                    sx={{ display: 'flex' }}
-                                                />
-                                            </Grid>*/}
-
-                                            <Grid item xs={3} >
-                                                <Box display="flex"
-                                                    justifyContent="center"
-                                                    alignItems="center">
-                                                    <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, background: "#363062" }} 
-                                                    // onClick={handleSubmitForm}
-                                                    
-                                                    onClick={handleSubmit(onSubmit)}
-                                                    >
-                                                        Sign Up
-                                                    </Button>
-                                                </Box>
-                                            </Grid  >
-
-                                            <Grid item xs={3} >
-                                                <Box display="flex"
-                                                    justifyContent="center"
-                                                    alignItems="center">
-                                                    <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundColor: '#c27a1b' }} onClick={handleReset}>
-                                                        Reset
-                                                    </Button>
-                                                </Box>
-                                            </Grid  >
-
-                                            <Grid item xs={12}>
-                                                <Box sx={{ mt: 2 }}>
-                                                    {showResponse && signupState.response != undefined ? <>{signupState.response}</> : <></>}
-                                                    <ModalComponent
-                                                        open={showResponse}
-                                                        close={handleClose}
-                                                        aria-labelledby="modal-modal-title"
-                                                        aria-describedby="modal-modal-description"
-                                                        className="special_modal"
-                                                        msg = {signupState.response}
-                                                        status = {signupState.status.fetchStatus}
-                                                    >
-                                                    </ModalComponent>
-                                                </Box>
-                                            </Grid>
-
-                                        </Grid>}
-                                        
-
-                                        {/*
-                                        <Grid item xs={12} >
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, mt: 2 }} onClick={isUserValid}>
-                                                    Sign Up
-                                                </Button>
-                                            </Box>
-                                        </Grid  >*/}
-
-                                    </Box>
-                                    <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, emailus at vcfapplication@sidbi.in</Typography>
-                                </CardContent>
-
-                            </Card>
+                        <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                            <Link
+                                href="#/home"
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    color: '#0B3C6F',
+                                    // width: '100%',
+                                    justifyContent: 'flex-end',
+                                    textDecoration: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '0.875rem',
+                                    mb: 0,
+                                    width: 'fit-content',
+                                    transition: 'all 0.2s',
+                                    '&:hover': {
+                                        color: '#092d54',
+                                        transform: 'translateX(-4px)'
+                                    }
+                                }}
+                            >
+                                <KeyboardDoubleArrowLeftIcon sx={{ fontSize: '1.2rem', mr: 0.5 }} />
+                                Back To Login
+                            </Link>
                         </Grid>
-
                     </Grid>
-                </Box></Container>
 
-        </div>
+                    <Box sx={{ mt: 3 }}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="sebiRegistration"
+                                    label="SEBI - Registration No."
+                                    value={formData["sebiRegistration"] || ''}
+                                    {...register("sebiRegistration")}
+                                    error={!!errors.sebiRegistration}
+                                    helperText={errors.sebiRegistration?.message as string}
+                                    onChange={handleChange}
+                                    sx={fieldSx}
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        label="SEBI - Registration Date"
+                                        inputFormat='DD/MM/YYYY'
+                                        value={sebiRegistrationDate || null}
+                                        onChange={(newValue) => handleChangeRegistedWithSebiDate(newValue)}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                fullWidth
+                                                required
+                                                error={!!errorssebiRegistrationDate}
+                                                helperText={errorssebiRegistrationDate as string}
+                                                sx={fieldSx}
+                                                {...params}
+                                            />
+                                        )}
+                                    />
+                                </LocalizationProvider>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="companyName"
+                                    label="AIF Name"
+                                    value={formData["companyName"] || ''}
+                                    {...register("companyName")}
+                                    error={!!errors.companyName}
+                                    helperText={errors.companyName?.message as string}
+                                    onChange={handleChange}
+                                    sx={fieldSx}
+                                />
+                            </Grid>
+
+                            <Grid item xs={8}>
+                                <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                                    <FormControl sx={{
+                                        ...fieldSx,
+                                        width: '120px',
+                                        '& .MuiOutlinedInput-root': {
+                                            ...fieldSx['& .MuiOutlinedInput-root'],
+                                            borderTopRightRadius: 0,
+                                            borderBottomRightRadius: 0,
+                                        }
+                                    }}>
+                                        <InputLabel id="title-label">Title</InputLabel>
+                                        <Select
+                                            required
+                                            labelId="title-label"
+                                            id="title"
+                                            label="Title"
+                                            defaultValue={formData["title"] || ""}
+                                            {...register("title")}
+                                            error={!!errors.title}
+                                            onChange={handleChange}
+                                        >
+                                            <MenuItem value="Mr.">Mr.</MenuItem>
+                                            <MenuItem value="Mrs.">Mrs.</MenuItem>
+                                            <MenuItem value="Ms.">Ms.</MenuItem>
+                                            <MenuItem value="Dr.">Dr.</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="contactPerson"
+                                        label="Contact Person Name"
+                                        value={formData["contactPerson"] || ''}
+                                        {...register("contactPerson")}
+                                        error={!!errors.contactPerson}
+                                        onChange={handleChange}
+                                        sx={{
+                                            ...fieldSx,
+                                            flex: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                ...fieldSx['& .MuiOutlinedInput-root'],
+                                                borderTopLeftRadius: 0,
+                                                borderBottomLeftRadius: 0,
+                                                ml: '-1px'
+                                            }
+                                        }}
+                                    />
+                                </Box>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', px: 1 }}>
+                                    {errors.title && (
+                                        <Typography variant="caption" color="error" sx={{ mt: 0.5, mr: 2 }}>
+                                            {errors.title.message as string}
+                                        </Typography>
+                                    )}
+                                    {errors.contactPerson && (
+                                        <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+                                            {errors.contactPerson.message as string}
+                                        </Typography>
+                                    )}
+                                </Box>
+                            </Grid>
+
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="username"
+                                    label="Email of Contact Person"
+                                    value={formData["username"] || ''}
+                                    {...register("username")}
+                                    error={!!errors.username}
+                                    helperText={errors.username?.message as string}
+                                    onChange={handleChange}
+                                    sx={fieldSx}
+                                />
+                            </Grid>
+
+                            <Grid item xs={4}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    type='number'
+                                    id="phoneNumber"
+                                    label="Phone Number"
+                                    value={formData["phoneNumber"] || ''}
+                                    {...register("phoneNumber")}
+                                    error={!!errors.phoneNumber}
+                                    helperText={errors.phoneNumber?.message as string}
+                                    onChange={handleChange}
+                                    sx={fieldSx}
+                                />
+                            </Grid>
+
+                            <Grid item xs={4}>
+                                <FormControl fullWidth sx={fieldSx}>
+                                    <InputLabel id="state-label">State</InputLabel>
+                                    <Select
+                                        required
+                                        labelId="state-label"
+                                        id="state"
+                                        label="State"
+                                        {...register("state")}
+                                        error={!!errors.state}
+                                        onChange={handleChange}
+                                        defaultValue={formData["state"] || ""}
+                                    >
+                                        {state.categoryData.map((item: any) => (
+                                            <MenuItem key={item.ID} value={item.ID}>
+                                                {item.VALUE}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    {errors.state && (
+                                        <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                                            {errors.state.message as string}
+                                        </Typography>
+                                    )}
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <FormControl fullWidth sx={fieldSx}>
+                                    <InputLabel id="city-label">City</InputLabel>
+                                    <Select
+                                        required
+                                        labelId="city-label"
+                                        id="city"
+                                        label="City"
+                                        {...register("city")}
+                                        error={!!errors.city}
+                                        onChange={handleChange}
+                                        defaultValue={formData["city"] || ""}
+                                    >
+                                        {city.categoryData.map((item: any) => {
+                                            if (item.STATE_ID === formData["state"]) {
+                                                return (
+                                                    <MenuItem key={item.ID} value={item.ID}>
+                                                        {item.VALUE}
+                                                    </MenuItem>
+                                                );
+                                            }
+                                            return null;
+                                        })}
+                                        <MenuItem key="others" value="others">
+                                            {"Others"}
+                                        </MenuItem>
+                                    </Select>
+                                    {errors.city && (
+                                        <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                                            {errors.city.message as string}
+                                        </Typography>
+                                    )}
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    multiline
+                                    maxRows={4}
+                                    id="address"
+                                    label="Full Address"
+                                    value={formData["address"] || ''}
+                                    {...register("address")}
+                                    error={!!errors.address}
+                                    helperText={errors.address?.message as string}
+                                    onChange={handleChange}
+                                    sx={fieldSx}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sx={{ mt: 1, mb: 0, display: 'flex', gap: 3, justifyContent: 'center' }}>
+                                <Button
+                                    variant="contained"
+                                    disableElevation
+                                    sx={{
+                                        textTransform: 'none',
+                                        width: 200,
+                                        borderRadius: '12px',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        background: "#363062",
+                                        '&:hover': {
+                                            background: "#2a254d",
+                                            boxShadow: '0 4px 15px rgba(54, 48, 98, 0.3)',
+                                        }
+                                    }}
+                                    onClick={handleSubmit(onSubmit)}
+                                >
+                                    Sign Up
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    disableElevation
+                                    sx={{
+                                        textTransform: 'none',
+                                        width: 200,
+                                        borderRadius: '12px',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        borderColor: '#c27a1b',
+                                        color: '#c27a1b',
+                                        borderWidth: '2px',
+                                        '&:hover': {
+                                            borderColor: '#a36616',
+                                            borderWidth: '2px',
+                                            backgroundColor: 'rgba(194, 122, 27, 0.04)',
+                                        }
+                                    }}
+                                    onClick={handleReset}
+                                >
+                                    Reset
+                                </Button>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <Box sx={{ mt: 0 }}>
+                                    {showResponse && signupState.response !== undefined && (
+                                        <Typography color="primary" sx={{ textAlign: 'center', mb: 1 }}>{signupState.response}</Typography>
+                                    )}
+                                    <ModalComponent
+                                        open={showResponse}
+                                        close={handleClose}
+                                        aria-labelledby="modal-modal-title"
+                                        aria-describedby="modal-modal-description"
+                                        className="special_modal"
+                                        msg={signupState.response}
+                                        status={signupState.status.fetchStatus}
+                                    />
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </Box>
+
+                    <Typography variant="body2" sx={{ mt: 1, mb: 2, textAlign: "center", color: '#64748b' }}>
+                        For any help, email us at <span style={{ color: '#363062', fontWeight: 600 }}>vcfapplication@sidbi.in</span>
+                    </Typography>
+                </Paper>
+
+
+            </Container>
         </>
-    )
-}
+    );
+};
 
 export default SignUp;

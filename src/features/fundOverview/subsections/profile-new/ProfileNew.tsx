@@ -15,7 +15,7 @@ export const ProfileNew = (props: any) => {
     if (navTo === 'previous') {
       navigate(`/preliminary/${id}/fund`)
     } else {
-      navigate(`/preliminary/${id}/selfRating`)
+      navigate(`/preliminary/${id}/declaration`)
     }
   }
 
@@ -83,54 +83,7 @@ export const ProfileNew = (props: any) => {
               Back to Fund Overview
             </Button>
 
-            <Button
-              onClick={handleClickSave}
-              variant="contained"
-              sx={{
-                position: 'fixed',
-                right: 0,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 1100,
-                borderRadius: '12px 0 0 12px',
-                minWidth: 'auto',
-                px: 2,
-                py: 2,
-                fontWeight: 700,
-                backgroundColor: '#363062',
-                boxShadow: '0 4px 20px rgba(54, 48, 98, 0.3)',
-                textTransform: 'none',
-                '&:hover': {
-                  backgroundColor: '#4d4585',
-                  boxShadow: '0 6px 24px rgba(54, 48, 98, 0.4)',
-                  pr: 3,
-                  transition: 'all 0.2s'
-                },
-                transition: 'all 0.2s'
-              }} >
-              <SaveIcon />
-            </Button>
-
             <Box>
-              <Button
-                onClick={handleClickSave}
-                variant="contained"
-                sx={{
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                  px: 2, // Reduced padding for icon-only
-                  fontWeight: 600,
-                  backgroundColor: '#363062',
-                  boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
-                  minWidth: 'auto', // Icon-only look
-                  '&:hover': {
-                    backgroundColor: '#4d4585',
-                    boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
-                  },
-                  mr: 2
-                }} >
-                <SaveIcon />
-              </Button>
               <Button
                 onClick={(e) => handleClick(e, "next")}
                 endIcon={<ArrowRightIcon />}
@@ -139,16 +92,17 @@ export const ProfileNew = (props: any) => {
                   textTransform: 'none',
                   borderRadius: '8px',
                   px: 4,
-                  fontWeight: 600,
-                  backgroundColor: '#D586F7',
+                  py: 1.5,
+                  fontWeight: 700,
+                  backgroundColor: '#363062',
                   color: 'white',
-                  boxShadow: '0 4px 12px rgba(213, 134, 247, 0.2)',
+                  boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                   '&:hover': {
-                    backgroundColor: '#c466e8',
-                    boxShadow: '0 6px 16px rgba(213, 134, 247, 0.3)'
+                    backgroundColor: '#4d4585',
+                    boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
                   }
                 }} >
-                Initail-Assesment
+                Save & Continue to Declaration
               </Button>
             </Box>
           </Box>

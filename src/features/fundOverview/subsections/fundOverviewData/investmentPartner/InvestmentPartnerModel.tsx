@@ -1,7 +1,8 @@
-import { Box, Button, Card, CardContent, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Collapse, Stack, IconButton } from "@mui/material";
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import { useState, useEffect } from "react"
 import { createInvestmentTeamsPartnerLevelAsync, updateInvestmentTeamsPartnerLevelAsync } from './investmentPartnerSlice'
-import { useAppDispatch } from '../../../../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultInvestmentPartner, IInvestmentPartner } from "./IInvestmentPartner";
@@ -9,6 +10,11 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
+import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { getAllInvestmentResponsibleAsLeadsAsnyc, selectInvestmentResponsibleAsLeads, createInvestmentResponsibleAsLeadAsync, updateInvestmentResponsibleAsLeadAsync, deleteInvestmentResponsibleAsLeadAsync } from "../../profile-new/investmentResponsibleAsLead/investmentResponsibleAsLeadSlice";
+import { IInvestmentResponsibleAsLead, defaultIIInvestmentResponsibleAsLead } from "../../profile-new/investmentResponsibleAsLead/IInvestmentResponsibleAsLead";
+import Moment from 'moment';
 
 
 interface InvestmentPartnerModelProps {
@@ -48,11 +54,77 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     props.handleClose();
   }
 
+  const investmentsAsLead = useAppSelector(selectInvestmentResponsibleAsLeads);
+  const [showInvestmentForm, setShowInvestmentForm] = useState(false);
+  const [editingInvestment, setEditingInvestment] = useState<IInvestmentResponsibleAsLead>(defaultIIInvestmentResponsibleAsLead);
+
   useEffect(() => {
     const data = { ...props.investmentPartnerFormData, prelimApplicationId: props.prelimApplicationId };
     setInvestmentPartnerFormData(data)
     reset(data);
+
+    if (data.id) {
+      dispatch(getAllInvestmentResponsibleAsLeadsAsnyc(wrapArgument(actionUid, Number(data.id))));
+    }
   }, [props.investmentPartnerFormData, props.open])
+
+  const handleOpenInvestmentForm = (investment?: IInvestmentResponsibleAsLead) => {
+    if (investment) {
+      setEditingInvestment(investment);
+      investmentReset(investment);
+    } else {
+      setEditingInvestment({ ...defaultIIInvestmentResponsibleAsLead, teamMemberId: Number(investmentPartnerFormData.id) });
+      investmentReset({ ...defaultIIInvestmentResponsibleAsLead, teamMemberId: Number(investmentPartnerFormData.id) });
+    }
+    setShowInvestmentForm(true);
+  };
+
+  const handleCloseInvestmentForm = () => {
+    setShowInvestmentForm(false);
+    setEditingInvestment(defaultIIInvestmentResponsibleAsLead);
+  };
+
+  const investmentValidationSchema = Yup.object().shape({
+    nameOfCompany: Yup.string().required("Name of company is required").nullable(),
+    amountInvested: Yup.number().typeError("Must be a number").required("Amount is required"),
+    dateOfInvestment: Yup.string().required("Date is required").nullable(),
+    exitOrWriteOff: Yup.string().required("Required").nullable(),
+    irrPercent: Yup.string().required("IRR % is required").nullable(),
+    comment: Yup.string().required("Comment is required").nullable()
+  });
+
+  const {
+    control: investmentControl,
+    register: investmentRegister,
+    handleSubmit: investmentHandleSubmit,
+    setValue: investmentSetValue,
+    reset: investmentReset,
+    formState: { errors: investmentErrors },
+  } = useForm({
+    resolver: yupResolver(investmentValidationSchema),
+  });
+
+  const onInvestmentSubmit = (data: any) => {
+    const payload = { ...data, teamMemberId: Number(investmentPartnerFormData.id) };
+    if (payload.id) {
+      dispatch(updateInvestmentResponsibleAsLeadAsync(wrapArgument(actionUid, payload))).then(() => {
+        dispatch(getAllInvestmentResponsibleAsLeadsAsnyc(wrapArgument(actionUid, Number(investmentPartnerFormData.id))));
+      });
+    } else {
+      dispatch(createInvestmentResponsibleAsLeadAsync(wrapArgument(actionUid, payload))).then(() => {
+        dispatch(getAllInvestmentResponsibleAsLeadsAsnyc(wrapArgument(actionUid, Number(investmentPartnerFormData.id))));
+      });
+    }
+    handleCloseInvestmentForm();
+  };
+
+  const handleDeleteInvestment = (investment: IInvestmentResponsibleAsLead) => {
+    if (window.confirm("Are you sure you want to delete this investment?")) {
+      dispatch(deleteInvestmentResponsibleAsLeadAsync(wrapArgument(actionUid, investment))).then(() => {
+        dispatch(getAllInvestmentResponsibleAsLeadsAsnyc(wrapArgument(actionUid, Number(investmentPartnerFormData.id))));
+      });
+    }
+  };
 
   const handleChange = (ev: any) => {
     ev.preventDefault();
@@ -226,7 +298,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               value={investmentPartnerFormData.description || ''}
               variant="outlined"
               multiline
-              rows={3}
+              maxRows={4}
               {...register("description")}
               error={!!errors.description}
               helperText={errors.description?.message as string}
@@ -279,6 +351,183 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               onChange={handleChange}
               sx={fieldSx}
             />
+          </Grid>
+          <Grid item xs={12}>
+            <Box sx={{ mt: 2, mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#363062' }}>Investments responsible for (as Lead and Non-Lead)</Typography>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={() => handleOpenInvestmentForm()}
+                // disabled={!investmentPartnerFormData.id}
+                variant="outlined"
+                size="small"
+                sx={{ textTransform: 'none', borderRadius: '8px' }}
+              >
+                Add Investment
+              </Button>
+            </Box>
+
+            <Collapse in={showInvestmentForm}>
+              <Paper sx={{ p: 3, mb: 3, border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: '#fcfcfc' }}>
+                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>{editingInvestment.id ? 'Edit Investment' : 'Add New Investment'}</Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Name of company"
+                      size="small"
+                      {...investmentRegister("nameOfCompany")}
+                      error={!!investmentErrors.nameOfCompany}
+                      helperText={investmentErrors.nameOfCompany?.message as string}
+                      sx={fieldSx}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label="Amount invested (₹ Crore)"
+                      size="small"
+                      {...investmentRegister("amountInvested")}
+                      error={!!investmentErrors.amountInvested}
+                      helperText={investmentErrors.amountInvested?.message as string}
+                      sx={fieldSx}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <Controller
+                        name="dateOfInvestment"
+                        control={investmentControl}
+                        render={({ field }) => (
+                          <DesktopDatePicker
+                            label="Date of investment"
+                            inputFormat="DD/MM/YYYY"
+                            value={field.value || null}
+                            onChange={(date) => field.onChange(date)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                size="small"
+                                fullWidth
+                                error={!!investmentErrors.dateOfInvestment}
+                                helperText={investmentErrors.dateOfInvestment?.message as string}
+                                sx={fieldSx}
+                              />
+                            )}
+                          />
+                        )}
+                      />
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      fullWidth
+                      label="Exited/Write off"
+                      size="small"
+                      {...investmentRegister("exitOrWriteOff")}
+                      error={!!investmentErrors.exitOrWriteOff}
+                      helperText={investmentErrors.exitOrWriteOff?.message as string}
+                      sx={fieldSx}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <Controller
+                        name="dateofExitorWriteOff"
+                        control={investmentControl}
+                        render={({ field }) => (
+                          <DesktopDatePicker
+                            label="Date of exit"
+                            inputFormat="DD/MM/YYYY"
+                            value={field.value || null}
+                            onChange={(date) => field.onChange(date)}
+                            renderInput={(params) => (
+                              <TextField {...params} size="small" fullWidth sx={fieldSx} />
+                            )}
+                          />
+                        )}
+                      />
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      fullWidth
+                      label="IRR Percent"
+                      size="small"
+                      {...investmentRegister("irrPercent")}
+                      error={!!investmentErrors.irrPercent}
+                      helperText={investmentErrors.irrPercent?.message as string}
+                      sx={fieldSx}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={2}
+                      label="Comment"
+                      size="small"
+                      {...investmentRegister("comment")}
+                      error={!!investmentErrors.comment}
+                      helperText={investmentErrors.comment?.message as string}
+                      sx={fieldSx}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Button onClick={handleCloseInvestmentForm} size="small" sx={{ textTransform: 'none' }}>Cancel</Button>
+                    <Button onClick={investmentHandleSubmit(onInvestmentSubmit)} variant="contained" size="small" sx={{ textTransform: 'none', backgroundColor: '#363062' }}>Save</Button>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Collapse>
+
+            <TableContainer component={Paper} sx={{ borderRadius: '8px', border: '1px solid #e0e0e0', boxShadow: 'none' }}>
+              <Table size="small">
+                <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Name of company</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Amount invested (₹ Crore)</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Date of investment</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Exited/Write off	</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Date of exit	</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>IRR Percent</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Comment</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {investmentsAsLead.data[String(investmentPartnerFormData.id)]?.investmentsAsLead?.length ? (
+                    investmentsAsLead.data[String(investmentPartnerFormData.id)]?.investmentsAsLead?.map((inv: IInvestmentResponsibleAsLead) => (
+                      <TableRow key={inv.id}>
+                        <TableCell>{inv.nameOfCompany}</TableCell>
+                        <TableCell>{inv.amountInvested}</TableCell>
+                        <TableCell>{inv.dateOfInvestment ? Moment(inv.dateOfInvestment).format("DD/MM/YYYY") : '-'}</TableCell>
+                        <TableCell>{inv.exitOrWriteOff}</TableCell>
+                        <TableCell>{inv.dateofExitorWriteOff && Moment(inv.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
+                        <TableCell>{inv.irrPercent}</TableCell>
+                        <TableCell>{inv.comment}</TableCell>
+                        <TableCell>
+                          <IconButton size="small" onClick={() => handleOpenInvestmentForm(inv)} color="primary">
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton size="small" onClick={() => handleDeleteInvestment(inv)} color="error">
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center" sx={{ py: 2, color: 'text.secondary' }}>
+                        {/* {!investmentPartnerFormData.id ? "Save partner details first to add investments" : "No investments added yet"} */}
+                        {"No investments added yet"}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
 
           <Grid item xs={12}>

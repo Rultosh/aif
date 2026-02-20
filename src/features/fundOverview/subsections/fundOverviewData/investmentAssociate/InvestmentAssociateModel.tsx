@@ -223,7 +223,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
               helperText={errors.description?.message as string}
               variant="outlined"
               multiline
-              rows={3}
+              maxRows={4}
               onChange={handleChange}
               sx={fieldSx}
             />

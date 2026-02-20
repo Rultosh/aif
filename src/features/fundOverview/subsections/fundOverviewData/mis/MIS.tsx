@@ -40,7 +40,6 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
 
     const validationSchema = Yup.object().shape({
         msMeetingFrequency: Yup.string().required("This field is required").nullable(),
-        msOrgStructure: Yup.string().required("This field is required").nullable(),
         msInvestigationDetails: Yup.string().required("This field is required").nullable(),
         msExclusiveVC: Yup.string().required("This field is required").nullable(),
         msDirectorshipsPolicy: Yup.string().required("This field is required").nullable(),
@@ -91,7 +90,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("msMeetingFrequency")}
                             error={!!errors.msMeetingFrequency}
                             helperText={errors.msMeetingFrequency?.message as string}
@@ -100,24 +99,11 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>2. Please attach the organisation structure / chart of the Investment Manager.</Typography>
+                        <Typography variant="body1" sx={labelSx}>2. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employee(s) of the Investment Manager have been investigated by any regulatory authority during the last 5 years? If yes, please give full details of the same.</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
-                            {...register("msOrgStructure")}
-                            error={!!errors.msOrgStructure}
-                            helperText={errors.msOrgStructure?.message as string}
-                            variant="outlined"
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employee(s) of the Investment Manager have been investigated by any regulatory authority during the last 5 years? If yes, please give full details of the same.</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={4}
+                            maxRows={4}
                             {...register("msInvestigationDetails")}
                             error={!!errors.msInvestigationDetails}
                             helperText={errors.msInvestigationDetails?.message as string}
@@ -126,11 +112,11 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. Is the Investment Manager exclusively handling VC business or is it also doing any other business or activity?</Typography>
+                        <Typography variant="body1" sx={labelSx}>3. Is the Investment Manager exclusively handling VC business or is it also doing any other business or activity?</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("msExclusiveVC")}
                             error={!!errors.msExclusiveVC}
                             helperText={errors.msExclusiveVC?.message as string}
@@ -139,16 +125,70 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. How many directorships does each Investment Manager (employee) hold? What is the policy in this regard?</Typography>
+                        <Typography variant="body1" sx={labelSx}>4. How many directorships does each Investment Manager (employee) hold?</Typography>
                         <TextField
                             fullWidth
                             multiline
-                            rows={3}
+                            maxRows={4}
                             {...register("msDirectorshipsPolicy")}
                             error={!!errors.msDirectorshipsPolicy}
                             helperText={errors.msDirectorshipsPolicy?.message as string}
                             variant="outlined"
                         />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>5. What is the reporting structure/procedure for the contributors (quarterly/ half-yearly/annual)</Typography>
+
+                        <Box sx={{ ml: 2 }}>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Consolidated information of investee companies</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("otConsolidatedInfo")}
+                                error={!!errors.otConsolidatedInfo}
+                                helperText={errors.otConsolidatedInfo?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("otNAVFrequency")}
+                                error={!!errors.otNAVFrequency}
+                                helperText={errors.otNAVFrequency?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("otValuationReport")}
+                                error={!!errors.otValuationReport}
+                                helperText={errors.otValuationReport?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("otNAVGuidelines")}
+                                error={!!errors.otNAVGuidelines}
+                                helperText={errors.otNAVGuidelines?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+                        </Box>
                     </Grid>
 
                     <Grid item xs={12}>

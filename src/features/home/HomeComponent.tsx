@@ -235,7 +235,7 @@ export const Home = (pros: any) => {
                                 startIcon={<AddCircleIcon />}
                                 href="#/Preliminary"
                             >
-                                Initial Assessment
+                                Start Application
                             </Button>
                         </Box>
                     </Box>

@@ -17,7 +17,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import FormHelperText from '@mui/material/FormHelperText';
-
+import dayjs, { Dayjs } from "dayjs";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -31,6 +31,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const [actionUid] = useState(uuid());
     const [prelimAppicationId, setPrelimApplicationId] = useState(props.prelimApplicationId);
     const [firstClosingSwitch, setfirstClosingSwitch] = useState(false);
+
+    const MIN_DATE = dayjs("2020-01-01");
 
     const dispatch = useAppDispatch()
 
@@ -86,6 +88,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         if (percentageFields.includes(id)) {
             if (value !== '') {
                 const numVal = parseFloat(value);
+                if (numVal < 0) value = '0';
                 if (numVal > 100) value = '100';
                 if (value.includes('.')) {
                     const parts = value.split('.');
@@ -204,13 +207,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             '&.Mui-readOnly, & .MuiInputBase-input[readOnly]': {
                 backgroundColor: 'rgba(0, 0, 0, 0.05)',
             }
-        },
-        '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
-            '-webkit-appearance': 'none',
-            margin: 0,
-        },
-        '& input[type=number]': {
-            '-moz-appearance': 'textfield',
         },
     };
 
@@ -359,27 +355,27 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             }
             return true;
         }),
-        termOfFund: Yup.string().required("Term of Fund is required"),
-        commitmentPeriod: Yup.string().required("Commitment Period is required"),
-        preferredReturn: Yup.string().required("Preferred Return is required"),
-        managementFees: Yup.string().required("Management Fees is required"),
-        carriedInterest: Yup.string().required("Carried Interest is required"),
+        termOfFund: Yup.number().typeError("Term of Fund must be a number").required("Term of Fund is required").min(0, "Negative values not allowed"),
+        commitmentPeriod: Yup.number().typeError("Commitment Period must be a number").required("Commitment Period is required").min(0, "Negative values not allowed"),
+        preferredReturn: Yup.number().typeError("Preferred Return must be a number").required("Preferred Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
+        managementFees: Yup.number().typeError("Management Fees must be a number").required("Management Fees is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
+        carriedInterest: Yup.number().typeError("Carried Interest must be a number").required("Carried Interest is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sdDescription: Yup.string().required("Capital raised till date is required"),
-        sdTargetCorpusDomestic: Yup.string().required("Domestic is required"),
-        sdTargetCorpusOverseas: Yup.string().required("Overseas is required"),
+        sdTargetCorpusDomestic: Yup.number().typeError("Domestic must be a number").required("Domestic is required").min(0, "Negative values not allowed"),
+        sdTargetCorpusOverseas: Yup.number().typeError("Overseas must be a number").required("Overseas is required").min(0, "Negative values not allowed"),
         sdTotalTargetCorpus: Yup.number().required("Total Target Corpus is required").min(100, "Value less than Rs. 100 crores shall not be allowed"),
-        sdGreenShoeTargetCorpusDomestic: Yup.string().required("Domestic (Green Shoe) is required"),
-        sdGreenShoeTargetCorpusOverseas: Yup.string().required("Overseas (Green Shoe) is required"),
-        sdGreenShoeTotalTargetCorpus: Yup.string().required("Total Target Corpus (Green Shoe) is required"),
-        sdFirstClosingDomesticAmount: Yup.string().required("Domestic Amount is required"),
-        sdFirstClosingOverseasAmount: Yup.string().required("Overseas Amount is required"),
+        sdGreenShoeTargetCorpusDomestic: Yup.number().typeError("Domestic (Green Shoe) must be a number").required("Domestic (Green Shoe) is required").min(0, "Negative values not allowed"),
+        sdGreenShoeTargetCorpusOverseas: Yup.number().typeError("Overseas (Green Shoe) must be a number").required("Overseas (Green Shoe) is required").min(0, "Negative values not allowed"),
+        sdGreenShoeTotalTargetCorpus: Yup.number().typeError("Total Target Corpus (Green Shoe) must be a number").required("Total Target Corpus (Green Shoe) is required").min(0, "Negative values not allowed"),
+        sdFirstClosingDomesticAmount: Yup.number().typeError("Domestic Amount must be a number").required("Domestic Amount is required").min(0, "Negative values not allowed"),
+        sdFirstClosingOverseasAmount: Yup.number().typeError("Overseas Amount must be a number").required("Overseas Amount is required").min(0, "Negative values not allowed"),
         sdFirstClosingDomesticAmountDate: Yup.string().required("This value is required").nullable(),
         sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
         aifCategoryType: Yup.string().required("AIF Category Type is required"),
-        targetReturnIRR: Yup.string().required("Target Return is required"),
-        fundSetupCost: Yup.string().required("Fund set up cost is required"),
+        targetReturnIRR: Yup.number().typeError("Target Return must be a number").required("Target Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
+        fundSetupCost: Yup.number().typeError("Fund set up cost must be a number").required("Fund set up cost is required").min(0, "Negative values not allowed"),
         hurdleCarryInterestRate: Yup.string().required("Hurdle and carry interest rate is required"),
     });
 
@@ -438,7 +434,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             variant="outlined"
                             multiline
-                            rows={3}
+                            maxRows={4}
                             sx={{
                                 '& .MuiOutlinedInput-root': {
                                     borderRadius: '8px',
@@ -604,27 +600,39 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             <Controller
                                 name="dateOfFilingWithSEBI"
                                 control={control}
-                                render={({
-                                    field: { onChange, value },
-                                    fieldState: { error, invalid }
-                                }) => (
+                                rules={{
+                                    required: "This value is required",
+                                    validate: (value: Dayjs | null) => {
+                                        if (!value) return true;
+                                        return value.isBefore(MIN_DATE)
+                                            ? "Date cannot be before 01/01/2020"
+                                            : true;
+                                    }
+                                }}
+                                render={({ field, fieldState }) => (
                                     <DesktopDatePicker
-                                        inputFormat="DD/MM/YYYY"
-                                        disableFuture={true}
                                         label="Date of Approval of PPM by SEBI"
-                                        value={prelimApplicationFormData.dateOfFilingWithSEBI || null}
-                                        onChange={(newValue: any) => {
-                                            setValue('dateOfFilingWithSEBI', newValue);
+                                        inputFormat="DD/MM/YYYY"
+                                        disableFuture
+                                        minDate={MIN_DATE}
+                                        value={field.value || null}
+                                        onChange={(newValue: Dayjs | null) => {
+                                            if (newValue && newValue.isBefore(MIN_DATE)) return;
+
+                                            field.onChange(newValue);
                                             setDateValue("dateOfFilingWithSEBI", newValue);
                                         }}
                                         renderInput={(params) => (
                                             <TextField
-                                                fullWidth
-                                                variant="outlined"
                                                 {...params}
-                                                error={invalid}
-                                                helperText={invalid ? "This value is required" : null}
-                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                                fullWidth
+                                                error={!!fieldState.error}
+                                                helperText={fieldState.error?.message}
+                                                sx={{
+                                                    '& .MuiOutlinedInput-root': {
+                                                        borderRadius: '8px'
+                                                    }
+                                                }}
                                             />
                                         )}
                                     />
@@ -750,11 +758,28 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number"
                             id="fundSetupCost"
-                            label="Fund set up cost and other expenses"
+                            label="Fund set up cost"
                             value={prelimApplicationFormData.fundSetupCost || ''}
                             {...register("fundSetupCost")}
                             error={!!errors.fundSetupCost}
                             helperText={errors.fundSetupCost?.message as string}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            variant="outlined"
+                            sx={numericSx}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <TextField
+                            required
+                            fullWidth
+                            type="number"
+                            id="otherExpenses"
+                            label="Other expenses"
+                            value={prelimApplicationFormData.otherExpenses || ''}
+                            {...register("otherExpenses")}
+                            error={!!errors.otherExpenses}
+                            helperText={errors.otherExpenses?.message as string}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
@@ -784,7 +809,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number"
                             id="hurdleCarryInterestRate"
-                            label="Hurdle and carry interest rate"
+                            label="Justification for hurdle and carried interest rate"
                             value={prelimApplicationFormData.hurdleCarryInterestRate || ''}
                             {...register("hurdleCarryInterestRate")}
                             error={!!errors.hurdleCarryInterestRate}
@@ -1117,8 +1142,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         />
                                     </LocalizationProvider>
                                 </Grid>
-                                <Grid item xs={12} md={4}></Grid>
-
                                 <Grid item xs={12} md={4}>
                                     <TextField
                                         required
@@ -1142,7 +1165,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         sx={numericSx}
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={4}>
+                                {/* <Grid item xs={12} md={4}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <Controller
                                             name="sdFirstCorpusOverseasAmountDate"
@@ -1170,7 +1193,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             )}
                                         />
                                     </LocalizationProvider>
-                                </Grid>
+                                </Grid> */}
 
                                 <Grid item xs={12}>
                                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>

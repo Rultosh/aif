@@ -11,9 +11,11 @@ export interface IInvestmentPast {
     shareholdingInvestee: String | undefined,
     moic: String | undefined,
     grossIrr: String | undefined,
+    timeTakenFromSourcingToClosure: String | undefined,
     conflictOfInterest: String | undefined,
     stakeOfEmployee: String | undefined,
-    investmentStageFundingRound: String | undefined
+    investmentStageFundingRound: String | undefined,
+    investmentStageDealSourced: String | undefined
 }
 
 export const defaultInvestmentPast: IInvestmentPast = {
@@ -29,7 +31,9 @@ export const defaultInvestmentPast: IInvestmentPast = {
     shareholdingInvestee: undefined,
     moic: undefined,
     grossIrr: undefined,
+    timeTakenFromSourcingToClosure: undefined,
     conflictOfInterest: undefined,
     stakeOfEmployee: undefined,
-    investmentStageFundingRound: undefined
+    investmentStageFundingRound: undefined,
+    investmentStageDealSourced: undefined
 }

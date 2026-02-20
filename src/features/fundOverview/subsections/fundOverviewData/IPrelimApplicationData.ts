@@ -1,3 +1,5 @@
+import { Dayjs } from "dayjs";
+
 export interface IPrelimApplicationData {
   id: Number | undefined,
   status: String | undefined,
@@ -19,7 +21,7 @@ export interface IPrelimApplicationData {
   impact: Number | undefined,
   aifCategory: Number | undefined,
   nameOfTrustee: String | undefined,
-  dateOfFilingWithSEBI: String | undefined,
+  dateOfFilingWithSEBI: Dayjs | null, 
   contributionSought: Number | undefined,
   termOfFund: Number | undefined,
   commitmentPeriod: Number | undefined,
@@ -55,6 +57,7 @@ export interface IPrelimApplicationData {
   targetReturnIRR: Number | undefined,
   fundSetupCost: Number | undefined,
   hurdleCarryInterestRate: Number | undefined,
+  otherExpenses: Number | undefined,
   // Investment Strategy
   isStrategyBasis: String | undefined,
   isFocusSectors: String | undefined,
@@ -93,7 +96,7 @@ export interface IPrelimApplicationData {
   otInternalCapital: String | undefined,
   // MIS
   msMeetingFrequency: String | undefined,
-  msOrgStructure: String | undefined,
+  // msOrgStructure: String | undefined,
   msInvestigationDetails: String | undefined,
   msExclusiveVC: String | undefined,
   msDirectorshipsPolicy: String | undefined,
@@ -120,7 +123,7 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   impact: undefined,
   aifCategory: undefined,
   nameOfTrustee: undefined,
-  dateOfFilingWithSEBI: undefined,
+  dateOfFilingWithSEBI: null,
   contributionSought: undefined,
   termOfFund: undefined,
   commitmentPeriod: undefined,
@@ -156,6 +159,7 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   targetReturnIRR: undefined,
   fundSetupCost: undefined,
   hurdleCarryInterestRate: undefined,
+  otherExpenses: undefined,
   // Investment Strategy
   isStrategyBasis: undefined,
   isFocusSectors: undefined,
@@ -194,7 +198,7 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   otInternalCapital: undefined,
   // MIS
   msMeetingFrequency: undefined,
-  msOrgStructure: undefined,
+  // msOrgStructure: undefined,
   msInvestigationDetails: undefined,
   msExclusiveVC: undefined,
   msDirectorshipsPolicy: undefined,
