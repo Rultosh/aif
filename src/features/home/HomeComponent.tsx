@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { wrapArgument } from '../../lib/api-status/actionWrapper';
-import { getPrelimApplicationList, IPageInfo, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
+import { createPrelimApplicationAsync, createShellPrelimApplicationAsync, getPrelimApplicationList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
 import logo from '../../images/logo.png';
 import logoNps from '../../images/logo_nps.png';
 import uuid from "react-uuid";
@@ -43,6 +43,8 @@ export const Home = (pros: any) => {
     //const { id } = useParams()
     const id = 1;
     const [formData, setFormData] = useState(defaultIDetailedApplication);
+    const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
+    const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     // const [detailedApplications, setDetailedApplications] = useState([] as any);
     const [actionId] = useState(uuid())
     const controller = new Controller(actionId, detailedApplicationThunk);
@@ -233,7 +235,13 @@ export const Home = (pros: any) => {
                                 sx={{ backgroundColor: '#34344b', color: 'white', fontWeight: 600, textTransform: 'capitalize' }}
                                 className='btn-primary'
                                 startIcon={<AddCircleIcon />}
-                                href="#/Preliminary"
+                                // href="#/Preliminary"
+                                onClick={async () => {
+                                    let application : IPrelimApplicationData = await dispatch(
+                                        createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
+                                        ).unwrap();
+                                    navigate(`/Preliminary/${application.id}/selfRating`)
+                                }}
                             >
                                 Start Application
                             </Button>

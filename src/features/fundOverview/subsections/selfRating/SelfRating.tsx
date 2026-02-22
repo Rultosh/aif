@@ -8,7 +8,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import React, * as Rect from 'react'
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
 import { ISelfRating } from "./ISelfRating";
-import { selectSelfRatings, fetchSelfRatingAsync, createSelfRatingAsync, updateSelfRatingAsync } from "./selfRatingSlice";
+import { selectSelfRatings, fetchSelfRatingAsync, createSelfRatingAsync, updateSelfRatingAsync, createIndependentSelfRatingAsync } from "./selfRatingSlice";
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
@@ -88,11 +88,19 @@ export const SelfRating = (props: any) => {
     async function handleClickSave() {
         console.log(selfRatingValue.id)
         if (!selfRatingValue.id) {
-            await dispatch(
-                createSelfRatingAsync(
-                    wrapArgument(actionUid, { ...selfRatingValue, prelimApplicationId: Number(id) })
-                )
-            ).unwrap();
+            if(Number(id)) {
+                await dispatch(
+                    createSelfRatingAsync(
+                        wrapArgument(actionUid, { ...selfRatingValue, prelimApplicationId: Number(id) })
+                    )
+                ).unwrap();
+            } else {
+                await dispatch(
+                    createIndependentSelfRatingAsync(
+                        wrapArgument(actionUid, { ...selfRatingValue })
+                    )
+                ).unwrap();
+            }
         } else {
             await dispatch(
                 updateSelfRatingAsync(
@@ -310,9 +318,9 @@ export const SelfRating = (props: any) => {
                                                 </Grid>
                                                 <Grid item xs={3}>
                                                     <FormControlLabel
-                                                        value={"Multiple Time >= One Fund"}
+                                                        value={"Managed >= One Fund"}
                                                         control={<Radio color="primary" />}
-                                                        label={<Typography variant="body2">Multiple Time {'>'}= One Fund</Typography>}
+                                                        label={<Typography variant="body2">Managed {'>'}= One Fund</Typography>}
                                                     />
                                                 </Grid>
                                             </RadioGroup>

@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
 import { ActionWrapper } from '../../../../lib/api-status/actionWrapper'
 import { defaultIISelfRating, ISelfRating } from './ISelfRating'
-import { createSelfRating, deleteSelfRating, fetchSelfRating, updateSelfRating } from './selfRatingApi'
+import { createIndependentRating, createSelfRating, deleteSelfRating, fetchSelfRating, updateSelfRating } from './selfRatingApi'
 import { getError } from '../../../../lib/api-status/errorHandler'
 import { FetchStatus, IStatus } from '../../../../lib/api-status/IStatus'
 import { RootState } from '../../../../app/store'
@@ -46,6 +46,22 @@ export const createSelfRatingAsync = createAsyncThunk(
     try {
       if(args.argument) {
         const response = await createSelfRating(args.argument);
+        return response.data;
+      }
+    } catch(reason) {
+      console.log(reason)
+      return rejectWithValue(getError(reason));
+    }
+  }
+)
+
+export const createIndependentSelfRatingAsync = createAsyncThunk(
+  'createIndependentSelfRatingAsync/create',
+  async (args: ActionWrapper<ISelfRating>, {rejectWithValue}) => { 
+    console.log("updatePrelimApplicationAsync called...")
+    try {
+      if(args.argument) {
+        const response = await createIndependentRating(args.argument);
         return response.data;
       }
     } catch(reason) {
@@ -135,6 +151,20 @@ const selfRatingSlice = createSlice({
       
     )
     builder.addCase(updateSelfRatingAsync.rejected, (state, action) => {
+      state.actionStatus.fetchStatus = FetchStatus.FAILED;
+    })
+    builder.addCase(createIndependentSelfRatingAsync.pending, state => {
+      state.actionStatus.fetchStatus = FetchStatus.DOING;
+    })
+    builder.addCase(
+      createIndependentSelfRatingAsync.fulfilled,
+      (state, action: PayloadAction<ISelfRating>) => {
+        state.actionStatus.fetchStatus = FetchStatus.IDLE;
+      }
+      
+    )
+    
+    builder.addCase(createIndependentSelfRatingAsync.rejected, (state, action) => {
       state.actionStatus.fetchStatus = FetchStatus.FAILED;
     })
     builder.addCase(createSelfRatingAsync.pending, state => {

@@ -23,6 +23,15 @@ export function fetchFundOverviewAllList(pageInfo : IPageInfo | undefined) {
   });
 }
 
+export function postPrelimApplicationShell(prelimAppData:IPrelimApplicationData) {
+  return api({
+    method: 'post',
+    // data: prelimAppData,
+    // url: `/api/prelims`
+    url: `/api/prelims/createShell`
+  });
+}
+
 export function postPrelimApplication(prelimAppData:IPrelimApplicationData) {
   return api({
     method: 'post',

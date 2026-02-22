@@ -8,7 +8,6 @@ export function fetchSelfRating(prelimAppId:Number | undefined) {
   });
 }
 
-
 export function updateSelfRating(selfRating:ISelfRating) {
   return api({
     method: 'patch',
@@ -22,6 +21,14 @@ export function createSelfRating(selfRating:ISelfRating) {
     method: 'post',
     data: selfRating,
     url: `api/prelims/${selfRating.prelimApplicationId}/selfRatings`
+  });
+}
+
+export function createIndependentRating(selfRating:ISelfRating) {
+  return api({
+    method: 'post',
+    data: selfRating,
+    url: `api/selfRatings`
   });
 }
 

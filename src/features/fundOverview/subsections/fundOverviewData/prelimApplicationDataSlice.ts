@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ActionWrapper } from '../../../../lib/api-status/actionWrapper'
-import { fetchFundOverviewData, fetchFundOverviewList, fetchFundOverviewAllList, patchPrelimApplication, postPrelimApplication, postApplication } from './fundOverviewDataApi'
+import { fetchFundOverviewData, fetchFundOverviewList, fetchFundOverviewAllList, patchPrelimApplication, postPrelimApplication, postApplication, postPrelimApplicationShell } from './fundOverviewDataApi'
 import { getError } from '../../../../lib/api-status/errorHandler'
 import { defaultIPrelimApplicationData, IPrelimApplicationData, IApplicationData } from './IPrelimApplicationData'
 import { FetchStatus, IStatus } from '../../../../lib/api-status/IStatus'
@@ -102,6 +102,21 @@ export const createPrelimApplicationAsync = createAsyncThunk(
   }
 );
 
+export const createShellPrelimApplicationAsync = createAsyncThunk(
+  'prelimApplicationdataShell/create',
+  async (args: ActionWrapper<IPrelimApplicationData>, {rejectWithValue}) => { 
+    try {
+      if(args.argument) {
+        const response = await postPrelimApplicationShell(args.argument);
+        console.log('prelimApplicationdataShell/create', args.argument);
+        return response.data;
+      }
+    } catch(reason) {
+      console.log("Error: " + reason)
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
 
 export const createApplicationAsync = createAsyncThunk(
   'applicationdata/create',
@@ -148,6 +163,21 @@ const prelimApplicationDataSlice = createSlice({
       }
     )
     .addCase(getPrelimApplicationData.rejected, (state, action) => {
+      state.status.fetchStatus = FetchStatus.FAILED;
+    })
+    
+    .addCase(createShellPrelimApplicationAsync.pending, state => {
+      state.status.fetchStatus = FetchStatus.DOING;
+    })
+    .addCase(
+      createShellPrelimApplicationAsync.fulfilled,
+      (state, action: PayloadAction<IPrelimApplicationData>) => {
+        console.log(action.payload)
+       state.prelimApplication = action.payload
+       state.status.fetchStatus = FetchStatus.IDLE;
+      }
+    )
+    .addCase(createShellPrelimApplicationAsync.rejected, (state, action) => {
       state.status.fetchStatus = FetchStatus.FAILED;
     })
     .addCase(createPrelimApplicationAsync.pending, state => {
