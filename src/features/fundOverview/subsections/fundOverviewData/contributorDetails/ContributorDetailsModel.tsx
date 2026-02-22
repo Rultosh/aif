@@ -42,8 +42,12 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
       return convert(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + convert(n % 10000000) : '');
     }
 
-    const result = convert(num).trim();
-    return result ? result + ' Rupees only' : '';
+    if(num !== undefined && convert(num) != undefined) {
+      const result = convert(num).trim();
+        return result ? result + ' Rupees only' : '';
+    } else {
+        return ''
+    }
   }
 
   const [actionUid] = useState(uuid())

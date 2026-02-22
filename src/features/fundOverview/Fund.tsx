@@ -131,6 +131,8 @@ export const Fund = (props: any) => {
             misRef.current?.submit()
         ]);
 
+        console.log("allValid", results);
+
         const allValid = results.every(res => res === true);
         if (!allValid) {
             const firstInvalidIndex = results.findIndex(res => res === false);
@@ -152,6 +154,8 @@ export const Fund = (props: any) => {
 
             if (allValid) {
                 navigate(`/preliminary/${prelimApplicationId}/declaration`)
+            } else {
+                console.log("allValid", allValid);
             }
         }
     }

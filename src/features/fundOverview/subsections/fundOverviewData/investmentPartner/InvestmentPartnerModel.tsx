@@ -28,7 +28,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
   const [actionUid] = useState(uuid())
   const [investmentPartnerFormData, setInvestmentPartnerFormData] = useState(defaultInvestmentPartner)
-
+  
   const dispatch = useAppDispatch();
 
   function handleSubmitForm() {
@@ -46,7 +46,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
         )
       )
     }
-    handleCloseModal();
   }
 
   const handleCloseModal = () => {
@@ -186,8 +185,16 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   });
 
   const onSubmit = (data: any) => {
+    let hasIdOnAction = data.id;
+    console.log('hasIdOnAction', hasIdOnAction, data.id);
     setInvestmentPartnerFormData(data);
     handleSubmitForm();
+    console.log('hasIdOnAction', hasIdOnAction, data.id, hasIdOnAction !== undefined);
+    if(hasIdOnAction) {
+      handleCloseModal();
+    } else {
+      return false;
+    }
   };
 
   const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
@@ -352,7 +359,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               sx={fieldSx}
             />
           </Grid>
-          <Grid item xs={12}>
+
+          {investmentPartnerFormData.id && <><Grid item xs={12}>
             <Box sx={{ mt: 2, mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#363062' }}>Investments responsible for (as Lead and Non-Lead)</Typography>
               <Button
@@ -546,15 +554,18 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 </Box>
               </Grid>
             </Grid>
-          </Grid>
+          </Grid></>}
 
           <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
             <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
+            {!investmentPartnerFormData.id && <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
+              Save
+            </Button>}
+            {investmentPartnerFormData.id && <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
               Submit
-            </Button>
+            </Button>}
           </Grid>
         </Grid>
       </Box>

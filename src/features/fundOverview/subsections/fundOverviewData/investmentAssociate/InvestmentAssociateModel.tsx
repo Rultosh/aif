@@ -39,7 +39,6 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
         )
       )
     }
-    handleCloseModal();
   }
 
   const handleCloseModal = () => {
@@ -108,8 +107,17 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
   });
 
   const onSubmit = (data: any) => {
+    let hasIdOnAction = data.id;
+    console.log('hasIdOnAction', hasIdOnAction, data.id);
     setInvestmentAssociateFormData(data);
     handleSubmitForm();
+    console.log('hasIdOnAction', hasIdOnAction, data.id, hasIdOnAction !== undefined);
+    if(hasIdOnAction) {
+      handleCloseModal();
+    } else {
+      return false;
+    }
+    
   };
 
   const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };

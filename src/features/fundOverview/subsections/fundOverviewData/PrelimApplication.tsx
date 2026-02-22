@@ -10,7 +10,7 @@ import { defaultIPrelimApplicationData, IPrelimApplicationData } from "./IPrelim
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
-import { useNavigate, useParams } from "react-router-dom";
+import { useAsyncError, useNavigate, useParams } from "react-router-dom";
 import DocumentChip from "../../../../components/DocumentChip";
 import MasterData from "../../../../components/master-data/MasterData";
 import { useForm, Controller } from "react-hook-form";
@@ -31,6 +31,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const [actionUid] = useState(uuid());
     const [prelimAppicationId, setPrelimApplicationId] = useState(props.prelimApplicationId);
     const [firstClosingSwitch, setfirstClosingSwitch] = useState(false);
+
+    const [fundManager] = useState(prelimApplicationFormData.fundManager);
 
     const MIN_DATE = dayjs("2020-01-01");
 
@@ -164,8 +166,12 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             return convert(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + convert(n % 10000000) : '');
         }
 
-        const result = convert(num).trim();
-        return result ? result + ' Rupees only' : '';
+        if(num !== undefined && convert(num) != undefined) {
+            const result = convert(num).trim();
+            return result ? result + ' Rupees only' : '';
+        } else {
+            return ''
+        }
     }
 
     const handleSelectChange = (id: String, value: any) => {
@@ -361,7 +367,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         managementFees: Yup.number().typeError("Management Fees must be a number").required("Management Fees is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         carriedInterest: Yup.number().typeError("Carried Interest must be a number").required("Carried Interest is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        // investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sdDescription: Yup.string().required("Capital raised till date is required"),
         sdTargetCorpusDomestic: Yup.number().typeError("Domestic must be a number").required("Domestic is required").min(0, "Negative values not allowed"),
         sdTargetCorpusOverseas: Yup.number().typeError("Overseas must be a number").required("Overseas is required").min(0, "Negative values not allowed"),
@@ -372,11 +378,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         sdFirstClosingDomesticAmount: Yup.number().typeError("Domestic Amount must be a number").required("Domestic Amount is required").min(0, "Negative values not allowed"),
         sdFirstClosingOverseasAmount: Yup.number().typeError("Overseas Amount must be a number").required("Overseas Amount is required").min(0, "Negative values not allowed"),
         sdFirstClosingDomesticAmountDate: Yup.string().required("This value is required").nullable(),
-        sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
+        // sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
         aifCategoryType: Yup.string().required("AIF Category Type is required"),
         targetReturnIRR: Yup.number().typeError("Target Return must be a number").required("Target Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         fundSetupCost: Yup.number().typeError("Fund set up cost must be a number").required("Fund set up cost is required").min(0, "Negative values not allowed"),
-        hurdleCarryInterestRate: Yup.string().required("Hurdle and carry interest rate is required"),
+        justificationForHurdleCarryInterestRate: Yup.string().required("Justification for Hurdle and carry interest rate is required"),
     });
 
     const {
@@ -392,18 +398,20 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         // defaultValues: prelimApplicationFormData
     });
 
-    console.log(prelimApplicationFormData);
     const onSubmit = (data: any) => {
         console.log(data);
         // setPrelimApplicationFormData(data);
         savePrelimApplicationForm();
     };
 
+    errors && console.log('errors', JSON.stringify(errors));
+
     useImperativeHandle(ref, () => ({
         submit: async () => {
             let isValid = false;
             await handleSubmit(
                 (data) => {
+                    console.log(data);
                     onSubmit(data);
                     isValid = true;
                 },
@@ -420,7 +428,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             // <form onSubmit={savePrelimApplicationForm}>
             <Box component="form" sx={{ p: 0 }}>
                 <Grid container spacing={3}>
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <TextField
                             required
                             fullWidth
@@ -441,7 +449,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 },
                             }}
                         />
-                    </Grid>
+                    </Grid> */}
                     {/* <FormControl variant="standard" sx={{ display: 'flex', ml: 2 }}>
                             <InputLabel id="demo-simple-select-standard-label">Scheme</InputLabel>
                             <Select
@@ -512,11 +520,37 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                     </Grid>
 
                     <Grid item xs={12} md={4}>
-                        <FormControl fullWidth variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}>
+                        {/* <FormControl fullWidth variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}>
                             <InputLabel id="fundManager-label" sx={{ backgroundColor: 'white', px: 0.5 }}>Fund Manager</InputLabel>
                             <MasterData propertyType="fundManager"
                                 propertyValue={prelimApplicationFormData.fundManager || 0}
                                 onChange={handleSelectChange} />
+                        </FormControl> */}
+                        <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
+                            <InputLabel id="demo-simple-select-standard-label"
+                                sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}
+                                >Fund Manager {prelimApplicationFormData.fundManager}</InputLabel>
+                            <Select
+                                labelId="fundManager"
+                                id="fundManager"
+                                value={prelimApplicationFormData.fundManager || ""}
+                                onChange={handleChange}
+                                name="fundManager"
+                                // defaultValue={prelimApplicationFormData.fundManager || ""}
+                            >
+                                <MenuItem 
+                                    // selected={prelimApplicationFormData.fundManager === "First time Fund Manager"}
+                                    key={"First time Fund Manager"} 
+                                    value={"First time Fund Manager"}>First time Fund Manager</MenuItem>
+                                <MenuItem 
+                                    // selected={prelimApplicationFormData.fundManager === "Two funds managed"}
+                                    key={"Two funds managed"}
+                                    value={"Two funds managed"}>Two funds managed</MenuItem>
+                                <MenuItem 
+                                    // selected={prelimApplicationFormData.fundManager === "More than two funds managed"}
+                                    key={"More than two funds managed"} 
+                                    value={"More than two funds managed"}>More than two funds managed</MenuItem>
+                            </Select>
                         </FormControl>
                     </Grid>
                     {/* <Grid item xs={4}>
@@ -541,11 +575,33 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                     </Grid> */}
 
                     <Grid item xs={12} md={4}>
-                        <FormControl fullWidth variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}>
+                        {/* <FormControl fullWidth variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}>
                             <InputLabel id="aifCategory-label" sx={{ backgroundColor: 'white', px: 0.5 }}>AIF Category</InputLabel>
                             <MasterData propertyType="aifCategory"
                                 propertyValue={prelimApplicationFormData.aifCategory || 0}
                                 onChange={handleSelectChange} />
+                        </FormControl> */}
+                        <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
+                            <InputLabel id="demo-simple-select-standard-label" 
+                                sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}>AIF Category</InputLabel>
+                            <Select
+                                labelId="aifCategory"
+                                id="aifCategory"
+                                value={prelimApplicationFormData.aifCategory || ""}
+                                onChange={handleChange}
+                                name="aifCategory"
+                                // defaultValue={prelimApplicationFormData.aifCategory || ""}
+                            >
+    
+                                <MenuItem 
+                                    // selected={prelimApplicationFormData.aifCategory === "Category I"}
+                                    key={"Category I"} 
+                                    value={"Category I"}>Category I</MenuItem>
+                                <MenuItem 
+                                    // selected={prelimApplicationFormData.aifCategory === "Category II"}
+                                    key={"Category II"} 
+                                    value={"Category II"}>Category II</MenuItem>
+                            </Select>
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -567,8 +623,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             });
                                         }}
                                     >
-                                        <FormControlLabel value="1" control={<Radio size="small" />} label="Equity oriented AIF" />
-                                        <FormControlLabel value="2" control={<Radio size="small" />} label="Debt oriented AIF" />
+                                        <FormControlLabel value="Equity oriented AIF" control={<Radio size="small" />} label="Equity oriented AIF" />
+                                        <FormControlLabel value="Debt oriented AIF" control={<Radio size="small" />} label="Debt oriented AIF" />
                                     </RadioGroup>
                                 )}
                             />
@@ -807,13 +863,12 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number"
-                            id="hurdleCarryInterestRate"
+                            id="justificationForHurdleCarryInterestRate"
                             label="Justification for hurdle and carried interest rate"
-                            value={prelimApplicationFormData.hurdleCarryInterestRate || ''}
-                            {...register("hurdleCarryInterestRate")}
-                            error={!!errors.hurdleCarryInterestRate}
-                            helperText={errors.hurdleCarryInterestRate?.message as string}
+                            value={prelimApplicationFormData.justificationForHurdleCarryInterestRate || ''}
+                            {...register("justificationForHurdleCarryInterestRate")}
+                            error={!!errors.justificationForHurdleCarryInterestRate}
+                            helperText={errors.justificationForHurdleCarryInterestRate?.message as string}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"

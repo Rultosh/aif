@@ -104,7 +104,7 @@ export const DetailedApplication2C = (props: any) => {
     const validationSchema = Yup.object().shape({
         approvers: Yup.string().required("Approvers is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         nominatinPolicy: Yup.string().required("Nominatin Policy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        // investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         grossReturnObjective: Yup.string().required("Gross Return Objective is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         targetSizePercentage: Yup.string().required("Target Size Percentage is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         targetNumberOfInvestmentPlanned: Yup.string().required("Target Number Of Investment Planned is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),

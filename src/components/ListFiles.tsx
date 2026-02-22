@@ -69,7 +69,7 @@ export default function ListFiles(props: ListFilesProps) {
       border: 0,
     },
   }));
-  console.log(files);
+  // console.log(files);
   return <>{files.length > 0 ? <div style={{ margin: "10px 0px" }}>
     <TableContainer component={Paper}>
       <Table aria-label="customized table">

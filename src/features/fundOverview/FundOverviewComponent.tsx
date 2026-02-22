@@ -92,15 +92,15 @@ export const FundOverview = (props: any) => {
         { label: 'Preview', path: 'preview' },
     ].find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
 
-    const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
+    // const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 
     return (
         <Container maxWidth="xl" sx={{ pt: '120px', pb: '50px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '30px' }}>
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#363062', mb: 0.5 }}>
+                    {/* <Typography variant="h5" sx={{ fontWeight: 700, color: '#363062', mb: 0.5 }}>
                         {pageTitle}
-                    </Typography>
+                    </Typography> */}
                     <Breadcrumbs aria-label="breadcrumb">
                         <LinkMui
                             sx={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
@@ -124,9 +124,9 @@ export const FundOverview = (props: any) => {
                         </Typography>
                     </Breadcrumbs>
                 </Box>
-                <Box>
+                {/* <Box>
                     <Button variant="contained" sx={{ backgroundColor: '#34344b', color: 'white', fontWeight: 600, textTransform: 'capitalize' }} startIcon={<KeyboardDoubleArrowLeftIcon />} className='btn-dark' href="#/home">Back To Application List</Button>
-                </Box>
+                </Box> */}
             </Box>
             <Box sx={{ flexGrow: 1 }}>
                 {/* Chevron Stepper */}

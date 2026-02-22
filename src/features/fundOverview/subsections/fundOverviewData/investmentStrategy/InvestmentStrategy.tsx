@@ -41,18 +41,18 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
 
     const validationSchema = Yup.object().shape({
         isStrategyBasis: Yup.string().required("This field is required").nullable(),
-        isFocusSectors: Yup.string().required("This field is required").nullable(),
+        // isFocusSectors: Yup.string().required("This field is required").nullable(),
         isComparisonPast: Yup.string().required("This field is required").nullable(),
-        isSignificantChange: Yup.string().required("This field is required").nullable(),
+        // isSignificantChange: Yup.string().required("This field is required").nullable(),
         isSectorSituations: Yup.string().required("This field is required").nullable(),
         isControlsRights: Yup.string().required("This field is required").nullable(),
-        isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
+        // isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
         isRisksMitigation: Yup.string().required("This field is required").nullable(),
         isRolledOverInvestments: Yup.string().required("This field is required").nullable(),
         isGrossReturnObjective: Yup.string().required("This field is required").nullable(),
         isTargetInvestmentSize: Yup.string().required("This field is required").nullable(),
         isTargetNumberInvestments: Yup.string().required("This field is required").nullable(),
-        isAverageHoldingPeriod: Yup.string().required("This field is required").nullable(),
+        // isAverageHoldingPeriod: Yup.string().required("This field is required").nullable(),
         isExitStrategy: Yup.string().required("This field is required").nullable(),
     });
 
@@ -92,6 +92,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
 
     const qSx = { mb: 3 };
     const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
+
+    errors && console.log('errors', JSON.stringify(errors));
 
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
         return (
