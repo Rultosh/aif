@@ -45,6 +45,10 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
         msInvestigationDetails: Yup.string().required("This field is required").nullable(),
         msExclusiveVC: Yup.string().required("This field is required").nullable(),
         msDirectorshipsPolicy: Yup.string().required("This field is required").nullable(),
+        otConsolidatedInfo: Yup.string().required("This field is required").nullable(),
+        otNAVFrequency: Yup.string().required("This field is required").nullable(),
+        otValuationReport: Yup.string().required("This field is required").nullable(),
+        otNAVGuidelines: Yup.string().required("This field is required").nullable(),
     });
 
     const {

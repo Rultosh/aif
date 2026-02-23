@@ -1,6 +1,6 @@
 import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
-import {  fetchInvestmentTeamsAssociateLevelAsync, selectInvestmentAssociate, createInvestmentTeamsAssociateLevelAsync, deleteInvestmentTeamsAssociateLevelAsync } from './investmentAssociateSlice'
+import { fetchInvestmentTeamsAssociateLevelAsync, selectInvestmentAssociate, createInvestmentTeamsAssociateLevelAsync, deleteInvestmentTeamsAssociateLevelAsync } from './investmentAssociateSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
@@ -44,7 +44,6 @@ export const InvestmentAssociate = (props: InvestmentAssociateProps) => {
         dispatch(fetchInvestmentTeamsAssociateLevelAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
-        setOpen(false)
     }, [investmentAssociatesState.actionStatus.fetchStatus === FetchStatus.IDLE, prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     useEffect(() => {
@@ -52,7 +51,6 @@ export const InvestmentAssociate = (props: InvestmentAssociateProps) => {
         dispatch(fetchInvestmentTeamsAssociateLevelAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
-        setOpen(false)
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Investment Experience", "Details of the Companies Invested", "Action"]
@@ -70,38 +68,36 @@ export const InvestmentAssociate = (props: InvestmentAssociateProps) => {
         <Box >
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 <Grid item xs={11.5}>
-                    <Box >
-                        <TableContainer component={Paper}  >
-                            <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
-                                <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
-                                    <TableRow>
-                                        {headerComponent}
-                                    </TableRow>
-                                </TableHead>
-                                {investmentAssociatesState.status.fetchStatus == FetchStatus.IDLE && investmentAssociatesState.actionStatus.fetchStatus == FetchStatus.IDLE?
+                    <TableContainer component={Paper} >
+                        <Table sx={{ minWidth: 700, m: 0 }} aria-label="customized table">
+                            <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
+                                <TableRow>
+                                    {headerComponent}
+                                </TableRow>
+                            </TableHead>
+                            {investmentAssociatesState.status.fetchStatus == FetchStatus.IDLE && investmentAssociatesState.actionStatus.fetchStatus == FetchStatus.IDLE ?
                                 <TableBody>
-                                    {investmentAssociatesState.investmentAssociates && investmentAssociatesState.investmentAssociates.length > 0?
+                                    {investmentAssociatesState.investmentAssociates && investmentAssociatesState.investmentAssociates.length > 0 ?
                                         investmentAssociatesState.investmentAssociates.map((row: IInvestmentAssociate) => (
-                                            <InvestmentAssociateRow row={row}/>
-                                    )):<TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
+                                            <InvestmentAssociateRow row={row} />
+                                        )) : <TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
                                     }
-                                </TableBody>:<TableBody>
+                                </TableBody> : <TableBody>
                                     <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
                                 </TableBody>}
-                            </Table>
-                        </TableContainer>
-                    </Box>
+                        </Table>
+                    </TableContainer>
                 </Grid>
                 <Grid item xs={11.5}>
                     <Button onClick={handleOpen} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Add
                     </Button>
-                    <InvestmentAssociateModel 
+                    <InvestmentAssociateModel
                         key='add-investment-partner'
-                        investmentAssociateFormData={defaultInvestmentAssociate} 
-                        open={open} 
-                        handleClose={handleClose} 
-                        prelimApplicationId={props.prelimApplicationId}/>
+                        investmentAssociateFormData={defaultInvestmentAssociate}
+                        open={open}
+                        handleClose={handleClose}
+                        prelimApplicationId={props.prelimApplicationId} />
                 </Grid>
             </Grid>
         </Box>

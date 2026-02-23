@@ -51,7 +51,6 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
         dispatch(fetchInvestmentTeamsPartnerLevelAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
-        setOpen(false)
     }, [investmentPartnersState.actionStatus.fetchStatus === FetchStatus.IDLE, prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     useEffect(() => {
@@ -59,7 +58,6 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
         dispatch(fetchInvestmentTeamsPartnerLevelAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
-        setOpen(false)
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     const tableHeaders = ["Name", "Designation", "Age", "Qualification", "VC/ PE Experience", "Brief Details of VC/PE Experience", "Action"]
@@ -84,16 +82,16 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
                                     {headerComponent}
                                 </TableRow>
                             </TableHead>
-                            {investmentPartnersState.status.fetchStatus == FetchStatus.IDLE && investmentPartnersState.actionStatus.fetchStatus == FetchStatus.IDLE?
-                            <TableBody>
-                                {investmentPartnersState.investmentPartners && investmentPartnersState.investmentPartners.length > 0?
-                                    investmentPartnersState.investmentPartners.map((row: IInvestmentPartner) => (
-                                        <InvestmentPartnerRow row={row}/>
-                                )):<TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
-                                }
-                            </TableBody>:<TableBody>
-                                <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
-                            </TableBody>}
+                            {investmentPartnersState.status.fetchStatus == FetchStatus.IDLE && investmentPartnersState.actionStatus.fetchStatus == FetchStatus.IDLE ?
+                                <TableBody>
+                                    {investmentPartnersState.investmentPartners && investmentPartnersState.investmentPartners.length > 0 ?
+                                        investmentPartnersState.investmentPartners.map((row: IInvestmentPartner) => (
+                                            <InvestmentPartnerRow row={row} />
+                                        )) : <TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
+                                    }
+                                </TableBody> : <TableBody>
+                                    <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
+                                </TableBody>}
                         </Table>
                     </TableContainer>
                 </Grid>
@@ -101,12 +99,12 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
                     <Button onClick={handleOpen} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Add
                     </Button>
-                    <InvestmentPartnerModel 
+                    <InvestmentPartnerModel
                         key='add-investment-partner'
-                        investmentPartnerFormData={defaultInvestmentPartner} 
-                        open={open} 
-                        handleClose={handleClose} 
-                        prelimApplicationId={props.prelimApplicationId}/>
+                        investmentPartnerFormData={defaultInvestmentPartner}
+                        open={open}
+                        handleClose={handleClose}
+                        prelimApplicationId={props.prelimApplicationId} />
                 </Grid>
             </Grid>
         </Box>

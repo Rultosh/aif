@@ -137,14 +137,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         }
 
         setPrelimApplicationFormData(copiedValue)
-        // live update words for contribution field
-        if (ev.target.id === 'contributionSought') {
-            const numValue = parseFloat(value) || 0;
-            setContributionWords(numberToWordsIndian(numValue * 10000000));
-        }
     };
-
-    const [contributionWords, setContributionWords] = useState<string>('');
 
     const numberToWordsIndian = (input: any) => {
         if (input === null || input === undefined) return '';
@@ -166,7 +159,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             return convert(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + convert(n % 10000000) : '');
         }
 
-        if(num !== undefined && convert(num) != undefined) {
+        if (num !== undefined && convert(num) != undefined) {
             const result = convert(num).trim();
             return result ? result + ' Rupees only' : '';
         } else {
@@ -202,7 +195,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         'sdTotalTargetCorpus', 'sdGreenShoeTargetCorpusDomestic',
         'sdGreenShoeTargetCorpusOverseas', 'sdGreenShoeTotalTargetCorpus',
         'sdFirstClosingDomesticAmount', 'sdFirstClosingOverseasAmount',
-        'fundSetupCost',
+        'fundSetupCost', 'otherExpenses',
         ...percentageFields,
         ...monthFields
     ];
@@ -229,9 +222,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             if (!isNaN(numValue)) {
                 const formattedValue = numValue.toFixed(2);
                 setValue(id as any, formattedValue);
-                if (id === 'contributionSought') {
-                    setContributionWords(numberToWordsIndian(parseFloat(formattedValue) * 10000000));
-                }
 
                 const updateTotals = (valId: string, totalId: string, domesticId: string, overseasId: string) => {
                     const values = getValues();
@@ -354,35 +344,36 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         contributionSought: Yup.string().required("Contribution Sought is required").test("test-name", "Enter value that cannot exceed 25% of target corpus", function (value: any) {
             let sdTotalTargetCorpusVal = Number(prelimApplicationFormData.sdTotalTargetCorpus || '0');
-            let contributionSoughtVal = Number(prelimApplicationFormData.contributionSought || '0');
+            let contributionSoughtVal = Number(value || '0');
             let sdTotalTargetCorpusValCalc = sdTotalTargetCorpusVal * 0.25; // Not more than 25%
             if (sdTotalTargetCorpusValCalc < contributionSoughtVal) {
                 return false;
             }
             return true;
-        }),
-        termOfFund: Yup.number().typeError("Term of Fund must be a number").required("Term of Fund is required").min(0, "Negative values not allowed"),
-        commitmentPeriod: Yup.number().typeError("Commitment Period must be a number").required("Commitment Period is required").min(0, "Negative values not allowed"),
-        preferredReturn: Yup.number().typeError("Preferred Return must be a number").required("Preferred Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
-        managementFees: Yup.number().typeError("Management Fees must be a number").required("Management Fees is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
-        carriedInterest: Yup.number().typeError("Carried Interest must be a number").required("Carried Interest is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
+        }).nullable(),
+        termOfFund: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Term of Fund must be a number").required("Term of Fund is required").min(0, "Negative values not allowed"),
+        commitmentPeriod: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Commitment Period must be a number").required("Commitment Period is required").min(0, "Negative values not allowed"),
+        preferredReturn: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Preferred Return must be a number").required("Preferred Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
+        managementFees: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Management Fees must be a number").required("Management Fees is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
+        carriedInterest: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Carried Interest must be a number").required("Carried Interest is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         // investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        sdDescription: Yup.string().required("Capital raised till date is required"),
-        sdTargetCorpusDomestic: Yup.number().typeError("Domestic must be a number").required("Domestic is required").min(0, "Negative values not allowed"),
-        sdTargetCorpusOverseas: Yup.number().typeError("Overseas must be a number").required("Overseas is required").min(0, "Negative values not allowed"),
-        sdTotalTargetCorpus: Yup.number().required("Total Target Corpus is required").min(100, "Value less than Rs. 100 crores shall not be allowed"),
-        sdGreenShoeTargetCorpusDomestic: Yup.number().typeError("Domestic (Green Shoe) must be a number").required("Domestic (Green Shoe) is required").min(0, "Negative values not allowed"),
-        sdGreenShoeTargetCorpusOverseas: Yup.number().typeError("Overseas (Green Shoe) must be a number").required("Overseas (Green Shoe) is required").min(0, "Negative values not allowed"),
-        sdGreenShoeTotalTargetCorpus: Yup.number().typeError("Total Target Corpus (Green Shoe) must be a number").required("Total Target Corpus (Green Shoe) is required").min(0, "Negative values not allowed"),
-        sdFirstClosingDomesticAmount: Yup.number().typeError("Domestic Amount must be a number").required("Domestic Amount is required").min(0, "Negative values not allowed"),
-        sdFirstClosingOverseasAmount: Yup.number().typeError("Overseas Amount must be a number").required("Overseas Amount is required").min(0, "Negative values not allowed"),
+        sdDescription: Yup.string().required("Capital raised till date is required").nullable(),
+        sdTargetCorpusDomestic: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic must be a number").required("Domestic is required").min(0, "Negative values not allowed"),
+        sdTargetCorpusOverseas: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Overseas must be a number").required("Overseas is required").min(0, "Negative values not allowed"),
+        sdTotalTargetCorpus: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("Total Target Corpus is required").min(100, "Value less than Rs. 100 crores shall not be allowed"),
+        sdGreenShoeTargetCorpusDomestic: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic (Green Shoe) must be a number").required("Domestic (Green Shoe) is required").min(0, "Negative values not allowed"),
+        sdGreenShoeTargetCorpusOverseas: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Overseas (Green Shoe) must be a number").required("Overseas (Green Shoe) is required").min(0, "Negative values not allowed"),
+        sdGreenShoeTotalTargetCorpus: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Total Target Corpus (Green Shoe) must be a number").required("Total Target Corpus (Green Shoe) is required").min(0, "Negative values not allowed"),
+        sdFirstClosingDomesticAmount: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic Amount must be a number").required("Domestic Amount is required").min(0, "Negative values not allowed"),
+        sdFirstClosingOverseasAmount: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Overseas Amount must be a number").required("Overseas Amount is required").min(0, "Negative values not allowed"),
         sdFirstClosingDomesticAmountDate: Yup.string().required("This value is required").nullable(),
         // sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
-        aifCategoryType: Yup.string().required("AIF Category Type is required"),
-        targetReturnIRR: Yup.number().typeError("Target Return must be a number").required("Target Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
-        fundSetupCost: Yup.number().typeError("Fund set up cost must be a number").required("Fund set up cost is required").min(0, "Negative values not allowed"),
-        justificationForHurdleCarryInterestRate: Yup.string().required("Justification for Hurdle and carry interest rate is required"),
+        aifCategoryType: Yup.string().required("AIF Category Type is required").nullable(),
+        targetReturnIRR: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Target Return must be a number").required("Target Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
+        fundSetupCost: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Fund set up cost must be a number").required("Fund set up cost is required").min(0, "Negative values not allowed"),
+        otherExpenses: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Other expenses must be a number").required("Other expenses is required").min(0, "Negative values not allowed"),
+        justificationForHurdleCarryInterestRate: Yup.string().required("Justification for Hurdle and carry interest rate is required").nullable(),
     });
 
     const {
@@ -529,26 +520,26 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
                             <InputLabel id="demo-simple-select-standard-label"
                                 sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}
-                                >Fund Manager {prelimApplicationFormData.fundManager}</InputLabel>
+                            >Fund Manager {prelimApplicationFormData.fundManager}</InputLabel>
                             <Select
                                 labelId="fundManager"
                                 id="fundManager"
                                 value={prelimApplicationFormData.fundManager || ""}
                                 onChange={handleChange}
                                 name="fundManager"
-                                // defaultValue={prelimApplicationFormData.fundManager || ""}
+                            // defaultValue={prelimApplicationFormData.fundManager || ""}
                             >
-                                <MenuItem 
+                                <MenuItem
                                     // selected={prelimApplicationFormData.fundManager === "First time Fund Manager"}
-                                    key={"First time Fund Manager"} 
+                                    key={"First time Fund Manager"}
                                     value={"First time Fund Manager"}>First time Fund Manager</MenuItem>
-                                <MenuItem 
+                                <MenuItem
                                     // selected={prelimApplicationFormData.fundManager === "Two funds managed"}
                                     key={"Two funds managed"}
                                     value={"Two funds managed"}>Two funds managed</MenuItem>
-                                <MenuItem 
+                                <MenuItem
                                     // selected={prelimApplicationFormData.fundManager === "More than two funds managed"}
-                                    key={"More than two funds managed"} 
+                                    key={"More than two funds managed"}
                                     value={"More than two funds managed"}>More than two funds managed</MenuItem>
                             </Select>
                         </FormControl>
@@ -582,7 +573,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 onChange={handleSelectChange} />
                         </FormControl> */}
                         <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
-                            <InputLabel id="demo-simple-select-standard-label" 
+                            <InputLabel id="demo-simple-select-standard-label"
                                 sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}>AIF Category</InputLabel>
                             <Select
                                 labelId="aifCategory"
@@ -590,16 +581,16 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 value={prelimApplicationFormData.aifCategory || ""}
                                 onChange={handleChange}
                                 name="aifCategory"
-                                // defaultValue={prelimApplicationFormData.aifCategory || ""}
+                            // defaultValue={prelimApplicationFormData.aifCategory || ""}
                             >
-    
-                                <MenuItem 
+
+                                <MenuItem
                                     // selected={prelimApplicationFormData.aifCategory === "Category I"}
-                                    key={"Category I"} 
+                                    key={"Category I"}
                                     value={"Category I"}>Category I</MenuItem>
-                                <MenuItem 
+                                <MenuItem
                                     // selected={prelimApplicationFormData.aifCategory === "Category II"}
-                                    key={"Category II"} 
+                                    key={"Category II"}
                                     value={"Category II"}>Category II</MenuItem>
                             </Select>
                         </FormControl>
@@ -814,11 +805,17 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number"
                             id="fundSetupCost"
-                            label="Fund set up cost"
+                            label="Fund set up cost (₹ Crore)"
                             value={prelimApplicationFormData.fundSetupCost || ''}
                             {...register("fundSetupCost")}
                             error={!!errors.fundSetupCost}
-                            helperText={errors.fundSetupCost?.message as string}
+                            helperText={
+                                errors.fundSetupCost
+                                    ? (errors.fundSetupCost.message as string)
+                                    : (prelimApplicationFormData?.fundSetupCost
+                                        ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.fundSetupCost)) * 10000000)
+                                        : '')
+                            }
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
@@ -831,11 +828,17 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number"
                             id="otherExpenses"
-                            label="Other expenses"
+                            label="Other expenses (₹ Crore)"
                             value={prelimApplicationFormData.otherExpenses || ''}
                             {...register("otherExpenses")}
                             error={!!errors.otherExpenses}
-                            helperText={errors.otherExpenses?.message as string}
+                            helperText={
+                                errors.otherExpenses
+                                    ? (errors.otherExpenses.message as string)
+                                    : (prelimApplicationFormData?.otherExpenses
+                                        ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.otherExpenses)) * 10000000)
+                                        : '')
+                            }
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"

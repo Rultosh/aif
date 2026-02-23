@@ -41,8 +41,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const validationSchema = Yup.object().shape({
         dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable(),
         dfCurrentPipeline: Yup.string().required("This field is required").nullable(),
-        dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
-        // dfConversionRatio: Yup.string().required("This field is required").nullable(),
+        // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
+        dfConversionRatio: Yup.string().required("This field is required").nullable(),
     });
 
     const {
@@ -127,7 +127,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfConversionRatio?.message as string}
                             variant="outlined"
                         /> */}
-                        
+
                         <TextField
                             required
                             fullWidth

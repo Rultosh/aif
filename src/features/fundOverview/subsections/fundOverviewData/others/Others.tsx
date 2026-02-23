@@ -41,16 +41,10 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
     const validationSchema = Yup.object().shape({
         otExternalFirms: Yup.string().required("This field is required").nullable(),
         otMonitoringActivities: Yup.string().required("This field is required").nullable(),
-        otReportsFrequency: Yup.string().required("This field is required").nullable(),
         otContributorTerms: Yup.string().required("This field is required").nullable(),
         otPlacementAgents: Yup.string().required("This field is required").nullable(),
         otDecisionApprovals: Yup.string().required("This field is required").nullable(),
         otEmployeeCost: Yup.string().required("This field is required").nullable(),
-        otReportingStructure: Yup.string().required("This field is required").nullable(),
-        otConsolidatedInfo: Yup.string().required("This field is required").nullable(),
-        otNAVFrequency: Yup.string().required("This field is required").nullable(),
-        otValuationReport: Yup.string().required("This field is required").nullable(),
-        otNAVGuidelines: Yup.string().required("This field is required").nullable(),
     });
 
     const {

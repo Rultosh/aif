@@ -28,21 +28,21 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
   const [actionUid] = useState(uuid())
   const [investmentPartnerFormData, setInvestmentPartnerFormData] = useState(defaultInvestmentPartner)
-  
+
   const dispatch = useAppDispatch();
 
-  function handleSubmitForm() {
-    console.log("Saving investment partner", investmentPartnerFormData)
-    if (investmentPartnerFormData.id) {
-      dispatch(
+  async function handleSubmitForm(data: IInvestmentPartner) {
+    console.log("Saving investment partner", data)
+    if (data.id) {
+      return await dispatch(
         updateInvestmentTeamsPartnerLevelAsync(
-          wrapArgument(actionUid, investmentPartnerFormData)
+          wrapArgument(actionUid, data)
         )
       )
     } else {
-      dispatch(
+      return await dispatch(
         createInvestmentTeamsPartnerLevelAsync(
-          wrapArgument(actionUid, investmentPartnerFormData)
+          wrapArgument(actionUid, data)
         )
       )
     }
@@ -184,16 +184,22 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     let hasIdOnAction = data.id;
     console.log('hasIdOnAction', hasIdOnAction, data.id);
-    setInvestmentPartnerFormData(data);
-    handleSubmitForm();
-    console.log('hasIdOnAction', hasIdOnAction, data.id, hasIdOnAction !== undefined);
-    if(hasIdOnAction) {
-      handleCloseModal();
-    } else {
-      return false;
+    const result = await handleSubmitForm(data);
+
+    if (result && result.payload) {
+      const savedData = result.payload as IInvestmentPartner;
+      setInvestmentPartnerFormData(savedData);
+      reset(savedData);
+
+      if (hasIdOnAction) {
+        handleCloseModal();
+      } else {
+        // New record saved, id is now available, UI will update automatically
+        dispatch(getAllInvestmentResponsibleAsLeadsAsnyc(wrapArgument(actionUid, Number(savedData.id))));
+      }
     }
   };
 
@@ -538,23 +544,23 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
             </TableContainer>
           </Grid>
 
-          <Grid item xs={12}>
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                  <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Bio-Data</Typography>
-                  <UploadComponents id={`sdPartnerResume${investmentPartnerFormData.id || uuid()}`} signed={false} />
-                </Box>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                    <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Bio-Data</Typography>
+                    <UploadComponents id={`sdPartnerResume${investmentPartnerFormData.id || uuid()}`} signed={false} />
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                    <Typography variant="body2" sx={{ mb: 1 }}>Experience supporting document</Typography>
+                    <UploadComponents id={`sdPartnerExperience${investmentPartnerFormData.id || uuid()}`} signed={false} />
+                  </Box>
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                  <Typography variant="body2" sx={{ mb: 1 }}>Experience supporting document</Typography>
-                  <UploadComponents id={`sdPartnerExperience${investmentPartnerFormData.id || uuid()}`} signed={false} />
-                </Box>
-              </Grid>
-            </Grid>
-          </Grid></>}
+            </Grid></>}
 
           <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
             <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>

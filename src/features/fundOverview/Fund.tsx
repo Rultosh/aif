@@ -117,7 +117,7 @@ export const Fund = (props: any) => {
                 }, 300);
             } else {
                 // If it's the last panel, go to next page
-                navigate(`/preliminary/${prelimApplicationId}/profile`);
+                navigate(`/preliminary/${prelimApplicationId}/declaration`);
             }
         }
     };
@@ -131,12 +131,20 @@ export const Fund = (props: any) => {
             misRef.current?.submit()
         ]);
 
-        console.log("allValid", results);
+        const sectionNames = ["Fund Overview", "Investment Strategy", "Deal Flow", "Others", "MIS"];
+        const panels = ["1", "2", "7", "10", "9"];
+
+        results.forEach((isValid, index) => {
+            if (isValid === false) {
+                console.log(`Validation failed in section: ${sectionNames[index]} (Panel ${panels[index]})`);
+            }
+        });
+
+        console.log("allValid results", results);
 
         const allValid = results.every(res => res === true);
         if (!allValid) {
             const firstInvalidIndex = results.findIndex(res => res === false);
-            const panels = ["1", "2", "7", "9", "10"];
             if (firstInvalidIndex !== -1) {
                 setExpanded(panels[firstInvalidIndex]);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
