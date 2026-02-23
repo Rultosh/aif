@@ -547,7 +547,7 @@ const SignUp = () => {
                                 >
                                     Sign Up
                                 </Button>
-                                <Button
+                                {/* <Button
                                     variant="outlined"
                                     disableElevation
                                     sx={{
@@ -568,7 +568,7 @@ const SignUp = () => {
                                     onClick={handleReset}
                                 >
                                     Reset
-                                </Button>
+                                </Button> */}
                             </Grid>
 
                             <Grid item xs={12}>
@@ -591,7 +591,7 @@ const SignUp = () => {
                     </Box>
 
                     <Typography variant="body2" sx={{ mt: 1, mb: 2, textAlign: "center", color: '#64748b' }}>
-                        For any help, email us at <span style={{ color: '#363062', fontWeight: 600 }}>vcfapplication@sidbi.in</span>
+                        For any help, email us at <span style={{ color: '#363062', fontWeight: 600 }}>aif.investment@npstrust.org.in</span>
                     </Typography>
                 </Paper>
 

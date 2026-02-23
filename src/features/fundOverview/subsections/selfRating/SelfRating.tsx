@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react"
 import { questions } from './selfRatingQuestions'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -88,7 +88,7 @@ export const SelfRating = (props: any) => {
     async function handleClickSave() {
         console.log(selfRatingValue.id)
         if (!selfRatingValue.id) {
-            if(Number(id)) {
+            if (Number(id)) {
                 await dispatch(
                     createSelfRatingAsync(
                         wrapArgument(actionUid, { ...selfRatingValue, prelimApplicationId: Number(id) })
@@ -228,7 +228,7 @@ export const SelfRating = (props: any) => {
                                         </RadioGroup>
                                     </FormControl>
 
-                                    <Divider sx={{ mb: 3, opacity: 0.6 }} />
+                                    {/* <Divider sx={{ mb: 3, opacity: 0.6 }} />
 
                                     <TextField
                                         fullWidth
@@ -246,7 +246,7 @@ export const SelfRating = (props: any) => {
                                                 backgroundColor: 'rgba(54, 48, 98, 0.01)'
                                             }
                                         }}
-                                    />
+                                    /> */}
                                 </Grid>
                             </Grid>
                         </CardContent>
@@ -254,6 +254,28 @@ export const SelfRating = (props: any) => {
                 </React.Fragment>)
         }
     }
+
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmitClick = async () => {
+        setIsLoading(true);
+        try {
+            await handleClickSave();
+            setIsSubmitted(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleNextClick = async (e: any) => {
+        setIsLoading(true);
+        try {
+            await handleClick(e, "next");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="formAnimation">
@@ -335,33 +357,101 @@ export const SelfRating = (props: any) => {
                     <Divider sx={{ mb: 4 }} />
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box></Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {/* Sticky Save Icon will be handled outside this Box for screen positioning */}
+                        </Box>
 
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                            <Button
-                                onClick={(e) => handleClick(e, "next")}
-                                endIcon={<ArrowRightIcon />}
-                                variant="contained"
-                                sx={{
-                                    textTransform: 'none',
-                                    borderRadius: '8px',
-                                    px: 4,
-                                    py: 1.5,
-                                    fontWeight: 700,
-                                    backgroundColor: '#363062',
-                                    color: 'white',
-                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
-                                    '&:hover': {
-                                        backgroundColor: '#4d4585',
-                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
-                                    }
-                                }} >
-                                Save & Continue to Fund Overview
-                            </Button>
+                            {!isSubmitted ? (
+                                <Button
+                                    onClick={handleSubmitClick}
+                                    variant="contained"
+                                    disabled={isLoading}
+                                    startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
+                                    sx={{
+                                        textTransform: 'none',
+                                        borderRadius: '8px',
+                                        px: 6,
+                                        py: 1.5,
+                                        fontWeight: 700,
+                                        backgroundColor: '#363062',
+                                        color: 'white',
+                                        boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
+                                        '&:hover': {
+                                            backgroundColor: '#4d4585',
+                                            boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                        }
+                                    }}
+                                >
+                                    Submit
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={handleNextClick}
+                                    startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
+                                    endIcon={!isLoading && <ArrowRightIcon />}
+                                    variant="contained"
+                                    disabled={isLoading}
+                                    sx={{
+                                        textTransform: 'none',
+                                        borderRadius: '8px',
+                                        px: 4,
+                                        py: 1.5,
+                                        fontWeight: 700,
+                                        backgroundColor: '#363062',
+                                        color: 'white',
+                                        boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
+                                        '&:hover': {
+                                            backgroundColor: '#4d4585',
+                                            boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                        }
+                                    }} >
+                                    Save & Continue to Fund Overview
+                                </Button>
+                            )}
                         </Box>
                     </Box>
                 </CardContent >
             </Card >
+
+            {/* Sticky Save Button */}
+            <Box
+                sx={{
+                    position: 'fixed',
+                    right: 0,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 2000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1
+                }}
+            >
+                <Button
+                    onClick={(e) => !isSubmitted ? handleSubmitClick() : handleNextClick(e)}
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{
+                        minWidth: 'auto',
+                        width: isLoading ? '80px' : '48px',
+                        height: '48px',
+                        borderRadius: '12px 0 0 12px',
+                        backgroundColor: '#363062',
+                        color: 'white',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '-2px 0 10px rgba(54, 48, 98, 0.3)',
+                        '&:hover': {
+                            backgroundColor: '#4d4585',
+                            width: isLoading ? '80px' : '56px',
+                        }
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {isLoading && <CircularProgress size={20} color="inherit" />}
+                        <SaveIcon />
+                    </Box>
+                </Button>
+            </Box>
         </div>
     );
 }
