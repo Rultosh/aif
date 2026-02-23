@@ -93,7 +93,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     const qSx = { mb: 3 };
     const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
 
-    errors && console.log('errors', JSON.stringify(errors));
+    // errors && console.log('errors', JSON.stringify(errors));
 
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
         return (

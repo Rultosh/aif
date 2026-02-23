@@ -404,7 +404,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         savePrelimApplicationForm();
     };
 
-    errors && console.log('errors', JSON.stringify(errors));
+    // errors && console.log('errors', JSON.stringify(errors));
 
     useImperativeHandle(ref, () => ({
         submit: async () => {
