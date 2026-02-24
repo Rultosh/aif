@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import { selectUsers } from '../admin/adminSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { selectPrelimApplication } from "../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
+import { selectSelfRatings } from "../fundOverview/subsections/selfRating/selfRatingSlice"
 // import { UserContext } from '../../App';
 // import useCookie, { getCookie } from 'react-use-cookie';
 // import WarningIcon from '@mui/icons-material/Warning';
@@ -29,6 +30,7 @@ export const FundOverview = (props: any) => {
     const [localId, setLocalId] = useState<string>();
     const usersState = useAppSelector(selectUsers)
     const prelimApplicationState = useAppSelector(selectPrelimApplication);
+    const selfRatingState = useAppSelector(selectSelfRatings);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
     const navigate = useNavigate();
 
@@ -139,6 +141,8 @@ export const FundOverview = (props: any) => {
                         { label: 'Preview', path: 'preview', subLabel: 'Review' },
                     ].map((s, index, array) => {
                         const isNew = id?.toString() === 'NEW';
+                        const score = Number(selfRatingState.selfRatings.score || 0);
+                        const isFailed = score < 0.7;
 
                         const currentPath = pathname.toLowerCase();
                         const activeIndex = array.findIndex(item => currentPath.includes(item.path.toLowerCase()));
@@ -146,7 +150,7 @@ export const FundOverview = (props: any) => {
                         const isActive = index === activeIndex;
                         const isPending = index > activeIndex;
 
-                        const isDisabled = isNew && isPending;
+                        const isDisabled = (isNew && isPending) || (isFailed && isPending);
 
                         // Colors from reference
                         const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#363062' : '#818181');

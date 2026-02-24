@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress, Switch } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress, Switch, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useState, useEffect } from "react"
 import { questionsForMoreThanOne } from './selfRatingQuestionsMoreThanOne'
 import { questionsForFirstTime } from './selfRatingQuestionsFirstTime'
@@ -62,15 +62,42 @@ export const SelfRating = (props: any) => {
     }, [selfRatingState.actionStatus.fetchStatus === FetchStatus.IDLE])
 
     useEffect(() => {
-        console.log(selfRatingState.selfRatings);
+        console.log("SelfRating data loaded:", selfRatingState.selfRatings);
         setSelfRatingValue(selfRatingState.selfRatings);
+
+        // Initialize questions and scoreboard based on loaded data
+        const currentManagerType = selfRatingState.selfRatings.fundManagerType || "First Time Fund Manager";
+        const questions = currentManagerType === "First Time Fund Manager"
+            ? questionsForFirstTime.selfRatingQuestions
+            : questionsForMoreThanOne.selfRatingQuestions;
+
+        setSelfQuestions(questions);
+        setFundManagerType(currentManagerType);
+
+        const newScoreBoard: any = {};
+        questions.forEach((q, index) => {
+            const answer = selfRatingState.selfRatings[`q${index + 1}` as keyof ISelfRating];
+            if (answer) {
+                const optIndex = q.options.indexOf(String(answer));
+                if (optIndex !== -1) {
+                    newScoreBoard[index] = {
+                        weight: q.weightage[optIndex],
+                        contribution: q.contribution
+                    };
+                }
+            }
+        });
+        console.log("Initialized ScoreBoard:", newScoreBoard);
+        setScoreBoard(newScoreBoard);
+
+        // Set isSubmitted based on initial data
+        const initialScore = Number(selfRatingState.selfRatings.score || 0);
+        if (selfRatingState.selfRatings.id && initialScore >= 0.7) {
+            setIsSubmitted(true);
+        } else {
+            setIsSubmitted(false);
+        }
     }, [selfRatingState.status.fetchStatus === FetchStatus.IDLE])
-
-    useEffect(() => {
-        updateScore()
-        console.log("use Effect running due to scoreBoard chnage");
-
-    }, [scoreBoard])
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -155,8 +182,9 @@ export const SelfRating = (props: any) => {
         setFundManagerType(e.target.value as String);
         setSelfQuestions(e.target.value === "First Time Fund Manager" ?
             questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
-        setScoreBoard(copiedValue);
+        setScoreBoard({});
         setSelfRatingValue(copiedValue);
+        setIsSubmitted(false);
     };
 
 
@@ -168,6 +196,7 @@ export const SelfRating = (props: any) => {
         copiedValue[key as keyof ISelfRating] = e.target.value as any;
         // setValue(e.target.id, e.target.value);
         setSelfRatingValue(copiedValue);
+        setIsSubmitted(false);
     };
 
     function getValue(key: string): string {
@@ -262,12 +291,22 @@ export const SelfRating = (props: any) => {
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [showResultModal, setShowResultModal] = useState(false);
+    const [modalType, setModalType] = useState<'success' | 'fail'>('success');
 
     const handleSubmitClick = async () => {
         setIsLoading(true);
         try {
             await handleClickSave();
-            setIsSubmitted(true);
+            const currentScore = Number(selfRatingValue.score || 0);
+            if (currentScore >= 0.7) {
+                setModalType('success');
+                setIsSubmitted(true);
+            } else {
+                setModalType('fail');
+                setIsSubmitted(false);
+            }
+            setShowResultModal(true);
         } finally {
             setIsLoading(false);
         }
@@ -366,7 +405,7 @@ export const SelfRating = (props: any) => {
                         {/* </CardContent>
                         </Card> */}
                         {selfRatingQuestionComponents}
-                        <Card sx={{
+                        {/* <Card sx={{
                             display: 'flex',
                             mt: 3,
                             borderRadius: '12px',
@@ -385,7 +424,7 @@ export const SelfRating = (props: any) => {
                                     </Grid>
                                 </Grid>
                             </CardContent>
-                        </Card>
+                        </Card> */}
                     </Box>
 
                     <Divider sx={{ mb: 4 }} />
@@ -486,6 +525,67 @@ export const SelfRating = (props: any) => {
                     </Box>
                 </Button>
             </Box>
+            {/* Assessment Result Modal */}
+            <Dialog
+                open={showResultModal}
+                onClose={() => setShowResultModal(false)}
+                PaperProps={{
+                    sx: {
+                        borderRadius: '16px',
+                        p: 1,
+                        maxWidth: '500px'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 800, color: '#363062', pb: 1 }}>
+                    {modalType === 'success' ? 'Assessment Successful' : 'Assessment Result'}
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1" sx={{ color: '#444', lineHeight: 1.6 }}>
+                        {modalType === 'success'
+                            ? "Thank you for your interest in the NPS Bharat Fund of Funds (NB-FoFs). We are happy to inform you that you have secured the minimum score to be eligible to apply for consideration under the NB-FoFs."
+                            : "Thank you for your interest in the NPS Bharat Fund of Funds (NB-FoFs). We regret to inform you that you have not secured the minimum score to be eligible to apply for consideration under the NB-FoFs."
+                        }
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, pt: 1 }}>
+                    {modalType === 'success' ? (
+                        <Button
+                            onClick={(e) => {
+                                setShowResultModal(false);
+                                handleNextClick(e);
+                            }}
+                            variant="contained"
+                            sx={{
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                px: 3,
+                                py: 1,
+                                fontWeight: 700,
+                                backgroundColor: '#363062'
+                            }}
+                        >
+                            Save & Continue to Fund Overview
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={() => setShowResultModal(false)}
+                            variant="outlined"
+                            sx={{
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                px: 4,
+                                py: 1,
+                                fontWeight: 700,
+                                color: '#363062',
+                                borderColor: '#363062'
+                            }}
+                        >
+                            OK
+                        </Button>
+                    )}
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }

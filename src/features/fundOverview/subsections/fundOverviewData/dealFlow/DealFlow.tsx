@@ -9,6 +9,8 @@ import { FetchStatus } from "../../../../../lib/api-status/IStatus";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import UploadIcon from '@mui/icons-material/Upload';
+import DocumentChip from "../../../../../components/DocumentChip";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -43,6 +45,14 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         dfCurrentPipeline: Yup.string().required("This field is required").nullable(),
         // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
         dfConversionRatio: Yup.number().required("This field is required").nullable(),
+        msMeetingFrequency: Yup.string().required("This field is required").nullable(),
+        msInvestigationDetails: Yup.string().required("This field is required").nullable(),
+        msExclusiveVC: Yup.string().required("This field is required").nullable(),
+        msDirectorshipsPolicy: Yup.string().required("This field is required").nullable(),
+        otConsolidatedInfo: Yup.string().required("This field is required").nullable(),
+        otNAVFrequency: Yup.string().required("This field is required").nullable(),
+        otValuationReport: Yup.string().required("This field is required").nullable(),
+        otNAVGuidelines: Yup.string().required("This field is required").nullable(),
     });
 
     const {
@@ -95,7 +105,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since fund inception and Conversion ratio for transactions sourced to those completed</Typography>
+                        <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since Fund inception and Conversion ratio for transactions sourced to those completed</Typography>
                         <TextField
                             fullWidth
                             {...register("dfTotalDealsEvaluated")}
@@ -115,31 +125,111 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             variant="outlined"
                         />
                     </Grid>
-
+                    
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. Conversion ratio for transactions sourced to those completed. </Typography>
-                        {/* <TextField
+                        <Typography variant="body1" sx={labelSx}>3. Frequency of meetings to update the contributor.</Typography>
+                        <TextField
                             fullWidth
                             multiline
-                            rows={3}
-                            {...register("dfConversionRatio")}
-                            error={!!errors.dfConversionRatio}
-                            helperText={errors.dfConversionRatio?.message as string}
+                            maxRows={4}
+                            {...register("msMeetingFrequency")}
+                            error={!!errors.msMeetingFrequency}
+                            helperText={errors.msMeetingFrequency?.message as string}
                             variant="outlined"
-                        /> */}
-
-                        <TextField
-                            required
-                            fullWidth
-                            type="number"
-                            id="dfConversionRatio"
-                            {...register("dfConversionRatio")}
-                            error={!!errors.dfConversionRatio}
-                            helperText={errors.dfConversionRatio?.message as string}
-                            variant="outlined"
-                            sx={numericSx}
-                            inputProps={{ min: 0 }}
                         />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>4. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employee(s) of the Investment Manager have been investigated by any regulatory authority during the last 5 years? If yes, please give full details of the same.</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            maxRows={4}
+                            {...register("msInvestigationDetails")}
+                            error={!!errors.msInvestigationDetails}
+                            helperText={errors.msInvestigationDetails?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>5. Is the Investment Manager exclusively handling VC business or is it also doing any other business or activity?</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            maxRows={4}
+                            {...register("msExclusiveVC")}
+                            error={!!errors.msExclusiveVC}
+                            helperText={errors.msExclusiveVC?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>6. How many directorships does each Investment Manager (employee) hold?</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            maxRows={4}
+                            {...register("msDirectorshipsPolicy")}
+                            error={!!errors.msDirectorshipsPolicy}
+                            helperText={errors.msDirectorshipsPolicy?.message as string}
+                            variant="outlined"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>7. What is the reporting structure/procedure for the contributors (quarterly/ half-yearly/annual)</Typography>
+
+                        <Box sx={{ ml: 2 }}>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Consolidated information of investee companies</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("otConsolidatedInfo")}
+                                error={!!errors.otConsolidatedInfo}
+                                helperText={errors.otConsolidatedInfo?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("otNAVFrequency")}
+                                error={!!errors.otNAVFrequency}
+                                helperText={errors.otNAVFrequency?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("otValuationReport")}
+                                error={!!errors.otValuationReport}
+                                helperText={errors.otValuationReport?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("otNAVGuidelines")}
+                                error={!!errors.otNAVGuidelines}
+                                helperText={errors.otNAVGuidelines?.message as string}
+                                variant="outlined"
+                                sx={{ mb: 2 }}
+                            />
+                        </Box>
                     </Grid>
 
                     <Grid item xs={12}>

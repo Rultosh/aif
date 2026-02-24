@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { FetchStatus } from "../../lib/api-status/IStatus";
 import UploadComponents from "../DetailedApplicationComponent/subsections/uploadComponents";
 import DealFlow from "./subsections/fundOverviewData/dealFlow/DealFlow";
-import MIS from "./subsections/fundOverviewData/mis/MIS";
+import LpAdvisoryGovernanceInvestmentCommittee from "./subsections/fundOverviewData/lpAdvisoryGovernanceInvestmentCommittee/LpAdvisoryGovernanceInvestmentCommittee";
 import Others from "./subsections/fundOverviewData/others/Others";
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
@@ -85,6 +85,7 @@ export const Fund = (props: any) => {
     const prelimRef = useRef<any>(null);
     const strategyRef = useRef<any>(null);
     const dealFlowRef = useRef<any>(null);
+    const lpAdvisoryGovernanceInvestmentCommitteeRef = useRef<any>(null);
     const othersRef = useRef<any>(null);
     const misRef = useRef<any>(null);
 
@@ -129,11 +130,12 @@ export const Fund = (props: any) => {
             prelimRef.current?.submit(),
             strategyRef.current?.submit(),
             dealFlowRef.current?.submit(),
+            lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit(),
             othersRef.current?.submit(),
             misRef.current?.submit()
         ]);
 
-        const sectionNames = ["Fund Overview", "Investment Strategy", "Deal Flow", "Others", "MIS"];
+        const sectionNames = ["Fund Overview", "Investment Strategy", "LP Advisory Governance and Investment Committee", "Deal Flow", "Others"];
         const panels = ["1", "2", "7", "10", "9"];
 
         results.forEach((isValid, index) => {
@@ -675,14 +677,14 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "7" ? '#363062' : '#444'
                                         }}>
-                                            Deal Flow
+                                            LP Advisory Governance and Investment Committee
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <DealFlow
-                                            ref={dealFlowRef}
+                                        <LpAdvisoryGovernanceInvestmentCommittee
+                                            ref={lpAdvisoryGovernanceInvestmentCommitteeRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("7", "8", null)}
@@ -736,38 +738,22 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "8" ? '#363062' : '#444'
                                         }}>
-                                            Past Investment Track Record Of the AMC
+                                            Deal Flow/MIS
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <Box sx={{ border: '1px dashed #ccc', borderRadius: '8px', p: 2, mb: 2, backgroundColor: '#fafafa' }}>
-                                            <Button
-                                                variant="text"
-                                                href="/templates/SASF_Fund Track Record Template.xlsx"
-                                                sx={{ color: '#363062', fontWeight: 600 }}
-                                            >
-                                                Download Template
-                                            </Button>
-                                        </Box>
-                                        <Box>
-                                            <UploadComponents id={`pastInvestmentTrackRecord${id}`} signed={false} />
-                                        </Box>
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleAccordionSaveAndContinue("8", "9", null)}
-                                                sx={{ backgroundColor: '#363062', color: 'white' }}
-                                            >
-                                                Save and Continue
-                                            </Button>
-                                        </Box>
+                                        <DealFlow
+                                            ref={dealFlowRef}
+                                            prelimApplicationId={String(prelimApplicationId)}
+                                            setPrelimApplicationId={handleApplicationIdCreation}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("8", null, null)}
+                                        />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
-
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["9"]}
@@ -813,22 +799,38 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "9" ? '#363062' : '#444'
                                         }}>
-                                            MIS
+                                            Past Investment Track Record Of the AMC
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <MIS
-                                            ref={misRef}
-                                            prelimApplicationId={String(prelimApplicationId)}
-                                            setPrelimApplicationId={handleApplicationIdCreation}
-                                            onSaveSuccess={() => handleAccordionSaveAndContinue("9", "10", null)}
-                                        />
+                                        <Box sx={{ border: '1px dashed #ccc', borderRadius: '8px', p: 2, mb: 2, backgroundColor: '#fafafa' }}>
+                                            <Button
+                                                variant="text"
+                                                href="/templates/SASF_Fund Track Record Template.xlsx"
+                                                sx={{ color: '#363062', fontWeight: 600 }}
+                                            >
+                                                Download Template
+                                            </Button>
+                                        </Box>
+                                        <Box>
+                                            <UploadComponents id={`pastInvestmentTrackRecord${id}`} signed={false} />
+                                        </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleAccordionSaveAndContinue("9", "10", null)}
+                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                            >
+                                                Save and Continue
+                                            </Button>
+                                        </Box>
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
+
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["10"]}

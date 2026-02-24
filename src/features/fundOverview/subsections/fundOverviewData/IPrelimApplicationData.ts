@@ -101,6 +101,14 @@ export interface IPrelimApplicationData {
   msInvestigationDetails: String | undefined,
   msExclusiveVC: String | undefined,
   msDirectorshipsPolicy: String | undefined,
+  // LP Advisory Governance and Investment Committee
+  lpacDetails: String | undefined,
+  lpacMemberSelectionDetails: String | undefined,
+  lpacLpParticipationDetails: String | undefined,
+  lpacBindingApprovalRightsDetails: String | undefined,
+  lpacTotalNumberAndVotingMembersDetails: String | undefined,
+  lpacDecisionMakingProcess: String | undefined,
+  lpacIndependentMembersDetails: String | undefined,
 }
 
 export const defaultIPrelimApplicationData: IPrelimApplicationData = {
@@ -204,6 +212,14 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   msInvestigationDetails: undefined,
   msExclusiveVC: undefined,
   msDirectorshipsPolicy: undefined,
+  // LP Advisory Governance and Investment Committee
+  lpacDetails: undefined,
+  lpacMemberSelectionDetails: undefined,
+  lpacLpParticipationDetails: undefined,
+  lpacBindingApprovalRightsDetails: undefined,
+  lpacTotalNumberAndVotingMembersDetails: undefined,
+  lpacDecisionMakingProcess: undefined,
+  lpacIndependentMembersDetails: undefined,
 }
 
 export interface IApplicationData {

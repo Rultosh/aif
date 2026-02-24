@@ -18,21 +18,21 @@ type InitialState = {
 const initialState: InitialState = {
   tableData: [],
   selfRatings: defaultIISelfRating,
-  status: {fetchStatus: FetchStatus.IDLE},
-  actionStatus: {fetchStatus: FetchStatus.IDLE}
+  status: { fetchStatus: FetchStatus.IDLE },
+  actionStatus: { fetchStatus: FetchStatus.IDLE }
 }
 
 
 export const fetchSelfRatingAsync = createAsyncThunk(
   'fetchSelfRatingAsync/getAll',
-  async (args: ActionWrapper<Number | undefined>, {rejectWithValue}) => { 
+  async (args: ActionWrapper<Number | undefined>, { rejectWithValue }) => {
     console.log("fetchSelfRatingAsync called...")
     try {
-      if(args.argument) {
+      if (args.argument) {
         const response = await fetchSelfRating(args.argument);
         return response.data;
       }
-    } catch(reason) {
+    } catch (reason) {
       console.log(reason)
       return rejectWithValue(getError(reason));
     }
@@ -41,14 +41,14 @@ export const fetchSelfRatingAsync = createAsyncThunk(
 
 export const createSelfRatingAsync = createAsyncThunk(
   'createSelfRatingAsync/create',
-  async (args: ActionWrapper<ISelfRating>, {rejectWithValue}) => { 
+  async (args: ActionWrapper<ISelfRating>, { rejectWithValue }) => {
     console.log("updatePrelimApplicationAsync called...")
     try {
-      if(args.argument) {
+      if (args.argument) {
         const response = await createSelfRating(args.argument);
         return response.data;
       }
-    } catch(reason) {
+    } catch (reason) {
       console.log(reason)
       return rejectWithValue(getError(reason));
     }
@@ -57,14 +57,14 @@ export const createSelfRatingAsync = createAsyncThunk(
 
 export const createIndependentSelfRatingAsync = createAsyncThunk(
   'createIndependentSelfRatingAsync/create',
-  async (args: ActionWrapper<ISelfRating>, {rejectWithValue}) => { 
+  async (args: ActionWrapper<ISelfRating>, { rejectWithValue }) => {
     console.log("updatePrelimApplicationAsync called...")
     try {
-      if(args.argument) {
+      if (args.argument) {
         const response = await createIndependentRating(args.argument);
         return response.data;
       }
-    } catch(reason) {
+    } catch (reason) {
       console.log(reason)
       return rejectWithValue(getError(reason));
     }
@@ -73,14 +73,14 @@ export const createIndependentSelfRatingAsync = createAsyncThunk(
 
 export const updateSelfRatingAsync = createAsyncThunk(
   'updateSelfRatingAsync/create',
-  async (args: ActionWrapper<ISelfRating>, {rejectWithValue}) => { 
+  async (args: ActionWrapper<ISelfRating>, { rejectWithValue }) => {
     console.log("updatePrelimApplicationAsync called...")
     try {
-      if(args.argument) {
+      if (args.argument) {
         const response = await updateSelfRating(args.argument);
         return response.data;
       }
-    } catch(reason) {
+    } catch (reason) {
       console.log(reason)
       return rejectWithValue(getError(reason));
     }
@@ -89,14 +89,14 @@ export const updateSelfRatingAsync = createAsyncThunk(
 
 export const deleteSelfRatingAsync = createAsyncThunk(
   'deleteSelfRatingAsync/delete',
-  async (args: ActionWrapper<ISelfRating>, {rejectWithValue}) => { 
+  async (args: ActionWrapper<ISelfRating>, { rejectWithValue }) => {
     console.log("deleteSelfRatingAsync called...")
     try {
-      if(args.argument) {
+      if (args.argument) {
         const response = await deleteSelfRating(args.argument);
         return response.data;
       }
-    } catch(reason) {
+    } catch (reason) {
       console.log(reason)
       return rejectWithValue(getError(reason));
     }
@@ -126,16 +126,16 @@ const selfRatingSlice = createSlice({
       fetchSelfRatingAsync.fulfilled,
       (state, action: PayloadAction<ISelfRating[]>) => {
         console.log("Full Payload", action.payload);
-        if(action.payload.length === 0) {
+        if (action.payload.length === 0) {
           state.selfRatings = defaultIISelfRating;
         } else {
           state.selfRatings = action.payload[0]
         }
-        
+
         console.log(state.selfRatings)
         state.status.fetchStatus = FetchStatus.IDLE;
       }
-      
+
     )
     builder.addCase(fetchSelfRatingAsync.rejected, (state, action) => {
       state.status.fetchStatus = FetchStatus.FAILED;
@@ -146,9 +146,9 @@ const selfRatingSlice = createSlice({
     builder.addCase(
       updateSelfRatingAsync.fulfilled,
       (state, action: PayloadAction<ISelfRating>) => {
+        state.selfRatings = action.payload;
         state.actionStatus.fetchStatus = FetchStatus.IDLE;
       }
-      
     )
     builder.addCase(updateSelfRatingAsync.rejected, (state, action) => {
       state.actionStatus.fetchStatus = FetchStatus.FAILED;
@@ -159,11 +159,11 @@ const selfRatingSlice = createSlice({
     builder.addCase(
       createIndependentSelfRatingAsync.fulfilled,
       (state, action: PayloadAction<ISelfRating>) => {
+        state.selfRatings = action.payload;
         state.actionStatus.fetchStatus = FetchStatus.IDLE;
       }
-      
     )
-    
+
     builder.addCase(createIndependentSelfRatingAsync.rejected, (state, action) => {
       state.actionStatus.fetchStatus = FetchStatus.FAILED;
     })
@@ -173,9 +173,9 @@ const selfRatingSlice = createSlice({
     builder.addCase(
       createSelfRatingAsync.fulfilled,
       (state, action: PayloadAction<ISelfRating>) => {
+        state.selfRatings = action.payload;
         state.actionStatus.fetchStatus = FetchStatus.IDLE;
       }
-      
     )
     builder.addCase(createSelfRatingAsync.rejected, (state, action) => {
       state.actionStatus.fetchStatus = FetchStatus.FAILED;

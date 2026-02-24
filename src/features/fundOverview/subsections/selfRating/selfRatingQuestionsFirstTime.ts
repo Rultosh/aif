@@ -52,8 +52,8 @@ export const questionsForFirstTime = {
         "id": 7,
         "text":"LP Advisory Committee/Advisory Board" ,
         "options":[
-                "The Fund shall have an Advisory Board/LP Advisory Committee with representation from major investors with 50% of total Corpus",
-                "The Fund shall have a Advisory Board/LP Advisory Committee with representation from a few investors.",
+                "The Fund have an Advisory Board/LP Advisory Committee with representation from major investors with 50% of total Corpus",
+                "The Fund have a Advisory Board/LP Advisory Committee with representation from a few investors.",
                 "The Fund do not propose to have such Board/Committee"
             ],
         "size":12,
@@ -113,7 +113,7 @@ export const questionsForFirstTime = {
     },
     {
         "id": 12,
-        "text":"Number of LPs with exposure >5% in the previous fund corpus (managed by the current fund's Partners/Directors)  continue to invest in the proposed fund." ,
+        "text":"Number of LPs with exposure >5% in the last fund corpus (managed by the current fund's Partners/Directors)  continue to invest in the proposed fund." ,
         "options":[
             ">= 5",
             ">= 3 & < 5",
