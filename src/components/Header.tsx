@@ -70,7 +70,7 @@ const Header = (props: any) => {
               </Link>}
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '16px', color: 'rgba(255,255,255,0.9)' }}>
-                  NPS Viksit Bharat Fund of Fund Portal
+                  NPS Bharat Fund of Fund Portal
                 </Typography>
               </Box>
 

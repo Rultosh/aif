@@ -100,7 +100,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>1. What is your investment strategy and What are the focus investment sectors for the fund?</Typography>
+                        <Typography variant="body1" sx={labelSx}>1. What is your investment strategy and the focus investment sectors for the fund?</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -152,7 +152,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. What are the Risks in the investments planned for this fund & what are the risk mitigation plans and how you plan to mitigate such risks?</Typography>
+                        <Typography variant="body1" sx={labelSx}>5. What are the risks associated with the investments planned under this Fund, and what strategies will be implemented to mitigate those risks?</Typography>
                         <TextField
                             fullWidth
                             multiline

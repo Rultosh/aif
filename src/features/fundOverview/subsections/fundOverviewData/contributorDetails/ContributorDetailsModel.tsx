@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, FormControl, FormControlLabel, FormHelperText, Grid, InputLabel, MenuItem, Modal, Radio, RadioGroup, Select, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
 import { createContributorDetailsAsync, updateContributorDetailsAsync } from './contributorDetailsSlice'
-import { useAppDispatch } from '../../../../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultContributorDetails, IContributorDetails } from "./IContributorDetails";
@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
+import { selectContributorDetails } from './contributorDetailsSlice'
 
 
 interface ContrinutorDetailsModelProps {
@@ -42,11 +43,11 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
       return convert(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + convert(n % 10000000) : '');
     }
 
-    if(num !== undefined && convert(num) != undefined) {
+    if (num !== undefined && convert(num) != undefined) {
       const result = convert(num).trim();
-        return result ? result + ' Rupees only' : '';
+      return result ? result + ' Rupees only' : '';
     } else {
-        return ''
+      return ''
     }
   }
 
@@ -54,6 +55,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
   const [contributorDetailsFormData, setContributorDetailsFormData] = useState(defaultContributorDetails)
 
   const dispatch = useAppDispatch();
+  const contributorDetailsState = useAppSelector(selectContributorDetails)
 
   function handleSubmitForm() {
     console.log("Saving contributorDetailsFormData", contributorDetailsFormData)
@@ -81,10 +83,16 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
   }
 
   useEffect(() => {
-    const data = { ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId };
+    let data = { ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId };
+
+    // Auto-set 'Sponsor' for the first record if name is empty
+    if (!data.name && (!contributorDetailsState.contributorDetails || contributorDetailsState.contributorDetails.length === 0)) {
+      data.name = 'Sponsor';
+    }
+
     setContributorDetailsFormData(data)
     reset(data);
-  }, [props.contributorDetailsFormData, props.open])
+  }, [props.contributorDetailsFormData, props.open, contributorDetailsState.contributorDetails])
 
   const percentageFields = ['percentOfCorpus', 'percentOfActualCorpusRaisedPrev'];
 
@@ -197,7 +205,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     aria-describedby="modal-modal-description"
   >
     <Box sx={style}>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details of Contributor to the Fund</Typography>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details Of Contributor To The Fund</Typography>
       <Box component="form">
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
@@ -212,7 +220,17 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               helperText={errors.name?.message as string}
               variant="outlined"
               onChange={handleChange}
-              sx={fieldSx}
+              InputProps={{
+                readOnly: contributorDetailsFormData.name === 'Sponsor',
+              }}
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                ...fieldSx,
+                '& .MuiOutlinedInput-root': {
+                  ...fieldSx['& .MuiOutlinedInput-root'],
+                  backgroundColor: contributorDetailsFormData.name === 'Sponsor' ? '#f5f5f5' : 'inherit'
+                }
+              }}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -234,6 +252,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               }
               variant="outlined"
               onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
               sx={fieldSx}
             />
           </Grid>
@@ -243,7 +262,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               required
               fullWidth
               id="percentOfCorpus"
-              label="% of Corpus"
+              label="% Of Corpus"
               value={contributorDetailsFormData.percentOfCorpus || ''}
               {...register("percentOfCorpus")}
               error={!!errors.percentOfCorpus}
@@ -251,6 +270,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               variant="outlined"
               onChange={handleChange}
               onBlur={handleBlur}
+              InputLabelProps={{ shrink: true }}
               sx={fieldSx}
             />
           </Grid>
@@ -280,7 +300,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth variant="outlined" error={!!errors.categoryOfContributor} sx={fieldSx}>
-              <InputLabel id="categoryOfContributor-label">Category of Contributor</InputLabel>
+              <InputLabel id="categoryOfContributor-label">Category Of Contributor</InputLabel>
               <Controller
                 name="categoryOfContributor"
                 control={control}
@@ -288,14 +308,14 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   <Select
                     {...field}
                     labelId="categoryOfContributor-label"
-                    label="Category of Contributor"
+                    label="Category Of Contributor"
                     onChange={(e) => {
                       field.onChange(e);
                       handleChange(e);
                     }}
                   >
                     <MenuItem value="Institutional Investor">Institutional Investor</MenuItem>
-                    <MenuItem value="Family offices/High Net worth Individual (HNI)">Family offices/High Net worth Individual (HNI)</MenuItem>
+                    <MenuItem value="Family Office/High Net worth Individual (HNI)">Family Office/High Net worth Individual (HNI)</MenuItem>
                   </Select>
                 )}
               />
@@ -309,7 +329,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                 control={control}
                 render={({ field: { onChange, value }, fieldState: { error } }) => (
                   <DesktopDatePicker
-                    label="Date of commitment to the fund"
+                    label="Date Of Commitment To The Fund"
                     inputFormat="DD/MM/YYYY"
                     disableFuture
                     value={value || null}
@@ -362,13 +382,14 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                 <TextField
                   fullWidth
                   id="amountContributedPrev"
-                  label="Amount Contributed in previous funds"
+                  label="Amount Contributed In Last Fund"
                   value={contributorDetailsFormData.amountContributedPrev || ''}
                   {...register("amountContributedPrev")}
                   error={!!errors.amountContributedPrev}
                   helperText={errors.amountContributedPrev?.message as string}
                   variant="outlined"
                   onChange={handleChange}
+                  InputLabelProps={{ shrink: true }}
                   sx={fieldSx}
                 />
               </Grid>
@@ -376,7 +397,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                 <TextField
                   fullWidth
                   id="percentOfActualCorpusRaisedPrev"
-                  label="% of Actual Corpus raised in previous funds"
+                  label="% Of Actual Corpus Raised In Last Fund"
                   value={contributorDetailsFormData.percentOfActualCorpusRaisedPrev || ''}
                   {...register("percentOfActualCorpusRaisedPrev")}
                   error={!!errors.percentOfActualCorpusRaisedPrev}
@@ -384,6 +405,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   variant="outlined"
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  InputLabelProps={{ shrink: true }}
                   sx={fieldSx}
                 />
               </Grid>
@@ -393,7 +415,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
           <Grid item xs={12}>
             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
             <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-              <Typography variant="body2" sx={{ mb: 1 }}>Letter of Intent for each contributor*</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>Letter Of Intent For Each Contributor</Typography>
               <UploadComponents id={`sdLetterOfIntent${contributorDetailsFormData.id || uuid()}`} signed={false} />
             </Box>
           </Grid>

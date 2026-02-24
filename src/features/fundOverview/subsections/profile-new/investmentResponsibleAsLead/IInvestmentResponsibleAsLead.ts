@@ -7,7 +7,8 @@ export interface IInvestmentResponsibleAsLead {
     exitOrWriteOff: string | undefined,
     dateofExitorWriteOff: string | undefined,
     comment: string | undefined,
-    irrPercent: string | undefined
+    irrPercent: string | undefined,
+    moic: string | undefined
 }
 
 export const defaultIIInvestmentResponsibleAsLead = {
@@ -19,5 +20,6 @@ export const defaultIIInvestmentResponsibleAsLead = {
   exitOrWriteOff: undefined,
   dateofExitorWriteOff: undefined,
   comment: undefined,
-  irrPercent: undefined
+  irrPercent: undefined,
+  moic: undefined
 }

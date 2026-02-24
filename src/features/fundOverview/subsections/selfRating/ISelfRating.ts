@@ -37,6 +37,7 @@ export interface ISelfRating {
   q16Comments: string | undefined,
   q17Comments: string | undefined,
   score: string | undefined,
+  managerType: string | undefined,
 }
 
 export const defaultIISelfRating = {
@@ -78,4 +79,5 @@ export const defaultIISelfRating = {
   q16Comments: undefined,
   q17Comments: undefined,
   score: undefined,
+  managerType: "First Time Fund Manager",
 }

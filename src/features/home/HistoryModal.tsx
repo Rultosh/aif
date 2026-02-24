@@ -58,33 +58,33 @@ export const HistoryModal = (props: any) => {
         onClose={props.close}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-        className= "special_modal"
+        className="special_modal"
     >
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
                 <TableContainer>
-                     <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
-                         <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
-                             <TableRow>
-                                 {headerComponent}
-                             </TableRow>
-                         </TableHead>
-                         <TableBody>
-                            {state?.histories? state?.histories?.map((row: IHistory) => (
-                               <TableRow key={`${row.id}`}>
-                                   {/* <TableCell align="center">{row.stage}</TableCell> */}
-                                   <TableCell align="center">{row.status}</TableCell>
-                                   <TableCell align="center">{row.createdOn}</TableCell>
-                                   <TableCell align="center">{row.remarks}</TableCell>
-                               </TableRow>
-                            )) : <>
+                    <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                        <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                             <TableRow>
-                                <TableCell align="center" colSpan={4}>No rows to display.</TableCell>
-                            </TableRow> </>
+                                {headerComponent}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {state?.histories ? state?.histories?.map((row: IHistory) => (
+                                <TableRow key={`${row.id}`}>
+                                    {/* <TableCell align="center">{row.stage}</TableCell> */}
+                                    <TableCell align="center">{row.status}</TableCell>
+                                    <TableCell align="center">{row.createdOn}</TableCell>
+                                    <TableCell align="center">{row.remarks}</TableCell>
+                                </TableRow>
+                            )) : <>
+                                <TableRow>
+                                    <TableCell align="center" colSpan={4}>No Rows To Display</TableCell>
+                                </TableRow> </>
                             }
-                         </TableBody>
-                     </Table>
-                 </TableContainer>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Box>
         </Box>
     </Modal>

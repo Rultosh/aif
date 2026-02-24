@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, FormControl, FormControlLabel, FormHelperText, Grid, InputLabel, MenuItem, Modal, Radio, RadioGroup, Select, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
 import { createInvestmentPastAsync, updateInvestmentPastAsync } from './investmentPastSlice'
 import { useAppDispatch } from '../../../../../app/hooks'
@@ -42,11 +42,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       return convert(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + convert(n % 10000000) : '');
     }
 
-    if(num !== undefined && convert(num) != undefined) {
+    if (num !== undefined && convert(num) != undefined) {
       const result = convert(num).trim();
-        return result ? result + ' Rupees only' : '';
+      return result ? result + ' Rupees only' : '';
     } else {
-        return ''
+      return ''
     }
   }
 
@@ -102,6 +102,23 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       }
     }
 
+    if (name === 'amountInvested' || name === 'shareholdingInvestee') {
+      value = value.replace(/[^0-9.]/g, '');
+      const dotCount = (value.match(/\./g) || []).length;
+      if (dotCount > 1) {
+        const parts = value.split('.');
+        value = parts[0] + '.' + parts.slice(1).join('');
+      }
+      if (value !== '' && !isNaN(parseFloat(value))) {
+        const numValue = parseFloat(value);
+        if (name === 'amountInvested' && numValue > 10000) {
+          value = '10000';
+        } else if (name === 'shareholdingInvestee' && numValue > 100) {
+          value = '100';
+        }
+      }
+    }
+
     let copiedValue: IInvestmentPast = { ...investmentPastFormData };
     copiedValue[name as keyof IInvestmentPast] = value;
 
@@ -150,10 +167,16 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     dateOfInvestment: Yup.string().required("Investment Date is required").nullable(),
-    amountInvested: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("Deal Size is required"),
+    amountInvested: Yup.string().transform((val) => (isNaN(val) ? undefined : val)).required("Deal Size is required").test("max-value", "Value cannot exceed 10000", (value) => {
+      if (!value) return true;
+      return parseFloat(value) <= 10000;
+    }).nullable(),
     currentStatus: Yup.string().required("Current Status is required").nullable(),
     instrumentType: Yup.string().required("Instrument Type is required").nullable(),
-    shareholdingInvestee: Yup.string().required("Shareholding in investee company is required").nullable(),
+    shareholdingInvestee: Yup.string().required("Shareholding in investee company is required").test("max-value", "Value cannot exceed 100", (value) => {
+      if (!value) return true;
+      return parseFloat(value) <= 100;
+    }).nullable(),
     moic: Yup.string().required("MOIC is required").nullable(),
     grossIrr: Yup.string().required("Gross IRR is required").nullable(),
     timeTakenFromSourcingToClosure: Yup.string().required("Time taken from sourcing to closure is required").nullable(),
@@ -197,7 +220,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               required
               fullWidth
               id="nameOfCompany"
-              label="Name of the investee company"
+              label="Name Of the Investee Company"
               value={investmentPastFormData.nameOfCompany || ''}
               {...register("nameOfCompany")}
               error={!!errors.nameOfCompany}
@@ -254,9 +277,9 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <TextField
               required
               fullWidth
-              type="number"
+              type="text"
               id="amountInvested"
-              label="Deal Size / Amount Invested (in Rs. Cr)"
+              label="Deal Size / Amount Invested (₹ Crore)"
               value={investmentPastFormData.amountInvested || ''}
               {...register("amountInvested")}
               error={!!errors.amountInvested}
@@ -269,6 +292,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               }
               variant="outlined"
               onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
               sx={fieldSx}
             />
           </Grid>
@@ -277,7 +301,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               required
               fullWidth
               id="briefProfile"
-              label="Business Introduction and basis for the valuation of company"
+              label="Business Introduction & Basis For the Valuation Of Company"
               value={investmentPastFormData.briefProfile || ''}
               variant="outlined"
               multiline
@@ -293,14 +317,16 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <TextField
               required
               fullWidth
+              type="text"
               id="shareholdingInvestee"
-              label="Shareholding in the investee company"
+              label="Shareholding In the Investee Company (%)"
               value={investmentPastFormData.shareholdingInvestee || ''}
               {...register("shareholdingInvestee")}
               error={!!errors.shareholdingInvestee}
               helperText={errors.shareholdingInvestee?.message as string}
               variant="outlined"
               onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
               sx={fieldSx}
             />
           </Grid>
@@ -378,25 +404,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               sx={fieldSx}
             />
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              id="conflictOfInterest"
-              label="Conflict of interest, if any"
-              value={investmentPastFormData.conflictOfInterest || ''}
-              {...register("conflictOfInterest")}
-              error={!!errors.conflictOfInterest}
-              helperText={errors.conflictOfInterest?.message as string}
-              variant="outlined"
-              onChange={handleChange}
-              sx={fieldSx}
-            />
-          </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <TextField
               fullWidth
               id="stakeOfEmployee"
-              label="Was there any Stake of any employee/relative of AMC/Fund in said Investee company?"
+              label="Was There Any Stake Of Any Employee/Relative Of AMC/Fund In Said Investee Company?"
               value={investmentPastFormData.stakeOfEmployee || ''}
               variant="outlined"
               multiline
@@ -407,12 +419,12 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               onChange={handleChange}
               sx={fieldSx}
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <TextField
               fullWidth
               id="investmentStageFundingRound"
-              label="What is the funding stage or round of investment in the said investee company?"
+              label="What Is the Funding Stage Or Round Of Investment In the Said Investee Company?"
               value={investmentPastFormData.investmentStageFundingRound || ''}
               variant="outlined"
               multiline
@@ -428,7 +440,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <TextField
               fullWidth
               id="investmentStageDealSourced"
-              label="How was the deal sourced either through Investment Banks, Networking, direct etc."
+              label="How Was the Deal Sourced Either Through Investment Banks, Networking, Direct etc."
               value={investmentPastFormData.investmentStageDealSourced || ''}
               variant="outlined"
               multiline
@@ -446,7 +458,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               fullWidth
               type="number"
               id="timeTakenFromSourcingToClosure"
-              label="Time taken from sourcing to closure"
+              label="Time Taken From Sourcing To Closure (In Months)"
               value={investmentPastFormData.timeTakenFromSourcingToClosure || ''}
               {...register("timeTakenFromSourcingToClosure")}
               error={!!errors.timeTakenFromSourcingToClosure}
@@ -456,6 +468,29 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               onBlur={handleBlur}
               sx={fieldSx}
             />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', color: '#363062' }}>
+              Conflict Of Interest, If Any:
+            </Typography>
+            <Controller
+              name="conflictOfInterest"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleChange(e);
+                  }}
+                >
+                  <FormControlLabel value="Was There Any Stake Of Any Employee/Relative Of AMC/Fund In Said Investee Company?" control={<Radio />} label="Was There Any Stake Of Any Employee/Relative Of AMC/Fund In Said Investee Company?" />
+                  <FormControlLabel value="" control={<Radio />} label="test 1" />
+                  <FormControlLabel value="" control={<Radio />} label="test 2" />
+                </RadioGroup>
+              )}
+            />
+            {errors.stakeOfEmployee && <FormHelperText error>{errors.stakeOfEmployee.message as string}</FormHelperText>}
           </Grid>
 
           <Grid item xs={12}>

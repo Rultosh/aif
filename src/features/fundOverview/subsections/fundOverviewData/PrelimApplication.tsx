@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Stack, Switch, TextField, Typography, Autocomplete } from "@mui/material";
 import UploadIcon from '@mui/icons-material/Upload';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
@@ -37,6 +37,25 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const MIN_DATE = dayjs("2020-01-01");
 
     const dispatch = useAppDispatch()
+
+    const dealSectorOptions = [
+        "Automobile And Auto Components",
+        "Capital Goods",
+        "Chemicals",
+        "Construction & Construction Materials",
+        "Consumer Services",
+        "Fast Moving Consumer Goods",
+        "Financial Services",
+        "Healthcare",
+        "Information Technology",
+        "Metals & Mining",
+        "Oil, Gas & Consumable Fuels",
+        "Power",
+        "Realty",
+        "Services",
+        "Telecommunication",
+        "Textiles"
+        ];
 
     useEffect(() => {
         if (Number(prelimAppicationId)) {
@@ -83,6 +102,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         let value = ev.target.value;
         const id = ev.target.id || ev.target.name;
 
+        if (id === 'termOfFund') {
+            value = value.replace(/[^0-9]/g, '');
+            if (value !== '' && parseInt(value) > 200) {
+                value = '200';
+            }
+        }
+
         if (monthFields.includes(id)) {
             value = value.replace(/[^0-9]/g, '');
         }
@@ -102,6 +128,20 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         }
 
         if (numericFields.includes(id) && !monthFields.includes(id) && !percentageFields.includes(id)) {
+            if (id === 'contributionSought') {
+                value = value.replace(/[^0-9.]/g, '');
+                const dotCount = (value.match(/\./g) || []).length;
+                if (dotCount > 1) {
+                    const parts = value.split('.');
+                    value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                if (value !== '' && !isNaN(parseFloat(value))) {
+                    if (parseFloat(value) > 10000) {
+                        value = '10000';
+                    }
+                }
+            }
+
             if (value.includes('.')) {
                 const parts = value.split('.');
                 if (parts[1].length > 2) {
@@ -181,7 +221,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     }
 
     const percentageFields = [
-        'preferredReturn', 'targetReturnIRR', 'managementFees',
+        'preferredReturn', 'otherExpenses', 'targetReturnIRR', 'managementFees',
         'carriedInterest', 'hurdleCarryInterestRate'
     ];
 
@@ -195,7 +235,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         'sdTotalTargetCorpus', 'sdGreenShoeTargetCorpusDomestic',
         'sdGreenShoeTargetCorpusOverseas', 'sdGreenShoeTotalTargetCorpus',
         'sdFirstClosingDomesticAmount', 'sdFirstClosingOverseasAmount',
-        'fundSetupCost', 'otherExpenses',
+        'fundSetupCost',
         ...percentageFields,
         ...monthFields
     ];
@@ -334,13 +374,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         nameOfTheFund: Yup.string().required("Name of the Fund is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sponsor: Yup.string().required("Sponsor is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         investmentManager: Yup.string().required("Investment Manager is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        // fundManager: Yup.string(),
+        fundManager: Yup.string().required("Fund Manager is required"),
         // dealType: Yup.string(),
         // impact: Yup.string(),
-        // aifCategory: Yup.string(),
+        aifCategory: Yup.string().required("AIF Category is required"),
         dateOfFilingWithSEBI: Yup.string().required("This value is required").nullable(),
-        // dealSector: Yup.string(),
-        // dealSubsector: Yup.string().required("Deal Sub Sector is required"),
+        dealSector: Yup.string().required("Deal Sector is required"),
+        dealSubsector: Yup.string().required("Deal Sub Sector is required"),
         nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         contributionSought: Yup.string().required("Contribution Sought is required").test("test-name", "Enter value that cannot exceed 25% of target corpus", function (value: any) {
             let sdTotalTargetCorpusVal = Number(prelimApplicationFormData.sdTotalTargetCorpus || '0');
@@ -350,8 +390,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                 return false;
             }
             return true;
+        }).test("max-value", "Value cannot exceed 10000", (value) => {
+            if (!value) return true;
+            return parseFloat(value) <= 10000;
         }).nullable(),
-        termOfFund: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Term of Fund must be a number").required("Term of Fund is required").min(0, "Negative values not allowed"),
+        termOfFund: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Term of Fund must be a number").required("Term of Fund is required").min(0, "Negative values not allowed").max(200, "Term of Fund cannot exceed 200"),
         commitmentPeriod: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Commitment Period must be a number").required("Commitment Period is required").min(0, "Negative values not allowed"),
         preferredReturn: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Preferred Return must be a number").required("Preferred Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         managementFees: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Management Fees must be a number").required("Management Fees is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
@@ -372,7 +415,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         aifCategoryType: Yup.string().required("AIF Category Type is required").nullable(),
         targetReturnIRR: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Target Return must be a number").required("Target Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         fundSetupCost: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Fund set up cost must be a number").required("Fund set up cost is required").min(0, "Negative values not allowed"),
-        otherExpenses: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Other expenses must be a number").required("Other expenses is required").min(0, "Negative values not allowed"),
+        otherExpenses: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Other Expenses must be a number").required("Other Expenses is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         justificationForHurdleCarryInterestRate: Yup.string().required("Justification for Hurdle and carry interest rate is required").nullable(),
     });
 
@@ -475,7 +518,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.nameOfTheFund?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -490,7 +533,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.sponsor?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
 
@@ -506,7 +549,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.investmentManager?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
 
@@ -520,7 +563,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
                             <InputLabel id="demo-simple-select-standard-label"
                                 sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}
-                            >Fund Manager {prelimApplicationFormData.fundManager}</InputLabel>
+                            >Fund Manager Experience {prelimApplicationFormData.fundManager}</InputLabel>
                             <Select
                                 labelId="fundManager"
                                 id="fundManager"
@@ -531,16 +574,16 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             >
                                 <MenuItem
                                     // selected={prelimApplicationFormData.fundManager === "First time Fund Manager"}
-                                    key={"First time Fund Manager"}
-                                    value={"First time Fund Manager"}>First time Fund Manager</MenuItem>
+                                    key={"First Time Fund Manager"}
+                                    value={"First Time Fund Manager"}>First Time Fund Manager</MenuItem>
                                 <MenuItem
                                     // selected={prelimApplicationFormData.fundManager === "Two funds managed"}
-                                    key={"Two funds managed"}
-                                    value={"Two funds managed"}>Two funds managed</MenuItem>
+                                    key={"Two Funds Managed"}
+                                    value={"Two Funds Managed"}>Two Funds Managed</MenuItem>
                                 <MenuItem
                                     // selected={prelimApplicationFormData.fundManager === "More than two funds managed"}
-                                    key={"More than two funds managed"}
-                                    value={"More than two funds managed"}>More than two funds managed</MenuItem>
+                                    key={"More Than Two Funds Managed"}
+                                    value={"More Than Two Funds Managed"}>More Than Two Funds Managed</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>
@@ -614,8 +657,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             });
                                         }}
                                     >
-                                        <FormControlLabel value="Equity oriented AIF" control={<Radio size="small" />} label="Equity oriented AIF" />
-                                        <FormControlLabel value="Debt oriented AIF" control={<Radio size="small" />} label="Debt oriented AIF" />
+                                        <FormControlLabel value="Equity Oriented AIF" control={<Radio size="small" />} label="Equity Oriented AIF" />
+                                        <FormControlLabel value="Debt Oriented AIF" control={<Radio size="small" />} label="Debt Oriented AIF" />
                                     </RadioGroup>
                                 )}
                             />
@@ -631,14 +674,14 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             required
                             fullWidth
                             id="nameOfTrustee"
-                            label="Name Of The Trustee"
+                            label="Name Of the Trustee"
                             value={prelimApplicationFormData.nameOfTrustee || ''}
                             {...register("nameOfTrustee")}
                             error={!!errors.nameOfTrustee}
                             helperText={errors.nameOfTrustee?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
 
@@ -692,9 +735,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number"
                             id="contributionSought"
-                            label="Contribution sought (₹ Crore)"
+                            label="Contribution Sought (₹ Crore)"
                             value={prelimApplicationFormData.contributionSought || ''}
                             {...register("contributionSought")}
                             error={!!errors.contributionSought}
@@ -708,7 +750,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -725,7 +767,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                             inputProps={{ min: 0 }}
                         />
                     </Grid>
@@ -744,7 +786,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
 
@@ -762,7 +804,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -771,7 +813,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number"
                             id="targetReturnIRR"
-                            label="Target Return in the fund (IRR in %)"
+                            label="Target Return in the Fund (IRR in %)"
                             value={prelimApplicationFormData.targetReturnIRR || ''}
                             {...register("targetReturnIRR")}
                             error={!!errors.targetReturnIRR}
@@ -779,7 +821,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -796,7 +838,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -805,7 +847,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number"
                             id="fundSetupCost"
-                            label="Fund set up cost (₹ Crore)"
+                            label="Fund Set Up Cost (₹ Crore)"
                             value={prelimApplicationFormData.fundSetupCost || ''}
                             {...register("fundSetupCost")}
                             error={!!errors.fundSetupCost}
@@ -819,7 +861,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -828,21 +870,15 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number"
                             id="otherExpenses"
-                            label="Other expenses (₹ Crore)"
+                            label="Other Expenses (%)"
                             value={prelimApplicationFormData.otherExpenses || ''}
                             {...register("otherExpenses")}
                             error={!!errors.otherExpenses}
-                            helperText={
-                                errors.otherExpenses
-                                    ? (errors.otherExpenses.message as string)
-                                    : (prelimApplicationFormData?.otherExpenses
-                                        ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.otherExpenses)) * 10000000)
-                                        : '')
-                            }
+                            helperText={errors.otherExpenses?.message as string}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -859,7 +895,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -867,7 +903,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             required
                             fullWidth
                             id="justificationForHurdleCarryInterestRate"
-                            label="Justification for hurdle and carried interest rate"
+                            label="Justification For Hurdle and Carried Interest Rate"
                             value={prelimApplicationFormData.justificationForHurdleCarryInterestRate || ''}
                             {...register("justificationForHurdleCarryInterestRate")}
                             error={!!errors.justificationForHurdleCarryInterestRate}
@@ -875,23 +911,104 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
-                            sx={numericSx}
+                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
 
                     <Grid item xs={12} md={4}>
-                        <TextField
-                            fullWidth
-                            id="dealSector"
-                            label="Deal Sector"
-                            value={prelimApplicationFormData.dealSector || ''}
-                            {...register("dealSector")}
-                            error={!!errors.dealSector}
-                            helperText={errors.dealSector?.message as string}
-                            onChange={handleChange}
-                            variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
-                        />
+                        {/* <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
+                            <InputLabel id="demo-simple-select-standard-label"
+                                sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}
+                            >Deal Sector</InputLabel>
+                            <Select
+                                labelId="dealSector"
+                                id="dealSector"
+                                value={prelimApplicationFormData.dealSector || ""}
+                                onChange={handleChange}
+                                name="dealSector"
+                            // defaultValue={prelimApplicationFormData.dealSector || ""}
+                            >
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Automobile And Auto Components"} 
+                                key={"Automobile And Auto Components"} value={"Automobile And Auto Components"}>Automobile And Auto Components</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Capital Goods"} 
+                                key={"Capital Goods"} value={"Capital Goods"}>Capital Goods</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Chemicals"} 
+                                key={"Chemicals"} value={"Chemicals"}>Chemicals</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Construction & Construction Materials"} 
+                                key={"Construction & Construction Materials"} value={"Construction & Construction Materials"}>Construction & Construction Materials</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Consumer Services"} 
+                                key={"Consumer Services"} value={"Consumer Services"}>Consumer Services</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Fast Moving Consumer Goods"} 
+                                key={"Fast Moving Consumer Goods"} value={"Fast Moving Consumer Goods"}>Fast Moving Consumer Goods</MenuItem>
+                                <MenuItem
+                                // selected={prelimApplicationFormData.dealSector === "Financial Services"}
+                                key={"Financial Services"}
+                                value={"Financial Services"}>
+                                    Financial Services
+                                </MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Healthcare"}
+                                key={"Healthcare"} value={"Healthcare"}>Healthcare</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Information Technology"}
+                                key={"Information Technology"} 
+                                value={"Information Technology"}>
+                                    Information Technology
+                                </MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Metals & Mining"} 
+                                key={"Metals & Mining"} value={"Metals & Mining"}>Metals & Mining</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Oil, Gas & Consumable Fuels"} 
+                                key={"Oil, Gas & Consumable Fuels"} value={"Oil, Gas & Consumable Fuels"}>Oil, Gas & Consumable Fuels</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Power"} 
+                                key={"Power"} value={"Power"}>Power</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Realty"} 
+                                key={"Realty"} value={"Realty"}>Realty</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Services"} 
+                                key={"Services"} value={"Services"}>Services</MenuItem>
+                                <MenuItem
+                                // selected={prelimApplicationFormData.dealSector === "Telecommunication"}
+                                key={"Telecommunication"} value={"Telecommunication"}>Telecommunication</MenuItem>
+                                <MenuItem 
+                                // selected={prelimApplicationFormData.dealSector === "Textiles"} 
+                                key={"Textiles"} value={"Textiles"}>Textiles</MenuItem>
+                            </Select>
+                        </FormControl> */}
+                        <FormControl fullWidth>
+                            <Autocomplete
+                                options={dealSectorOptions}
+                                // value={prelimApplicationFormData.dealSector || null}
+                                onChange={(event, newValue) => {
+                                handleChange({
+                                    target: {
+                                    name: "dealSector",
+                                    value: newValue || ""
+                                    }
+                                });
+                                }}
+                                renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Deal Sector"
+                                    variant="outlined"
+                                    sx={{
+                                    borderRadius: "8px",
+                                    backgroundColor: "white"
+                                    }}
+                                />
+                                )}
+                            />
+                            </FormControl>
                     </Grid>
                     <Grid item xs={12} md={4}>
                         <TextField
@@ -920,7 +1037,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.description?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
 
@@ -954,7 +1071,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         fullWidth
                                         type="number"
                                         id="sdDescription"
-                                        label="Capital raised till date (₹ Crore)"
+                                        label="Capital Raised Till Date (₹ Crore)"
                                         value={prelimApplicationFormData.sdDescription || ''}
                                         {...register("sdDescription")}
                                         error={!!errors.sdDescription}
@@ -968,7 +1085,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                     />
                                 </Grid>
 
@@ -998,7 +1115,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -1021,7 +1138,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -1044,7 +1161,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                         InputProps={{ readOnly: true }}
                                     />
                                 </Grid>
@@ -1075,7 +1192,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -1098,7 +1215,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -1121,7 +1238,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                         InputProps={{ readOnly: true }}
                                     />
                                 </Grid>
@@ -1168,7 +1285,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4}>
@@ -1179,7 +1296,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             render={({ fieldState: { invalid } }) => (
                                                 <DesktopDatePicker
                                                     inputFormat="DD/MM/YYYY"
-                                                    label="Closing Date (Domestic)"
+                                                    label="Closing Date"
                                                     value={prelimApplicationFormData.sdFirstClosingDomesticAmountDate || null}
                                                     onChange={(newValue: any) => {
                                                         setValue('sdFirstClosingDomesticAmountDate', newValue);
@@ -1220,7 +1337,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         variant="outlined"
-                                        sx={numericSx}
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                     />
                                 </Grid>
                                 {/* <Grid item xs={12} md={4}>

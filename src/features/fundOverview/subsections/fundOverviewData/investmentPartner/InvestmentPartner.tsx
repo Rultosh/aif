@@ -60,7 +60,7 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
         ))
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
-    const tableHeaders = ["Name", "Designation", "Age", "Qualification", "VC/ PE Experience", "Brief Details of VC/PE Experience", "Action"]
+    const tableHeaders = ["Name", "Designation", "Age", "Qualification", "VC/ PE Experience", "Area Of Expertise", "Action"]
 
     let headerComponent = []
 
@@ -87,7 +87,7 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
                                     {investmentPartnersState.investmentPartners && investmentPartnersState.investmentPartners.length > 0 ?
                                         investmentPartnersState.investmentPartners.map((row: IInvestmentPartner) => (
                                             <InvestmentPartnerRow row={row} />
-                                        )) : <TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
+                                        )) : <TableRow><TableCell colSpan={7}>No Rows To Display</TableCell></TableRow>
                                     }
                                 </TableBody> : <TableBody>
                                     <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>

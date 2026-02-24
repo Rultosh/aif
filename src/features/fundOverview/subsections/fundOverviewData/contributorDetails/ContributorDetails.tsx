@@ -1,6 +1,6 @@
 import { Box, Button, Grid, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
-import { fetchContributorDetailsAsync,  selectContributorDetails } from './contributorDetailsSlice'
+import { fetchContributorDetailsAsync, selectContributorDetails } from './contributorDetailsSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
@@ -34,7 +34,7 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
     const [actionUid] = useState(uuid())
     const contributorDetailsState = useAppSelector(selectContributorDetails)
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
-    const [open, setOpen] = useState(false);    
+    const [open, setOpen] = useState(false);
     let totalAmountwithstate = 0;
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -55,7 +55,7 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
         setOpen(false)
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
-    const tableHeaders = ["Name of Contributor", "Amount Contributed (₹ Crore)", "% Of Corpus", "Type", "Action"]
+    const tableHeaders = ["Name Of Contributor", "Amount Contributed (₹ Crore)", "% Of Corpus", "Type", "Action"]
 
     let headerComponent = []
 
@@ -72,42 +72,42 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
                 <Grid item xs={11.5}>
                     <Box>
                         <TableContainer component={Paper}  >
-                            <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                            <Table sx={{ minWidth: 700 }} aria-label="customized table">
                                 <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                                     <TableRow>
                                         {headerComponent}
                                     </TableRow>
                                 </TableHead>
-                                {contributorDetailsState.status.fetchStatus == FetchStatus.IDLE && contributorDetailsState.actionStatus.fetchStatus == FetchStatus.IDLE?
-                                <TableBody>
-                                    <>
-                                    {contributorDetailsState.contributorDetails && contributorDetailsState.contributorDetails.length > 0?
-                                        contributorDetailsState.contributorDetails.map((row: IContributorDetails) => (
-                                            <ContributorDetailsRow row={row}/>
-                                    )):<TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
-                                    }
-                                    
-                                    {contributorDetailsState.contributorDetails && contributorDetailsState.contributorDetails.length > 0?
-                                    <>{
-                                        contributorDetailsState.contributorDetails.map((row: IContributorDetails) => {
-                                            if(row.amount != undefined){
-                                                var rowAmount = String(row.amount);
-                                                totalAmountwithstate = parseInt(rowAmount) + totalAmountwithstate;
+                                {contributorDetailsState.status.fetchStatus == FetchStatus.IDLE && contributorDetailsState.actionStatus.fetchStatus == FetchStatus.IDLE ?
+                                    <TableBody>
+                                        <>
+                                            {contributorDetailsState.contributorDetails && contributorDetailsState.contributorDetails.length > 0 ?
+                                                contributorDetailsState.contributorDetails.map((row: IContributorDetails) => (
+                                                    <ContributorDetailsRow row={row} />
+                                                )) : <TableRow><TableCell colSpan={7}>No Rows To Display</TableCell></TableRow>
                                             }
-                                        })
-                                       }
-                                       <TableRow>
-                                            <TableCell align="center" component="th" scope="row" sx={{ fontWeight: 700 }}>
-                                            Total Amount Contributed
-                                            </TableCell>
-                                            <TableCell align="center" sx={{ fontWeight: 700 }}>{totalAmountwithstate}</TableCell>
-                                        </TableRow>
-                                        </>:<></>
-                                    }
-                                    </>
-                                </TableBody>:<TableBody>
-                                    <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
-                                </TableBody>}
+
+                                            {contributorDetailsState.contributorDetails && contributorDetailsState.contributorDetails.length > 0 ?
+                                                <>{
+                                                    contributorDetailsState.contributorDetails.map((row: IContributorDetails) => {
+                                                        if (row.amount != undefined) {
+                                                            var rowAmount = String(row.amount);
+                                                            totalAmountwithstate = parseInt(rowAmount) + totalAmountwithstate;
+                                                        }
+                                                    })
+                                                }
+                                                    <TableRow>
+                                                        <TableCell align="center" component="th" scope="row" sx={{ fontWeight: 700 }}>
+                                                            Total Amount Contributed
+                                                        </TableCell>
+                                                        <TableCell align="center" sx={{ fontWeight: 700 }}>{totalAmountwithstate}</TableCell>
+                                                    </TableRow>
+                                                </> : <></>
+                                            }
+                                        </>
+                                    </TableBody> : <TableBody>
+                                        <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
+                                    </TableBody>}
                             </Table>
                         </TableContainer>
                     </Box>
@@ -116,12 +116,12 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
                     <Button onClick={handleOpen} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Add
                     </Button>
-                    <ContributorDetailsModel 
+                    <ContributorDetailsModel
                         key='add-contributor-details'
-                        contributorDetailsFormData={defaultContributorDetails} 
-                        open={open} 
-                        handleClose={handleClose} 
-                        prelimApplicationId={props.prelimApplicationId}/>
+                        contributorDetailsFormData={defaultContributorDetails}
+                        open={open}
+                        handleClose={handleClose}
+                        prelimApplicationId={props.prelimApplicationId} />
                 </Grid>
             </Grid>
         </Box>

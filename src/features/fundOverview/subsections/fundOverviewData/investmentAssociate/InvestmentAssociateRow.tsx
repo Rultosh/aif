@@ -38,7 +38,7 @@ export const InvestmentAssociateRow = (props: InvestmentAssociateRowPros) => {
     <TableCell align="center">{String(props.row.age)}</TableCell>
     <TableCell align="center">{props.row.qualification}</TableCell>
     <TableCell align="center">{String(props.row.investmentExperience)}</TableCell>
-    <TableCell align="center">{props.row.description}</TableCell>
+    <TableCell align="center">{props.row.areaOfExpertise}</TableCell>
     <TableCell align="center">
       <Edit onClick={handleOpen}/>&nbsp;
       <Delete onClick={handleDelete}></Delete>

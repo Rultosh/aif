@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress, Switch } from "@mui/material";
 import { useState, useEffect } from "react"
 import { questionsForMoreThanOne } from './selfRatingQuestionsMoreThanOne'
 import { questionsForFirstTime } from './selfRatingQuestionsFirstTime'
@@ -316,7 +316,7 @@ export const SelfRating = (props: any) => {
                     </Box>
 
                     <Box sx={{ mb: 4 }}>
-                        <Card sx={{
+                        {/* <Card sx={{
                             display: 'flex',
                             mt: 3,
                             borderRadius: '12px',
@@ -328,37 +328,47 @@ export const SelfRating = (props: any) => {
                                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
                             }
                         }}>
-                            <CardContent sx={{ p: 3, width: '100%' }}>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={12}>
-                                        <FormControl fullWidth>
-                                            <RadioGroup
-                                                row
-                                                value={fundManagerType}
-                                                onChange={handleChangeFundManagerType}
-                                                name={"fundManagerType"}
-                                                defaultValue="First Time Fund Manager"
-                                            >
-                                                <Grid item xs={3}>
-                                                    <FormControlLabel
-                                                        value={"First Time Fund Manager"}
-                                                        control={<Radio color="primary" />}
-                                                        label={<Typography variant="body2">First Time Fund Manager</Typography>}
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <FormControlLabel
-                                                        value={"Managed >= One Fund"}
-                                                        control={<Radio color="primary" />}
-                                                        label={<Typography variant="body2">Managed {'>'}= One Fund</Typography>}
-                                                    />
-                                                </Grid>
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </Grid>
-                                </Grid>
-                            </CardContent>
-                        </Card>
+                            <CardContent sx={{ p: 3, width: '100%' }}> */}
+                        <Grid container spacing={3}>
+                            <Grid item xs={12}>
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    p: 2,
+                                    borderRadius: '12px',
+                                    backgroundColor: 'rgba(54, 48, 98, 0.02)',
+                                    border: '1px dashed rgba(54, 48, 98, 0.2)'
+                                }}>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062' }}>
+                                        First Time Fund Manager?
+                                    </Typography>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={selfRatingValue.managerType === "First Time Fund Manager" || !selfRatingValue.managerType}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelfRatingValue({
+                                                            ...selfRatingValue,
+                                                            managerType: "First Time Fund Manager"
+                                                        });
+                                                    }
+                                                }}
+                                                color="primary"
+                                            />
+                                        }
+                                        label={
+                                            <Typography variant="body2" sx={{ fontWeight: 600, color: selfRatingValue.managerType === "First Time Fund Manager" || !selfRatingValue.managerType ? '#363062' : '#666' }}>
+                                                {selfRatingValue.managerType === "First Time Fund Manager" || !selfRatingValue.managerType ? "Yes" : "No"}
+                                            </Typography>
+                                        }
+                                    />
+                                </Box>
+                            </Grid>
+                        </Grid>
+                        {/* </CardContent>
+                        </Card> */}
                         {selfRatingQuestionComponents}
                         <Card sx={{
                             display: 'flex',

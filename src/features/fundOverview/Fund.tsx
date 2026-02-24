@@ -1,4 +1,4 @@
-import { Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button } from "@mui/material";
+import { Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, CircularProgress } from "@mui/material";
 import FundOverviewData from "./subsections/fundOverviewData/FundOverviewData";
 import InvestmentPartner from "./subsections/fundOverviewData/investmentPartner/InvestmentPartner";
 import InvestmentStrategy from "./subsections/fundOverviewData/investmentStrategy/InvestmentStrategy";
@@ -25,6 +25,8 @@ export const Fund = (props: any) => {
     const { id } = useParams();
     const dispatch = useAppDispatch();
     const [prelimApplicationId, setPrelimApplicationId] = useState(id);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
 
@@ -153,20 +155,38 @@ export const Fund = (props: any) => {
         return results;
     };
 
-    const handleClick = async (ev: any, navTo: string) => {
-        if (navTo === 'previous') {
-            navigate(`/preliminary/${prelimApplicationId}/selfrating`)
-        } else if (navTo === 'next') {
-            const results = await handleClickSave();
-            const allValid = results.every(res => res === true);
-
-            if (allValid) {
-                navigate(`/preliminary/${prelimApplicationId}/declaration`)
+    const handleNextClick = async (ev: any) => {
+        setIsLoading(true);
+        try {
+            if (ev?.navTo === 'previous') {
+                navigate(`/preliminary/${prelimApplicationId}/selfrating`)
             } else {
-                console.log("allValid", allValid);
+                const results = await handleClickSave();
+                const allValid = results.every(res => res === true);
+
+                if (allValid) {
+                    navigate(`/preliminary/${prelimApplicationId}/declaration`)
+                } else {
+                    console.log("allValid", allValid);
+                }
             }
+        } finally {
+            setIsLoading(false);
         }
     }
+
+    const handleSubmitClick = async () => {
+        setIsLoading(true);
+        try {
+            const results = await handleClickSave();
+            const allValid = results.every(res => res === true);
+            if (allValid) {
+                setIsSubmitted(true);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <Box className="formAnimation" sx={{ pb: 5 }}>
             {/* {Number(prelimApplicationId) ? (
@@ -272,6 +292,8 @@ export const Fund = (props: any) => {
                                             color: expanded === "1" ? '#363062' : '#444'
                                         }}>
                                             Fund Overview
+                                            <br/>
+                                            <small>All Fields are mandatory</small>
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -393,7 +415,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "3" ? '#363062' : '#444'
                                         }}>
-                                            Details of Key Investment team (At Partner Level)
+                                            Details Of Key Investment Team (At Partner Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -458,7 +480,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "4" ? '#363062' : '#444'
                                         }}>
-                                            Details of Key Investment team (At Associate Level)
+                                            Details Of Key Investment Team (At Associate Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -523,7 +545,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "5" ? '#363062' : '#444'
                                         }}>
-                                            Details of Contributor to the Fund
+                                            Details Of Contributor To the Fund
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -588,7 +610,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "6" ? '#363062' : '#444'
                                         }}>
-                                            Investments made, if any from the current Fund
+                                            Investments Made, If Any From the Current Fund
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -714,7 +736,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "8" ? '#363062' : '#444'
                                         }}>
-                                            Past investment track record of the AMC
+                                            Past Investment Track Record Of the AMC
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -874,9 +896,10 @@ export const Fund = (props: any) => {
                     <Divider sx={{ mb: 3 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Button
-                            onClick={(e) => handleClick(e, "previous")}
+                            onClick={(e) => handleNextClick({ navTo: 'previous' })}
                             startIcon={<ArrowLeftIcon />}
                             variant="outlined"
+                            disabled={isLoading}
                             sx={{
                                 textTransform: 'none',
                                 borderRadius: '8px',
@@ -889,37 +912,103 @@ export const Fund = (props: any) => {
                                     backgroundColor: 'rgba(54, 48, 98, 0.04)'
                                 }
                             }} >
-                            Back to Initial Assessment
+                            Back To Initial Assessment
                         </Button>
 
 
 
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                            <Button
-                                onClick={(e) => handleClick(e, "next")}
-                                endIcon={<ArrowRightIcon />}
-                                variant="contained"
-                                sx={{
-                                    textTransform: 'none',
-                                    borderRadius: '8px',
-                                    px: 4,
-                                    py: 1.5,
-                                    fontWeight: 700,
-                                    backgroundColor: '#363062',
-                                    color: 'white',
-                                    boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
-                                    '&:hover': {
-                                        backgroundColor: '#4d4585',
-                                        boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
-                                    }
-                                }} >
-                                Save & Continue to Declaration
-                            </Button>
+                            {!isSubmitted ? (
+                                <Button
+                                    onClick={handleSubmitClick}
+                                    variant="contained"
+                                    disabled={isLoading}
+                                    startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
+                                    sx={{
+                                        textTransform: 'none',
+                                        borderRadius: '8px',
+                                        px: 6,
+                                        py: 1.5,
+                                        fontWeight: 700,
+                                        backgroundColor: '#363062',
+                                        color: 'white',
+                                        boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
+                                        '&:hover': {
+                                            backgroundColor: '#4d4585',
+                                            boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                        }
+                                    }}
+                                >
+                                    Submit
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={(e) => handleNextClick({ navTo: 'next' })}
+                                    startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
+                                    endIcon={!isLoading && <ArrowRightIcon />}
+                                    variant="contained"
+                                    disabled={isLoading}
+                                    sx={{
+                                        textTransform: 'none',
+                                        borderRadius: '8px',
+                                        px: 4,
+                                        py: 1.5,
+                                        fontWeight: 700,
+                                        backgroundColor: '#363062',
+                                        color: 'white',
+                                        boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
+                                        '&:hover': {
+                                            backgroundColor: '#4d4585',
+                                            boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                        }
+                                    }} >
+                                    Save & Continue To Declaration
+                                </Button>
+                            )}
                         </Box>
                     </Box>
 
                 </CardContent>
             </Card>
+
+            {/* Sticky Save Button */}
+            <Box
+                sx={{
+                    position: 'fixed',
+                    right: 0,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 2000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1
+                }}
+            >
+                <Button
+                    onClick={(e) => !isSubmitted ? handleSubmitClick() : handleNextClick({ navTo: 'next' })}
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{
+                        minWidth: 'auto',
+                        width: isLoading ? '80px' : '48px',
+                        height: '48px',
+                        borderRadius: '12px 0 0 12px',
+                        backgroundColor: '#363062',
+                        color: 'white',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '-2px 0 10px rgba(54, 48, 98, 0.3)',
+                        '&:hover': {
+                            backgroundColor: '#4d4585',
+                            width: isLoading ? '80px' : '56px',
+                        }
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {isLoading && <CircularProgress size={20} color="inherit" />}
+                        <SaveIcon />
+                    </Box>
+                </Button>
+            </Box>
         </Box>
     );
 }

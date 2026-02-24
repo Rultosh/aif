@@ -1,6 +1,6 @@
 import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react"
-import {  fetchInvestmentPastAsync, selectInvestmentPast, createInvestmentPastAsync, deleteInvestmentPastAsync } from './investmentPastSlice'
+import { fetchInvestmentPastAsync, selectInvestmentPast, createInvestmentPastAsync, deleteInvestmentPastAsync } from './investmentPastSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
@@ -56,10 +56,10 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     const tableHeaders = [
-        "Name Of Company", 
-        "Sector", 
-        "Amount Invested(₹ Crore)", 
-        "Date Of Investment", 
+        "Name Of Company",
+        "Sector",
+        "Amount Invested(₹ Crore)",
+        "Date Of Investment",
         "Brief Profile",
         "Action"]
 
@@ -78,22 +78,22 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
                 <Grid item xs={11.5}>
                     <Box >
                         <TableContainer component={Paper}  >
-                            <Table sx={{ minWidth: 700, mt: 1, mb: 1 }} aria-label="customized table">
+                            <Table sx={{ minWidth: 700 }} aria-label="customized table">
                                 <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
                                     <TableRow>
                                         {headerComponent}
                                     </TableRow>
                                 </TableHead>
-                                {investmentPastsState.status.fetchStatus == FetchStatus.IDLE && investmentPastsState.actionStatus.fetchStatus == FetchStatus.IDLE?
-                                <TableBody>
-                                    {investmentPastsState.investmentPasts && investmentPastsState.investmentPasts.length > 0?
-                                        investmentPastsState.investmentPasts.map((row: IInvestmentPast) => (
-                                            <InvestmentPastRow row={row}/>
-                                    )):<TableRow><TableCell colSpan={7}>No rows to display.</TableCell></TableRow>
-                                    }
-                                </TableBody>:<TableBody>
-                                    <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
-                                </TableBody>}
+                                {investmentPastsState.status.fetchStatus == FetchStatus.IDLE && investmentPastsState.actionStatus.fetchStatus == FetchStatus.IDLE ?
+                                    <TableBody>
+                                        {investmentPastsState.investmentPasts && investmentPastsState.investmentPasts.length > 0 ?
+                                            investmentPastsState.investmentPasts.map((row: IInvestmentPast) => (
+                                                <InvestmentPastRow row={row} />
+                                            )) : <TableRow><TableCell colSpan={7}>No Rows To Display</TableCell></TableRow>
+                                        }
+                                    </TableBody> : <TableBody>
+                                        <TableRow><TableCell colSpan={7}>Loading...</TableCell></TableRow>
+                                    </TableBody>}
                             </Table>
                         </TableContainer>
                     </Box>
@@ -102,12 +102,12 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
                     <Button onClick={handleOpen} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                         Add
                     </Button>
-                    <InvestmentPastModel 
+                    <InvestmentPastModel
                         key='add-investment-past    '
-                        investmentPastFormData={defaultInvestmentPast} 
-                        open={open} 
-                        handleClose={handleClose} 
-                        prelimApplicationId={props.prelimApplicationId}/>
+                        investmentPastFormData={defaultInvestmentPast}
+                        open={open}
+                        handleClose={handleClose}
+                        prelimApplicationId={props.prelimApplicationId} />
                 </Grid>
             </Grid>
         </Box>
