@@ -1,13 +1,14 @@
 import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react"
-import { questions } from './selfRatingQuestions'
+import { questionsForMoreThanOne } from './selfRatingQuestionsMoreThanOne'
+import { questionsForFirstTime } from './selfRatingQuestionsFirstTime'
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import SaveIcon from '@mui/icons-material/Save';
 import React, * as Rect from 'react'
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
-import { ISelfRating } from "./ISelfRating";
+import { defaultIISelfRating, ISelfRating } from "./ISelfRating";
 import { selectSelfRatings, fetchSelfRatingAsync, createSelfRatingAsync, updateSelfRatingAsync, createIndependentSelfRatingAsync } from "./selfRatingSlice";
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from 'react-uuid';
@@ -32,6 +33,7 @@ export const SelfRating = (props: any) => {
     const selfRatingState = useAppSelector(selectSelfRatings)
 
     const [selfRatingValue, setSelfRatingValue] = useState<ISelfRating>(selfRatingState.selfRatings);
+    const [firstTime] = useState<boolean>(selfRatingState.selfRatings.id !== undefined);
     const [scoreBoard, setScoreBoard] = useState({} as any);
     const [score, setScore] = useState('0');
     const usersState = useAppSelector(selectUsers)
@@ -116,15 +118,19 @@ export const SelfRating = (props: any) => {
     function calculateScore(v: any, sel: string, idx: number) {
         let i = v.options.indexOf(sel);
         let weight = v.weightage[i]
+        console.log('calculateScore', v);
+        let contribution = v.contribution
         let copiedValue = { ...scoreBoard };
-        copiedValue[idx] = weight;
+        copiedValue[idx] = {weight, contribution};
         setScoreBoard(copiedValue);
     }
     function updateScore() {
         let sum = 0;
-        let arr: any = Object.values(scoreBoard)
+        let arr: {weight: number, contribution: number}[] = Object.values(scoreBoard)
         for (let i = 0; i < arr.length; i++) {
-            sum += arr[i];
+            let delta =  arr[i] && arr[i].weight * arr[i].contribution;
+            console.log('delta'+i, delta, sum)
+            sum += delta || 0;
         }
         let sumStr = sum.toFixed(2);
         //setScore(sumStr)
@@ -134,6 +140,24 @@ export const SelfRating = (props: any) => {
     }
 
 
+    const handleChangeFundManagerType = (e: any) => {
+        // ev.preventDefault();
+        // let copiedValue = { ...formData }
+        // let key = ev.target.id ? ev.target.id : ev.target.name;
+        // copiedValue[key as keyof typeof formData] = ev.target.value;
+        // setFormData(copiedValue);
+
+        e.preventDefault();
+        let copiedValue = { ...defaultIISelfRating };
+        let key = e.target.id ? e.target.id : e.target.name;
+        copiedValue[key as keyof typeof selfRatingValue] = e.target.value as any;
+        console.log("FundManagerType", e.target.value as String);
+        setFundManagerType(e.target.value as String);
+        setSelfQuestions(e.target.value === "First Time Fund Manager" ? 
+            questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
+        setScoreBoard(copiedValue);
+        setSelfRatingValue(copiedValue);
+    };
 
 
     const handleChange = (e: any, idx: any) => {
@@ -157,29 +181,10 @@ export const SelfRating = (props: any) => {
 
     let selfRatingQuestionComponents = []
 
-    let selfQuestions = questions.selfRatingQuestions
+    const [fundManagerType, setFundManagerType] = useState<String | undefined>(selfRatingValue.fundManagerType)
 
-
-    // const validationSchema = Yup.object().shape({
-    //     comments: Yup.string().required("Comments is required")
-    //   });
-
-    //   const {
-    //     control,
-    //     register,
-    //     handleSubmit,
-    //     getValues,
-    //     setValue,
-    //     reset,
-    //     formState: { errors },
-    //   } = useForm({
-    //     resolver: yupResolver(validationSchema),
-    //   });
-
-    //   const onSubmit = (data: any) => {
-    //     console.log(data);
-    //     handleClickSave();
-    //   };
+    const [selfQuestions, setSelfQuestions] = useState(!fundManagerType || fundManagerType === "First Time Fund Manager" ? 
+        questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
 
     for (let i = 0; i < selfQuestions.length; i++) {
         let qes = selfQuestions[i].id.toString().concat('. ', selfQuestions[i].text);
@@ -329,6 +334,9 @@ export const SelfRating = (props: any) => {
                                         <FormControl fullWidth>
                                             <RadioGroup
                                                 row
+                                                value={fundManagerType}
+                                                onChange={handleChangeFundManagerType}
+                                                name={"fundManagerType"}
                                                 defaultValue="First Time Fund Manager"
                                             >
                                                 <Grid item xs={3}>
@@ -352,6 +360,26 @@ export const SelfRating = (props: any) => {
                             </CardContent>
                         </Card>
                         {selfRatingQuestionComponents}
+                        <Card sx={{
+                            display: 'flex',
+                            mt: 3,
+                            borderRadius: '12px',
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                            border: '1px solid rgba(0,0,0,0.05)',
+                            transition: 'transform 0.2s, box-shadow 0.2s',
+                            '&:hover': {
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                                }
+                            }}>
+                            <CardContent sx={{ p: 3, width: '100%' }}>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12}>
+                                        Score: {selfRatingValue.score || '-'} First Time: {firstTime === true ? "Yes" : "No"}
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
                     </Box>
 
                     <Divider sx={{ mb: 4 }} />
