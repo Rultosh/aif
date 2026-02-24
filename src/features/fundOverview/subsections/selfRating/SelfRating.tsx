@@ -121,15 +121,15 @@ export const SelfRating = (props: any) => {
         console.log('calculateScore', v);
         let contribution = v.contribution
         let copiedValue = { ...scoreBoard };
-        copiedValue[idx] = {weight, contribution};
+        copiedValue[idx] = { weight, contribution };
         setScoreBoard(copiedValue);
     }
     function updateScore() {
         let sum = 0;
-        let arr: {weight: number, contribution: number}[] = Object.values(scoreBoard)
+        let arr: { weight: number, contribution: number }[] = Object.values(scoreBoard)
         for (let i = 0; i < arr.length; i++) {
-            let delta =  arr[i] && arr[i].weight * arr[i].contribution;
-            console.log('delta'+i, delta, sum)
+            let delta = arr[i] && arr[i].weight * arr[i].contribution;
+            console.log('delta' + i, delta, sum)
             sum += delta || 0;
         }
         let sumStr = sum.toFixed(2);
@@ -147,13 +147,13 @@ export const SelfRating = (props: any) => {
         // copiedValue[key as keyof typeof formData] = ev.target.value;
         // setFormData(copiedValue);
 
-        e.preventDefault();
-        let copiedValue = { ...defaultIISelfRating };
-        let key = e.target.id ? e.target.id : e.target.name;
-        copiedValue[key as keyof typeof selfRatingValue] = e.target.value as any;
+        e.preventDefault?.();
+        const copiedValue: any = { ...defaultIISelfRating };
+        const key = e.target.id ? e.target.id : e.target.name;
+        copiedValue[key] = e.target.value;
         console.log("FundManagerType", e.target.value as String);
         setFundManagerType(e.target.value as String);
-        setSelfQuestions(e.target.value === "First Time Fund Manager" ? 
+        setSelfQuestions(e.target.value === "First Time Fund Manager" ?
             questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
         setScoreBoard(copiedValue);
         setSelfRatingValue(copiedValue);
@@ -183,7 +183,7 @@ export const SelfRating = (props: any) => {
 
     const [fundManagerType, setFundManagerType] = useState<String | undefined>(selfRatingValue.fundManagerType)
 
-    const [selfQuestions, setSelfQuestions] = useState(!fundManagerType || fundManagerType === "First Time Fund Manager" ? 
+    const [selfQuestions, setSelfQuestions] = useState(!fundManagerType || fundManagerType === "First Time Fund Manager" ?
         questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
 
     for (let i = 0; i < selfQuestions.length; i++) {
@@ -346,21 +346,17 @@ export const SelfRating = (props: any) => {
                                     <FormControlLabel
                                         control={
                                             <Switch
-                                                checked={selfRatingValue.managerType === "First Time Fund Manager" || !selfRatingValue.managerType}
+                                                checked={fundManagerType === "First Time Fund Manager" || !fundManagerType}
                                                 onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setSelfRatingValue({
-                                                            ...selfRatingValue,
-                                                            managerType: "First Time Fund Manager"
-                                                        });
-                                                    }
+                                                    const value = e.target.checked ? "First Time Fund Manager" : "Experienced Fund Manager";
+                                                    handleChangeFundManagerType({ target: { name: "fundManagerType", value } });
                                                 }}
                                                 color="primary"
                                             />
                                         }
                                         label={
-                                            <Typography variant="body2" sx={{ fontWeight: 600, color: selfRatingValue.managerType === "First Time Fund Manager" || !selfRatingValue.managerType ? '#363062' : '#666' }}>
-                                                {selfRatingValue.managerType === "First Time Fund Manager" || !selfRatingValue.managerType ? "Yes" : "No"}
+                                            <Typography variant="body2" sx={{ fontWeight: 600, color: fundManagerType === "First Time Fund Manager" || !fundManagerType ? '#363062' : '#666' }}>
+                                                {fundManagerType === "First Time Fund Manager" || !fundManagerType ? "Yes" : "No"}
                                             </Typography>
                                         }
                                     />
@@ -378,10 +374,10 @@ export const SelfRating = (props: any) => {
                             border: '1px solid rgba(0,0,0,0.05)',
                             transition: 'transform 0.2s, box-shadow 0.2s',
                             '&:hover': {
-                                    transform: 'translateY(-2px)',
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
-                                }
-                            }}>
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                            }
+                        }}>
                             <CardContent sx={{ p: 3, width: '100%' }}>
                                 <Grid container spacing={3}>
                                     <Grid item xs={12}>
