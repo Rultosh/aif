@@ -42,7 +42,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable(),
         dfCurrentPipeline: Yup.string().required("This field is required").nullable(),
         // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
-        dfConversionRatio: Yup.string().required("This field is required").nullable(),
+        dfConversionRatio: Yup.number().required("This field is required").nullable(),
     });
 
     const {

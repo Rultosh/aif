@@ -78,8 +78,8 @@ export interface IPrelimApplicationData {
   // Deal Flow
   dfTotalDealsEvaluated: String | undefined,
   dfCurrentPipeline: String | undefined,
-  dfSourcingBreakdown: String | undefined,
-  dfConversionRatio: String | undefined,
+  // dfSourcingBreakdown: String | undefined,
+  dfConversionRatio: Number | undefined,
   // Others
   otExternalFirms: String | undefined,
   otMonitoringActivities: String | undefined,
@@ -181,7 +181,7 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   // Deal Flow
   dfTotalDealsEvaluated: undefined,
   dfCurrentPipeline: undefined,
-  dfSourcingBreakdown: undefined,
+  // dfSourcingBreakdown: undefined,
   dfConversionRatio: undefined,
   // Others
   otExternalFirms: undefined,
