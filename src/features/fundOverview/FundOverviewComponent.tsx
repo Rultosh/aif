@@ -89,8 +89,8 @@ export const FundOverview = (props: any) => {
     const currentStep = [
         { label: 'Initial Assessment', path: 'selfrating' },
         { label: 'Fund Overview', path: 'fund' },
-        { label: 'Profile', path: 'profile' },
-        { label: 'Declaration', path: 'declaration' },
+        // { label: 'Profile', path: 'profile' },
+        { label: 'KYC, Supporting Documents & Declaration', path: 'declaration' },
         { label: 'Preview', path: 'preview' },
     ].find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
 
@@ -137,7 +137,7 @@ export const FundOverview = (props: any) => {
                         { label: 'Initial Assessment', path: 'selfrating', subLabel: 'Assessment' },
                         { label: 'Fund Overview', path: 'fund', subLabel: 'Information' },
                         // { label: 'Profile', path: 'profile', subLabel: 'Details' },
-                        { label: 'Declaration', path: 'declaration', subLabel: 'Legal' },
+                        { label: 'KYC, Supporting Documents & Declaration', path: 'declaration', subLabel: 'Legal' },
                         { label: 'Preview', path: 'preview', subLabel: 'Review' },
                     ].map((s, index, array) => {
                         const isNew = id?.toString() === 'NEW';

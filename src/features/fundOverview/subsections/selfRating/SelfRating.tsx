@@ -100,6 +100,11 @@ export const SelfRating = (props: any) => {
     }, [selfRatingState.status.fetchStatus === FetchStatus.IDLE])
 
     useEffect(() => {
+        updateScore()
+        console.log("use Effect running due to scoreBoard change");
+    }, [scoreBoard])
+
+    useEffect(() => {
         window.scrollTo(0, 0)
     }, [])
 
@@ -299,6 +304,7 @@ export const SelfRating = (props: any) => {
         try {
             await handleClickSave();
             const currentScore = Number(selfRatingValue.score || 0);
+            // alert(currentScore)
             if (currentScore >= 0.7) {
                 setModalType('success');
                 setIsSubmitted(true);

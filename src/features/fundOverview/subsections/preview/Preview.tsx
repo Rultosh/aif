@@ -222,73 +222,74 @@ export const Preview = (props: any) => {
                                         Submission Steps:
                                     </Typography>
                                     <Grid container spacing={2}>
-                                        <Grid item xs={12} md={4}>
+                                        <Grid item xs={12} md={6}>
                                             <Card sx={{ height: '100%', borderRadius: '12px' }}>
                                                 <CardContent sx={{ p: 2, textAlign: 'center' }}>
                                                     <Typography variant="caption" sx={{ fontWeight: 800, color: '#D586F7', mb: 1, display: 'block' }}>STEP 1</Typography>
-                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>Download Application</Typography>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600, m: 0 }}>Download Application</Typography>
+                                                    <br />
+                                                    <Chip
+                                                        icon={<FileDownloadIcon />}
+                                                        label="Download Application"
+                                                        component="a"
+                                                        href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
+                                                        clickable
+                                                        sx={{
+                                                            backgroundColor: '#0295c9',
+                                                            color: '#ffffff',
+                                                            '& .MuiChip-icon': { color: 'white' },
+                                                            fontWeight: 600,
+                                                            borderRadius: '16px',
+                                                            height: '40px',
+                                                            width: 'fit-content',
+                                                            '&:hover': {
+                                                                backgroundColor: '#808080',
+                                                                color: '#ffffff'
+                                                            }
+                                                        }}
+                                                    />
+                                                    <span style={{ marginLeft: '10px' }}></span>
+                                                    <Chip
+                                                        icon={<FileDownloadIcon />}
+                                                        label="Download All As Zip"
+                                                        component="a"
+                                                        href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
+                                                        clickable
+                                                        sx={{
+                                                            backgroundColor: '#0295c9',
+                                                            color: '#ffffff',
+                                                            '& .MuiChip-icon': { color: 'white' },
+                                                            fontWeight: 600,
+                                                            borderRadius: '16px',
+                                                            height: '40px',
+                                                            width: 'fit-content',
+                                                            '&:hover': {
+                                                                backgroundColor: '#808080',
+                                                                color: '#ffffff'
+                                                            }
+                                                        }}
+                                                    />
                                                 </CardContent>
                                             </Card>
                                         </Grid>
-                                        <Grid item xs={12} md={4}>
+                                        <Grid item xs={12} md={6}>
                                             <Card sx={{ height: '100%', borderRadius: '12px' }}>
                                                 <CardContent sx={{ p: 2, textAlign: 'center' }}>
                                                     <Typography variant="caption" sx={{ fontWeight: 800, color: '#D586F7', mb: 1, display: 'block' }}>STEP 2</Typography>
-                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>Digitally sign and upload application</Typography>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                        <Grid item xs={12} md={4}>
-                                            <Card sx={{ height: '100%', borderRadius: '12px' }}>
-                                                <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#D586F7', mb: 1, display: 'block' }}>STEP 3</Typography>
-                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>OR manually sign on letterhead and upload</Typography>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600, m: 0 }}>Upload the signed Application</Typography>
+                                                    <br />
+
+                                                    <DocumentChip label="Upload" id={`unsignedDocument${id}`} />
                                                 </CardContent>
                                             </Card>
                                         </Grid>
                                     </Grid>
-
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 3, p: 2, backgroundColor: 'white', borderRadius: '12px', border: '1px dashed rgba(54, 48, 98, 0.2)' }}>
-                                        <Chip
-                                            icon={<FileDownloadIcon />}
-                                            label="Download Application"
-                                            component="a"
-                                            href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
-                                            clickable
-                                            sx={{
-                                                backgroundColor: '#363062',
-                                                color: 'white',
-                                                '& .MuiChip-icon': { color: 'white' },
-                                                fontWeight: 600,
-                                                borderRadius: '8px',
-                                                height: '40px'
-                                            }}
-                                        />
-                                        <Chip
-                                            icon={<FileDownloadIcon />}
-                                            label="Download All As Zip"
-                                            component="a"
-                                            href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
-                                            clickable
-                                            sx={{
-                                                backgroundColor: 'rgba(54, 48, 98, 0.1)',
-                                                color: '#363062',
-                                                fontWeight: 600,
-                                                borderRadius: '8px',
-                                                height: '40px'
-                                            }}
-                                        />
-                                        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-                                        <DocumentChip label="Upload Digitally Signed Application" id={`DigitallySignedApplication${id}`} signed={true} />
-                                        <DocumentChip label="Upload Digital Certificates" id={`DigitalCertificate${id}`} />
-                                        <DocumentChip label="Upload (Standard)" id={`unsignedDocument${id}`} />
-                                    </Box>
                                 </Box>
                             ) : null}
 
                             <Box sx={{ p: 2, backgroundColor: 'white', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062', mb: 2 }}>
-                                    Actions & Comments
+                                    Any Comments/Feedback
                                 </Typography>
                                 <TextField
                                     fullWidth

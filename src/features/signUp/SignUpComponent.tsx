@@ -134,6 +134,14 @@ const SignUp = () => {
             let copiedValue = { ...formData }
             let key = ev.target.id ? ev.target.id : ev.target.name;
             copiedValue[key as keyof typeof formData] = ev.target.value;
+
+            if (key === 'state') {
+                copiedValue.city = undefined;
+                copiedValue.otherCity = undefined;
+                setValue('city', '');
+                setValue('otherCity', '');
+            }
+
             setFormData(copiedValue);
         }
     };
@@ -212,7 +220,7 @@ const SignUp = () => {
             }),
         title: Yup
             .string()
-            .matches(/^[A-Za-z ]*$/, 'Please enter valid title')
+            .matches(/^[A-Za-z. ]*$/, 'Please enter valid title')
             .required("Title is required"),
         phoneNumber: Yup.string().required("Phone Number is required").test("test-name", "Enter a valid Mobile No", function (value: any) {
             const PhoneRegex = /^[0-9]{10}$/; // Change This Regex Based On Requirement
@@ -228,6 +236,11 @@ const SignUp = () => {
         city: Yup
             .string()
             .required("City is required"),
+        otherCity: Yup.string().when("city", {
+            is: (val: string) => val === "others",
+            then: Yup.string().required("Please specify your city"),
+            otherwise: Yup.string().nullable()
+        }),
         address: Yup.string()
             .trim()
             .test("Invalid input entered", function (value: any) {
@@ -373,7 +386,7 @@ const SignUp = () => {
                                             labelId="title-label"
                                             id="title"
                                             label="Title"
-                                            defaultValue={formData["title"] || ""}
+                                            value={formData["title"] || ""}
                                             {...register("title")}
                                             error={!!errors.title}
                                             onChange={handleChange}
@@ -424,7 +437,7 @@ const SignUp = () => {
                                     required
                                     fullWidth
                                     id="username"
-                                    label="Email of Contact Person"
+                                    label="Email Of Contact Person"
                                     value={formData["username"] || ''}
                                     {...register("username")}
                                     error={!!errors.username}
@@ -461,7 +474,7 @@ const SignUp = () => {
                                         {...register("state")}
                                         error={!!errors.state}
                                         onChange={handleChange}
-                                        defaultValue={formData["state"] || ""}
+                                        value={formData["state"] || ""}
                                     >
                                         {state.categoryData.map((item: any) => (
                                             <MenuItem key={item.ID} value={item.ID}>
@@ -487,7 +500,7 @@ const SignUp = () => {
                                         {...register("city")}
                                         error={!!errors.city}
                                         onChange={handleChange}
-                                        defaultValue={formData["city"] || ""}
+                                        value={formData["city"] || ""}
                                     >
                                         {city.categoryData.map((item: any) => {
                                             if (item.STATE_ID === formData["state"]) {
@@ -510,12 +523,27 @@ const SignUp = () => {
                                     )}
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12}>
+                            {formData.city === 'others' && (
+                                <Grid item xs={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="otherCity"
+                                        label="Please Enter City Name"
+                                        value={formData["otherCity"] || ''}
+                                        {...register("otherCity")}
+                                        error={!!errors.otherCity}
+                                        helperText={errors.otherCity?.message as string}
+                                        onChange={handleChange}
+                                        sx={fieldSx}
+                                    />
+                                </Grid>
+                            )}
+                            <Grid item xs={8}>
                                 <TextField
                                     required
                                     fullWidth
                                     multiline
-                                    maxRows={4}
                                     id="address"
                                     label="Full Address"
                                     value={formData["address"] || ''}
@@ -591,7 +619,7 @@ const SignUp = () => {
                     </Box>
 
                     <Typography variant="body2" sx={{ mt: 1, mb: 2, textAlign: "center", color: '#64748b' }}>
-                        For any help, email us at <span style={{ color: '#363062', fontWeight: 600 }}>aif.investment@npstrust.org.in</span>
+                        For any help, please feel free to contact us at <span style={{ color: '#363062', fontWeight: 600 }}>aif.investment@npstrust.org.in</span>
                     </Typography>
                 </Paper>
 

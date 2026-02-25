@@ -287,7 +287,7 @@ const Landing = () => {
                                                                     </Grid>
 
                                                                 </Box>
-                                                                <Typography sx={{ flex: 1, mt: 2, mb: "2px", mx: 4, color: '#858487', textAlign: 'center' }}  variant="body2">To reset your password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
+                                                                <Typography sx={{ flex: 1, mt: 2, mb: "2px", mx: 4, color: '#858487', textAlign: 'center' }}  variant="body2">Forgot password, please click <a href="/resetPassword" style={{ color: 'blue' }}>here</a></Typography>
 
                                                                 <Box
                                                                     justifyContent="center"

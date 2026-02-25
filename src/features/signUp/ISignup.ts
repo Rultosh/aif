@@ -9,14 +9,15 @@ export interface ISignup extends IEntity {
   phoneNumber: string | undefined,
   address: string | undefined,
   city: string | undefined,
+  otherCity: string | undefined,
   state: string | undefined,
   sebiRegistration: string | undefined,
   sebiRegistrationDate: Date | undefined | null,
   registeredOn: Date | undefined | null
 }
 
-export const defaultISignup : ISignup = {
-  id : undefined,
+export const defaultISignup: ISignup = {
+  id: undefined,
   parentId: undefined,
   username: undefined,
   companyName: undefined,
@@ -25,6 +26,7 @@ export const defaultISignup : ISignup = {
   state: undefined,
   title: undefined,
   city: undefined,
+  otherCity: undefined,
   address: undefined,
   sebiRegistration: undefined,
   sebiRegistrationDate: null,

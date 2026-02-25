@@ -55,7 +55,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         "Services",
         "Telecommunication",
         "Textiles"
-        ];
+    ];
 
     useEffect(() => {
         if (Number(prelimAppicationId)) {
@@ -989,26 +989,26 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 options={dealSectorOptions}
                                 // value={prelimApplicationFormData.dealSector || null}
                                 onChange={(event, newValue) => {
-                                handleChange({
-                                    target: {
-                                    name: "dealSector",
-                                    value: newValue || ""
-                                    }
-                                });
+                                    handleChange({
+                                        target: {
+                                            name: "dealSector",
+                                            value: newValue || ""
+                                        }
+                                    });
                                 }}
                                 renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Deal Sector"
-                                    variant="outlined"
-                                    sx={{
-                                    borderRadius: "8px",
-                                    backgroundColor: "white"
-                                    }}
-                                />
+                                    <TextField
+                                        {...params}
+                                        label="Deal Sector"
+                                        variant="outlined"
+                                        sx={{
+                                            borderRadius: "8px",
+                                            backgroundColor: "white"
+                                        }}
+                                    />
                                 )}
                             />
-                            </FormControl>
+                        </FormControl>
                     </Grid>
                     <Grid item xs={12} md={4}>
                         <TextField
