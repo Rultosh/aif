@@ -173,13 +173,13 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     }).nullable(),
     currentStatus: Yup.string().required("Current Status is required").nullable(),
     instrumentType: Yup.string().required("Instrument Type is required").nullable(),
-    shareholdingInvestee: Yup.string().required("Shareholding in investee company is required").test("max-value", "Value cannot exceed 100", (value) => {
+    shareholdingInvestee: Yup.number().required("Shareholding in investee company is required").test("max-value", "Value cannot exceed 100", (value) => {
       if (!value) return true;
-      return parseFloat(value) <= 100;
+      return parseFloat(String(value)) <= 100;
     }).nullable(),
     moic: Yup.string().required("MOIC is required").nullable(),
-    grossIrr: Yup.string().required("Gross IRR is required").nullable(),
-    timeTakenFromSourcingToClosure: Yup.string().required("Time taken from sourcing to closure is required").nullable(),
+    grossIrr: Yup.number().required("Gross IRR is required").nullable(),
+    timeTakenFromSourcingToClosure: Yup.number().required("Time taken from sourcing to closure is required").nullable(),
     conflictOfInterest: Yup.string().nullable(),
     stakeOfEmployee: Yup.string().nullable(),
     investmentStageFundingRound: Yup.string().nullable(),

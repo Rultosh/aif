@@ -84,20 +84,27 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         setPrelimApplicationFormData(copiedValue)
     };
 
-    const savePrelimApplicationForm = async () => {
-        // console.log("onSubmit called", prelimApplicationFormData);
-        if (prelimApplicationFormData.id) {
-            await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationFormData)));
+    const savePrelimApplicationForm = async (data: IPrelimApplicationData) => {
+        // console.log("onSubmit called", data);
+        if (data.id) {
+            await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, data)));
             if (props.onSaveSuccess) {
                 props.onSaveSuccess();
             }
         } else {
-            dispatch(createPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationFormData)));
+            const resultAction = await dispatch(createPrelimApplicationAsync(wrapArgument(actionUid, data)));
+            if (createPrelimApplicationAsync.fulfilled.match(resultAction)) {
+                if (props.onSaveSuccess) {
+                    props.onSaveSuccess();
+                }
+            }
         }
     };
 
     const handleChange = (ev: any) => {
-        ev.preventDefault();
+        if (ev.preventDefault) {
+            ev.preventDefault();
+        }
 
         let value = ev.target.value;
         const id = ev.target.id || ev.target.name;
@@ -374,13 +381,17 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         nameOfTheFund: Yup.string().required("Name of the Fund is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sponsor: Yup.string().required("Sponsor is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         investmentManager: Yup.string().required("Investment Manager is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        fundManager: Yup.string().required("Fund Manager is required"),
+        fundManager: Yup.string().required("Fund Manager is required").nullable(),
         // dealType: Yup.string(),
         // impact: Yup.string(),
-        aifCategory: Yup.string().required("AIF Category is required"),
-        dateOfFilingWithSEBI: Yup.string().required("This value is required").nullable(),
-        dealSector: Yup.string().required("Deal Sector is required"),
-        dealSubsector: Yup.string().required("Deal Sub Sector is required"),
+        aifCategory: Yup.string().required("AIF Category is required").nullable(),
+        dateOfFilingWithSEBI: Yup.mixed().required("This value is required").test("min-date", "Date cannot be before 01/01/2020", (value) => {
+            if (!value) return true;
+            const dateValue = dayjs(value);
+            return dateValue.isValid() && !dateValue.isBefore(dayjs("2020-01-01"));
+        }).nullable(),
+        dealSector: Yup.string().required("Deal Sector is required").nullable(),
+        dealSubsector: Yup.string().required("Deal Sub Sector is required").nullable(),
         nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         contributionSought: Yup.string().required("Contribution Sought is required").test("test-name", "Enter value that cannot exceed 25% of target corpus", function (value: any) {
             let sdTotalTargetCorpusVal = Number(prelimApplicationFormData.sdTotalTargetCorpus || '0');
@@ -432,10 +443,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         // defaultValues: prelimApplicationFormData
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: IPrelimApplicationData) => {
         console.log(data);
-        // setPrelimApplicationFormData(data);
-        savePrelimApplicationForm();
+        savePrelimApplicationForm(data);
     };
 
     // errors && console.log('errors', JSON.stringify(errors));
@@ -560,31 +570,36 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 propertyValue={prelimApplicationFormData.fundManager || 0}
                                 onChange={handleSelectChange} />
                         </FormControl> */}
-                        <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
-                            <InputLabel id="demo-simple-select-standard-label"
+                        <FormControl fullWidth variant="outlined" error={!!errors.fundManager} sx={{ display: 'flex', borderRadius: '8px' }}>
+                            <InputLabel id="fundManager-label"
                                 sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}
-                            >Fund Manager Experience {prelimApplicationFormData.fundManager}</InputLabel>
-                            <Select
-                                labelId="fundManager"
-                                id="fundManager"
-                                value={prelimApplicationFormData.fundManager || ""}
-                                onChange={handleChange}
+                            >Fund Manager Experience</InputLabel>
+                            <Controller
                                 name="fundManager"
-                            // defaultValue={prelimApplicationFormData.fundManager || ""}
-                            >
-                                <MenuItem
-                                    // selected={prelimApplicationFormData.fundManager === "First time Fund Manager"}
-                                    key={"First Time Fund Manager"}
-                                    value={"First Time Fund Manager"}>First Time Fund Manager</MenuItem>
-                                <MenuItem
-                                    // selected={prelimApplicationFormData.fundManager === "Two funds managed"}
-                                    key={"Two Funds Managed"}
-                                    value={"Two Funds Managed"}>Two Funds Managed</MenuItem>
-                                <MenuItem
-                                    // selected={prelimApplicationFormData.fundManager === "More than two funds managed"}
-                                    key={"More Than Two Funds Managed"}
-                                    value={"More Than Two Funds Managed"}>More Than Two Funds Managed</MenuItem>
-                            </Select>
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        {...field}
+                                        labelId="fundManager-label"
+                                        id="fundManager"
+                                        value={field.value || ""}
+                                        onChange={(e) => {
+                                            field.onChange(e);
+                                            handleChange({
+                                                preventDefault: () => { },
+                                                target: { name: 'fundManager', value: e.target.value }
+                                            });
+                                        }}
+                                    >
+                                        <MenuItem value={"First Time Fund Manager"}>First Time Fund Manager</MenuItem>
+                                        <MenuItem value={"Two Funds Managed"}>Two Funds Managed</MenuItem>
+                                        <MenuItem value={"More Than Two Funds Managed"}>More Than Two Funds Managed</MenuItem>
+                                    </Select>
+                                )}
+                            />
+                            {errors.fundManager && (
+                                <FormHelperText>{errors.fundManager.message as string}</FormHelperText>
+                            )}
                         </FormControl>
                     </Grid>
                     {/* <Grid item xs={4}>
@@ -615,27 +630,34 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 propertyValue={prelimApplicationFormData.aifCategory || 0}
                                 onChange={handleSelectChange} />
                         </FormControl> */}
-                        <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
-                            <InputLabel id="demo-simple-select-standard-label"
+                        <FormControl fullWidth variant="outlined" error={!!errors.aifCategory} sx={{ display: 'flex', borderRadius: '8px' }}>
+                            <InputLabel id="aifCategory-label"
                                 sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}>AIF Category</InputLabel>
-                            <Select
-                                labelId="aifCategory"
-                                id="aifCategory"
-                                value={prelimApplicationFormData.aifCategory || ""}
-                                onChange={handleChange}
+                            <Controller
                                 name="aifCategory"
-                            // defaultValue={prelimApplicationFormData.aifCategory || ""}
-                            >
-
-                                <MenuItem
-                                    // selected={prelimApplicationFormData.aifCategory === "Category I"}
-                                    key={"Category I"}
-                                    value={"Category I"}>Category I</MenuItem>
-                                <MenuItem
-                                    // selected={prelimApplicationFormData.aifCategory === "Category II"}
-                                    key={"Category II"}
-                                    value={"Category II"}>Category II</MenuItem>
-                            </Select>
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        {...field}
+                                        labelId="aifCategory-label"
+                                        id="aifCategory"
+                                        value={field.value || ""}
+                                        onChange={(e) => {
+                                            field.onChange(e);
+                                            handleChange({
+                                                preventDefault: () => { },
+                                                target: { name: 'aifCategory', value: e.target.value }
+                                            });
+                                        }}
+                                    >
+                                        <MenuItem value={"Category I"}>Category I</MenuItem>
+                                        <MenuItem value={"Category II"}>Category II</MenuItem>
+                                    </Select>
+                                )}
+                            />
+                            {errors.aifCategory && (
+                                <FormHelperText>{errors.aifCategory.message as string}</FormHelperText>
+                            )}
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -707,8 +729,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         minDate={MIN_DATE}
                                         value={field.value || null}
                                         onChange={(newValue: Dayjs | null) => {
-                                            if (newValue && newValue.isBefore(MIN_DATE)) return;
-
                                             field.onChange(newValue);
                                             setDateValue("dateOfFilingWithSEBI", newValue);
                                         }}
@@ -985,26 +1005,36 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             </Select>
                         </FormControl> */}
                         <FormControl fullWidth>
-                            <Autocomplete
-                                options={dealSectorOptions}
-                                // value={prelimApplicationFormData.dealSector || null}
-                                onChange={(event, newValue) => {
-                                    handleChange({
-                                        target: {
-                                            name: "dealSector",
-                                            value: newValue || ""
-                                        }
-                                    });
-                                }}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Deal Sector"
-                                        variant="outlined"
-                                        sx={{
-                                            borderRadius: "8px",
-                                            backgroundColor: "white"
+                            <Controller
+                                name="dealSector"
+                                control={control}
+                                render={({ field }) => (
+                                    <Autocomplete
+                                        {...field}
+                                        options={dealSectorOptions}
+                                        value={(field.value as any) || null}
+                                        onChange={(event, newValue) => {
+                                            field.onChange(newValue);
+                                            handleChange({
+                                                target: {
+                                                    name: "dealSector",
+                                                    value: newValue || ""
+                                                }
+                                            } as any);
                                         }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Deal Sector"
+                                                variant="outlined"
+                                                error={!!errors.dealSector}
+                                                helperText={errors.dealSector?.message}
+                                                sx={{
+                                                    borderRadius: "8px",
+                                                    backgroundColor: "white"
+                                                }}
+                                            />
+                                        )}
                                     />
                                 )}
                             />
@@ -1019,7 +1049,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             {...register("dealSubsector")}
                             error={!!errors.dealSubsector}
                             helperText={errors.dealSubsector?.message as string}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                                handleChange(e);
+                            }}
                             variant="outlined"
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                         />
@@ -1400,10 +1432,32 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                     </Grid>
                 </Grid>
             </Box >
-            // </form>
+        );
+    else if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED)
+        return (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="h6" color="error" gutterBottom>
+                    Failed to load data
+                </Typography>
+                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                    {prelimApplicationState.status.message || "An unexpected error occurred while fetching application data."}
+                </Typography>
+                <Button
+                    variant="outlined"
+                    onClick={() => {
+                        if (Number(prelimAppicationId)) {
+                            dispatch(getPrelimApplicationData(
+                                wrapArgument(actionUid, Number(prelimAppicationId))
+                            ))
+                        }
+                    }}
+                >
+                    Retry
+                </Button>
+            </Box>
         );
     else
-        return <div>Loading...</div>
+        return <Box sx={{ p: 3, textAlign: 'center' }}><Typography>Loading...</Typography></Box>
 });
 
 
