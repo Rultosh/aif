@@ -272,6 +272,11 @@ const SignUp = () => {
 
     return (
         <>
+            <ReCAPTCHA
+                ref={captchaRef}
+                size={'invisible'}
+                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
+            />
             <Container maxWidth="lg" sx={{ pt: '140px', pb: '60px' }}>
 
                 <Paper
