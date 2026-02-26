@@ -149,11 +149,11 @@ const Landing = () => {
 
     return (
         <>
-            {/* <ReCAPTCHA
+            <ReCAPTCHA
                 ref={captchaRef}
                 size={'invisible'}
                 sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
-            /> */}
+            />
             <div className="landingComp" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
                 <Container maxWidth="lg">
                     <Box sx={{ flexGrow: 1 }}>
