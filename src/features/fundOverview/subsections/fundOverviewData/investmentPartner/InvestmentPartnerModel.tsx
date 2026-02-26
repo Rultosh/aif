@@ -90,6 +90,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
         irrPercent: '',
         moic: '',
         comment: '',
+        howWasTheDealSourced: '',
+        addressOfCompany: '',
         teamMemberId: Number(investmentPartnerFormData.id)
       };
       setEditingLeadInvestment(emptyLead as any);
@@ -112,6 +114,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
         irrPercent: '',
         moic: '',
         comment: '',
+        howWasTheDealSourced: '',
+        addressOfCompany: '',
         teamMemberId: Number(investmentPartnerFormData.id)
       };
       setEditingNonLeadInvestment(emptyNonLead as any);
@@ -133,11 +137,14 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   const investmentValidationSchema = Yup.object().shape({
     nameOfCompany: Yup.string().required("Name of company is required").nullable(),
     amountInvested: Yup.number().typeError("Must be a number").required("Amount is required"),
-    dateOfInvestment: Yup.string().required("Date is required").nullable(),
+    dateOfInvestment: Yup.string().required("Date of investment is required").nullable(),
+    dateofExitorWriteOff: Yup.string().required("Date of exit or write off is required").nullable(),
     exitOrWriteOff: Yup.string().required("Required").nullable(),
     moic: Yup.string().required("MOIC is required").nullable(),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
-    comment: Yup.string().required("Comment is required").nullable()
+    comment: Yup.string().required("Exit Process is required").nullable(),
+    howWasTheDealSourced: Yup.string().required("This field is required").nullable(), 
+    addressOfCompany: Yup.string().required("Address of company is required").nullable()
   });
 
   const {
@@ -253,6 +260,10 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   const htmlTagsNotAllowed = "Tags not allowed in input.";
 
   const validationSchema = Yup.object().shape({
+    title: Yup.string()
+      .matches(/^[A-Za-z. ]*$/, 'Please enter valid title')
+      .required("Title is required")
+      .nullable(),
     name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     age: Yup.string().required("Age is required").nullable(),
@@ -308,7 +319,34 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
         <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details Of Investment Team (At Partner Level)</Typography>
         <Box component="form">
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'flex-end' }}>
+              <FormControl sx={{
+                  ...fieldSx,
+                  width: '120px',
+                  '& .MuiOutlinedInput-root': {
+                      ...fieldSx['& .MuiOutlinedInput-root'],
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                  }
+              }} error={!!errors.title}>
+                  <InputLabel id="title-label">Title</InputLabel>
+                  <Select
+                      required
+                      labelId="title-label"
+                      id="title"
+                      // name="title"
+                      label="Title"
+                      value={investmentPartnerFormData.title || ""}
+                      {...register("title")}
+                      onChange={handleChange}
+                  >
+                      <MenuItem value="Mr.">Mr.</MenuItem>
+                      <MenuItem value="Mrs.">Mrs.</MenuItem>
+                      <MenuItem value="Ms.">Ms.</MenuItem>
+                      <MenuItem value="Dr.">Dr.</MenuItem>
+                  </Select>
+                  {errors.title && <FormHelperText>{errors.title.message as string}</FormHelperText>}
+              </FormControl>
               <TextField
                 required
                 fullWidth
@@ -321,7 +359,16 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ 
+                  ...fieldSx, 
+                  flex: 1, 
+                  '& .MuiOutlinedInput-root': {
+                      ...fieldSx['& .MuiOutlinedInput-root'],
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                      ml: '-1px'
+                  }
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -483,7 +530,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
               <Collapse in={showLeadForm}>
                 <Paper sx={{ p: 3, mb: 3, border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: '#fcfcfc' }}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>{editingLeadInvestment.id ? 'Edit Investment' : 'Add New Investment'}</Typography>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>{editingLeadInvestment.id ? 'Edit Investment' : 'Add Investment'}</Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TextField
@@ -561,7 +608,15 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                               value={field.value || null}
                               onChange={(date) => field.onChange(date)}
                               renderInput={(params) => (
-                                <TextField {...params} size="small" fullWidth InputLabelProps={{ shrink: true }} sx={fieldSx} />
+                                <TextField
+                                  {...params}
+                                  size="small"
+                                  fullWidth
+                                  error={!!leadErrors.dateofExitorWriteOff}
+                                  helperText={leadErrors.dateofExitorWriteOff?.message as string}
+                                  InputLabelProps={{ shrink: true }}
+                                  sx={fieldSx}
+                                />
                               )}
                             />
                           )}
@@ -596,12 +651,40 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TextField
                         fullWidth
                         multiline
-                        rows={2}
-                        label="Comment"
+                        maxRows={4}
+                        label="Address Of Company"
+                        size="small"
+                        {...leadRegister("addressOfCompany")}
+                        error={!!leadErrors.addressOfCompany}
+                        helperText={leadErrors.addressOfCompany?.message as string}
+                        InputLabelProps={{ shrink: true }}
+                        sx={fieldSx}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        multiline
+                        maxRows={4}
+                        label="Exit Process"
                         size="small"
                         {...leadRegister("comment")}
                         error={!!leadErrors.comment}
                         helperText={leadErrors.comment?.message as string}
+                        InputLabelProps={{ shrink: true }}
+                        sx={fieldSx}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        multiline
+                        maxRows={4}
+                        label="How was the deal sourced either through Investment Banks, Networking, direct etc"
+                        size="small"
+                        {...leadRegister("howWasTheDealSourced")}
+                        error={!!leadErrors.howWasTheDealSourced}
+                        helperText={leadErrors.howWasTheDealSourced?.message as string}
                         InputLabelProps={{ shrink: true }}
                         sx={fieldSx}
                       />
@@ -625,7 +708,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TableCell sx={{ fontWeight: 'bold' }}>Date Of Exit	</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>IRR (%)</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>MOIC</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Comment</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Exit Process</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
@@ -677,7 +760,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
               <Collapse in={showNonLeadForm}>
                 <Paper sx={{ p: 3, mb: 3, border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: '#fcfcfc' }}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>{editingNonLeadInvestment.id ? 'Edit Investment' : 'Add New Investment'}</Typography>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>{editingNonLeadInvestment.id ? 'Edit Investment' : 'Add Investment'}</Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TextField
@@ -755,7 +838,15 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                               value={field.value || null}
                               onChange={(date) => field.onChange(date)}
                               renderInput={(params) => (
-                                <TextField {...params} size="small" fullWidth InputLabelProps={{ shrink: true }} sx={fieldSx} />
+                                <TextField
+                                  {...params}
+                                  size="small"
+                                  fullWidth
+                                  error={!!nonLeadErrors.dateofExitorWriteOff}
+                                  helperText={nonLeadErrors.dateofExitorWriteOff?.message as string}
+                                  InputLabelProps={{ shrink: true }}
+                                  sx={fieldSx}
+                                />
                               )}
                             />
                           )}
@@ -790,12 +881,40 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TextField
                         fullWidth
                         multiline
-                        rows={2}
-                        label="Comment"
+                        maxRows={4}
+                        label="Address Of Company"
+                        size="small"
+                        {...nonLeadRegister("addressOfCompany")}
+                        error={!!nonLeadErrors.addressOfCompany}
+                        helperText={nonLeadErrors.addressOfCompany?.message as string}
+                        InputLabelProps={{ shrink: true }}
+                        sx={fieldSx}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        multiline
+                        maxRows={4}
+                        label="Exit Process"
                         size="small"
                         {...nonLeadRegister("comment")}
                         error={!!nonLeadErrors.comment}
                         helperText={nonLeadErrors.comment?.message as string}
+                        InputLabelProps={{ shrink: true }}
+                        sx={fieldSx}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        multiline
+                        maxRows={4}
+                        label="How was the deal sourced either through Investment Banks, Networking, direct etc"
+                        size="small"
+                        {...nonLeadRegister("howWasTheDealSourced")}
+                        error={!!nonLeadErrors.howWasTheDealSourced}
+                        helperText={nonLeadErrors.howWasTheDealSourced?.message as string}
                         InputLabelProps={{ shrink: true }}
                         sx={fieldSx}
                       />
@@ -819,7 +938,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TableCell sx={{ fontWeight: 'bold' }}>Date Of Exit	</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>IRR (%)</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>MOIC</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Comment</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Exit Process</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
@@ -862,18 +981,13 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
                     <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                      <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Bio-Data</Typography>
+                      <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Experience</Typography>
                       <UploadComponents id={`sdPartnerResume${investmentPartnerFormData.id || uuid()}`} signed={false} />
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                      <Typography variant="body2" sx={{ mb: 1 }}>Experience Supporting Document</Typography>
-                      <UploadComponents id={`sdPartnerExperience${investmentPartnerFormData.id || uuid()}`} signed={false} />
-                    </Box>
-                  </Grid>
                 </Grid>
-              </Grid></>}
+              </Grid>
+            </>}
 
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
               <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
@@ -883,7 +997,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 Save
               </Button>}
               {investmentPartnerFormData.id && <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
-                Submit
+                Save
               </Button>}
             </Grid>
           </Grid>

@@ -28,11 +28,13 @@ type InitialState = {
 export const SelfRating = (props: any) => {
 
     const { id } = useParams();
+    console.log(id)
     const [actionUid] = useState(uuid());
 
     const selfRatingState = useAppSelector(selectSelfRatings)
 
     const [selfRatingValue, setSelfRatingValue] = useState<ISelfRating>(selfRatingState.selfRatings);
+    console.log("selfRatingValue", selfRatingValue)
     const [firstTime] = useState<boolean>(selfRatingState.selfRatings.id !== undefined);
     const [scoreBoard, setScoreBoard] = useState({} as any);
     const [score, setScore] = useState('0');
@@ -66,13 +68,13 @@ export const SelfRating = (props: any) => {
         setSelfRatingValue(selfRatingState.selfRatings);
 
         // Initialize questions and scoreboard based on loaded data
-        const currentManagerType = selfRatingState.selfRatings.fundManagerType || "First Time Fund Manager";
+        const currentManagerType = selfRatingState.selfRatings.managerType || "First Time Fund Manager";
         const questions = currentManagerType === "First Time Fund Manager"
             ? questionsForFirstTime.selfRatingQuestions
             : questionsForMoreThanOne.selfRatingQuestions;
 
         setSelfQuestions(questions);
-        setFundManagerType(currentManagerType);
+        setManagerType(currentManagerType);
 
         const newScoreBoard: any = {};
         questions.forEach((q, index) => {
@@ -109,42 +111,48 @@ export const SelfRating = (props: any) => {
     }, [])
 
     const handleClick = async (ev: any, navTo: string) => {
+        try {
+            await handleClickSave();
 
-        await handleClickSave();
-
-        if (navTo === 'previous') {
-            // No back button from first step
-        } else {
-            navigate(`/preliminary/${id}/fund`)
+            if (navTo !== 'previous') {
+                navigate(`/preliminary/${id}/fund`)
+            }
+        } catch (error: any) {
+            console.error("Save failure:", error);
+            alert(error?.message || "An unexpected error occurred while saving.");
         }
     }
 
     async function handleClickSave() {
         console.log(selfRatingValue.id)
-        if (!selfRatingValue.id) {
-            if (Number(id)) {
+        // console.log((!selfRatingValue.id))
+        // console.log(id)
+        try {
+            if (!selfRatingValue.id) {
+                if (Number(id)) {
+                    await dispatch(
+                        createSelfRatingAsync(
+                            wrapArgument(actionUid, { ...selfRatingValue, prelimApplicationId: Number(id) })
+                        )
+                    ).unwrap();
+                } else {
+                    await dispatch(
+                        createIndependentSelfRatingAsync(
+                            wrapArgument(actionUid, { ...selfRatingValue })
+                        )
+                    ).unwrap();
+                }
+            } else {
                 await dispatch(
-                    createSelfRatingAsync(
+                    updateSelfRatingAsync(
                         wrapArgument(actionUid, { ...selfRatingValue, prelimApplicationId: Number(id) })
                     )
                 ).unwrap();
-            } else {
-                await dispatch(
-                    createIndependentSelfRatingAsync(
-                        wrapArgument(actionUid, { ...selfRatingValue })
-                    )
-                ).unwrap();
             }
-        } else {
-            await dispatch(
-                updateSelfRatingAsync(
-                    wrapArgument(actionUid, { ...selfRatingValue, prelimApplicationId: Number(id) })
-                )
-            ).unwrap();
+        } catch (error) {
+            // Re-throw to be caught by callers (handleSubmitClick, handleClick)
+            throw error;
         }
-        // if(selfRatingValue){
-        // setSelfRating('0');
-        // }
     }
 
     function calculateScore(v: any, sel: string, idx: number) {
@@ -183,8 +191,8 @@ export const SelfRating = (props: any) => {
         const copiedValue: any = { ...defaultIISelfRating };
         const key = e.target.id ? e.target.id : e.target.name;
         copiedValue[key] = e.target.value;
-        console.log("FundManagerType", e.target.value as String);
-        setFundManagerType(e.target.value as String);
+        console.log("managerType", e.target.value as String);
+        setManagerType(e.target.value as String);
         setSelfQuestions(e.target.value === "First Time Fund Manager" ?
             questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
         setScoreBoard({});
@@ -215,10 +223,20 @@ export const SelfRating = (props: any) => {
 
     let selfRatingQuestionComponents = []
 
-    const [fundManagerType, setFundManagerType] = useState<String | undefined>(selfRatingValue.fundManagerType)
+    const [managerType, setManagerType] = useState<String | undefined>(selfRatingValue.managerType)
 
-    const [selfQuestions, setSelfQuestions] = useState(!fundManagerType || fundManagerType === "First Time Fund Manager" ?
+    const [selfQuestions, setSelfQuestions] = useState(!managerType || managerType === "First Time Fund Manager" ?
         questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
+
+    // determine if every question has been answered (mandatory fields)
+    const allAnswered = React.useMemo(() => {
+        if (!selfQuestions || selfQuestions.length === 0) return false;
+        return selfQuestions.every((q, idx) => {
+            const key = `q${idx + 1}` as keyof ISelfRating;
+            const val = selfRatingValue[key];
+            return val !== undefined && val !== null && String(val).trim() !== '';
+        });
+    }, [selfQuestions, selfRatingValue]);
 
     for (let i = 0; i < selfQuestions.length; i++) {
         let qes = selfQuestions[i].id.toString().concat('. ', selfQuestions[i].text);
@@ -313,6 +331,9 @@ export const SelfRating = (props: any) => {
                 setIsSubmitted(false);
             }
             setShowResultModal(true);
+        } catch (error: any) {
+            console.error("Submit failure:", error);
+            alert(error?.message || "An unexpected error occurred while submitting.");
         } finally {
             setIsLoading(false);
         }
@@ -391,17 +412,17 @@ export const SelfRating = (props: any) => {
                                     <FormControlLabel
                                         control={
                                             <Switch
-                                                checked={fundManagerType === "First Time Fund Manager" || !fundManagerType}
+                                                checked={managerType === "First Time Fund Manager" || !managerType}
                                                 onChange={(e) => {
                                                     const value = e.target.checked ? "First Time Fund Manager" : "Experienced Fund Manager";
-                                                    handleChangeFundManagerType({ target: { name: "fundManagerType", value } });
+                                                    handleChangeFundManagerType({ target: { name: "managerType", value } });
                                                 }}
                                                 color="primary"
                                             />
                                         }
                                         label={
-                                            <Typography variant="body2" sx={{ fontWeight: 600, color: fundManagerType === "First Time Fund Manager" || !fundManagerType ? '#363062' : '#666' }}>
-                                                {fundManagerType === "First Time Fund Manager" || !fundManagerType ? "Yes" : "No"}
+                                            <Typography variant="body2" sx={{ fontWeight: 600, color: managerType === "First Time Fund Manager" || !managerType ? '#363062' : '#666' }}>
+                                                {managerType === "First Time Fund Manager" || !managerType ? "Yes" : "No"}
                                             </Typography>
                                         }
                                     />
@@ -445,7 +466,7 @@ export const SelfRating = (props: any) => {
                                 <Button
                                     onClick={handleSubmitClick}
                                     variant="contained"
-                                    disabled={isLoading}
+                                    disabled={isLoading || !allAnswered}
                                     startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
                                     sx={{
                                         textTransform: 'none',
@@ -485,7 +506,7 @@ export const SelfRating = (props: any) => {
                                             boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
                                         }
                                     }} >
-                                    Save & Continue to Fund Overview
+                                    Continue to Fund Overview
                                 </Button>
                             )}
                         </Box>
@@ -509,7 +530,7 @@ export const SelfRating = (props: any) => {
                 <Button
                     onClick={(e) => !isSubmitted ? handleSubmitClick() : handleNextClick(e)}
                     variant="contained"
-                    disabled={isLoading}
+                    disabled={isLoading || (!isSubmitted && !allAnswered)}
                     sx={{
                         minWidth: 'auto',
                         width: isLoading ? '80px' : '48px',
@@ -571,7 +592,7 @@ export const SelfRating = (props: any) => {
                                 backgroundColor: '#363062'
                             }}
                         >
-                            Save & Continue to Fund Overview
+                            Continue to Fund Overview
                         </Button>
                     ) : (
                         <Button

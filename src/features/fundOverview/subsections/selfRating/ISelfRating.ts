@@ -1,6 +1,6 @@
 export interface ISelfRating {
   id: string | undefined,
-  fundManagerType: String | undefined,
+  managerType: String | undefined,
   prelimApplicationId: Number | undefined,
   q1: string | undefined,
   q2: string | undefined,
@@ -37,12 +37,11 @@ export interface ISelfRating {
   q16Comments: string | undefined,
   q17Comments: string | undefined,
   score: string | undefined,
-  managerType: string | undefined,
 }
 
 export const defaultIISelfRating = {
   id: undefined,
-  fundManagerType: undefined,
+  managerType: "Experienced Fund Manager",
   prelimApplicationId: undefined,
   q1: undefined,
   q2: undefined,
@@ -79,5 +78,4 @@ export const defaultIISelfRating = {
   q16Comments: undefined,
   q17Comments: undefined,
   score: undefined,
-  managerType: "First Time Fund Manager",
 }

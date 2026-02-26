@@ -220,15 +220,15 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               helperText={errors.name?.message as string}
               variant="outlined"
               onChange={handleChange}
-              InputProps={{
-                readOnly: contributorDetailsFormData.name === 'Sponsor',
-              }}
+              // InputProps={{
+              //   readOnly: contributorDetailsFormData.name === 'Sponsor',
+              // }}
               InputLabelProps={{ shrink: true }}
               sx={{
                 ...fieldSx,
                 '& .MuiOutlinedInput-root': {
                   ...fieldSx['& .MuiOutlinedInput-root'],
-                  backgroundColor: contributorDetailsFormData.name === 'Sponsor' ? '#f5f5f5' : 'inherit'
+                  // backgroundColor: contributorDetailsFormData.name === 'Sponsor' ? '#f5f5f5' : 'inherit'
                 }
               }}
             />
@@ -262,7 +262,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               required
               fullWidth
               id="percentOfCorpus"
-              label="% Of Corpus"
+              label="% Of Target Corpus"
               value={contributorDetailsFormData.percentOfCorpus || ''}
               {...register("percentOfCorpus")}
               error={!!errors.percentOfCorpus}
@@ -354,7 +354,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
           <Grid item xs={12}>
             <FormControl component="fieldset" error={!!errors.isFirstTimeContributing}>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>Whether the contributor is first time contributing in the fund of the IM</Typography>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>Whether the contributor is first time contributing in the Fund of the IM/AMC</Typography>
               <Controller
                 name="isFirstTimeContributing"
                 control={control}
@@ -414,11 +414,23 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
           <Grid item xs={12}>
             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                  <Typography variant="body2" sx={{ mb: 1 }}>Letter Of Intent</Typography>
+                  <UploadComponents id={`contributorLetterOfIntent${contributorDetailsFormData.id || uuid()}`} signed={false} />
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* <Grid item xs={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
             <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
               <Typography variant="body2" sx={{ mb: 1 }}>Letter Of Intent For Each Contributor</Typography>
               <UploadComponents id={`sdLetterOfIntent${contributorDetailsFormData.id || uuid()}`} signed={false} />
             </Box>
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
             <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>

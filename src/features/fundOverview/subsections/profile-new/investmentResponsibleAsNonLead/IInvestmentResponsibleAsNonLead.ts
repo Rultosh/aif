@@ -9,7 +9,8 @@ export interface IInvestmentResponsibleAsNonLead {
     irrPercent: string | undefined,
     moic: string | undefined,
     comment: string | undefined,
-    
+    howWasTheDealSourced: string | undefined,
+    addressOfCompany: string | undefined
 }
 
 export const defaultIIInvestmentResponsibleAsNonLead = {
@@ -22,5 +23,7 @@ export const defaultIIInvestmentResponsibleAsNonLead = {
   dateofExitorWriteOff: undefined,
   irrPercent: undefined,
   comment: undefined,
+  howWasTheDealSourced: undefined,
+  addressOfCompany: undefined,
   moic: undefined
 }

@@ -1,6 +1,7 @@
 export interface IInvestmentPartner {
     id: Number | undefined,
     prelimApplicationId: Number | undefined,
+    title: string | undefined,
     name: String | undefined,
     designation: String | undefined,
     age: String | undefined,
@@ -15,6 +16,7 @@ export interface IInvestmentPartner {
 export const defaultInvestmentPartner: IInvestmentPartner = {
     id: undefined,
     prelimApplicationId: undefined,
+    title: undefined,
     name: undefined,
     designation: undefined,
     age: undefined,

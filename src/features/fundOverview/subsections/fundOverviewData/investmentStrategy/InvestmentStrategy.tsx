@@ -231,14 +231,6 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                         </Box>
                     </Grid>
 
-                    <Grid item xs={12} sx={{ mt: 2, mb: 4 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#363062' }}>Supporting Documents</Typography>
-                        <Box sx={{ p: 3, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                            <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>Investment and Other Policies</Typography>
-                            <UploadComponents id={`sdInvestmentPolicy${prelimAppicationId}`} signed={false} />
-                        </Box>
-                    </Grid>
-
                     <Grid item xs={12}>
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, gap: 2 }}>
                             <Button

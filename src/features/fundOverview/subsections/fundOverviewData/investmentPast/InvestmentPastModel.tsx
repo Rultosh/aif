@@ -493,13 +493,13 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             {errors.stakeOfEmployee && <FormHelperText error>{errors.stakeOfEmployee.message as string}</FormHelperText>}
           </Grid>
 
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
             <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
               <Typography variant="body2" sx={{ mb: 1 }}>Investment Committee Note*</Typography>
               <UploadComponents id={`sdInvestmentCommitteeNote${investmentPastFormData.id || uuid()}`} signed={false} />
             </Box>
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
             <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>

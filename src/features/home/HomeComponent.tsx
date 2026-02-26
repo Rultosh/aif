@@ -237,10 +237,15 @@ export const Home = (pros: any) => {
                                 startIcon={<AddCircleIcon />}
                                 // href="#/Preliminary"
                                 onClick={async () => {
-                                    let application : IPrelimApplicationData = await dispatch(
-                                        createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
+                                    try {
+                                        let application: IPrelimApplicationData = await dispatch(
+                                            createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
                                         ).unwrap();
-                                    navigate(`/Preliminary/${application.id}/selfRating`)
+                                        navigate(`/Preliminary/${application.id}/selfRating`)
+                                    } catch (error: any) {
+                                        console.error("Failed to start application:", error);
+                                        alert(error?.message || "An unexpected error occurred while starting the application.");
+                                    }
                                 }}
                             >
                                 Start Application
