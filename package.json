@@ -58,6 +58,7 @@
     "build": "env-cmd -f .env.development react-scripts build",
     "build-uat": "env-cmd -f .env.server npx react-scripts build",
     "build-prod": "env-cmd -f .env.prod npx react-scripts build",
+    "build-staging": "env-cmd -f .env.staging npx react-scripts build",
     "build-migration": "env-cmd -f .env.migration npx react-scripts build",
     "package": "npm run build-uat && cd build && jar -cvf vcf.war .",
     "test": "react-scripts test",
