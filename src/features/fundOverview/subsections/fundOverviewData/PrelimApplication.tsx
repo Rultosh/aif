@@ -1398,61 +1398,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             </Grid>
                         </Box>
                     </Grid>
-
-                    <Grid item xs={12}>
-                        <Box sx={{ mt: 5 }}>
-                            <Typography variant="body1" sx={{ fontWeight: 700, color: '#363062', mb: 3 }}>
-                                Supporting Documents
-                            </Typography>
-
-                            <Box sx={{
-                                p: 3,
-                                border: '1px solid rgba(0,0,0,0.08)',
-                                borderRadius: '16px',
-                                backgroundColor: '#fafafa'
-                            }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                                    <UploadIcon sx={{ color: '#363062', mr: 2 }} />
-                                    <Typography variant="subtitle2" sx={{ color: '#666' }}>
-                                        (Max. file size 5 MB each)
-                                    </Typography>
-                                </Box>
-
-                                {Number(prelimAppicationId) ? (
-                                    <Grid container spacing={2}>
-                                        <Grid item xs="auto">
-                                            <DocumentChip label="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${prelimAppicationId}`} />
-                                        </Grid>
-                                        <Grid item xs="auto">
-                                            <DocumentChip label="Latest Investor Presentation" id={`sdLatestInvestorPresentation${prelimAppicationId}`} />
-                                        </Grid>
-                                        <Grid item xs="auto">
-                                            <DocumentChip label="IM Agreement" id={`sdImAgreement${prelimAppicationId}`} />
-                                        </Grid>
-                                        <Grid item xs="auto">
-                                            <DocumentChip label="Trust Deed" id={`sdTrustDeal${prelimAppicationId}`} />
-                                        </Grid>
-                                        <Grid item xs="auto">
-                                            <DocumentChip label="SEBI Registration Certificate" id={`sdSEBICertificate${prelimAppicationId}`} />
-                                        </Grid>
-                                        <Grid item xs="auto">
-                                            <DocumentChip label="Shareholding Pattern of Sponsor/IM" id={`sdShareholdingPattern${prelimAppicationId}`} />
-                                        </Grid>
-                                        <Grid item xs="auto">
-                                            <DocumentChip label="Policy of Carry" id={`sdPolicyOfCarry${prelimAppicationId}`} />
-                                        </Grid>
-                                        <Grid item xs="auto">
-                                            <DocumentChip label="Contribution Agreement" id={`sdContributionAgreement${prelimAppicationId}`} />
-                                        </Grid>
-                                    </Grid>
-                                ) : (
-                                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
-                                        Please save the form to upload documents.
-                                    </Typography>
-                                )}
-                            </Box>
-                        </Box>
-                    </Grid>
                 </Grid>
             </Box >
             // </form>

@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, TextField, FormControlLabel, Divider, Checkbox, FormGroup, Switch } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, TextField, FormControlLabel, Divider, Checkbox, FormGroup, Switch, Dialog, DialogContent, Zoom } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
@@ -32,6 +32,7 @@ const Declaration = (props: any) => {
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
     const [agreed, setAgreed] = useState<boolean>(!!prelimApplicationState.prelimApplication.declarationAccepted);
     const [expanded, setExpanded] = useState<string | false>("1");
+    const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
     const validationSchema = Yup.object().shape({
         sdDescription: Yup.string().label("Capital Raised Till Date").nullable(),
@@ -63,10 +64,20 @@ const Declaration = (props: any) => {
             navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/selfRating`)
         } else {
             await handleSubmit(async (data) => {
-                await handleClickSave(data);
-                navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
+                try {
+                    await handleClickSave(data);
+                    setShowSuccessDialog(true);
+                } catch (error: any) {
+                    console.error("Save failure:", error);
+                    alert(error?.message || "An unexpected error occurred while saving.");
+                }
             })();
         }
+    }
+
+    const handleSuccessDialogClose = () => {
+        setShowSuccessDialog(false);
+        navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
     }
 
     useEffect(() => {
@@ -97,13 +108,18 @@ const Declaration = (props: any) => {
 
     async function handleClickSave(formData?: IPrelimApplicationData) {
         const dataToUpdate = formData || prelimApplicationState.prelimApplication;
-        await dispatch(
-            updatePrelimApplicationAsync(
-                wrapArgument(
-                    actionUid, { ...defaultIPrelimApplicationData, ...dataToUpdate, id: Number(id), declarationAccepted: agreed }
+        try {
+            await dispatch(
+                updatePrelimApplicationAsync(
+                    wrapArgument(
+                        actionUid, { ...defaultIPrelimApplicationData, ...dataToUpdate, id: Number(id), declarationAccepted: agreed }
+                    )
                 )
-            )
-        ).unwrap();
+            ).unwrap();
+        } catch (error) {
+            // Re-throw to be caught by the caller
+            throw error;
+        }
     }
 
     const accordionSx = {
@@ -152,13 +168,6 @@ const Declaration = (props: any) => {
             backgroundColor: '#4d4585'
         }
     };
-
-    const numericSx = {
-        '& .MuiOutlinedInput-root': { borderRadius: '8px' },
-        '& .MuiFormHelperText-root': { fontWeight: 600, color: '#666', fontSize: '0.75rem', mt: 0.5 }
-    };
-
-    const labelSx = { fontWeight: 700, mb: 1, display: 'block', color: '#363062' };
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -264,10 +273,171 @@ const Declaration = (props: any) => {
                             </AccordionSummary>
                             <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                 <Box sx={{ mb: 4 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#363062', mb: 3 }}>
+                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3 }}>
                                         Fund Overview
                                     </Typography>
+
+                                    <Box sx={{
+                                        p: 3,
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                        borderRadius: '16px',
+                                        backgroundColor: '#fafafa'
+                                    }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                                            <UploadIcon sx={{ color: '#363062', mr: 2 }} />
+                                            <Typography variant="subtitle2" sx={{ color: '#666' }}>
+                                                (Max. file size 5 MB each)
+                                            </Typography>
+                                        </Box>
+
+                                        {Number(id) ? (
+                                            <Grid container spacing={2}>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${id}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Latest Investor Presentation" id={`sdLatestInvestorPresentation${id}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="IM Agreement" id={`sdImAgreement${id}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Trust Deed" id={`sdTrustDeal${id}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="SEBI Registration Certificate" id={`sdSEBICertificate${id}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Shareholding Pattern of Sponsor/IM" id={`sdShareholdingPattern${id}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Policy of Carry" id={`sdPolicyOfCarry${id}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Contribution Agreement" id={`sdContributionAgreement${id}`} />
+                                                </Grid>
+                                            </Grid>
+                                        ) : (
+                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                                Please save the form to upload documents.
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
+                                        Investment Strategy
+                                    </Typography>
+
+                                    <Box sx={{
+                                        p: 3,
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                        borderRadius: '16px',
+                                        backgroundColor: '#fafafa'
+                                    }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                                            <UploadIcon sx={{ color: '#363062', mr: 2 }} />
+                                            <Typography variant="subtitle2" sx={{ color: '#666' }}>
+                                                (Max. file size 5 MB each)
+                                            </Typography>
+                                        </Box>
+
+                                        {Number(id) ? (
+                                            <Grid container spacing={2}>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Investment and Other Policies" id={`sdInvestmentPolicy${id}`} />
+                                                </Grid>
+                                            </Grid>
+                                        ) : (
+                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                                Please save the form to upload documents.
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
+                                        Details Of Contributor To the Fund
+                                    </Typography>
+
+                                    <Box sx={{
+                                        p: 3,
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                        borderRadius: '16px',
+                                        backgroundColor: '#fafafa'
+                                    }}>
+                                        {Number(id) ? (
+                                            <Grid container spacing={2}>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Letter Of Intent For Each Contributor" id={`sdLetterOfIntent${id}`} />
+                                                </Grid>
+                                            </Grid>
+                                        ) : (
+                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                                Please save the form to upload documents.
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
+                                        Investments Made, If Any From the Current Fund
+                                    </Typography>
+
+                                    <Box sx={{
+                                        p: 3,
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                        borderRadius: '16px',
+                                        backgroundColor: '#fafafa'
+                                    }}>
+                                        {Number(id) ? (
+                                            <Grid container spacing={2}>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip label="Investment Committee Note" id={`sdInvestmentCommitteeNote${id}`} />
+                                                </Grid>
+                                            </Grid>
+                                        ) : (
+                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                                Please save the form to upload documents.
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
+                                        Past Investment Track Record Of the AMC
+                                    </Typography>
+
+                                    <Box sx={{
+                                        p: 3,
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                        borderRadius: '16px',
+                                        backgroundColor: '#fafafa'
+                                    }}>
+                                        {Number(id) ? (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    href="/templates/SASF_Fund Track Record Template.xlsx"
+                                                    size="small"
+                                                    startIcon={<DownloadIcon />}
+                                                    sx={{
+                                                        textTransform: 'none',
+                                                        borderRadius: '6px',
+                                                        borderColor: 'rgba(54, 48, 98, 0.3)',
+                                                        color: '#363062',
+                                                        '&:hover': { borderColor: '#363062', backgroundColor: 'rgba(54, 48, 98, 0.05)' },
+                                                        mb: '17px'
+                                                    }}
+                                                >
+                                                    Download Template
+                                                </Button>
+                                                <DocumentChip label="Upload Document" id={`pastInvestmentTrackRecord${id}`} />
+                                            </Box>
+                                        ) : (
+                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                                Please save the form to upload documents.
+                                            </Typography>
+                                        )}
+                                    </Box>
                                 </Box>
+
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
                                     <Button
                                         variant="contained"
@@ -390,6 +560,110 @@ const Declaration = (props: any) => {
                         </Box>
                     </CardContent>
                 </Card>
+
+                <Dialog
+                    open={showSuccessDialog}
+                    TransitionComponent={Zoom}
+                    keepMounted
+                    onClose={handleSuccessDialogClose}
+                    PaperProps={{
+                        sx: {
+                            borderRadius: '24px',
+                            padding: '24px',
+                            maxWidth: '450px',
+                            textAlign: 'center'
+                        }
+                    }}
+                >
+                    <DialogContent>
+                        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+                            <Box className="checkmark-wrapper">
+                                <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                    <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                                    <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                                </svg>
+                            </Box>
+                        </Box>
+                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062', mb: 2 }}>
+                            Success!
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: '#666', mb: 4, lineHeight: 1.6 }}>
+                            Your application has been received successfully. Our team is working on it and will update you soon.
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            onClick={handleSuccessDialogClose}
+                            sx={{
+                                backgroundColor: '#363062',
+                                borderRadius: '12px',
+                                py: 1.5,
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                fontSize: '1.1rem',
+                                '&:hover': {
+                                    backgroundColor: '#4d4585'
+                                }
+                            }}
+                        >
+                            Continue to Preview
+                        </Button>
+                    </DialogContent>
+                </Dialog>
+
+                <style>
+                    {`
+                    .checkmark__circle {
+                        stroke-dasharray: 166;
+                        stroke-dashoffset: 166;
+                        stroke-width: 2;
+                        stroke-miterlimit: 10;
+                        stroke: #7ac142;
+                        fill: none;
+                        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+                    }
+
+                    .checkmark {
+                        width: 100px;
+                        height: 100px;
+                        border-radius: 50%;
+                        display: block;
+                        stroke-width: 2;
+                        stroke: #fff;
+                        stroke-miterlimit: 10;
+                        box-shadow: inset 0px 0px 0px #7ac142;
+                        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+                    }
+
+                    .checkmark__check {
+                        transform-origin: 50% 50%;
+                        stroke-dasharray: 48;
+                        stroke-dashoffset: 48;
+                        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+                    }
+
+                    @keyframes stroke {
+                        100% {
+                            stroke-dashoffset: 0;
+                        }
+                    }
+
+                    @keyframes scale {
+                        0%, 100% {
+                            transform: none;
+                        }
+                        50% {
+                            transform: scale3d(1.1, 1.1, 1);
+                        }
+                    }
+
+                    @keyframes fill {
+                        100% {
+                            box-shadow: inset 0px 0px 0px 50px #7ac142;
+                        }
+                    }
+                    `}
+                </style>
             </div>
         </LocalizationProvider>
     )

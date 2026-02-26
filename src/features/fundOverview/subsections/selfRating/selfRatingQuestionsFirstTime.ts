@@ -35,7 +35,7 @@ export const questionsForFirstTime = {
     {
         "id": 5,
         "text":"Share of employees (other than the Partners/ Directors) in Carry" ,
-        "options":[ ">=40", ">=30 & <40%", ">=20% & <30%", "<20%"],
+        "options":[ ">=40%", ">=30% & <40%", ">=20% & <30%", "<20%"],
         "size":3,
         "contribution": 0.04,
         'weightage':[1,0.6,0.3]
@@ -81,7 +81,7 @@ export const questionsForFirstTime = {
             " Confirmed commitments of more than 15% of targeted corpus already raised", 
             "Confirmed commitments of less than 15% of targeted corpus already raised / No confirmed commitments raised so far"
         ],
-        "size":6,
+        "size":12,
         "contribution": 0.0875,
         'weightage':[1,0.75,0.5,0.25]
     },
@@ -89,10 +89,10 @@ export const questionsForFirstTime = {
         "id": 10,
         "text":"Expected or Actual First close size (If achieved)" ,
         "options":[
-            "More than 30%",
-            "More than 20% but upto 30%",
-            "More than 10% but upto 20%",
-            "Upto 10%"
+            ">30%",
+            ">20% & <=30%",
+            ">10% & <=20%",
+            "<10%"
         ],
         "size":3,
         "contribution": 0.0875,
@@ -103,7 +103,7 @@ export const questionsForFirstTime = {
         "text":"Target IRR of the current Fund" ,
         "options":[
             ">=25%",
-            ">=18 & < 25%",
+            ">=18% & < 25%",
             ">=10% & <18%",
             "<10%"
         ],

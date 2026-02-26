@@ -294,7 +294,7 @@ export const Fund = (props: any) => {
                                             color: expanded === "1" ? '#363062' : '#444'
                                         }}>
                                             Fund Overview
-                                            <br/>
+                                            <br />
                                             <small>All Fields are mandatory</small>
                                         </Typography>
                                     </Box>
@@ -748,12 +748,13 @@ export const Fund = (props: any) => {
                                             ref={dealFlowRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
-                                            onSaveSuccess={() => handleAccordionSaveAndContinue("8", null, null)}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("8", "9", null)}
                                         />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
+
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["9"]}
@@ -799,83 +800,6 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "9" ? '#363062' : '#444'
                                         }}>
-                                            Past Investment Track Record Of the AMC
-                                        </Typography>
-                                    </Box>
-                                </AccordionSummary>
-                                <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
-                                    <Box sx={{ pt: 2 }}>
-                                        <Box sx={{ border: '1px dashed #ccc', borderRadius: '8px', p: 2, mb: 2, backgroundColor: '#fafafa' }}>
-                                            <Button
-                                                variant="text"
-                                                href="/templates/SASF_Fund Track Record Template.xlsx"
-                                                sx={{ color: '#363062', fontWeight: 600 }}
-                                            >
-                                                Download Template
-                                            </Button>
-                                        </Box>
-                                        <Box>
-                                            <UploadComponents id={`pastInvestmentTrackRecord${id}`} signed={false} />
-                                        </Box>
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleAccordionSaveAndContinue("9", "10", null)}
-                                                sx={{ backgroundColor: '#363062', color: 'white' }}
-                                            >
-                                                Save and Continue
-                                            </Button>
-                                        </Box>
-                                    </Box>
-                                </AccordionDetails>
-                            </Accordion>
-                        </Grid> : <></>}
-
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
-                            <Accordion
-                                ref={accordionRefs["10"]}
-                                elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
-                                    }
-                                }}
-                                expanded={expanded === "10"}
-                                onChange={handleChange("10")}
-                            >
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "10" ? '#363062' : '#666' }} />}
-                                    sx={{
-                                        px: 3,
-                                        py: 1,
-                                        backgroundColor: expanded === "10" ? 'rgba(54, 48, 98, 0.02)' : 'transparent',
-                                    }}
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Box sx={{
-                                            width: 32,
-                                            height: 32,
-                                            borderRadius: '50%',
-                                            backgroundColor: expanded === "10" ? '#363062' : '#f0f0f0',
-                                            color: expanded === "10" ? 'white' : '#666',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            mr: 2,
-                                            fontWeight: 700,
-                                            fontSize: '0.9rem'
-                                        }}>10</Box>
-                                        <Typography sx={{
-                                            fontWeight: 700,
-                                            color: expanded === "10" ? '#363062' : '#444'
-                                        }}>
                                             Others
                                         </Typography>
                                     </Box>
@@ -886,7 +810,7 @@ export const Fund = (props: any) => {
                                             ref={othersRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
-                                            onSaveSuccess={() => handleAccordionSaveAndContinue("10", null, null)}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("9", null, null)}
                                         />
                                     </Box>
                                 </AccordionDetails>
