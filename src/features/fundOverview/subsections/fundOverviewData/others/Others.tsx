@@ -82,7 +82,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
     }));
 
     const qSx = { mb: 3 };
-    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
+    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333', textAlign: 'justify' };
 
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
         return (

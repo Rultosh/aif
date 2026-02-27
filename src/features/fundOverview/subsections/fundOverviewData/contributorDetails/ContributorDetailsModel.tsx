@@ -256,7 +256,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               fullWidth
               type='number'
               id="amount"
-              label="Amount (₹ Crore)"
+              label="Commitment Amount (₹ Crore)"
               value={contributorDetailsFormData.amount || ''}
               {...register("amount")}
               error={!!errors.amount}
@@ -270,7 +270,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               variant="outlined"
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
-              sx={fieldSx}
+              sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -288,7 +288,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               onChange={handleChange}
               onBlur={handleBlur}
               InputLabelProps={{ shrink: true }}
-              sx={fieldSx}
+              sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -360,7 +360,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                         fullWidth
                         error={!!error}
                         helperText={error?.message}
-                        sx={fieldSx}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     )}
                   />
@@ -407,7 +407,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   variant="outlined"
                   onChange={handleChange}
                   InputLabelProps={{ shrink: true }}
-                  sx={fieldSx}
+                  sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -423,7 +423,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                   onChange={handleChange}
                   onBlur={handleBlur}
                   InputLabelProps={{ shrink: true }}
-                  sx={fieldSx}
+                  sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                 />
               </Grid>
             </>
@@ -448,7 +448,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               Cancel
             </Button>
             <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
-              {contributorDetailsFormData.id ? "Save" : "Submit"}
+              {contributorDetailsFormData.id ? "Save" : "Save"}
             </Button>
           </Grid>
         </Grid>

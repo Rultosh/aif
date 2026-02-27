@@ -207,7 +207,7 @@ const Declaration = (props: any) => {
                                     {[
                                         {
                                             id: "kycBoardDirectors",
-                                            text: "1. KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment Management Team to be provided in the format attached in Annexure I. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address: permanent and correspondent), Two passport size photograph for purpose of KYC.",
+                                            text: "1. Details and KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment Management Team to be provided in the format attached in Annexure I and Annexure II. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address: permanent and correspondent), Two passport size photograph for purpose of KYC.",
                                             templateLabel: "Download Template"
                                         },
                                         {
@@ -273,23 +273,12 @@ const Declaration = (props: any) => {
                             </AccordionSummary>
                             <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                 <Box sx={{ mb: 4 }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3 }}>
-                                        Fund Overview
-                                    </Typography>
-
                                     <Box sx={{
                                         p: 3,
                                         border: '1px solid rgba(0,0,0,0.08)',
                                         borderRadius: '16px',
                                         backgroundColor: '#fafafa'
                                     }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                                            <UploadIcon sx={{ color: '#363062', mr: 2 }} />
-                                            <Typography variant="subtitle2" sx={{ color: '#666' }}>
-                                                (Max. file size 5 MB each)
-                                            </Typography>
-                                        </Box>
-
                                         {Number(id) ? (
                                             <Grid container spacing={2}>
                                                 <Grid item xs="auto">
@@ -316,79 +305,9 @@ const Declaration = (props: any) => {
                                                 <Grid item xs="auto">
                                                     <DocumentChip label="Contribution Agreement" id={`sdContributionAgreement${id}`} />
                                                 </Grid>
-                                            </Grid>
-                                        ) : (
-                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
-                                                Please save the form to upload documents.
-                                            </Typography>
-                                        )}
-                                    </Box>
-
-                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
-                                        Investment Strategy
-                                    </Typography>
-
-                                    <Box sx={{
-                                        p: 3,
-                                        border: '1px solid rgba(0,0,0,0.08)',
-                                        borderRadius: '16px',
-                                        backgroundColor: '#fafafa'
-                                    }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                                            <UploadIcon sx={{ color: '#363062', mr: 2 }} />
-                                            <Typography variant="subtitle2" sx={{ color: '#666' }}>
-                                                (Max. file size 5 MB each)
-                                            </Typography>
-                                        </Box>
-
-                                        {Number(id) ? (
-                                            <Grid container spacing={2}>
                                                 <Grid item xs="auto">
                                                     <DocumentChip label="Investment and Other Policies" id={`sdInvestmentPolicy${id}`} />
                                                 </Grid>
-                                            </Grid>
-                                        ) : (
-                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
-                                                Please save the form to upload documents.
-                                            </Typography>
-                                        )}
-                                    </Box>
-
-                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
-                                        Details Of Contributor To the Fund
-                                    </Typography>
-
-                                    <Box sx={{
-                                        p: 3,
-                                        border: '1px solid rgba(0,0,0,0.08)',
-                                        borderRadius: '16px',
-                                        backgroundColor: '#fafafa'
-                                    }}>
-                                        {Number(id) ? (
-                                            <Grid container spacing={2}>
-                                                <Grid item xs="auto">
-                                                    <DocumentChip label="Letter Of Intent For Each Contributor" id={`sdLetterOfIntent${id}`} />
-                                                </Grid>
-                                            </Grid>
-                                        ) : (
-                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
-                                                Please save the form to upload documents.
-                                            </Typography>
-                                        )}
-                                    </Box>
-
-                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
-                                        Investments Made, If Any From the Current Fund
-                                    </Typography>
-
-                                    <Box sx={{
-                                        p: 3,
-                                        border: '1px solid rgba(0,0,0,0.08)',
-                                        borderRadius: '16px',
-                                        backgroundColor: '#fafafa'
-                                    }}>
-                                        {Number(id) ? (
-                                            <Grid container spacing={2}>
                                                 <Grid item xs="auto">
                                                     <DocumentChip label="Investment Committee Note" id={`sdInvestmentCommitteeNote${id}`} />
                                                 </Grid>
@@ -401,7 +320,7 @@ const Declaration = (props: any) => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
-                                        Past Investment Track Record Of the AMC
+                                        Past Investment Track Record Of IM/AMC
                                     </Typography>
 
                                     <Box sx={{

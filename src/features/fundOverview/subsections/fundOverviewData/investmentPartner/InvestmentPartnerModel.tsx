@@ -142,7 +142,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     exitOrWriteOff: Yup.string().required("Required").nullable(),
     moic: Yup.string().required("MOIC is required").nullable(),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
-    comment: Yup.string().required("Exit Process is required").nullable(),
+    comment: Yup.string().required("Comment on the Exit/Write off Process is required").nullable(),
     howWasTheDealSourced: Yup.string().required("This field is required").nullable(), 
     addressOfCompany: Yup.string().required("Address of company is required").nullable()
   });
@@ -271,8 +271,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     description: Yup.string().required("Brief details of VC/PE Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     vcpeExperience: Yup.string().required("VC/PE Experience is required").nullable(),
     areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    yearsWorkedTogether: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("This field is required"),
-    legalCasesPending: Yup.string().test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    yearsWorkedTogether: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("No. Of Years Worked Together Among Partners is required"),
+    legalCasesPending: Yup.string().required("Details Of Legal Cases Pending If Any In Court Of Law is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
   });
 
   const {
@@ -358,7 +358,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 helperText={errors.name?.message as string}
                 variant="outlined"
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
+                InputLabelProps={{ shrink: true, required: true }}
                 sx={{ 
                   ...fieldSx, 
                   flex: 1, 
@@ -367,7 +367,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       borderTopLeftRadius: 0,
                       borderBottomLeftRadius: 0,
                       ml: '-1px'
-                  }
+                  }, '& .MuiFormLabel-asterisk': { display: 'none' }
                 }}
               />
             </Grid>
@@ -383,8 +383,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 helperText={errors.designation?.message as string}
                 variant="outlined"
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                InputLabelProps={{ shrink: true, required: true }}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -400,8 +400,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 helperText={errors.age?.message as string}
                 variant="outlined"
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                InputLabelProps={{ shrink: true, required: true }}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12} md={9}>
@@ -416,8 +416,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 helperText={errors.qualification?.message as string}
                 variant="outlined"
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                InputLabelProps={{ shrink: true, required: true }}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -460,8 +460,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 error={!!errors.description}
                 helperText={errors.description?.message as string}
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                InputLabelProps={{ shrink: true, required: true }}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -476,8 +476,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 helperText={errors.areaOfExpertise?.message as string}
                 variant="outlined"
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                InputLabelProps={{ shrink: true, required: true }}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -493,14 +493,15 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 helperText={errors.yearsWorkedTogether?.message as string}
                 variant="outlined"
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                InputLabelProps={{ shrink: true, required: true }}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               // inputProps={{ step: "1", onKeyDown: (e) => (e.key === '.' || e.key === 'e') && e.preventDefault() }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
+                required
                 id="legalCasesPending"
                 label="Details Of Legal Cases Pending If Any In Court Of Law"
                 value={investmentPartnerFormData.legalCasesPending || ''}
@@ -509,8 +510,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 helperText={errors.legalCasesPending?.message as string}
                 variant="outlined"
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                InputLabelProps={{ shrink: true, required: true }}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
 
@@ -534,18 +535,20 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TextField
+                        required
                         fullWidth
                         label="Name Of Company"
                         size="small"
                         {...leadRegister("nameOfCompany")}
                         error={!!leadErrors.nameOfCompany}
                         helperText={leadErrors.nameOfCompany?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <TextField
+                        required
                         fullWidth
                         type="number"
                         label="Amount Invested (₹ Crore)"
@@ -553,8 +556,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         {...leadRegister("amountInvested")}
                         error={!!leadErrors.amountInvested}
                         helperText={leadErrors.amountInvested?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12} md={3}>
@@ -576,7 +579,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                                   error={!!leadErrors.dateOfInvestment}
                                   helperText={leadErrors.dateOfInvestment?.message as string}
                                   InputLabelProps={{ shrink: true }}
-                                  sx={fieldSx}
+                                  sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                 />
                               )}
                             />
@@ -584,19 +587,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         />
                       </LocalizationProvider>
                     </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        label="Exited/Write Off"
-                        size="small"
-                        {...leadRegister("exitOrWriteOff")}
-                        error={!!leadErrors.exitOrWriteOff}
-                        helperText={leadErrors.exitOrWriteOff?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid item xs={12} md={4}>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <Controller
                           name="dateofExitorWriteOff"
@@ -614,8 +605,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                                   fullWidth
                                   error={!!leadErrors.dateofExitorWriteOff}
                                   helperText={leadErrors.dateofExitorWriteOff?.message as string}
-                                  InputLabelProps={{ shrink: true }}
-                                  sx={fieldSx}
+                                  InputLabelProps={{ shrink: true, required: true }}
+                                  sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                 />
                               )}
                             />
@@ -623,32 +614,35 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         />
                       </LocalizationProvider>
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid item xs={12} md={4}>
                       <TextField
+                        required
                         fullWidth
                         label="IRR (%)"
                         size="small"
                         {...leadRegister("irrPercent")}
                         error={!!leadErrors.irrPercent}
                         helperText={leadErrors.irrPercent?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid item xs={12} md={4}>
                       <TextField
+                        required
                         fullWidth
                         label="MOIC"
                         size="small"
                         {...leadRegister("moic")}
                         error={!!leadErrors.moic}
                         helperText={leadErrors.moic?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
+                        required
                         fullWidth
                         multiline
                         maxRows={4}
@@ -657,26 +651,28 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         {...leadRegister("addressOfCompany")}
                         error={!!leadErrors.addressOfCompany}
                         helperText={leadErrors.addressOfCompany?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
+                        required
                         fullWidth
                         multiline
                         maxRows={4}
-                        label="Exit Process"
+                        label="Comment on the Exit/Write off Process"
                         size="small"
                         {...leadRegister("comment")}
                         error={!!leadErrors.comment}
                         helperText={leadErrors.comment?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
+                        required
                         fullWidth
                         multiline
                         maxRows={4}
@@ -685,8 +681,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         {...leadRegister("howWasTheDealSourced")}
                         error={!!leadErrors.howWasTheDealSourced}
                         helperText={leadErrors.howWasTheDealSourced?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -704,11 +700,10 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TableCell sx={{ fontWeight: 'bold' }}>Name Of Company</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Amount Invested (₹ Crore)</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Date Of Investment</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Exited/Write Off	</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Date Of Exit	</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>IRR (%)</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>MOIC</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Exit Process</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Comment on the Exit/Write off Process</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
@@ -764,18 +759,20 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TextField
+                        required
                         fullWidth
                         label="Name Of Company"
                         size="small"
                         {...nonLeadRegister("nameOfCompany")}
                         error={!!nonLeadErrors.nameOfCompany}
                         helperText={nonLeadErrors.nameOfCompany?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <TextField
+                        required
                         fullWidth
                         type="number"
                         label="Amount Invested (₹ Crore)"
@@ -783,8 +780,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         {...nonLeadRegister("amountInvested")}
                         error={!!nonLeadErrors.amountInvested}
                         helperText={nonLeadErrors.amountInvested?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12} md={3}>
@@ -801,12 +798,13 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
+                                  required
                                   size="small"
                                   fullWidth
                                   error={!!nonLeadErrors.dateOfInvestment}
                                   helperText={nonLeadErrors.dateOfInvestment?.message as string}
-                                  InputLabelProps={{ shrink: true }}
-                                  sx={fieldSx}
+                                  InputLabelProps={{ shrink: true, required: true }}
+                                  sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                 />
                               )}
                             />
@@ -814,19 +812,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         />
                       </LocalizationProvider>
                     </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        label="Exited/Write Off"
-                        size="small"
-                        {...nonLeadRegister("exitOrWriteOff")}
-                        error={!!nonLeadErrors.exitOrWriteOff}
-                        helperText={nonLeadErrors.exitOrWriteOff?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid item xs={12} md={4}>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <Controller
                           name="dateofExitorWriteOff"
@@ -840,12 +826,13 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
+                                  required
                                   size="small"
                                   fullWidth
                                   error={!!nonLeadErrors.dateofExitorWriteOff}
                                   helperText={nonLeadErrors.dateofExitorWriteOff?.message as string}
-                                  InputLabelProps={{ shrink: true }}
-                                  sx={fieldSx}
+                                  InputLabelProps={{ shrink: true, required: true }}
+                                  sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                 />
                               )}
                             />
@@ -853,32 +840,35 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         />
                       </LocalizationProvider>
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid item xs={12} md={4}>
                       <TextField
+                        required
                         fullWidth
                         label="IRR (%)"
                         size="small"
                         {...nonLeadRegister("irrPercent")}
                         error={!!nonLeadErrors.irrPercent}
                         helperText={nonLeadErrors.irrPercent?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid item xs={12} md={4}>
                       <TextField
+                        required
                         fullWidth
                         label="MOIC"
                         size="small"
                         {...nonLeadRegister("moic")}
                         error={!!nonLeadErrors.moic}
                         helperText={nonLeadErrors.moic?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
+                        required
                         fullWidth
                         multiline
                         maxRows={4}
@@ -887,26 +877,28 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         {...nonLeadRegister("addressOfCompany")}
                         error={!!nonLeadErrors.addressOfCompany}
                         helperText={nonLeadErrors.addressOfCompany?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
+                        required
                         fullWidth
                         multiline
                         maxRows={4}
-                        label="Exit Process"
+                        label="Comment on the Exit/Write off Process"
                         size="small"
                         {...nonLeadRegister("comment")}
                         error={!!nonLeadErrors.comment}
                         helperText={nonLeadErrors.comment?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
+                        required
                         fullWidth
                         multiline
                         maxRows={4}
@@ -915,8 +907,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         {...nonLeadRegister("howWasTheDealSourced")}
                         error={!!nonLeadErrors.howWasTheDealSourced}
                         helperText={nonLeadErrors.howWasTheDealSourced?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
+                        InputLabelProps={{ shrink: true, required: true }}
+                        sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -934,11 +926,10 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TableCell sx={{ fontWeight: 'bold' }}>Name Of Company</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Amount Invested (₹ Crore)</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Date Of Investment</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Exited/Write Off	</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Date Of Exit	</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>IRR (%)</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>MOIC</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Exit Process</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Comment on the Exit/Write off Process</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>

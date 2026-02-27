@@ -53,7 +53,7 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
         ))
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
-    const tableHeaders = ["Name Of Contributor", "Amount Contributed (₹ Crore)", "% Of Corpus", "Type", "Action"]
+    const tableHeaders = ["Name Of Contributor", "Commitment Amount (₹ Crore)", "% Of Corpus", "Type", "Action"]
 
     let headerComponent = []
 

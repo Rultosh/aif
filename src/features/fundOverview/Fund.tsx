@@ -186,6 +186,18 @@ export const Fund = (props: any) => {
             setIsLoading(false);
         }
     };
+    
+    const internalButtonSx = {
+        backgroundColor: '#363062',
+        color: 'white',
+        textTransform: 'none',
+        borderRadius: '8px',
+        px: 4,
+        '&:hover': {
+            backgroundColor: '#4d4585'
+        }
+    };
+
     return (
         <Box className="formAnimation" sx={{ pb: 5 }}>
             {/* {Number(prelimApplicationId) ? (
@@ -236,11 +248,11 @@ export const Fund = (props: any) => {
                 <CardContent sx={{ p: 4 }}>
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h6" sx={{ fontWeight: 800, color: '#363062', mb: 1 }}>
-                            Fund Overview
+                            Fund Information
                         </Typography>
                         <Divider sx={{ borderColor: 'rgba(54, 48, 98, 0.1)', mb: 3 }} />
                         <Typography variant="body2" sx={{ color: '#666', mb: 4 }}>
-                            Provide detailed information about the fund, investment team, and track record.
+                            <b>Provide detailed information about the fund, investment team, and track record (All Fields are mandatory).</b>
                         </Typography>
                     </Box>
 
@@ -291,8 +303,6 @@ export const Fund = (props: any) => {
                                             color: expanded === "1" ? '#363062' : '#444'
                                         }}>
                                             Fund Overview
-                                            <br />
-                                            <small>All Fields are mandatory</small>
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -421,13 +431,13 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>                                            
                                             <Button
                                                 variant="contained"
                                                 onClick={() => handleAccordionSaveAndContinue("3", "4", null)}
-                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                                sx={internalButtonSx}
                                             >
-                                                Save and Continue
+                                                Save & Continue
                                             </Button>
                                         </Box>
                                     </Box>
@@ -486,13 +496,13 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>                                           
                                             <Button
                                                 variant="contained"
                                                 onClick={() => handleAccordionSaveAndContinue("4", "5", null)}
-                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                                sx={internalButtonSx}
                                             >
-                                                Save and Continue
+                                                Save & Continue
                                             </Button>
                                         </Box>
                                     </Box>
@@ -551,13 +561,13 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <ContributorDetails prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>                                          
                                             <Button
                                                 variant="contained"
                                                 onClick={() => handleAccordionSaveAndContinue("5", "6", null)}
-                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                                sx={internalButtonSx}
                                             >
-                                                Save and Continue
+                                                Save & Continue
                                             </Button>
                                         </Box>
                                     </Box>
@@ -616,13 +626,13 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentPast prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>                                    
                                             <Button
                                                 variant="contained"
                                                 onClick={() => handleAccordionSaveAndContinue("6", "7", null)}
-                                                sx={{ backgroundColor: '#363062', color: 'white' }}
+                                                sx={internalButtonSx}
                                             >
-                                                Save and Continue
+                                                Save & Continue
                                             </Button>
                                         </Box>
                                     </Box>
@@ -862,7 +872,7 @@ export const Fund = (props: any) => {
                                         }
                                     }}
                                 >
-                                    Submit
+                                    Save & Continue
                                 </Button>
                             ) : (
                                 <Button

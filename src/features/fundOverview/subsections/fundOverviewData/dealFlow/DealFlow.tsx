@@ -89,7 +89,18 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     }));
 
     const qSx = { mb: 3 };
-    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
+    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333', textAlign: 'justify' };
+
+    const internalButtonSx = {
+        backgroundColor: '#363062',
+        color: 'white',
+        textTransform: 'none',
+        borderRadius: '8px',
+        px: 4,
+        '&:hover': {
+            backgroundColor: '#4d4585'
+        }
+    };
 
     const numericSx = {
         '& .MuiOutlinedInput-root': {
@@ -105,7 +116,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since Fund inception and Conversion ratio for transactions sourced to those completed</Typography>
+                        <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since Fund inception and Conversion ratio for transactions sourced to those completed.</Typography>
                         <TextField
                             fullWidth
                             {...register("dfTotalDealsEvaluated")}
@@ -116,7 +127,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>2. What is the current pipeline of deals under consideration? Give details and timeline for investment</Typography>
+                        <Typography variant="body1" sx={labelSx}>2. What is the current pipeline of deals under consideration? Give details and timeline for investment.</Typography>
                         <TextField
                             fullWidth
                             {...register("dfCurrentPipeline")}
@@ -179,10 +190,10 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>7. What is the reporting structure/procedure for the contributors (quarterly/ half-yearly/annual)</Typography>
+                        <Typography variant="body1" sx={labelSx}>7. What is the reporting structure/procedure for the contributors (quarterly/ half-yearly/annual).</Typography>
 
                         <Box sx={{ ml: 2 }}>
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Consolidated information of investee companies</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Consolidated information of investee companies.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
@@ -194,7 +205,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 sx={{ mb: 2 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
@@ -206,7 +217,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 sx={{ mb: 2 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
@@ -218,7 +229,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 sx={{ mb: 2 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
@@ -233,18 +244,11 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <Button
                                 type="submit"
                                 variant="contained"
-                                sx={{
-                                    backgroundColor: '#363062',
-                                    '&:hover': { backgroundColor: '#2a254d' },
-                                    px: 4,
-                                    py: 1,
-                                    borderRadius: '8px',
-                                    fontWeight: 600
-                                }}
+                                sx={internalButtonSx}
                             >
                                 Save and Continue
                             </Button>

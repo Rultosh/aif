@@ -367,7 +367,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                     borderTopLeftRadius: 0,
                     borderBottomLeftRadius: 0,
                     ml: '-1px'
-                  }
+                  }, '& .MuiFormLabel-asterisk': { display: 'none' }
                 }}
               />
             </Grid>
@@ -384,7 +384,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -401,7 +401,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12} md={9}>
@@ -417,11 +417,11 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControl fullWidth variant="outlined" error={!!errors.investmentExperience} sx={fieldSx}>
+              <FormControl fullWidth variant="outlined" error={!!errors.investmentExperience} sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}>
                 <InputLabel id="investmentExperience-label">Investment Experience</InputLabel>
                 <Controller
                   name="investmentExperience"
@@ -461,7 +461,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 maxRows={4}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -477,7 +477,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             {investmentAssociateFormData.id && (
@@ -499,7 +499,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 Cancel
               </Button>
               <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
-                {investmentAssociateFormData.id ? "Save" : "Submit"}
+                {investmentAssociateFormData.id ? "Save" : "Save"}
               </Button>
             </Grid>
           </Grid>
