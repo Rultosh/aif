@@ -32,11 +32,11 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
     }, [prelimAppicationId, actionUid, dispatch]);
 
     useEffect(() => {
-        if (prelimApplicationState.prelimApplication) {
+        if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
             setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
             reset(prelimApplicationState.prelimApplication);
         }
-    }, [prelimApplicationState.prelimApplication]);
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
 
     const validationSchema = Yup.object().shape({
         lpacDetails: Yup.string().required("This field is required").nullable(),
@@ -82,7 +82,18 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
     }));
 
     const qSx = { mb: 3 };
-    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
+    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333', textAlign: 'justify' };
+    
+    const internalButtonSx = {
+        backgroundColor: '#363062',
+        color: 'white',
+        textTransform: 'none',
+        borderRadius: '8px',
+        px: 4,
+        '&:hover': {
+            backgroundColor: '#4d4585'
+        }
+    };
 
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
         return (
@@ -183,14 +194,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             <Button
                                 type="submit"
                                 variant="contained"
-                                sx={{
-                                    backgroundColor: '#363062',
-                                    '&:hover': { backgroundColor: '#2a254d' },
-                                    px: 4,
-                                    py: 1,
-                                    borderRadius: '8px',
-                                    fontWeight: 600
-                                }}
+                                sx={internalButtonSx}
                             >
                                 Save and Continue
                             </Button>

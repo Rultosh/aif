@@ -44,7 +44,6 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
         dispatch(fetchContributorDetailsAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
-        setOpen(false)
     }, [contributorDetailsState.actionStatus.fetchStatus === FetchStatus.IDLE, prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     useEffect(() => {
@@ -52,10 +51,9 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
         dispatch(fetchContributorDetailsAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
-        setOpen(false)
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
-    const tableHeaders = ["Name Of Contributor", "Amount Contributed (₹ Crore)", "% Of Corpus", "Type", "Action"]
+    const tableHeaders = ["Name Of Contributor", "Commitment Amount (₹ Crore)", "% Of Corpus", "Type", "Action"]
 
     let headerComponent = []
 

@@ -34,25 +34,25 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     }, [prelimAppicationId, actionUid, dispatch]);
 
     useEffect(() => {
-        if (prelimApplicationState.prelimApplication) {
+        if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
             setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
             reset(prelimApplicationState.prelimApplication);
         }
-    }, [prelimApplicationState.prelimApplication]);
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
 
     const validationSchema = Yup.object().shape({
         dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable(),
         dfCurrentPipeline: Yup.string().required("This field is required").nullable(),
         // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
-        dfConversionRatio: Yup.number().required("This field is required").nullable(),
-        msMeetingFrequency: Yup.string().required("This field is required").nullable(),
-        msInvestigationDetails: Yup.string().required("This field is required").nullable(),
-        msExclusiveVC: Yup.string().required("This field is required").nullable(),
-        msDirectorshipsPolicy: Yup.string().required("This field is required").nullable(),
-        otConsolidatedInfo: Yup.string().required("This field is required").nullable(),
-        otNAVFrequency: Yup.string().required("This field is required").nullable(),
-        otValuationReport: Yup.string().required("This field is required").nullable(),
-        otNAVGuidelines: Yup.string().required("This field is required").nullable(),
+        // dfConversionRatio: Yup.number().required("This field is required").nullable(),
+        dfMeetingFrequency: Yup.string().required("This field is required").nullable(),
+        dfInvestigationDetails: Yup.string().required("This field is required").nullable(),
+        dfExclusiveVC: Yup.string().required("This field is required").nullable(),
+        dfDirectorshipsPolicy: Yup.string().required("This field is required").nullable(),
+        dfConsolidatedInfo: Yup.string().required("This field is required").nullable(),
+        dfNAVFrequency: Yup.string().required("This field is required").nullable(),
+        dfValuationReport: Yup.string().required("This field is required").nullable(),
+        dfNAVGuidelines: Yup.string().required("This field is required").nullable(),
     });
 
     const {
@@ -89,7 +89,18 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     }));
 
     const qSx = { mb: 3 };
-    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
+    const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333', textAlign: 'justify' };
+
+    const internalButtonSx = {
+        backgroundColor: '#363062',
+        color: 'white',
+        textTransform: 'none',
+        borderRadius: '8px',
+        px: 4,
+        '&:hover': {
+            backgroundColor: '#4d4585'
+        }
+    };
 
     const numericSx = {
         '& .MuiOutlinedInput-root': {
@@ -105,7 +116,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since Fund inception and Conversion ratio for transactions sourced to those completed</Typography>
+                        <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since Fund inception and Conversion ratio for transactions sourced to those completed.</Typography>
                         <TextField
                             fullWidth
                             {...register("dfTotalDealsEvaluated")}
@@ -116,7 +127,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>2. What is the current pipeline of deals under consideration? Give details and timeline for investment</Typography>
+                        <Typography variant="body1" sx={labelSx}>2. What is the current pipeline of deals under consideration? Give details and timeline for investment.</Typography>
                         <TextField
                             fullWidth
                             {...register("dfCurrentPipeline")}
@@ -132,9 +143,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             fullWidth
                             multiline
                             maxRows={4}
-                            {...register("msMeetingFrequency")}
-                            error={!!errors.msMeetingFrequency}
-                            helperText={errors.msMeetingFrequency?.message as string}
+                            {...register("dfMeetingFrequency")}
+                            error={!!errors.dfMeetingFrequency}
+                            helperText={errors.dfMeetingFrequency?.message as string}
                             variant="outlined"
                         />
                     </Grid>
@@ -145,9 +156,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             fullWidth
                             multiline
                             maxRows={4}
-                            {...register("msInvestigationDetails")}
-                            error={!!errors.msInvestigationDetails}
-                            helperText={errors.msInvestigationDetails?.message as string}
+                            {...register("dfInvestigationDetails")}
+                            error={!!errors.dfInvestigationDetails}
+                            helperText={errors.dfInvestigationDetails?.message as string}
                             variant="outlined"
                         />
                     </Grid>
@@ -158,9 +169,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             fullWidth
                             multiline
                             maxRows={4}
-                            {...register("msExclusiveVC")}
-                            error={!!errors.msExclusiveVC}
-                            helperText={errors.msExclusiveVC?.message as string}
+                            {...register("dfExclusiveVC")}
+                            error={!!errors.dfExclusiveVC}
+                            helperText={errors.dfExclusiveVC?.message as string}
                             variant="outlined"
                         />
                     </Grid>
@@ -171,61 +182,61 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             fullWidth
                             multiline
                             maxRows={4}
-                            {...register("msDirectorshipsPolicy")}
-                            error={!!errors.msDirectorshipsPolicy}
-                            helperText={errors.msDirectorshipsPolicy?.message as string}
+                            {...register("dfDirectorshipsPolicy")}
+                            error={!!errors.dfDirectorshipsPolicy}
+                            helperText={errors.dfDirectorshipsPolicy?.message as string}
                             variant="outlined"
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>7. What is the reporting structure/procedure for the contributors (quarterly/ half-yearly/annual)</Typography>
+                        <Typography variant="body1" sx={labelSx}>7. What is the reporting structure/procedure for the contributors (quarterly/ half-yearly/annual).</Typography>
 
                         <Box sx={{ ml: 2 }}>
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Consolidated information of investee companies</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Consolidated information of investee companies.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
                                 maxRows={4}
-                                {...register("otConsolidatedInfo")}
-                                error={!!errors.otConsolidatedInfo}
-                                helperText={errors.otConsolidatedInfo?.message as string}
+                                {...register("dfConsolidatedInfo")}
+                                error={!!errors.dfConsolidatedInfo}
+                                helperText={errors.dfConsolidatedInfo?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
                                 maxRows={4}
-                                {...register("otNAVFrequency")}
-                                error={!!errors.otNAVFrequency}
-                                helperText={errors.otNAVFrequency?.message as string}
+                                {...register("dfNAVFrequency")}
+                                error={!!errors.dfNAVFrequency}
+                                helperText={errors.dfNAVFrequency?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
                                 maxRows={4}
-                                {...register("otValuationReport")}
-                                error={!!errors.otValuationReport}
-                                helperText={errors.otValuationReport?.message as string}
+                                {...register("dfValuationReport")}
+                                error={!!errors.dfValuationReport}
+                                helperText={errors.dfValuationReport?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
                                 maxRows={4}
-                                {...register("otNAVGuidelines")}
-                                error={!!errors.otNAVGuidelines}
-                                helperText={errors.otNAVGuidelines?.message as string}
+                                {...register("dfNAVGuidelines")}
+                                error={!!errors.dfNAVGuidelines}
+                                helperText={errors.dfNAVGuidelines?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
                             />
@@ -233,18 +244,11 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <Button
                                 type="submit"
                                 variant="contained"
-                                sx={{
-                                    backgroundColor: '#363062',
-                                    '&:hover': { backgroundColor: '#2a254d' },
-                                    px: 4,
-                                    py: 1,
-                                    borderRadius: '8px',
-                                    fontWeight: 600
-                                }}
+                                sx={internalButtonSx}
                             >
                                 Save and Continue
                             </Button>

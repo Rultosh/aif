@@ -32,25 +32,44 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
 
   const dispatch = useAppDispatch();
 
-  async function handleSubmitForm(data: IInvestmentAssociate) {
+  async function handleSubmitForm(data: IInvestmentAssociate, shouldClose: boolean = false) {
     console.log("Saving investment Associate", data)
+    let response: any;
     if (data.id) {
-      return await dispatch(
+      response = await dispatch(
         updateInvestmentTeamsAssociateLevelAsync(
           wrapArgument(actionUid, data)
         )
       )
     } else {
-      return await dispatch(
+      response = await dispatch(
         createInvestmentTeamsAssociateLevelAsync(
           wrapArgument(actionUid, data)
         )
       )
     }
+
+    if (response && response.type.endsWith('/fulfilled')) {
+      const savedData = response.payload as IInvestmentAssociate;
+      const combinedData = { ...data, ...savedData };
+      setInvestmentAssociateFormData(combinedData);
+      reset(combinedData);
+
+      if (!data.id) {
+        // New record saved, id is now available
+        dispatch(getAllInvestmentResponsibleAsLeadsAsnyc(wrapArgument(actionUid, Number(savedData.id))));
+        dispatch(getAllInvestmentResponsibleAsNonLeadsAsnyc(wrapArgument(actionUid, Number(savedData.id))));
+      }
+
+      if (shouldClose) {
+        handleCloseModal();
+      }
+    }
   }
 
   const handleCloseModal = () => {
-    reset();
+    reset(defaultInvestmentAssociate);
+    setInvestmentAssociateFormData(defaultInvestmentAssociate);
     props.handleClose();
   }
 
@@ -142,7 +161,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     moic: Yup.string().required("MOIC is required").nullable(),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
     comment: Yup.string().required("Comment is required").nullable(),
-    howWasTheDealSourced: Yup.string().required("This field is required").nullable(), 
+    howWasTheDealSourced: Yup.string().required("This field is required").nullable(),
     addressOfCompany: Yup.string().required("Address of company is required").nullable()
   });
 
@@ -280,25 +299,11 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
   });
 
   const onSubmit = async (data: any) => {
-    let hasIdOnAction = data.id;
-    console.log('hasIdOnAction', hasIdOnAction, data.id);
-    const result = await handleSubmitForm(data);
+    const isUpdate = !!investmentAssociateFormData.id;
+    console.log('Submitting investment associate. isUpdate:', isUpdate, 'ID:', investmentAssociateFormData.id, 'data:', data);
 
-    if (result && result.payload) {
-      const savedData = result.payload as IInvestmentAssociate;
-      setInvestmentAssociateFormData(savedData);
-      reset(savedData);
-
-      if (hasIdOnAction) {
-        handleCloseModal();
-      } else {
-        // New record saved, id is now available
-        dispatch(getAllInvestmentResponsibleAsLeadsAsnyc(wrapArgument(actionUid, Number(savedData.id))));
-        dispatch(getAllInvestmentResponsibleAsNonLeadsAsnyc(wrapArgument(actionUid, Number(savedData.id))));
-      }
-      // Close modal after successful save in both cases
-      handleCloseModal();
-    }
+    // Pass shouldClose based on whether it's an update
+    await handleSubmitForm(data, isUpdate);
   };
 
   const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
@@ -316,31 +321,31 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'flex-end' }}>
               <FormControl sx={{
-                  ...fieldSx,
-                  width: '120px',
-                  '& .MuiOutlinedInput-root': {
-                      ...fieldSx['& .MuiOutlinedInput-root'],
-                      borderTopRightRadius: 0,
-                      borderBottomRightRadius: 0,
-                  }
+                ...fieldSx,
+                width: '120px',
+                '& .MuiOutlinedInput-root': {
+                  ...fieldSx['& .MuiOutlinedInput-root'],
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                }
               }} error={!!errors.title}>
-                  <InputLabel id="title-label">Title</InputLabel>
-                  <Select
-                      required
-                      labelId="title-label"
-                      id="title"
-                      // name="title"
-                      label="Title"
-                      value={investmentAssociateFormData.title || ""}
-                      {...register("title")}
-                      onChange={handleChange}
-                  >
-                      <MenuItem value="Mr.">Mr.</MenuItem>
-                      <MenuItem value="Mrs.">Mrs.</MenuItem>
-                      <MenuItem value="Ms.">Ms.</MenuItem>
-                      <MenuItem value="Dr.">Dr.</MenuItem>
-                  </Select>
-                  {errors.title && <FormHelperText>{errors.title.message as string}</FormHelperText>}
+                <InputLabel id="title-label">Title</InputLabel>
+                <Select
+                  required
+                  labelId="title-label"
+                  id="title"
+                  // name="title"
+                  label="Title"
+                  value={investmentAssociateFormData.title || ""}
+                  {...register("title")}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Mr.">Mr.</MenuItem>
+                  <MenuItem value="Mrs.">Mrs.</MenuItem>
+                  <MenuItem value="Ms.">Ms.</MenuItem>
+                  <MenuItem value="Dr.">Dr.</MenuItem>
+                </Select>
+                {errors.title && <FormHelperText>{errors.title.message as string}</FormHelperText>}
               </FormControl>
               <TextField
                 required
@@ -354,15 +359,15 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={{ 
-                  ...fieldSx, 
-                  flex: 1, 
+                sx={{
+                  ...fieldSx,
+                  flex: 1,
                   '& .MuiOutlinedInput-root': {
-                      ...fieldSx['& .MuiOutlinedInput-root'],
-                      borderTopLeftRadius: 0,
-                      borderBottomLeftRadius: 0,
-                      ml: '-1px'
-                  }
+                    ...fieldSx['& .MuiOutlinedInput-root'],
+                    borderTopLeftRadius: 0,
+                    borderBottomLeftRadius: 0,
+                    ml: '-1px'
+                  }, '& .MuiFormLabel-asterisk': { display: 'none' }
                 }}
               />
             </Grid>
@@ -379,7 +384,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -396,7 +401,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12} md={9}>
@@ -412,11 +417,11 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControl fullWidth variant="outlined" error={!!errors.investmentExperience} sx={fieldSx}>
+              <FormControl fullWidth variant="outlined" error={!!errors.investmentExperience} sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}>
                 <InputLabel id="investmentExperience-label">Investment Experience</InputLabel>
                 <Controller
                   name="investmentExperience"
@@ -456,7 +461,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 maxRows={4}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -472,495 +477,30 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                sx={fieldSx}
+                sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                    <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Experience</Typography>
-                    <UploadComponents id={`sdAssociateResume${investmentAssociateFormData.id || uuid()}`} signed={false} />
-                  </Box>
+            {investmentAssociateFormData.id && (
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                      <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Experience</Typography>
+                      <UploadComponents id={`sdAssociateResumeCvExperience${investmentAssociateFormData.id}`} signed={false} />
+                    </Box>
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-
-            {/* {investmentAssociateFormData.id && <><Grid item xs={12}>
-              <Box sx={{ mt: 2, mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#363062' }}>Investments Responsible As Lead</Typography>
-                <Button
-                  startIcon={<AddIcon />}
-                  onClick={() => handleOpenLeadForm()}
-                  variant="outlined"
-                  size="small"
-                  sx={{ textTransform: 'none', borderRadius: '8px' }}
-                >
-                  Add Investment
-                </Button>
-              </Box>
-
-              <Collapse in={showLeadForm}>
-                <Paper sx={{ p: 3, mb: 3, border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: '#fcfcfc' }}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>{editingLeadInvestment.id ? 'Edit Investment' : 'Add Investment'}</Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <TextField
-                        fullWidth
-                        label="Name Of Company"
-                        size="small"
-                        {...leadRegister("nameOfCompany")}
-                        error={!!leadErrors.nameOfCompany}
-                        helperText={leadErrors.nameOfCompany?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label="Amount Invested (₹ Crore)"
-                        size="small"
-                        {...leadRegister("amountInvested")}
-                        error={!!leadErrors.amountInvested}
-                        helperText={leadErrors.amountInvested?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Controller
-                          name="dateOfInvestment"
-                          control={leadControl}
-                          render={({ field }) => (
-                            <DesktopDatePicker
-                              label="Date Of Investment"
-                              inputFormat="DD/MM/YYYY"
-                              value={field.value || null}
-                              onChange={(date) => field.onChange(date)}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  size="small"
-                                  fullWidth
-                                  error={!!leadErrors.dateOfInvestment}
-                                  helperText={leadErrors.dateOfInvestment?.message as string}
-                                  InputLabelProps={{ shrink: true }}
-                                  sx={fieldSx}
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        label="Exited/Write Off"
-                        size="small"
-                        {...leadRegister("exitOrWriteOff")}
-                        error={!!leadErrors.exitOrWriteOff}
-                        helperText={leadErrors.exitOrWriteOff?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Controller
-                          name="dateofExitorWriteOff"
-                          control={leadControl}
-                          render={({ field }) => (
-                            <DesktopDatePicker
-                              label="Date Of Exit"
-                              inputFormat="DD/MM/YYYY"
-                              value={field.value || null}
-                              onChange={(date) => field.onChange(date)}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  size="small"
-                                  fullWidth
-                                  error={!!leadErrors.dateofExitorWriteOff}
-                                  helperText={leadErrors.dateofExitorWriteOff?.message as string}
-                                  InputLabelProps={{ shrink: true }}
-                                  sx={fieldSx}
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        label="IRR (%)"
-                        size="small"
-                        {...leadRegister("irrPercent")}
-                        error={!!leadErrors.irrPercent}
-                        helperText={leadErrors.irrPercent?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        label="MOIC"
-                        size="small"
-                        {...leadRegister("moic")}
-                        error={!!leadErrors.moic}
-                        helperText={leadErrors.moic?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        multiline
-                        maxRows={4}
-                        label="Address Of Company"
-                        size="small"
-                        {...leadRegister("addressOfCompany")}
-                        error={!!leadErrors.addressOfCompany}
-                        helperText={leadErrors.addressOfCompany?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        multiline
-                        maxRows={4}
-                        label="Comment"
-                        size="small"
-                        {...leadRegister("comment")}
-                        error={!!leadErrors.comment}
-                        helperText={leadErrors.comment?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        multiline
-                        maxRows={4}
-                        label="How was the deal sourced either through Investment Banks, Networking, direct etc"
-                        size="small"
-                        {...leadRegister("howWasTheDealSourced")}
-                        error={!!leadErrors.howWasTheDealSourced}
-                        helperText={leadErrors.howWasTheDealSourced?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                      <Button onClick={handleCloseLeadForm} size="small" sx={{ textTransform: 'none' }}>Cancel</Button>
-                      <Button onClick={leadHandleSubmit(onLeadSubmit)} variant="contained" size="small" sx={{ textTransform: 'none', backgroundColor: '#363062' }}>Save</Button>
-                    </Grid>
-                  </Grid>
-                </Paper>
-              </Collapse>
-
-              <TableContainer component={Paper} sx={{ borderRadius: '8px', border: '1px solid #e0e0e0', boxShadow: 'none', mb: 4 }}>
-                <Table size="small">
-                  <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Name Of Company</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Amount Invested (₹ Crore)</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Date Of Investment</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Exited/Write Off	</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Date Of Exit	</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>IRR (%)</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>MOIC</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Comment</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {investmentsAsLead.data[String(investmentAssociateFormData.id)]?.investmentsAsLead?.length ? (
-                      investmentsAsLead.data[String(investmentAssociateFormData.id)]?.investmentsAsLead?.map((inv: IInvestmentResponsibleAsLead) => (
-                        <TableRow key={inv.id}>
-                          <TableCell>{inv.nameOfCompany}</TableCell>
-                          <TableCell>{inv.amountInvested}</TableCell>
-                          <TableCell>{inv.dateOfInvestment ? Moment(inv.dateOfInvestment).format("DD/MM/YYYY") : '-'}</TableCell>
-                          <TableCell>{inv.exitOrWriteOff}</TableCell>
-                          <TableCell>{inv.dateofExitorWriteOff && Moment(inv.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
-                          <TableCell>{inv.irrPercent}</TableCell>
-                          <TableCell>{inv.moic || '-'}</TableCell>
-                          <TableCell>{inv.comment}</TableCell>
-                          <TableCell>
-                            <IconButton size="small" onClick={() => handleOpenLeadForm(inv)} color="primary">
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton size="small" onClick={() => handleDeleteLead(inv)} color="error">
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={9} align="center" sx={{ py: 2, color: 'text.secondary' }}>
-                          {"No investments added yet"}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-
-              <Box sx={{ mt: 2, mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#363062' }}>Investments Responsible As Non-Lead</Typography>
-                <Button
-                  startIcon={<AddIcon />}
-                  onClick={() => handleOpenNonLeadForm()}
-                  variant="outlined"
-                  size="small"
-                  sx={{ textTransform: 'none', borderRadius: '8px' }}
-                >
-                  Add Investment
-                </Button>
-              </Box>
-
-              <Collapse in={showNonLeadForm}>
-                <Paper sx={{ p: 3, mb: 3, border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: '#fcfcfc' }}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>{editingNonLeadInvestment.id ? 'Edit Investment' : 'Add Investment'}</Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <TextField
-                        fullWidth
-                        label="Name Of Company"
-                        size="small"
-                        {...nonLeadRegister("nameOfCompany")}
-                        error={!!nonLeadErrors.nameOfCompany}
-                        helperText={nonLeadErrors.nameOfCompany?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label="Amount Invested (₹ Crore)"
-                        size="small"
-                        {...nonLeadRegister("amountInvested")}
-                        error={!!nonLeadErrors.amountInvested}
-                        helperText={nonLeadErrors.amountInvested?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Controller
-                          name="dateOfInvestment"
-                          control={nonLeadControl}
-                          render={({ field }) => (
-                            <DesktopDatePicker
-                              label="Date Of Investment"
-                              inputFormat="DD/MM/YYYY"
-                              value={field.value || null}
-                              onChange={(date) => field.onChange(date)}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  size="small"
-                                  fullWidth
-                                  error={!!nonLeadErrors.dateOfInvestment}
-                                  helperText={nonLeadErrors.dateOfInvestment?.message as string}
-                                  InputLabelProps={{ shrink: true }}
-                                  sx={fieldSx}
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        label="Exited/Write Off"
-                        size="small"
-                        {...nonLeadRegister("exitOrWriteOff")}
-                        error={!!nonLeadErrors.exitOrWriteOff}
-                        helperText={nonLeadErrors.exitOrWriteOff?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Controller
-                          name="dateofExitorWriteOff"
-                          control={nonLeadControl}
-                          render={({ field }) => (
-                            <DesktopDatePicker
-                              label="Date Of Exit"
-                              inputFormat="DD/MM/YYYY"
-                              value={field.value || null}
-                              onChange={(date) => field.onChange(date)}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  size="small"
-                                  fullWidth
-                                  error={!!nonLeadErrors.dateofExitorWriteOff}
-                                  helperText={nonLeadErrors.dateofExitorWriteOff?.message as string}
-                                  InputLabelProps={{ shrink: true }}
-                                  sx={fieldSx}
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        label="IRR (%)"
-                        size="small"
-                        {...nonLeadRegister("irrPercent")}
-                        error={!!nonLeadErrors.irrPercent}
-                        helperText={nonLeadErrors.irrPercent?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <TextField
-                        fullWidth
-                        label="MOIC"
-                        size="small"
-                        {...nonLeadRegister("moic")}
-                        error={!!nonLeadErrors.moic}
-                        helperText={nonLeadErrors.moic?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        multiline
-                        maxRows={4}
-                        label="Address Of Company"
-                        size="small"
-                        {...nonLeadRegister("addressOfCompany")}
-                        error={!!nonLeadErrors.addressOfCompany}
-                        helperText={nonLeadErrors.addressOfCompany?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        multiline
-                        maxRows={4}
-                        label="Comment"
-                        size="small"
-                        {...nonLeadRegister("comment")}
-                        error={!!nonLeadErrors.comment}
-                        helperText={nonLeadErrors.comment?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        multiline
-                        maxRows={4}
-                        label="How was the deal sourced either through Investment Banks, Networking, direct etc"
-                        size="small"
-                        {...nonLeadRegister("howWasTheDealSourced")}
-                        error={!!nonLeadErrors.howWasTheDealSourced}
-                        helperText={nonLeadErrors.howWasTheDealSourced?.message as string}
-                        InputLabelProps={{ shrink: true }}
-                        sx={fieldSx}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                      <Button onClick={handleCloseNonLeadForm} size="small" sx={{ textTransform: 'none' }}>Cancel</Button>
-                      <Button onClick={nonLeadHandleSubmit(onNonLeadSubmit)} variant="contained" size="small" sx={{ textTransform: 'none', backgroundColor: '#363062' }}>Save</Button>
-                    </Grid>
-                  </Grid>
-                </Paper>
-              </Collapse>
-
-              <TableContainer component={Paper} sx={{ borderRadius: '8px', border: '1px solid #e0e0e0', boxShadow: 'none' }}>
-                <Table size="small">
-                  <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Name Of Company</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Amount Invested (₹ Crore)</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Date Of Investment</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Exited/Write Off	</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Date Of Exit	</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>IRR (%)</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>MOIC</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Comment</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {investmentsAsNonLead.data[String(investmentAssociateFormData.id)]?.investmentsAsNonLead?.length ? (
-                      investmentsAsNonLead.data[String(investmentAssociateFormData.id)]?.investmentsAsNonLead?.map((inv: IInvestmentResponsibleAsNonLead) => (
-                        <TableRow key={inv.id}>
-                          <TableCell>{inv.nameOfCompany}</TableCell>
-                          <TableCell>{inv.amountInvested}</TableCell>
-                          <TableCell>{inv.dateOfInvestment ? Moment(inv.dateOfInvestment).format("DD/MM/YYYY") : '-'}</TableCell>
-                          <TableCell>{inv.exitOrWriteOff}</TableCell>
-                          <TableCell>{inv.dateofExitorWriteOff && Moment(inv.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
-                          <TableCell>{inv.irrPercent}</TableCell>
-                          <TableCell>{inv.moic || '-'}</TableCell>
-                          <TableCell>{inv.comment}</TableCell>
-                          <TableCell>
-                            <IconButton size="small" onClick={() => handleOpenNonLeadForm(inv)} color="primary">
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton size="small" onClick={() => handleDeleteNonLead(inv)} color="error">
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={9} align="center" sx={{ py: 2, color: 'text.secondary' }}>
-                          {"No investments added yet"}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid></>} */}
+            )}
 
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
               <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
                 Cancel
               </Button>
-              {/* {!investmentAssociateFormData.id && <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
-                Save
-              </Button>} */}
-              {/* {investmentAssociateFormData.id &&  */}
               <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
-                Save
+                {investmentAssociateFormData.id ? "Save" : "Save"}
               </Button>
-              {/* } */}
             </Grid>
           </Grid>
         </Box>

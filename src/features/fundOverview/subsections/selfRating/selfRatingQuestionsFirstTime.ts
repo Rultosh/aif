@@ -10,7 +10,7 @@ export const questionsForFirstTime = {
     },
     {
         "id": 2,
-        "text":"Age Profile of key members" ,
+        "text":"Age Profile of Key Members (Partners/Directors)" ,
         "options":["Average age is less than 45 years", "Average age is between 45 and 55 years", "Average age is between 55 and 60 years", "Average age is more than 60 years"],
         "size":6,
         "contribution": 0.04,
@@ -18,15 +18,15 @@ export const questionsForFirstTime = {
     },
     {
         "id": 3,
-        "text":"Average Investment experience of Partners / Directors of Fund Manager" ,
-        "options":["More than 20 years", "More than 15 years but upto 20 years", "More than 10 years but upto 15 years", "Upto 10 years / No related experience"],
+        "text":"Average Investment Experience of Partners/Directors of Fund Manager" ,
+        "options":["More than 20 years", "More than 15 years but upto 20 years", "More than 10 years but upto 15 years", "Upto 10 years"],
         "size":6,
         "contribution": 0.04,
         'weightage':[1,0.75,0.5,0.25]
     },
     {
         "id": 4,
-        "text":"Average Investment experience of investment team members (other than Partners / Directors) of Fund Manager" ,
+        "text":"Average Investment experience of investment team members (other than Partners/Directors) of Fund Manager" ,
         "options":["More than 10 years", "More than 5 years but upto 10 years", "More than 3 years but upto 5 years", "Upto 3 years/No related experience"],
         "size":6,
         "contribution": 0.04,
@@ -34,7 +34,7 @@ export const questionsForFirstTime = {
     },
     {
         "id": 5,
-        "text":"Share of employees (other than the Partners/ Directors) in Carry" ,
+        "text":"Share of employees (other than the Partners/Directors) in Carry" ,
         "options":[ ">=40%", ">=30% & <40%", ">=20% & <30%", "<20%"],
         "size":3,
         "contribution": 0.04,
@@ -42,7 +42,7 @@ export const questionsForFirstTime = {
     },
     {
         "id": 6,
-        "text":"Working relation among Directors / Partners of AMC" ,
+        "text":"Working relation among Directors/Partners of AMC" ,
         "options":["Working together for more than 10 years though some new may have joined", "Majority working together for more than 5 years,though few members have left", "Working together for more than 2 years but upto 5 years or major split in AMC structure","Coming together for the first time whose cohesiveness is to be tested"],
         "size":12,
         "contribution": 0.04,
@@ -64,7 +64,7 @@ export const questionsForFirstTime = {
         "id": 8,
         "text":"Profile of Auditors engaged/proposed to be engaged by the Fund" ,
         "options":[
-            "Big 5 Auditors / propose to engage one of Big 5 auditors",
+            "Big 5 Auditors/propose to engage one of Big 5 auditors",
             "Not from Big 5 list, but reputed auditors with atleast 20 partners",
             "Other than above"
         ],
@@ -79,7 +79,7 @@ export const questionsForFirstTime = {
             "Confirmed commitments of more than 40% of targeted corpus already raised", 
             "Confirmed commitments of more than 25% of targeted corpus already raised", 
             " Confirmed commitments of more than 15% of targeted corpus already raised", 
-            "Confirmed commitments of less than 15% of targeted corpus already raised / No confirmed commitments raised so far"
+            "Confirmed commitments of less than 15% of targeted corpus already raised/No confirmed commitments raised so far"
         ],
         "size":12,
         "contribution": 0.0875,

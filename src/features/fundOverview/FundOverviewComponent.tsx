@@ -88,7 +88,7 @@ export const FundOverview = (props: any) => {
 
     const currentStep = [
         { label: 'Initial Assessment', path: 'selfrating' },
-        { label: 'Fund Overview', path: 'fund' },
+        { label: 'Fund Information', path: 'fund' },
         // { label: 'Profile', path: 'profile' },
         { label: 'KYC, Supporting Documents & Declaration', path: 'declaration' },
         { label: 'Preview', path: 'preview' },
@@ -134,11 +134,11 @@ export const FundOverview = (props: any) => {
                 {/* Chevron Stepper */}
                 <Box sx={{ width: '100%', mb: 2, display: 'flex', gap: 0.5 }}>
                     {[
-                        { label: 'Initial Assessment', path: 'selfrating', subLabel: 'Assessment' },
-                        { label: 'Fund Overview', path: 'fund', subLabel: 'Information' },
-                        // { label: 'Profile', path: 'profile', subLabel: 'Details' },
-                        { label: 'KYC, Supporting Documents & Declaration', path: 'declaration', subLabel: 'Legal' },
-                        { label: 'Preview', path: 'preview', subLabel: 'Review' },
+                        { label: 'Initial Assessment', path: 'selfrating' },
+                        { label: 'Fund Information', path: 'fund' },
+                        // { label: 'Profile', path: 'profile' },
+                        { label: 'KYC, Supporting Documents & Declaration', path: 'declaration' },
+                        { label: 'Preview', path: 'preview' },
                     ].map((s, index, array) => {
                         const isNew = id?.toString() === 'NEW';
                         const score = Number(selfRatingState.selfRatings.score || 0);
@@ -204,9 +204,6 @@ export const FundOverview = (props: any) => {
                                 <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                     <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
                                         {s.label}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ opacity: 0.7, fontSize: '0.7rem' }}>
-                                        {s.subLabel}
                                     </Typography>
                                 </Box>
                             </Box>

@@ -66,15 +66,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     }, [])
 
     useEffect(() => {
-        console.log('useEffect', prelimAppicationId, prelimApplicationState.prelimApplication)
-        setPrelimApplicationFormData(prelimApplicationState.prelimApplication)
-
-        reset(prelimApplicationState.prelimApplication);
-
-        if (prelimApplicationState.prelimApplication?.id) {
+        if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
+            console.log('useEffect', prelimAppicationId, prelimApplicationState.prelimApplication)
+            setPrelimApplicationFormData(prelimApplicationState.prelimApplication)
+            reset(prelimApplicationState.prelimApplication);
             setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id));
         }
-    }, [prelimApplicationState.prelimApplication, prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus])
 
     const setDateValue = (key: String, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
@@ -466,6 +464,17 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             return isValid;
         }
     }));
+
+    const internalButtonSx = {
+        backgroundColor: '#363062',
+        color: 'white',
+        textTransform: 'none',
+        borderRadius: '8px',
+        px: 4,
+        '&:hover': {
+            backgroundColor: '#4d4585'
+        }
+    };
 
     if (prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
         return (
@@ -1403,27 +1412,14 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 </Grid> */}
 
                                 <Grid item xs={12}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2 }}>                                    
                                         <Button
                                             type="submit"
                                             variant="contained"
                                             onClick={handleSubmit(onSubmit)}
-                                            sx={{
-                                                backgroundColor: '#363062',
-                                                px: 6,
-                                                py: 1.5,
-                                                borderRadius: '8px',
-                                                textTransform: 'none',
-                                                fontWeight: 700,
-                                                border: '1px solid #2a254d',
-                                                '&:hover': {
-                                                    backgroundColor: '#ffffff',
-                                                    color: '#2a254d',
-                                                    border: '1px solid #2a254d'
-                                                }
-                                            }}
+                                            sx={internalButtonSx}
                                         >
-                                            Save and Continue
+                                            Save & Continue
                                         </Button>
                                     </Box>
                                 </Grid>
