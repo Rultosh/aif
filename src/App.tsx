@@ -58,7 +58,7 @@ function App() {
 
   // let { shoppingList } = useContext(UserContext);
   // console.log(shoppingList);
-  const userLogged = useAppSelector(state => state.landing.validUser);//false;
+  const userLogged = !!useAppSelector(state => state.auth.token);
   const checkIsCorrectStateToUpdate = (data: any, keyObj: any) => {
     let tempVal = false
     let keys = Object.keys(keyObj);
@@ -71,236 +71,35 @@ function App() {
     });
     return tempVal
   }
-  // const THEME = createTheme({
-  //   typography: {
-  //   "fontFamily": "Roboto",
-  //   }
-  // });
+  const THEME = createTheme({
+    typography: {
+      "fontFamily": "'Poppins', sans-serif",
+    }
+  });
 
   //   useEffect(() => {
   //     setSelfRatingLink('0');
   // })
 
   return (
-    // <ThemeProvider theme={THEME}>
-    <div className="App"  >
-      {/* <BackgroundPattern /> */}
-      <Header className="App-header">
-      </Header>
-      <Routes>
-        <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
-        <Route path='/admin' element={
-          <UserAdminRoute> <Admin checkUnAuth={CheckAuth.isUnauthorized} /> </UserAdminRoute>
-        }></Route>
-        <Route path='/login' element={<Landing />}></Route>
-        <Route path='eligibilityQuestioner' element={<EligibilityQuestioner />}></Route>
-        <Route path='eligibilityResults' element={<EligibilityResults />}></Route>
-        <Route path='signUp' element={<SignUp />}></Route>
-        <Route path='resetPassword' element={<ResetPassword />}></Route>
-        <Route path='setPassword' element={<ForgotPassword />}></Route>
+    <ThemeProvider theme={THEME}>
+      <div className="App"  >
+        {/* <BackgroundPattern /> */}
+        <Header className="App-header">
+        </Header>
+        <Routes>
+          <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
+          <Route path='/admin' element={
+            <UserAdminRoute> <Admin checkUnAuth={CheckAuth.isUnauthorized} /> </UserAdminRoute>
+          }></Route>
+          <Route path='/login' element={<Landing />}></Route>
+          <Route path='eligibilityQuestioner' element={<EligibilityQuestioner />}></Route>
+          <Route path='eligibilityResults' element={<EligibilityResults />}></Route>
+          <Route path='signUp' element={<SignUp />}></Route>
+          <Route path='resetPassword' element={<ResetPassword />}></Route>
+          <Route path='setPassword' element={<ForgotPassword />}></Route>
 
-        <Route path='/detailed/sidbiReference'
-          element={
-            <PrivateRoute>
-              <SidbiReference checkUnAuth={CheckAuth.isUnauthorized} />
-            </PrivateRoute>
-          }>
-        </Route>
-
-        <Route path='home'
-          element={
-            <PrivateRoute>
-              <Home checkUnAuth={CheckAuth.isUnauthorized} />
-            </PrivateRoute>
-          }>
-        </Route>
-
-        <Route path='workflow' element={
-          <PrivateRoute>
-            <Workflow checkUnAuth={CheckAuth.isUnauthorized} />
-          </PrivateRoute>
-        }>
-        </Route>
-
-        <Route path='changePassword'
-          element={
-            <PrivateRoute>
-              <ChangePassword checkUnAuth={CheckAuth.isUnauthorized} />
-            </PrivateRoute>
-          }>
-        </Route>
-
-        <Route path='preliminary'
-          element={
-            <PrivateRoute>
-              <FundOverview checkUnAuth={CheckAuth.isUnauthorized} />
-            </PrivateRoute>
-          }>
-        </Route>
-
-        <Route path='preliminary/:id'
-          element={
-            <PrivateRoute>
-              <FundOverview checkUnAuth={CheckAuth.isUnauthorized} />
-            </PrivateRoute>
-          }>
-
-          <Route path='fund'
-            element={
-              <PrivateRoute>
-                <Fund checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='profile'
-            element={
-              <PrivateRoute>
-                <ProfileNew checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='selfRating'
-            element={
-              <PrivateRoute>
-                <SelfRating checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='declaration'
-            element={
-              <PrivateRoute>
-                <Declaration checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='preview'
-            element={
-              <PrivateRoute>
-                <Preview checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-        </Route>
-
-        <Route path='Detailed' element={<DetailedApplicationComponent />}></Route>
-
-        <Route path='Detailed/:id'
-          element={
-            <PrivateRoute>
-              <DetailedApplicationComponent />
-            </PrivateRoute>
-          }>
-
-          <Route path='detailed2A'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2A checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2B'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2B isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2C'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2C isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2D'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2D isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2E'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2E isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2F'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2F isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2G'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2G isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2H'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2H isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2I'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2I isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2J'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2J isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='detailed2K'
-            element={
-              <PrivateRoute>
-                <DetailedApplication2K isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='InvestmentThemeOfFund'
-            element={
-              <PrivateRoute>
-                <InvestmentThemeOfFund isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='EngagementAndRole'
-            element={
-              <PrivateRoute>
-                <EngagementAndRole isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
-              </PrivateRoute>
-            }>
-          </Route>
-
-          <Route path='SidbiReference'
+          <Route path='/detailed/sidbiReference'
             element={
               <PrivateRoute>
                 <SidbiReference checkUnAuth={CheckAuth.isUnauthorized} />
@@ -308,17 +107,218 @@ function App() {
             }>
           </Route>
 
-          <Route path='carryDistribution'
+          <Route path='home'
             element={
               <PrivateRoute>
-                <CarryDistribution isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                <Home checkUnAuth={CheckAuth.isUnauthorized} />
               </PrivateRoute>
             }>
           </Route>
-        </Route>
-      </Routes>
-    </div>
-    // </ThemeProvider>
+
+          <Route path='workflow' element={
+            <PrivateRoute>
+              <Workflow checkUnAuth={CheckAuth.isUnauthorized} />
+            </PrivateRoute>
+          }>
+          </Route>
+
+          <Route path='changePassword'
+            element={
+              <PrivateRoute>
+                <ChangePassword checkUnAuth={CheckAuth.isUnauthorized} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='preliminary'
+            element={
+              <PrivateRoute>
+                <FundOverview checkUnAuth={CheckAuth.isUnauthorized} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='preliminary/:id'
+            element={
+              <PrivateRoute>
+                <FundOverview checkUnAuth={CheckAuth.isUnauthorized} />
+              </PrivateRoute>
+            }>
+
+            <Route path='fund'
+              element={
+                <PrivateRoute>
+                  <Fund checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='profile'
+              element={
+                <PrivateRoute>
+                  <ProfileNew checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='selfRating'
+              element={
+                <PrivateRoute>
+                  <SelfRating checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='declaration'
+              element={
+                <PrivateRoute>
+                  <Declaration checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='preview'
+              element={
+                <PrivateRoute>
+                  <Preview checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+          </Route>
+
+          <Route path='Detailed' element={<DetailedApplicationComponent />}></Route>
+
+          <Route path='Detailed/:id'
+            element={
+              <PrivateRoute>
+                <DetailedApplicationComponent />
+              </PrivateRoute>
+            }>
+
+            <Route path='detailed2A'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2A checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2B'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2B isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2C'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2C isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2D'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2D isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2E'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2E isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2F'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2F isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2G'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2G isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2H'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2H isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2I'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2I isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2J'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2J isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='detailed2K'
+              element={
+                <PrivateRoute>
+                  <DetailedApplication2K isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='InvestmentThemeOfFund'
+              element={
+                <PrivateRoute>
+                  <InvestmentThemeOfFund isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='EngagementAndRole'
+              element={
+                <PrivateRoute>
+                  <EngagementAndRole isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='SidbiReference'
+              element={
+                <PrivateRoute>
+                  <SidbiReference checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+
+            <Route path='carryDistribution'
+              element={
+                <PrivateRoute>
+                  <CarryDistribution isCrtStateToUpdate={checkIsCorrectStateToUpdate} checkUnAuth={CheckAuth.isUnauthorized} />
+                </PrivateRoute>
+              }>
+            </Route>
+          </Route>
+        </Routes>
+      </div>
+    </ThemeProvider>
   );
 }
 

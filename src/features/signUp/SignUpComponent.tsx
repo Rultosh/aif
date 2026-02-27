@@ -7,19 +7,19 @@ import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import CloseIcon from '@mui/icons-material/Close';
 import loginIconImg from '../../images/aif_login_icon.png'
-import { defaultISignup } from "./ISignup";
+import { defaultISignup, ISignup } from "./ISignup";
 import uuid from "react-uuid";
-import { Controller } from "../../lib/api-wrappers/Controller";
 import { signupUsersAsync } from './signUpSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { selectedSignup } from './signUpSlice'
 import { ModalComponent } from '../../components/ModalComponent'
 import { state, city } from "./stateAndCity";
+import signupBg from '../../images/signup_ai.jpeg';
 
 import { getError } from "../../lib/api-status/errorHandler"
 import ReCAPTCHA from "react-google-recaptcha";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -30,19 +30,17 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 const SignUp = () => {
     const fieldSx = {
         '& .MuiOutlinedInput-root': {
-            borderRadius: '12px',
-            backgroundColor: '#f8fafc',
-            transition: 'all 0.2s ease-in-out',
-            '&:hover': {
-                backgroundColor: '#f1f5f9',
+            borderRadius: '6px',
+            backgroundColor: '#ffffff',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
             },
-            '&.Mui-focused': {
-                backgroundColor: '#ffffff',
-                boxShadow: '0 4px 12px rgba(54, 48, 98, 0.1)',
-            }
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
         },
         '& .MuiInputLabel-root': {
-            color: '#64748b',
+            color: '#000000',
         }
     };
 
@@ -51,7 +49,7 @@ const SignUp = () => {
         mt: 4,
         pb: 1,
         borderBottom: '1px solid #e2e8f0',
-        color: '#363062',
+        color: '#000000',
         fontWeight: 600,
         display: 'flex',
         alignItems: 'center',
@@ -67,40 +65,21 @@ const SignUp = () => {
     const [showResponse, setShowResponse] = useState(false);
     const [formDataEmail, setFormDataEmail] = useState(false);
     const [registedWithSebi, setRegisteredWithSebi] = useState("no");
-    const [sebiRegistrationDate, setSebiRegistrationDate] = useState<Date | undefined | null>(null);
-    const [errorssebiRegistrationDate, seterrorssebiRegistrationDate] = useState<String | undefined>(undefined);
-
     const captchaRef = React.createRef<ReCAPTCHA>();
 
-    async function handleSubmitForm() {
-
-        if (sebiRegistrationDate === undefined || sebiRegistrationDate === null) {
-            seterrorssebiRegistrationDate("SEBI Registration Date is required")
-        } else {
-            seterrorssebiRegistrationDate(undefined)
-            const captchaResponse = await captchaRef.current?.executeAsync();
-            console.log("recaptcha", captchaResponse);
-            // dispatch(validateUser(value))
-            if (captchaResponse !== null && captchaResponse !== undefined) {
-                console.log(formData)
-                setShowResponse(true)
-                dispatch(
-                    signupUsersAsync(
-                        wrapArgument(actionUid, { ...formData, sebiRegistrationDate, registeredOn: new Date(), captchaResponse })
-                    )
+    async function handleSubmitForm(data: any) {
+        const captchaResponse = await captchaRef.current?.executeAsync();
+        console.log("recaptcha", captchaResponse);
+        if (captchaResponse !== null && captchaResponse !== undefined) {
+            console.log(data)
+            setShowResponse(true)
+            dispatch(
+                signupUsersAsync(
+                    wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
                 )
-            }
+            )
         }
     }
-
-    const handleChangeRegistedWithSebi = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRegisteredWithSebi((event.target as HTMLInputElement).value);
-    };
-
-
-    const handleChangeRegistedWithSebiDate = (value: Date | undefined | null) => {
-        setSebiRegistrationDate(value);
-    };
 
 
     const handleChange = (ev: any) => {
@@ -139,7 +118,7 @@ const SignUp = () => {
                 copiedValue.city = undefined;
                 copiedValue.otherCity = undefined;
                 setValue('city', '');
-                setValue('otherCity', '');
+                setValue('otherCity', undefined);
             }
 
             setFormData(copiedValue);
@@ -201,6 +180,7 @@ const SignUp = () => {
             .string()
             .matches(/^[A-Za-z ]*$/, 'Please enter valid contact person')
             .required("Contact Person is required"),
+        sebiRegistrationDate: Yup.date().nullable().required("SEBI Registration Date is required"),
         username: Yup
             .string()
             .required("Email is required")
@@ -256,44 +236,72 @@ const SignUp = () => {
     });
 
     const {
+        control,
         setValue,
         getValues,
         register,
         reset,
         handleSubmit,
         formState: { errors },
-    } = useForm({
+    } = useForm<ISignup>({
         resolver: yupResolver(validationSchema),
+        defaultValues: defaultISignup
     });
 
     const onSubmit = (data: any) => {
-        handleSubmitForm();
+        handleSubmitForm(data);
     };
 
     return (
-        <>
+        <Box sx={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
+            {/* Blurred Background Layer */}
+            <Box sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: -1,
+                backgroundImage: `url(${signupBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: 'blur(2px)',
+                transform: 'scale(1.1)', // Prevent blurred edges from showing
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(255, 255, 255, 0.4)', // Light overlay to keep form readable
+                }
+            }} />
+
             <ReCAPTCHA
                 ref={captchaRef}
                 size={'invisible'}
                 sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
             />
-            <Container maxWidth="lg" sx={{ pt: '140px', pb: '60px' }}>
+            <Container maxWidth="lg" sx={{ pt: '100px', pb: '60px', position: 'relative', zIndex: 1 }}>
 
                 <Paper
                     elevation={0}
                     sx={{
-                        p: 3,
-                        borderRadius: '16px',
-                        border: '1px solid #e2e8f0',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+                        px: 4,
+                        py: 5,
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
                         background: '#ffffff',
+                        backdropFilter: 'blur(20px)',
                         mb: 3
                     }}
                 >
                     <Grid container spacing={3} alignItems="center">
                         <Grid item xs={12} md={6}>
-                            <Typography variant="h5" sx={{ fontWeight: 800, color: '#0B3C6F' }}>
-                                Sign Up
+                            <Typography variant="h5" sx={{ fontWeight: 600, color: '#000000' }}>
+                                Registration
                             </Typography>
                         </Grid>
                         <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
@@ -302,7 +310,7 @@ const SignUp = () => {
                                 sx={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    color: '#0B3C6F',
+                                    color: '#1942b6',
                                     // width: '100%',
                                     justifyContent: 'flex-end',
                                     textDecoration: 'none',
@@ -312,7 +320,7 @@ const SignUp = () => {
                                     width: 'fit-content',
                                     transition: 'all 0.2s',
                                     '&:hover': {
-                                        color: '#092d54',
+                                        color: '#000000',
                                         transform: 'translateX(-4px)'
                                     }
                                 }}
@@ -341,19 +349,25 @@ const SignUp = () => {
                             </Grid>
                             <Grid item xs={4}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
-                                        label="SEBI - Registration Date"
-                                        inputFormat='DD/MM/YYYY'
-                                        value={sebiRegistrationDate || null}
-                                        onChange={(newValue) => handleChangeRegistedWithSebiDate(newValue)}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                fullWidth
-                                                required
-                                                error={!!errorssebiRegistrationDate}
-                                                helperText={errorssebiRegistrationDate as string}
-                                                sx={fieldSx}
-                                                {...params}
+                                    <Controller
+                                        name="sebiRegistrationDate"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <DatePicker
+                                                {...field}
+                                                label="SEBI - Registration Date"
+                                                inputFormat='DD/MM/YYYY'
+                                                onChange={(newValue) => field.onChange(newValue)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        fullWidth
+                                                        required
+                                                        error={!!errors.sebiRegistrationDate}
+                                                        helperText={errors.sebiRegistrationDate?.message as string}
+                                                        sx={fieldSx}
+                                                    />
+                                                )}
                                             />
                                         )}
                                     />
@@ -376,7 +390,7 @@ const SignUp = () => {
 
                             <Grid item xs={8}>
                                 <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-                                    <FormControl sx={{
+                                    <FormControl required sx={{
                                         ...fieldSx,
                                         width: '120px',
                                         '& .MuiOutlinedInput-root': {
@@ -390,7 +404,7 @@ const SignUp = () => {
                                             required
                                             labelId="title-label"
                                             id="title"
-                                            label="Title"
+                                            label="Title *"
                                             value={formData["title"] || ""}
                                             {...register("title")}
                                             error={!!errors.title}
@@ -469,13 +483,13 @@ const SignUp = () => {
                             </Grid>
 
                             <Grid item xs={4}>
-                                <FormControl fullWidth sx={fieldSx}>
+                                <FormControl required fullWidth sx={fieldSx}>
                                     <InputLabel id="state-label">State</InputLabel>
                                     <Select
                                         required
                                         labelId="state-label"
                                         id="state"
-                                        label="State"
+                                        label="State *"
                                         {...register("state")}
                                         error={!!errors.state}
                                         onChange={handleChange}
@@ -495,13 +509,13 @@ const SignUp = () => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={4}>
-                                <FormControl fullWidth sx={fieldSx}>
+                                <FormControl required fullWidth sx={fieldSx}>
                                     <InputLabel id="city-label">City</InputLabel>
                                     <Select
                                         required
                                         labelId="city-label"
                                         id="city"
-                                        label="City"
+                                        label="City *"
                                         {...register("city")}
                                         error={!!errors.city}
                                         onChange={handleChange}
@@ -566,19 +580,21 @@ const SignUp = () => {
                                     disableElevation
                                     sx={{
                                         textTransform: 'none',
-                                        width: 200,
-                                        borderRadius: '12px',
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        background: "#363062",
+                                        width: 250,
+                                        py: 1.8,
+                                        borderRadius: '6px',
+                                        fontSize: '16px',
+                                        fontWeight: 500,
+                                        backgroundColor: '#FF671F',
                                         '&:hover': {
-                                            background: "#2a254d",
-                                            boxShadow: '0 4px 15px rgba(54, 48, 98, 0.3)',
-                                        }
+                                            backgroundColor: '#e85a15',
+                                            boxShadow: '0 6px 16px rgba(255, 103, 31, 0.4)',
+                                        },
+                                        boxShadow: '0 4px 12px rgba(255, 107, 33, 0.3)',
                                     }}
                                     onClick={handleSubmit(onSubmit)}
                                 >
-                                    Sign Up
+                                    Registration
                                 </Button>
                                 {/* <Button
                                     variant="outlined"
@@ -607,7 +623,7 @@ const SignUp = () => {
                             <Grid item xs={12}>
                                 <Box sx={{ mt: 0 }}>
                                     {showResponse && signupState.response !== undefined && (
-                                        <Typography color="primary" sx={{ textAlign: 'center', mb: 1 }}>{signupState.response}</Typography>
+                                        <Typography sx={{ textAlign: 'center', mb: 1, color: '#000000' }}>{signupState.response}</Typography>
                                     )}
                                     <ModalComponent
                                         open={showResponse}
@@ -623,14 +639,12 @@ const SignUp = () => {
                         </Grid>
                     </Box>
 
-                    <Typography variant="body2" sx={{ mt: 1, mb: 2, textAlign: "center", color: '#64748b' }}>
-                        For any help, please feel free to contact us at <span style={{ color: '#363062', fontWeight: 600 }}>aif.investment@npstrust.org.in</span>
+                    <Typography variant="body2" sx={{ mt: 1, textAlign: "center", color: '#000000' }}>
+                        For any help, please feel free to contact us at <span style={{ color: '#000000', fontWeight: 600 }}>aif.investment@npstrust.org.in</span>
                     </Typography>
                 </Paper>
-
-
             </Container>
-        </>
+        </Box>
     );
 };
 

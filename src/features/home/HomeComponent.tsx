@@ -22,7 +22,7 @@ import FileDownloadIcon from '@mui/icons-material/DownloadForOfflineRounded';
 // import MailIcon from '@mui/icons-material/Mail';
 import { ReactComponent as MailIcon } from '../../images/email.svg';
 // import HistoryIcon from '@mui/icons-material/History';
-import { ReactComponent as HistoryIcon } from '../../images/list.svg';
+// import { ReactComponent as HistoryIcon } from '../../images/list.svg';
 import QueryResolutionModal from './QueryResolutionModal'
 import HistoryModal from './HistoryModal'
 // import orengeImg from '../../images/Orange.png'
@@ -34,9 +34,14 @@ import { IPrelimApplicationData } from '../fundOverview/subsections/fundOverview
 import Moment from 'moment';
 import { CheckAuth } from '../../app/api';
 import { useNavigate } from 'react-router-dom';
-import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { ReactComponent as ViewIcon } from '../../images/view.svg';
+import { ReactComponent as DownloadIcon } from '../../images/download.svg';
+import { ReactComponent as EmailListIcon } from '../../images/email_list.svg';
+import { ReactComponent as HistoryCustomIcon } from '../../images/history.svg';
+import { ReactComponent as SettingCustomIcon } from '../../images/setting.svg';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 export const Home = (pros: any) => {
 
@@ -61,6 +66,7 @@ export const Home = (pros: any) => {
     const [selectedRowHistory, setSelectedRowHistory] = useState(0);
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
+    const [jumpPage, setJumpPage] = useState("1");
 
     const handleChange = (event: SelectChangeEvent) => {
         let updatedPageInfo = { ...pageInfo, pageSize: parseInt(event.target.value) }
@@ -121,7 +127,7 @@ export const Home = (pros: any) => {
     for (let i = 0; i < tableHeaders.length; i++) {
         headerComponent.push(
             <React.Fragment key={tableHeaders[i]}>
-                <TableCell align="center" sx={{ fontWeight: '700', color: '#64748b', p: '12px 10px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05rem', borderBottom: '1px solid #e2e8f0', backgroundColor: '#cdddf1' }}>{tableHeaders[i]}</TableCell>
+                <TableCell align="left" sx={{ fontWeight: '600', color: '#1a1a1a', p: '12px 10px', fontSize: '13px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#e9e9f6' }}>{tableHeaders[i]}</TableCell>
             </React.Fragment>)
     }
 
@@ -152,6 +158,22 @@ export const Home = (pros: any) => {
         dispatch(getPrelimApplicationList(wrapArgument(
             actionUid, updatedPageInfo
         )))
+    }
+
+    const goToPage = (pageNo: number) => {
+        let updatedPageInfo = { ...pageInfo, pageNumber: pageNo }
+        setPageInfo(updatedPageInfo)
+        setPageInfoSelect(pageInfo.pageSize);
+        dispatch(getPrelimApplicationList(wrapArgument(
+            actionUid, updatedPageInfo
+        )))
+    }
+
+    const handleJumpPage = () => {
+        const page = parseInt(jumpPage);
+        if (!isNaN(page) && page > 0) {
+            goToPage(page - 1);
+        }
     }
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
@@ -192,7 +214,7 @@ export const Home = (pros: any) => {
 
         const stageDescription = stage === "PRELIM" ? "Preliminary application" : "Detailed application";
 
-        if(stage !== "PRELIM") return "Approved.";
+        if (stage !== "PRELIM") return "Approved";
 
         switch (status) {
             case "CREATED":
@@ -218,10 +240,10 @@ export const Home = (pros: any) => {
         <div className="homeComp">
             <NavigationBar></NavigationBar>
             {prelimApplications.allStatus.fetchStatus === FetchStatus.IDLE ? <>
-                <Container maxWidth="xl" sx={{ pt: '120px', pb: '80px' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box sx={{ mb: '30px' }}>
-                            {/* <Typography variant="h5" sx={{ fontWeight: 600, color: '#013d7b' }}>Applications</Typography> */}
+                <Container maxWidth="xl" sx={{ pt: '90px', pb: '80px' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '20px' }}>
+                        <Box>
+                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#333333' }}>Applications</Typography>
                             <Breadcrumbs aria-label="breadcrumb">
                                 <Typography variant="body2"
                                     sx={{ color: '#476bbc', display: 'flex', alignItems: 'center' }}
@@ -231,32 +253,39 @@ export const Home = (pros: any) => {
                                 </Typography>
                             </Breadcrumbs>
                         </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: '20px' }}>
-                            <Button
-                                variant="contained"
-                                sx={{ backgroundColor: '#34344b', color: 'white', fontWeight: 600, textTransform: 'capitalize' }}
-                                className='btn-primary'
-                                startIcon={<AddCircleIcon />}
-                                // href="#/Preliminary"
-                                onClick={async () => {
-                                    try {
-                                        let application: IPrelimApplicationData = await dispatch(
-                                            createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
-                                        ).unwrap();
-                                        navigate(`/Preliminary/${application.id}/selfRating`)
-                                    } catch (error: any) {
-                                        console.error("Failed to start application:", error);
-                                        alert(error?.message || "An unexpected error occurred while starting the application.");
-                                    }
-                                }}
-                            >
-                                Start Application
-                            </Button>
-                        </Box>
+                        <Button
+                            variant="outlined"
+                            sx={{
+                                color: '#FF671F',
+                                borderColor: '#FF671F',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                borderRadius: '4px',
+                                px: 3,
+                                '&:hover': {
+                                    borderColor: '#e85a15',
+                                    color: '#e85a15',
+                                    backgroundColor: 'rgba(255, 103, 30, 0.04)'
+                                }
+                            }}
+                            onClick={async () => {
+                                try {
+                                    let application: IPrelimApplicationData = await dispatch(
+                                        createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
+                                    ).unwrap();
+                                    navigate(`/Preliminary/${application.id}/selfRating`)
+                                } catch (error: any) {
+                                    console.error("Failed to start application:", error);
+                                    alert(error?.message || "An unexpected error occurred while starting the application.");
+                                }
+                            }}
+                        >
+                            Start Application
+                        </Button>
                     </Box>
                     <Paper elevation={0} sx={{
                         backgroundColor: '#ffffff',
-                        borderRadius: '16px',
+                        borderRadius: '8px',
                         overflow: 'hidden',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
                         border: '1px solid #edf2f7'
@@ -278,65 +307,50 @@ export const Home = (pros: any) => {
                                                     transition: 'background-color 0.2s ease'
                                                 }}
                                             >
-                                                {row.stage === "PRELIM" ? 
-                                                    <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
+                                                {row.stage === "PRELIM" ?
+                                                    <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
                                                         {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/selfrating`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
-                                                    {/* {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/${String(getPath(row.status))}`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>} */}
-                                                </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
-                                                    {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
-                                                </TableCell>}
-                                                <TableCell align="center" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
-                                                <TableCell align="center" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
-                                                <TableCell align="center" sx={{ color: '#64748b' }}>{row.applicationSubmissionDate ? Moment(String(row.applicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>
-                                                {/* <TableCell align="center" sx={{ color: '#64748b' }}>{row.detailedApplicationSubmissionDate ? Moment(String(row.detailedApplicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell> */}
-                                                <TableCell align="center" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.sdTotalTargetCorpus)}</TableCell>
-                                                <TableCell align="center" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
-                                                <TableCell align="center">
-                                                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                                                        <Tooltip title="Download Preview">
-                                                            <IconButton size="small" sx={{ color: '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.stage === "PRELIM" ? row.id : row.detailedApplicationId}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
-                                                                <FileDownloadIcon fontSize="small" />
+                                                        {/* {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/${String(getPath(row.status))}`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>} */}
+                                                    </TableCell> : <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
+                                                        {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+                                                    </TableCell>}
+                                                <TableCell align="left" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
+                                                <TableCell align="left" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
+                                                <TableCell align="left" sx={{ color: '#64748b' }}>{row.applicationSubmissionDate ? Moment(String(row.applicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>
+                                                {/* <TableCell align="left" sx={{ color: '#64748b' }}>{row.detailedApplicationSubmissionDate ? Moment(String(row.detailedApplicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell> */}
+                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.sdTotalTargetCorpus)}</TableCell>
+                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
+                                                <TableCell align="left">
+                                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: 1.5 }}>
+                                                        <Tooltip title="View Preview">
+                                                            <IconButton size="small" sx={{ p: '2px', color: '#1a1a1a', '&:hover': { backgroundColor: '#f3f4f6' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.stage === "PRELIM" ? row.id : row.detailedApplicationId}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
+                                                                <ViewIcon style={{ width: '22px', height: '22px' }} />
                                                             </IconButton>
                                                         </Tooltip>
                                                         <Tooltip title="Download ZIP">
-                                                            <IconButton size="small" sx={{ color: '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.stage === "PRELIM" ? row.id : row.detailedApplicationId}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
-                                                                <FileDownloadIcon fontSize="small" />
+                                                            <IconButton size="small" sx={{ p: '2px', color: '#1a1a1a', '&:hover': { backgroundColor: '#f3f4f6' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.stage === "PRELIM" ? row.id : row.detailedApplicationId}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
+                                                                <DownloadIcon style={{ width: '22px', height: '22px' }} />
                                                             </IconButton>
                                                         </Tooltip>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell align="center">
-                                                    <IconButton size="small" sx={{ color: '#64748b', '&:hover': { backgroundColor: '#f1f5f9' } }} onClick={() => openModel(row)}>
-                                                        <MailIcon style={{ width: '20px', height: '20px' }} />
+                                                <TableCell align="left">
+                                                    <IconButton size="small" sx={{ p: '2px', color: '#476bbc', '&:hover': { backgroundColor: '#f0f4ff' } }} onClick={() => openModel(row)}>
+                                                        <EmailListIcon style={{ width: '22px', height: '22px', fill: 'currentColor' }} />
                                                     </IconButton>
                                                 </TableCell>
-                                                <TableCell align="center">
-                                                    <IconButton size="small" sx={{ color: '#64748b', '&:hover': { backgroundColor: '#f1f5f9' } }} onClick={() => openModelHistory(row)}>
-                                                        <HistoryIcon style={{ width: '20px', height: '20px', fill: 'currentColor' }} />
+                                                <TableCell align="left">
+                                                    <IconButton size="small" sx={{ p: '2px', color: '#37c5ab', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => openModelHistory(row)}>
+                                                        <HistoryCustomIcon style={{ width: '22px', height: '20px', fill: 'currentColor' }} />
                                                     </IconButton>
                                                 </TableCell>
-                                                <TableCell align="center">
-                                                    <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                                <TableCell align="left">
+                                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                                                         <Tooltip title={`${row.stage === 'PRELIM' ? row.status : 'APPROVED'}`}>
-                                                            <Box sx={{
-                                                                width: 10,
-                                                                height: 10,
-                                                                borderRadius: '50%',
-                                                                backgroundColor: row.stage === 'PRELIM' ?
-                                                                    (row.status === 'APPROVED' ? '#2cc56c' : (row.status === 'REJECTED' || row.status === 'CLOSED' ? '#ef4444' : (row.status === 'CREATED' || row.status === 'TEMP_CLOSED' ? '#94a3b8' : '#f59e0b'))) :
-                                                                    '#2cc56c'
-                                                            }} />
+                                                            <IconButton size="small" sx={{ p: '2px', color: '#ffc107', '&:hover': { backgroundColor: '#fffbeb' } }}>
+                                                                <SettingCustomIcon style={{ width: '22px', height: '20px', fill: 'currentColor' }} />
+                                                            </IconButton>
                                                         </Tooltip>
-                                                        {row.stage === 'DETAILED' && (
-                                                            <Tooltip title={`${row.status}`}>
-                                                                <Box sx={{
-                                                                    width: 10,
-                                                                    height: 10,
-                                                                    borderRadius: '50%',
-                                                                    backgroundColor: row.status === 'APPROVED' ? '#2cc56c' : (row.status === 'REJECTED' || row.status === 'CLOSED' ? '#ef4444' : (row.status === 'CREATED' || row.status === 'TEMP_CLOSED' ? '#94a3b8' : '#f59e0b'))
-                                                                }} />
-                                                            </Tooltip>
-                                                        )}
                                                     </Box>
                                                 </TableCell>
                                             </TableRow>
@@ -348,51 +362,115 @@ export const Home = (pros: any) => {
 
                         <Box sx={{
                             display: 'flex',
-                            justifyContent: 'space-between',
+                            justifyContent: 'flex-end',
                             alignItems: 'center',
-                            p: '20px 24px',
-                            borderTop: '1px solid #edf2f7'
+                            p: '25px 24px',
+                            gap: 4
                         }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Typography variant="body2" sx={{ color: '#64748b' }}>Rows per page:</Typography>
-                                <FormControl size="small" variant="outlined">
-                                    <Select
-                                        value={String(pageInfoSelect)}
-                                        onChange={handleChange}
+                            <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                                <IconButton
+                                    onClick={previousPage}
+                                    disabled={pageInfo.pageNumber <= 0}
+                                    sx={{
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '4px',
+                                        p: '8px',
+                                        color: '#333'
+                                    }}
+                                >
+                                    <ChevronLeftIcon fontSize="small" />
+                                </IconButton>
+
+                                {[1, 2, 3].map((num) => (
+                                    <Box
+                                        key={num}
+                                        onClick={() => goToPage(num - 1)}
                                         sx={{
-                                            fontSize: '0.875rem',
-                                            borderRadius: '8px',
-                                            '.MuiSelect-select': { py: '4px' }
+                                            border: '1px solid',
+                                            borderColor: pageInfo.pageNumber === num - 1 ? '#4466c1' : '#e2e8f0',
+                                            borderRadius: '4px',
+                                            width: '36px',
+                                            height: '36px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '14px',
+                                            fontWeight: pageInfo.pageNumber === num - 1 ? 600 : 400,
+                                            color: pageInfo.pageNumber === num - 1 ? '#4466c1' : '#333',
+                                            cursor: 'pointer',
+                                            backgroundColor: '#fff',
+                                            '&:hover': { backgroundColor: '#f8fafc' }
                                         }}
                                     >
-                                        {[5, 10, 50, 100, 500].map(val => (
-                                            <MenuItem key={val} value={val}>{val}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                        {num}
+                                    </Box>
+                                ))}
+
+                                <Typography sx={{ mx: 1, color: '#64748b' }}>...</Typography>
+
+                                <Box
+                                    onClick={() => goToPage(9)}
+                                    sx={{
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '4px',
+                                        width: '36px',
+                                        height: '36px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '14px',
+                                        color: '#333',
+                                        cursor: 'pointer',
+                                        backgroundColor: '#fff'
+                                    }}
+                                >
+                                    10
+                                </Box>
+
+                                <IconButton
+                                    onClick={nextPage}
+                                    disabled={prelimApplications.prelimApplications.length < pageInfo.pageSize}
+                                    sx={{
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '4px',
+                                        p: '8px',
+                                        color: '#333'
+                                    }}
+                                >
+                                    <ChevronRightIcon fontSize="small" />
+                                </IconButton>
                             </Box>
 
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Button
-                                    disabled={pageInfo.pageNumber <= 0}
-                                    variant="outlined"
-                                    size="small"
-                                    onClick={previousPage}
-                                    startIcon={<KeyboardDoubleArrowLeftIcon />}
-                                    sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                <Typography sx={{ fontSize: '14px', color: '#333' }}>Page</Typography>
+                                <Box
+                                    component="input"
+                                    type="text"
+                                    value={jumpPage}
+                                    onChange={(e: any) => setJumpPage(e.target.value)}
+                                    sx={{
+                                        width: '45px',
+                                        height: '36px',
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '4px',
+                                        textAlign: 'center',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                        '&:focus': { borderColor: '#4466c1' }
+                                    }}
+                                />
+                                <Typography
+                                    onClick={handleJumpPage}
+                                    sx={{
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        color: '#1a1a1a',
+                                        cursor: 'pointer',
+                                        '&:hover': { color: '#FF671F' }
+                                    }}
                                 >
-                                    Previous
-                                </Button>
-                                <Button
-                                    disabled={prelimApplications.prelimApplications.length < pageInfo.pageSize}
-                                    variant="outlined"
-                                    size="small"
-                                    onClick={nextPage}
-                                    endIcon={<KeyboardDoubleArrowRightIcon />}
-                                    sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
-                                >
-                                    Next
-                                </Button>
+                                    Go
+                                </Typography>
                             </Box>
                         </Box>
                     </Paper>
@@ -432,9 +510,10 @@ export const Home = (pros: any) => {
                         <div className="dot"></div>
                     </div>
                 </Backdrop>
-            )}
+            )
+            }
 
-        </div>
+        </div >
     )
 }
 

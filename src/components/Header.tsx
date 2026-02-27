@@ -16,6 +16,7 @@ import Divider from '@mui/material/Divider';
 import MailIcon from '@mui/icons-material/Mail';
 import headerBg from '../images/header_bg.png';
 import logoNps from '../images/logo_nps.png';
+// import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import loginRupeeIconImg from '../images/logo_rupee_symbol.png'
 import { useAppSelector } from '../app/hooks';
@@ -23,23 +24,21 @@ import { selectUsers } from '../features/admin/adminSlice';
 
 const Header = (props: any) => {
 
-  const token = localStorage.getItem('token')
-  const [loggedIn, setLoggedIn] = React.useState<boolean>(token !== undefined && false);
+  const auth = useAppSelector(state => state.auth);
+  const token = auth.token || localStorage.getItem('token');
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const usersState = useAppSelector(selectUsers)
 
-
-  React.useEffect(() => {
-    console.log(JSON.stringify(usersState.me))
-    if (usersState.me.role) setLoggedIn(true);
-    else setLoggedIn(false);
-  }, [usersState.status.fetchStatus])
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setLoggedIn(false);
+    // We should ideally dispatch a logout action here if it exists to clear Redux state
+    // For now, since redirection happens in App.tsx based on the token which we manually cleared from localStorage,
+    // we need to make sure the app re-renders or navigates.
     navigate('/login');
+    window.location.reload(); // Hard reload to clear all state if no logout action is available
   }
 
   const navItems = ['FAQs', 'Help', 'vcfapplication@sidbi.in'];
@@ -47,58 +46,157 @@ const Header = (props: any) => {
   return (
     <>
       <Box sx={{ flexGrow: 1 }} className={props.className}>
-        <Box component="section" sx={{ 
-          position: 'absolute', 
-          zIndex: 999999, 
-          width: '100%', 
-          transition: 'all 0.3s ease', 
-          // background: '#013d7b', 
-          background: 'linear-gradient(90deg, #02274c, #0457ab, #00b4d8)',
-          // background: 'linear-gradient(90deg, #003049, #005f73, #0a9396)',
-          top: 0, 
-          padding: '5px 0' 
-          }}>
-          <Container maxWidth={!token ? "lg" : "xl"}>
+        <Box component="section" sx={{
+          position: 'absolute',
+          zIndex: 999,
+          width: '100%',
+          transition: 'all 0.3s ease',
+          background: '#1942b6',
+          top: 0,
+          padding: '8px 0'
+        }}>
+          <Container maxWidth={"xl"}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              {token && <Link to={`/Home`} style={{ cursor: 'pointer', color: '#2C3E50', textDecoration: 'none' }}>
-                <Box
-                  component="img"
-                  sx={{ width: '160px', aspectRatio: '16/9', objectFit: 'contain', justifyContent: "left" }}
-                  alt="success"
-                  src={logoNps}
-                />
-              </Link>}
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
-                <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '16px', color: 'rgba(255,255,255,0.9)' }}>
-                  NPS Bharat Fund of Fund Portal
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography sx={{ fontWeight: 400, fontSize: '26px', color: '#ea6c3c' }}>
+                    NPS
+                  </Typography>
+                  <Typography sx={{ fontWeight: 700, fontSize: '26px', color: '#ffffff' }}>
+                    भारत
+                  </Typography>
+                  <Typography sx={{ fontWeight: 400, fontSize: '26px', color: '#ea6c3c' }}>
+                    Fund of Funds
+                  </Typography>
+                </Box>
+                <Typography variant="caption" sx={{ fontSize: '16px', color: '#e7fdff', fontStyle: 'italic', fontWeight: 400, lineHeight: 1 }}>
+                  Investing for Bharat
                 </Typography>
               </Box>
 
-              {token && <><Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-                {/* {usersState.role !== 'ADMIN' && <><Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, color: '#ffffff' }}>
-                  <Link to={`/Preliminary`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '0.8rem' }}>
-                    Preliminary
-                  </Link>
-                </Typography>
-                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box></>} */}
-                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '14px', fontWeight: 500, color: '#ffffff' }}>
-                  <Link to={`/Workflow`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '14px' }}>
-                    Workflow
-                  </Link>
-                </Typography>
-                {/* <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
-                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '14px', fontWeight: 500, color: '#ffffff' }}>
-                  <Link to={`/FAQ`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '14px' }}>
-                    FAQ
-                  </Link>
-                </Typography> */}
-                <Box component="span" sx={{ opacity: 0.4, color: '#ffffff' }}>|</Box>
-                <Typography variant="caption" sx={{ cursor: 'pointer', fontSize: '14px', fontWeight: 500, color: '#ffffff' }}>
-                  <div onClick={handleLogout} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none', fontSize: '14px' }}>
-                    Logout
-                  </div>
-                </Typography>
-              </Box></>}
+              {token && <>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <>
+                    {usersState.role === 'USERADMIN' && (
+                      <>
+                        <Link
+                          to="/admin"
+                          style={{
+                            cursor: 'pointer',
+                            color: '#FFFFFF',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            fontWeight: 500
+                          }}
+                        >
+                          User Admin
+                        </Link>
+                        <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
+                      </>
+                    )}
+
+                    {usersState.role === 'USER' && (
+                      <>
+                        <Link
+                          to="/Workflow"
+                          style={{
+                            cursor: 'pointer',
+                            color: '#FFFFFF',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            fontWeight: 500
+                          }}
+                        >
+                          Workflow
+                        </Link>
+                        <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
+                      </>
+                    )}
+
+                    <Link
+                      to="/setPassword"
+                      style={{
+                        cursor: 'pointer',
+                        color: '#FFFFFF',
+                        textDecoration: 'none',
+                        fontSize: '14px',
+                        fontWeight: 500
+                      }}
+                    >
+                      Reset Password
+                    </Link>
+
+                    <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
+                    {/* <Box component="span" sx={{ opacity: 0.6, color: '#ffffff', fontSize: '18px' }}>|</Box> */}
+                    {/* user avatar menu */}
+                    <IconButton
+                      size="small"
+                      sx={{
+                        '&:hover': { bgcolor: '#2196f3' },
+                        'img': {
+                          width: 34,
+                          height: 34
+                        },
+                        p: 0
+                      }}
+                      onClick={(e) => {
+                        console.log('avatar clicked', e.currentTarget);
+                        setAnchorEl(e.currentTarget as HTMLElement);
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={require('../images/user.svg').default}
+                        alt="user"
+                        sx={{ width: 28, height: 28 }}
+                      />
+                    </IconButton>
+                    {console.log('anchorEl state', anchorEl)}
+                    <Menu
+                      id="user-menu"
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={() => setAnchorEl(null)}
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                      PaperProps={{ sx: { zIndex: 2000 } }}
+                      MenuListProps={{
+                        'aria-labelledby': 'user-avatar-button',
+                      }}
+                      slotProps={{
+                        paper: {
+                          elevation: 0,
+                          sx: {
+                            overflow: 'visible',
+                            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                            mt: 1.5,
+                            '& .MuiAvatar-root': {
+                              width: 32,
+                              height: 32,
+                              ml: -0.5,
+                              mr: 1,
+                            },
+                            '&::before': {
+                              content: '""',
+                              display: 'block',
+                              position: 'absolute',
+                              top: 0,
+                              right: 14,
+                              width: 10,
+                              height: 10,
+                              bgcolor: 'background.paper',
+                              transform: 'translateY(-50%) rotate(45deg)',
+                              zIndex: 0,
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem onClick={() => { setAnchorEl(null); handleLogout(); }}>Logout</MenuItem>
+                    </Menu>
+                  </>
+                </Box>
+              </>}
             </Box>
           </Container>
         </Box>
@@ -148,27 +246,6 @@ const Header = (props: any) => {
         </Container>
       </Box> */}
       </Box>
-      {!token && <Box sx={{ flexGrow: 1 }}>
-        <Box component="section" sx={{ position: 'absolute', zIndex: 999999, width: '100%', transition: 'all 0.3s ease', top: 0, padding: '5px 0' }}>
-          <Container maxWidth="lg">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
-                <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)', marginTop: '30px' }}>
-
-                </Typography>
-                <Link to={`/Home`} style={{ cursor: 'pointer', color: '#FFFFFF', textDecoration: 'none' }}>
-                  <Box
-                    component="img"
-                    sx={{ width: '180px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "left", display: { xs: 'block' } }}
-                    alt="success"
-                    src={logoNps}
-                  />
-                </Link>
-              </Box>
-            </Box>
-          </Container>
-        </Box>
-      </Box>}
     </>
   )
 }

@@ -1,33 +1,50 @@
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Typography, TextField, IconButton, Link, Divider, InputAdornment } from "@mui/material";
+import IconButtonIcon from '@mui/material/IconButton';
 import logo from '../../images/logo.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
-import { useNavigate } from 'react-router-dom';
-//import {  updateFormData } from '../signUp/signUpSlice'
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import CloseIcon from '@mui/icons-material/Close';
 import loginIconImg from '../../images/aif_login_icon.png'
-import { useSearchParams } from "react-router-dom";
 import uuid from "react-uuid";
 import { useEffect, useState } from "react";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { setUserPasswordAsync, selectedforgotPassword } from './forgotPasswordSlice'
 import { defaultIForgotPassword } from './IForgotPassword'
-import {ModalComponent} from '../../components/ModalComponent'
-
-
+import { ModalComponent } from '../../components/ModalComponent'
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import signupBg from '../../images/signup_ai.jpeg';
+import viewIcon from '../../images/view.svg';
+import hideIcon from '../../images/hide.svg';
 
 const ForgotPassword = () => {
+    const fieldSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '6px',
+            backgroundColor: '#ffffff',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+        },
+        '& .MuiInputLabel-root': {
+            color: '#000000',
+        }
+    };
 
     const navigate = useNavigate()
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     let token = searchParams.get("token")
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const [formData, setFormData] = useState(defaultIForgotPassword);
     const state = useAppSelector(selectedforgotPassword)
-    let emailSent = false;
+    const [passwordSet, setPasswordSet] = useState(false);
     const [showResponse, setShowResponse] = useState(false);
-
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         if (token != undefined) {
@@ -36,7 +53,7 @@ const ForgotPassword = () => {
     }, [token])
 
     function handleSubmitForm() {
-        emailSent = true
+        setPasswordSet(true)
         setShowResponse(true)
         dispatch(
             setUserPasswordAsync(
@@ -44,7 +61,6 @@ const ForgotPassword = () => {
             )
         )
     }
-
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -54,201 +70,202 @@ const ForgotPassword = () => {
         setFormData(copiedValue);
     };
 
-    const handleClose= () => {
+    const handleClose = () => {
         setShowResponse(false)
-        //setFormData(defaultISignup)
     };
 
     return (
-        <div >
-            <Container sx={{ mt: '60px', }}>
-                <Box sx={{ flexGrow: 1 }}>
-                    <Grid container >
-                        <Grid item xs={5}>
-                            <Card className="login_card_left" sx={{ height: '545px', display: 'flex', border: 1, borderColor: "#363062", borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px', backgroundColor: "#363062" }}>
-                                <CardContent sx={{ flex: 1, position: "relative", backgroundColor: "transparent" }}>
+        <Box sx={{
+            minHeight: '100vh',
+            width: '100%',
+            position: 'relative',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pt: '80px',
+            pb: '40px'
+        }}>
+            {/* Background with Blur */}
+            <Box sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url(${signupBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                zIndex: -1,
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                    backdropFilter: 'blur(2px)',
+                }
+            }} />
 
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4 }}>
+            <Container maxWidth="sm">
+                <Card sx={{
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                    overflow: 'hidden',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}>
+                    <CardContent sx={{ p: '0 !important' }}>
+                        <Box sx={{ p: 4 }}>
+                            <Grid container spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                                <Grid item xs={12} sm={8}>
+                                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#000000' }}>
+                                        Set your password
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={4} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                                    <Link
+                                        href="#/home"
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            color: '#1942b6',
+                                            textDecoration: 'none',
+                                            fontWeight: 700,
+                                            fontSize: '0.875rem',
+                                            transition: 'all 0.2s',
+                                            '&:hover': {
+                                                color: '#FF671F',
+                                                transform: 'translateX(-4px)'
+                                            }
+                                        }}
+                                    >
+                                        <KeyboardDoubleArrowLeftIcon sx={{ fontSize: '1.2rem', mr: 0.5 }} />
+                                        Back To Home
+                                    </Link>
+                                </Grid>
+                            </Grid>
 
-                                        <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="ffsLogo"
-                                                src={ffsLogo}
-                                            />
-                                        </Toolbar>
-                                    </Box>
+                            <Typography variant="body2" sx={{ color: '#666666', mb: 4 }}>
+                                Please create a strong password for your account.
+                            </Typography>
 
-
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4 }}>
-
-                                        <Toolbar disableGutters sx={{ borderRadius: '18px', justifyContent: "center", backgroundColor: '#ffffff' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="success"
-                                                src={logo}
-                                            />
-                                        </Toolbar>
-                                    </Box>
-
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4, mb: 2 }}>
-
-                                        <Toolbar disableGutters sx={{ width: '80px', height: '80px', justifyContent: "center", backgroundColor: '#ffffff', borderRadius: '50px' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{ position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="success"
-                                                src={loginIconImg}
-                                            />
-
-                                        </Toolbar>
-
-                                    </Box>
-
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center">
-
-                                        <Toolbar disableGutters sx={{ justifyContent: "center", color: "#ffffff" }}>
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Alternate Investment Fund</Typography>
-
-                                            </Box>
-
-                                        </Toolbar>
-
-                                    </Box>
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center">
-
-                                        <Toolbar disableGutters sx={{ justifyContent: "center", color: "#ffffff" }}>
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Application Portal</Typography>
-
-                                            </Box>
-
-                                        </Toolbar>
-
-                                    </Box>
-                                </CardContent>
-
-                            </Card>
-                        </Grid>
-                        <Grid item xs={7}>
-                            <Card sx={{ display: 'flex', height: '545px', borderColor: "#363062", border: 1 }}>
-                                <CardContent sx={{ flex: 1 }}>
-
-
-                                    <Toolbar disableGutters sx={{ opacity: '0.8', mt: -2, ml: -2, mr: -2, color: 'white', backgroundColor: '#363062', textAlign: "center", justifyContent: "space-around" }}>
-                                        <Grid container xs={12}>
-                                            <Grid item xs={11}>
-                                                <Box display="flex"
-                                                    justifyContent="center"
-                                                    alignItems="center">
-                                                    <Typography sx={{ flex: 1, ml: '10px', textAlign: "center", fontWeight: 'bold' }}>Set Password</Typography>
-                                                </Box>
-                                            </Grid>
-                                            <Grid item xs={1}>
-                                                <Box onClick={() => navigate('/')} sx={{ color: 'white', cursor: 'pointer' }} >
-                                                    <CloseIcon ></CloseIcon>
-                                                </Box>
-                                            </Grid>
-                                        </Grid>
-                                    </Toolbar>
-
-                                    <Box
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 3 }}>
-
-                                        <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Set your password here</Typography> <br></br>
-
-                                        {!emailSent ?
-                                            <Grid container spacing={2} >
-
-                                                <Grid item xs={12}>
-                                                    <TextField
-                                                        required
-                                                        type='password'
-                                                        id="password"
-                                                        label="Password"
-                                                        value={formData["password"] || ''}
-                                                        onChange={handleChange}
-                                                        sx={{ display: 'flex' }}
-                                                    />
-                                                </Grid>
-
-                                                <Grid item xs={12}>
-                                                    <TextField
-                                                        required
-                                                        type='password'
-                                                        id="matchingPassword"
-                                                        label="Confirm Password"
-                                                        value={formData["matchingPassword"] || ''}
-                                                        onChange={handleChange}
-                                                        sx={{ display: 'flex' }}
-                                                    />
-                                                </Grid>
-
-
-                                                <Grid item xs={12} >
-                                                    <Box display="flex"
-                                                        justifyContent="center"
-                                                        alignItems="center">
-                                                        <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundColor: '#c27a1b' }} onClick={handleSubmitForm}>
-                                                            Set Password
-                                                        </Button>
-                                                    </Box>
-                                                </Grid  >
-
-                                                <Grid item xs={12}>
-                                                    <Box sx={{ mt: 2 }}>
-                                                        {showResponse && state.response != undefined ? <>{state.response}</> : <></>}
-                                                        <ModalComponent
-                                                            open={showResponse}
-                                                            close={handleClose}
-                                                            aria-labelledby="modal-modal-title"
-                                                            aria-describedby="modal-modal-description"
-                                                            className="special_modal"
-                                                            msg={state.response}
-                                                            status={state.status.fetchStatus}
+                            {!passwordSet ? (
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            type={showPassword ? "text" : "password"}
+                                            id="password"
+                                            label="New Password"
+                                            value={formData["password"] || ''}
+                                            onChange={handleChange}
+                                            placeholder="Enter new password"
+                                            sx={fieldSx}
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButtonIcon
+                                                            onClick={() => setShowPassword(!showPassword)}
+                                                            edge="end"
                                                         >
-                                                        </ModalComponent>
-                                                    </Box>
-                                                </Grid>
+                                                            {showPassword ? (
+                                                                <Box component="img" src={viewIcon} sx={{ width: '20px', height: '20px' }} />
+                                                            ) : (
+                                                                <Box component="img" src={hideIcon} sx={{ width: '20px', height: '20px' }} />
+                                                            )}
+                                                        </IconButtonIcon>
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                        />
+                                    </Grid>
 
-                                            </Grid> : <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>Passwor reset email has been sent to your email id!</Typography>
-                                        }
-                                    </Box>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            id="matchingPassword"
+                                            label="Confirm Password"
+                                            value={formData["matchingPassword"] || ''}
+                                            onChange={handleChange}
+                                            placeholder="Confirm your password"
+                                            sx={fieldSx}
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButtonIcon
+                                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                            edge="end"
+                                                        >
+                                                            {showConfirmPassword ? (
+                                                                <Box component="img" src={viewIcon} sx={{ width: '20px', height: '20px' }} />
+                                                            ) : (
+                                                                <Box component="img" src={hideIcon} sx={{ width: '20px', height: '20px' }} />
+                                                            )}
+                                                        </IconButtonIcon>
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                        />
+                                    </Grid>
 
-                                    <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, email us at vcfapplication@sidbi.in</Typography>
-                                </CardContent>
+                                    <Grid item xs={12}>
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            onClick={handleSubmitForm}
+                                            sx={{
+                                                py: 1.5,
+                                                backgroundColor: '#FF671F',
+                                                '&:hover': { backgroundColor: '#e85a15' },
+                                                borderRadius: '6px',
+                                                fontSize: '16px',
+                                                fontWeight: 600,
+                                                textTransform: 'none',
+                                                boxShadow: '0 4px 12px rgba(255, 107, 33, 0.3)',
+                                                mt: 1
+                                            }}
+                                        >
+                                            Set Password
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            ) : (
+                                <Box sx={{ textAlign: 'center', py: 4 }}>
+                                    <Typography sx={{ color: '#000', fontWeight: 500 }}>
+                                        Processing your request...
+                                    </Typography>
+                                </Box>
+                            )}
 
-                            </Card>
-                        </Grid>
+                            <Box sx={{ mt: 2 }}>
+                                <ModalComponent
+                                    open={showResponse}
+                                    close={handleClose}
+                                    aria-labelledby="modal-modal-title"
+                                    aria-describedby="modal-modal-description"
+                                    className="special_modal"
+                                    msg={state.response}
+                                    status={state.status.fetchStatus}
+                                />
+                            </Box>
 
-                    </Grid>
-                </Box></Container>
+                            <Divider sx={{ my: 4 }} />
 
-        </div>
-
-    )
+                            <Typography variant="body2" sx={{ color: '#666666', textAlign: 'center' }}>
+                                Need help? Contact us at <Link href="mailto:vcfapplication@sidbi.in" sx={{ color: '#FF671F', textDecoration: 'none', fontWeight: 600 }}>vcfapplication@sidbi.in</Link>
+                            </Typography>
+                        </Box>
+                    </CardContent>
+                </Card>
+            </Container>
+        </Box>
+    );
 }
 
 export default ForgotPassword;

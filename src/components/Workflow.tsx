@@ -1,6 +1,7 @@
 import { Box, Paper, Typography, Container, Breadcrumbs, Link, Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
+import workflowImage from '../images/Workflow.jpeg';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import HomeIcon from '@mui/icons-material/Home';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
@@ -108,7 +109,7 @@ const Workflow = (props:any) => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ pt: '120px', pb: '50px' }}>
+    <Container maxWidth="xl" sx={{ pt: '90px', pb: '50px' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ mb: '30px' }}>
               <Typography variant="h5" sx={{ fontWeight: 600, color: '#013d7b' }}>Workflow</Typography>
@@ -136,102 +137,12 @@ const Workflow = (props:any) => {
       </Box>
       <Box sx={{ p: 0, bgcolor: '#fdfdfd' }}>
         <Box sx={{ width: '100%', overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
-          <Box sx={{ position: 'relative', width: svgWidth, height: svgHeight }}>
-            {/* Wave Path */}
-            <svg width={svgWidth} height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`} style={{ position: 'absolute', top: 0, left: 0 }}>
-              <path
-                d={pathD}
-                stroke="#e0e0e0"
-                strokeWidth="6"
-                fill="none"
-                strokeLinecap="round"
-              />
-
-              {/* Arrows */}
-              {/* {markers.slice(0, -1).map((m1, i) => {
-                const m2 = markers[i + 1]
-                const isUp = i % 2 === 0
-                const arrowX = (m1.x + m2.x) / 2
-                const arrowY = (m1.y + m2.y) / 2
-
-                return (
-                  <g key={`arrow-group-${i}`} transform={`translate(${arrowX}, ${arrowY}) rotate(${isUp ? -45 : 45})`}>
-                    <path
-                      d="M -12 8 L 0 -12 L 12 8 Z"
-                      fill="#dcdcdc"
-                      style={{ filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.15))' }}
-                    />
-                  </g>
-                )
-              })} */}
-              {markers.map((m) => (
-                <g key={`marker-${m.num}`}>
-                  <circle cx={m.x} cy={m.y} r={18} fill="#eee" />
-                  <text x={m.x} y={m.y + 7} textAnchor="middle" fill="#999" fontSize="17" fontWeight="bold">
-                    {m.num}
-                  </text>
-                </g>
-              ))}
-            </svg>
-
-            {/* Cards */}
-            {steps.map((s, i) => {
-              const m = markers[i]
-              const isBottomMarker = i % 2 !== 0
-              const cardX = m.x - cardWidth / 2
-              // Adjusted offsets to ensure no overlap with the wave
-              const cardY = isBottomMarker ? m.y - 190 : m.y + 60
-
-              return (
-                <Paper
-                  key={i}
-                  elevation={4}
-                  sx={{
-                    position: 'absolute',
-                    left: cardX,
-                    top: cardY,
-                    width: cardWidth,
-                    borderRadius: '16px',
-                    // overflow: 'hidden', // Changed to visible for the half-outside icon
-                    overflow: 'visible',
-                    zIndex: 2,
-                    border: '1px solid #f0f0f0',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
-                  }}
-                >
-                  <Box sx={{ bgcolor: s.titlebgcolor, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pt: 2.8, pb: 1.5, borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: (s.description === '') ? '16px' : undefined, borderBottomRightRadius: (s.description === '') ? '16px' : undefined }}>
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)', // Centered on the top edge
-                        width: 36,
-                        height: 36,
-                        bgcolor: '#fff',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                        zIndex: 3
-                      }}
-                    >
-                      {s.icon}
-                    </Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, textAlign: 'center', px: 1, lineHeight: 1.1, color: s.titlecolor, fontSize: '0.9rem' }}>
-                      {s.title}
-                    </Typography>
-                  </Box>
-                  {s.description && <Box sx={{ py: 2, px: 1, textAlign: 'center', bgcolor: '#fff', maxHeight: '90px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
-                    <Typography variant="caption" sx={{ color: '#888', fontSize: '0.7rem', display: 'block', lineHeight: 1.2 }}>
-                      {s.description}
-                    </Typography>
-                  </Box>}
-                </Paper>
-              )
-            })}
-          </Box>
+          <Box
+            component="img"
+            src={workflowImage}
+            alt="Workflow diagram"
+            sx={{ width: '100%', height: '580px' }}
+          />
         </Box>
       </Box>
     </Container>

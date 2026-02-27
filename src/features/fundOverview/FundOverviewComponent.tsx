@@ -86,18 +86,24 @@ export const FundOverview = (props: any) => {
     };
 
 
-    const currentStep = [
+    const allSteps = [
         { label: 'Initial Assessment', path: 'selfrating' },
         { label: 'Fund Information', path: 'fund' },
         // { label: 'Profile', path: 'profile' },
         { label: 'KYC, Supporting Documents & Declaration', path: 'declaration' },
         { label: 'Preview', path: 'preview' },
-    ].find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
+    ];
+
+    const filteredSteps = ['USERADMIN', 'ADMIN'].includes(usersState.role || '')
+        ? allSteps.filter(s => s.path === 'preview')
+        : allSteps;
+
+    const currentStep = filteredSteps.find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
 
     // const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 
     return (
-        <Container maxWidth="xl" sx={{ pt: '120px', pb: '50px' }}>
+        <Container maxWidth="xl" sx={{ pt: '90px', pb: '50px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '30px' }}>
                 <Box>
                     {/* <Typography variant="h5" sx={{ fontWeight: 700, color: '#363062', mb: 0.5 }}>
@@ -132,84 +138,80 @@ export const FundOverview = (props: any) => {
             </Box>
             <Box sx={{ flexGrow: 1 }}>
                 {/* Chevron Stepper */}
-                <Box sx={{ width: '100%', mb: 2, display: 'flex', gap: 0.5 }}>
-                    {[
-                        { label: 'Initial Assessment', path: 'selfrating' },
-                        { label: 'Fund Information', path: 'fund' },
-                        // { label: 'Profile', path: 'profile' },
-                        { label: 'KYC, Supporting Documents & Declaration', path: 'declaration' },
-                        { label: 'Preview', path: 'preview' },
-                    ].map((s, index, array) => {
-                        const isNew = id?.toString() === 'NEW';
-                        const score = Number(selfRatingState.selfRatings.score || 0);
-                        const isFailed = score < 0.7;
+                {!['USERADMIN', 'ADMIN'].includes(usersState.role || '') && (
+                    <Box sx={{ width: '100%', mb: 2, display: 'flex', gap: 0.5 }}>
+                        {filteredSteps.map((s, index, array) => {
+                            const isNew = id?.toString() === 'NEW';
+                            const score = Number(selfRatingState.selfRatings.score || 0);
+                            const isFailed = score < 0.7;
 
-                        const currentPath = pathname.toLowerCase();
-                        const activeIndex = array.findIndex(item => currentPath.includes(item.path.toLowerCase()));
-                        const isCompleted = index < activeIndex;
-                        const isActive = index === activeIndex;
-                        const isPending = index > activeIndex;
+                            const currentPath = pathname.toLowerCase();
+                            const activeIndex = array.findIndex(item => currentPath.includes(item.path.toLowerCase()));
+                            const isCompleted = index < activeIndex;
+                            const isActive = index === activeIndex;
+                            const isPending = index > activeIndex;
 
-                        const isDisabled = (isNew && isPending) || (isFailed && isPending);
+                            const isDisabled = (isNew && isPending) || (isFailed && isPending);
 
-                        // Colors from reference
-                        const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#363062' : '#818181');
+                            // Colors from reference
+                            const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#363062' : '#818181');
 
-                        return (
-                            <Box
-                                key={s.path}
-                                onClick={() => !isDisabled && navigate(s.path)}
-                                sx={{
-                                    flex: 1,
-                                    height: '70px',
-                                    backgroundColor: bgColor,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    px: 4,
-                                    cursor: isDisabled ? 'not-allowed' : 'pointer',
-                                    color: 'white',
-                                    position: 'relative',
-                                    opacity: isDisabled ? 0.6 : 1,
-                                    clipPath: index === 0 ? 'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)' :
-                                        (index === (array.length - 1) ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 20px 50%)' :
-                                            'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%, 20px 50%)'),
-                                    ml: index === 0 ? 0 : -2.5,
-                                    zIndex: array.length - index,
-                                    transition: 'all 0.3s ease',
-                                    '&:hover': { opacity: isDisabled ? 0.6 : 0.9 }
-                                }}
-                            >
-                                {/* Left Icon */}
-                                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
-                                    {isCompleted ? (
-                                        <CheckCircleIcon sx={{ color: 'white', fontSize: 24 }} />
-                                    ) : isActive ? (
-                                        <Box sx={{
-                                            width: '24px',
-                                            height: '24px',
-                                            borderRadius: '50%',
-                                            border: '2px solid white',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}>
-                                            <Box sx={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'white' }} />
-                                        </Box>
-                                    ) : (
-                                        <LockIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} />
-                                    )}
+                            return (
+                                <Box
+                                    key={s.path}
+                                    onClick={() => !isDisabled && navigate(s.path)}
+                                    sx={{
+                                        flex: 1,
+                                        height: '70px',
+                                        backgroundColor: bgColor,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        px: 4,
+                                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                        color: 'white',
+                                        position: 'relative',
+                                        opacity: isDisabled ? 0.6 : 1,
+                                        clipPath: index === 0 ? 'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)' :
+                                            (index === (array.length - 1) ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 20px 50%)' :
+                                                'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%, 20px 50%)'),
+                                        ml: index === 0 ? 0 : -2.5,
+                                        zIndex: array.length - index,
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': { opacity: isDisabled ? 0.6 : 0.9 }
+                                    }}
+                                >
+                                    {/* Left Icon */}
+                                    <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                                        {isCompleted ? (
+                                            <CheckCircleIcon sx={{ color: 'white', fontSize: 24 }} />
+                                        ) : isActive ? (
+                                            <Box sx={{
+                                                width: '24px',
+                                                height: '24px',
+                                                borderRadius: '50%',
+                                                border: '2px solid white',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}>
+                                                <Box sx={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'white' }} />
+                                            </Box>
+                                        ) : (
+                                            <LockIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} />
+                                        )}
+                                    </Box>
+
+                                    {/* Labels */}
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                        <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                                            {s.label}
+                                        </Typography>
+                                    </Box>
                                 </Box>
-
-                                {/* Labels */}
-                                <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
-                                        {s.label}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        );
-                    })}
-                </Box>
+                            );
+                        })}
+                    </Box>
+                )}
 
                 {/* Sub-content Area */}
                 <Box sx={{ width: '100%', mt: 2 }}>

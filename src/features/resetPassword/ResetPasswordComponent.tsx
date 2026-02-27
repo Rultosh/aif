@@ -1,40 +1,49 @@
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Typography, TextField, IconButton, Link, Divider } from "@mui/material";
 import logo from '../../images/logo.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
 import { useNavigate } from 'react-router-dom';
-//import {  updateFormData } from '../signUp/signUpSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import CloseIcon from '@mui/icons-material/Close';
-import loginIconImg from '../../images/aif_login_icon.png'
 import uuid from "react-uuid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { resetUserPasswordAsync, selectedforgotPassword } from '../forgotPassword/forgotPasswordSlice'
-import {  defaultIResetPassword } from './IResetPassword'
-
-
+import { defaultIResetPassword } from './IResetPassword'
+import signupBg from '../../images/signup_ai.jpeg';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 
 const ResetPassword = () => {
+    const fieldSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '6px',
+            backgroundColor: '#ffffff',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+        },
+        '& .MuiInputLabel-root': {
+            color: '#000000',
+        }
+    };
 
     const navigate = useNavigate()
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const [formData, setFormData] = useState(defaultIResetPassword);
     const state = useAppSelector(selectedforgotPassword)
-    let emailSent = false;
-
-    
-
+    const [emailSent, setEmailSent] = useState(false);
 
     function handleSubmitForm() {
-        emailSent = true
+        setEmailSent(true)
         dispatch(
             resetUserPasswordAsync(
                 wrapArgument(actionUid, formData)
             )
         )
     }
-
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -44,230 +53,154 @@ const ResetPassword = () => {
         setFormData(copiedValue);
     };
 
-
     return (
-        <div >
-            <Container sx={{ mt: '60px', }}>
-                <Box sx={{ flexGrow: 1 }}>
-                    <Grid container >
-                        <Grid item xs={5}>
-                            <Card className="login_card_left" sx={{  height: '545px',display: 'flex',  border: 1, borderColor:"#363062",borderTopLeftRadius:'8px',borderBottomLeftRadius:'8px',backgroundColor:"#363062" }}>
-                                <CardContent sx={{ flex: 1, position: "relative", backgroundColor: "transparent" }}>
+        <Box sx={{
+            minHeight: '100vh',
+            width: '100%',
+            position: 'relative',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pt: '80px',
+            pb: '40px'
+        }}>
+            {/* Background with Blur */}
+            <Box sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url(${signupBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                zIndex: -1,
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                    backdropFilter: 'blur(2px)',
+                }
+            }} />
 
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4 }}>
+            <Container maxWidth="sm">
+                <Card sx={{
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                    overflow: 'hidden',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}>
+                    <CardContent sx={{ p: 0 }}>
 
-                                        <Toolbar disableGutters sx={{  borderRadius:'18px',justifyContent: "center",backgroundColor:'#ffffff' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="ffsLogo"
-                                                src={ffsLogo}
-                                            />
-                                        </Toolbar>
-                                    </Box>
+                        <Box sx={{ p: 4 }}>
+                            <Grid container spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                                <Grid item xs={12} sm={8}>
+                                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#000000' }}>
+                                        Forgot your password?
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={4} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                                    <Link
+                                        href="#/login"
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            color: '#1942b6',
+                                            textDecoration: 'none',
+                                            fontWeight: 700,
+                                            fontSize: '0.875rem',
+                                            transition: 'all 0.2s',
+                                            '&:hover': {
+                                                color: '#FF671F',
+                                                transform: 'translateX(-4px)'
+                                            }
+                                        }}
+                                    >
+                                        <KeyboardDoubleArrowLeftIcon sx={{ fontSize: '1.2rem', mr: 0.5 }} />
+                                        Back To Login
+                                    </Link>
+                                </Grid>
+                            </Grid>
 
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4 }}>
+                            <Typography variant="body2" sx={{ color: '#666666', mb: 4 }}>
+                                Enter your registered email address to receive instructions.
+                            </Typography>
 
-                                        <Toolbar disableGutters sx={{  borderRadius:'18px',justifyContent: "center",backgroundColor:'#ffffff' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{ width: '175px', aspectRatio: '16/9', objectFit: 'contain', position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="success"
-                                                src={logo}
-                                            />
-                                        </Toolbar>
-                                    </Box>
+                            {!emailSent ? (
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            id="username"
+                                            label="Email Address"
+                                            value={formData["username"]}
+                                            onChange={handleChange}
+                                            placeholder="Enter your email"
+                                            sx={fieldSx}
+                                        />
+                                    </Grid>
 
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 4,mb:2 }}>
+                                    <Grid item xs={12}>
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            onClick={handleSubmitForm}
+                                            sx={{
+                                                py: 1.5,
+                                                backgroundColor: '#FF671F',
+                                                '&:hover': { backgroundColor: '#e85a15' },
+                                                borderRadius: '6px',
+                                                fontSize: '16px',
+                                                fontWeight: 600,
+                                                textTransform: 'none',
+                                                boxShadow: '0 4px 12px rgba(255, 107, 33, 0.3)',
+                                                mt: 1
+                                            }}
+                                        >
+                                            Send Email
+                                        </Button>
+                                    </Grid>
 
-                                        <Toolbar disableGutters sx={{width:'80px',height:'80px', justifyContent: "center",backgroundColor:'#ffffff', borderRadius:'50px' }}>
-                                            <Box
-                                                component="img"
-                                                sx={{  position: 'relative', justifyContent: "center", display: { xs: 'block' } }}
-                                                alt="success"
-                                                src={loginIconImg}
-                                            />
-
-                                        </Toolbar>
-
-                                    </Box>
-
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center">
-
-                                        <Toolbar disableGutters sx={{ justifyContent: "center",color:"#ffffff" }}>
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Typography variant="h5" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Alternative Investment Fund</Typography>
-
-                                            </Box>
-
-                                        </Toolbar>
-
-                                    </Box>
-                                    <Box display="flex"
-                                        justifyContent="center"
-                                        alignItems="center">
-
-                                        <Toolbar disableGutters sx={{ justifyContent: "center" ,color:"#ffffff"}}>
-                                            <Box display="flex"
-                                                justifyContent="center"
-                                                alignItems="center">
-                                                <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Application Portal</Typography>
-
-                                            </Box>
-
-                                        </Toolbar>
-
-                                    </Box>
-                                </CardContent>
-
-                            </Card>
-                        </Grid>
-                        <Grid item xs={7}>
-                            <Card sx={{ display: 'flex', height: '545px',borderColor:"#363062",border:1 }}>
-                                <CardContent sx={{ flex: 1 }}>
-
-
-                                    <Toolbar disableGutters sx={{opacity:'0.8',mt:-2,ml:-2,mr:-2, color: 'white', backgroundColor: '#363062', textAlign: "center", justifyContent: "space-around" }}>
-                                        <Grid container xs={12}>
-                                            <Grid item xs={11}>
-                                                <Box display="flex"
-                                                    justifyContent="center"
-                                                    alignItems="center">
-                                                    <Typography sx={{ flex: 1, ml: '10px', textAlign: "center",fontWeight:'bold' }}>Reset Password</Typography>
-                                                </Box>
-                                            </Grid>
-                                            <Grid item xs={1}>
-                                                <Box onClick={() => navigate('/')} sx={{ color: 'white' ,cursor: 'pointer'}} >
-                                                    <CloseIcon ></CloseIcon>
-                                                </Box>
-                                            </Grid>
+                                    {state.response_resetPassword && (
+                                        <Grid item xs={12}>
+                                            <Typography sx={{ color: '#000', textAlign: 'center', mt: 2 }}>
+                                                {state.response_resetPassword}
+                                            </Typography>
                                         </Grid>
-                                    </Toolbar>
-
-                                    <Box
-                                        justifyContent="center"
-                                        alignItems="center"
-                                        sx={{ mt: 3 }}>
-
-                                        <Typography variant="h6" sx={{ flex: 1, ml: '10px', textAlign: "left" }}>Forgot your password?</Typography> <br></br>
-
-                                        {!emailSent ?
-                                            <Grid container spacing={2} >
-
-                                                <Grid item xs={12}>
-                                                    <TextField
-                                                        required
-                                                        id="username"
-                                                        label="Email"
-                                                        value={formData["username"]}
-                                                        onChange={handleChange}
-                                                        sx={{ display: 'flex' }}
-                                                    />
-                                                </Grid>
-
-                                                {/*<Grid item xs={6}>
-                                                    <TextField
-                                                        required
-                                                        id="outlined-required"
-                                                        label="Captcha"
-                                                        sx={{ display: 'flex' }}
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <TextField
-                                                        required
-                                                        id="outlined-required"
-                                                        label="Captcha"
-                                                        sx={{ display: 'flex' }}
-                                                    />
-                                        </Grid>*/}
-
-                                                <Grid item xs={12} >
-                                                    <Box display="flex"
-                                                        justifyContent="center"
-                                                        alignItems="center">
-                                                        <Button variant="contained" disableElevation sx={{ textTransform: 'none', width: 200, backgroundColor:'#c27a1b' }} onClick={handleSubmitForm}>
-                                                            Send Email
-                                                        </Button>
-                                                    </Box>
-                                                </Grid  >
-                                                {state.response_resetPassword?<Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}> {state.response_resetPassword} </Typography>:<></>}
-                                            </Grid> : <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>Password reset email has been sent to your email id!</Typography>
-                                        }
-                                    </Box>
-                                    <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, email us at vcfapplication@sidbi.in</Typography>
-                                </CardContent>
-                                {/*<CardFooter>
-                                    <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, emailus at vcfapplication@sidbi.in</Typography>
-                                    </CardFooter>*/}
-                            </Card>
-                        </Grid>
-
-                    </Grid>
-                </Box></Container>
-            {/*} <Container sx={{ mt: '90px', }}>
-                <Grid >
-               
-                    <CardActionArea component="a" disableRipple >
-                    <Grid item  sm={3} >
-                        <Card sx={{ display: 'flex' }}>
-                            <CardContent sx={{ flex: 1 }}>
-                                {"card1"}
-                                <Box display="flex"
-                                    justifyContent="center"
-                                    alignItems="center">
-                                   
+                                    )}
+                                </Grid>
+                            ) : (
+                                <Box sx={{ textAlign: 'center', py: 4 }}>
+                                    <Typography sx={{ color: '#000', fontWeight: 500 }}>
+                                        Password reset email has been sent to your email id!
+                                    </Typography>
+                                    <Button
+                                        onClick={() => navigate('/')}
+                                        sx={{ mt: 3, color: '#FF671F', fontWeight: 600 }}
+                                    >
+                                        Back to Login
+                                    </Button>
                                 </Box>
-                            </CardContent>
+                            )}
 
-                        </Card>
-                        </Grid>
-                        <Grid item  sm={3} >
-                        <Card sx={{ display: 'flex' }}>
-                            <CardContent sx={{ flex: 1 }}>
-                                {"card2"}
-                                <Box display="flex"
-                                    justifyContent="center"
-                                    alignItems="center">
-                                   
-                                </Box>
-                            </CardContent>
+                            <Divider sx={{ my: 4 }} />
 
-                        </Card>
-                        </Grid>
-                        <Grid item  sm={3} >
-                        <Card sx={{ display: 'flex' }}>
-                            <CardContent sx={{ flex: 1 }}>
-                                {"card3"}
-                                <Box display="flex"
-                                    justifyContent="center"
-                                    alignItems="center">
-                                   
-                                </Box>
-                            </CardContent>
-
-                        </Card>
-                        </Grid>
-
-                    </CardActionArea>
-                </Grid>
-    </Container>*/}
-        </div>
-
-    )
+                            <Typography variant="body2" sx={{ color: '#666666', textAlign: 'center' }}>
+                                Need help? Contact us at <Link href="mailto:vcfapplication@sidbi.in" sx={{ color: '#FF671F', textDecoration: 'none', fontWeight: 600 }}>vcfapplication@sidbi.in</Link>
+                            </Typography>
+                        </Box>
+                    </CardContent>
+                </Card>
+            </Container>
+        </Box>
+    );
 }
 
 export default ResetPassword;
