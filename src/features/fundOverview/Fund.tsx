@@ -126,35 +126,32 @@ export const Fund = (props: any) => {
     };
 
     const handleClickSave = async () => {
-        const results = await Promise.all([
-            prelimRef.current?.submit(),
-            strategyRef.current?.submit(),
-            dealFlowRef.current?.submit(),
-            lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit(),
-            othersRef.current?.submit(),
-            misRef.current?.submit()
+        // Validate required sections: Fund Overview (panel 1), LP Advisory (panel 7), Deal Flow/MIS (panel 8), Others (panel 9)
+        const validations = await Promise.all([
+            prelimRef.current?.submit?.() ?? Promise.resolve(true),
+            lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit?.() ?? Promise.resolve(true),
+            dealFlowRef.current?.submit?.() ?? Promise.resolve(true),
+            othersRef.current?.submit?.() ?? Promise.resolve(true),
         ]);
 
-        const sectionNames = ["Fund Overview", "Investment Strategy", "LP Advisory Governance and Investment Committee", "Deal Flow", "Others"];
-        const panels = ["1", "2", "7", "10", "9"];
+        const sectionNames = ["Fund Overview", "LP Advisory Governance and Investment Committee", "Deal Flow/MIS", "Others"];
+        const panels = ["1", "7", "8", "9"];
 
-        results.forEach((isValid, index) => {
+        validations.forEach((isValid, index) => {
             if (isValid === false) {
                 console.log(`Validation failed in section: ${sectionNames[index]} (Panel ${panels[index]})`);
             }
         });
 
-        console.log("allValid results", results);
-
-        const allValid = results.every(res => res === true);
+        const allValid = validations.every(res => res === true);
         if (!allValid) {
-            const firstInvalidIndex = results.findIndex(res => res === false);
+            const firstInvalidIndex = validations.findIndex(res => res === false);
             if (firstInvalidIndex !== -1) {
                 setExpanded(panels[firstInvalidIndex]);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
-        return results;
+        return validations;
     };
 
     const handleNextClick = async (ev: any) => {

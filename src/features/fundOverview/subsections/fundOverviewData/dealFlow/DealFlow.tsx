@@ -34,11 +34,11 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     }, [prelimAppicationId, actionUid, dispatch]);
 
     useEffect(() => {
-        if (prelimApplicationState.prelimApplication) {
+        if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
             setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
             reset(prelimApplicationState.prelimApplication);
         }
-    }, [prelimApplicationState.prelimApplication]);
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
 
     const validationSchema = Yup.object().shape({
         dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable(),

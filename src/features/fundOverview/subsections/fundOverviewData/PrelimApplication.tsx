@@ -66,15 +66,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     }, [])
 
     useEffect(() => {
-        console.log('useEffect', prelimAppicationId, prelimApplicationState.prelimApplication)
-        setPrelimApplicationFormData(prelimApplicationState.prelimApplication)
-
-        reset(prelimApplicationState.prelimApplication);
-
-        if (prelimApplicationState.prelimApplication?.id) {
+        if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
+            console.log('useEffect', prelimAppicationId, prelimApplicationState.prelimApplication)
+            setPrelimApplicationFormData(prelimApplicationState.prelimApplication)
+            reset(prelimApplicationState.prelimApplication);
             setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id));
         }
-    }, [prelimApplicationState.prelimApplication, prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus])
 
     const setDateValue = (key: String, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
