@@ -310,6 +310,7 @@ export const Home = (pros: any) => {
                                                 {row.stage === "PRELIM" ?
                                                     <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
                                                         {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/selfrating`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+<<<<<<< Updated upstream
                                                         {/* {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/${String(getPath(row.status))}`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>} */}
                                                     </TableCell> : <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
                                                         {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
@@ -330,6 +331,28 @@ export const Home = (pros: any) => {
                                                         <Tooltip title="Download ZIP">
                                                             <IconButton size="small" sx={{ p: '2px', color: '#1a1a1a', '&:hover': { backgroundColor: '#f3f4f6' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.stage === "PRELIM" ? row.id : row.detailedApplicationId}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
                                                                 <DownloadIcon style={{ width: '22px', height: '22px' }} />
+=======
+                                                    {/* {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/${String(getPath(row.status))}`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>} */}
+                                                </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
+                                                    {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+                                                </TableCell>}
+                                                <TableCell align="center" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
+                                                <TableCell align="center" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
+                                                <TableCell align="center" sx={{ color: '#64748b' }}>{row.applicationSubmissionDate ? Moment(String(row.applicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>
+                                                {/* <TableCell align="center" sx={{ color: '#64748b' }}>{row.detailedApplicationSubmissionDate ? Moment(String(row.detailedApplicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell> */}
+                                                <TableCell align="center" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.sdTotalTargetCorpus)}</TableCell>
+                                                <TableCell align="center" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
+                                                <TableCell align="center">
+                                                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                                                        <Tooltip title="Download Preview">
+                                                            <IconButton size="small" sx={{ color: '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
+                                                                <FileDownloadIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Download ZIP">
+                                                            <IconButton size="small" sx={{ color: '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
+                                                                <FileDownloadIcon fontSize="small" />
+>>>>>>> Stashed changes
                                                             </IconButton>
                                                         </Tooltip>
                                                     </Box>
