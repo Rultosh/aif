@@ -44,15 +44,15 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable(),
         dfCurrentPipeline: Yup.string().required("This field is required").nullable(),
         // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
-        dfConversionRatio: Yup.number().required("This field is required").nullable(),
-        msMeetingFrequency: Yup.string().required("This field is required").nullable(),
-        msInvestigationDetails: Yup.string().required("This field is required").nullable(),
-        msExclusiveVC: Yup.string().required("This field is required").nullable(),
-        msDirectorshipsPolicy: Yup.string().required("This field is required").nullable(),
-        otConsolidatedInfo: Yup.string().required("This field is required").nullable(),
-        otNAVFrequency: Yup.string().required("This field is required").nullable(),
-        otValuationReport: Yup.string().required("This field is required").nullable(),
-        otNAVGuidelines: Yup.string().required("This field is required").nullable(),
+        // dfConversionRatio: Yup.number().required("This field is required").nullable(),
+        dfMeetingFrequency: Yup.string().required("This field is required").nullable(),
+        dfInvestigationDetails: Yup.string().required("This field is required").nullable(),
+        dfExclusiveVC: Yup.string().required("This field is required").nullable(),
+        dfDirectorshipsPolicy: Yup.string().required("This field is required").nullable(),
+        dfConsolidatedInfo: Yup.string().required("This field is required").nullable(),
+        dfNAVFrequency: Yup.string().required("This field is required").nullable(),
+        dfValuationReport: Yup.string().required("This field is required").nullable(),
+        dfNAVGuidelines: Yup.string().required("This field is required").nullable(),
     });
 
     const {
@@ -132,9 +132,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             fullWidth
                             multiline
                             maxRows={4}
-                            {...register("msMeetingFrequency")}
-                            error={!!errors.msMeetingFrequency}
-                            helperText={errors.msMeetingFrequency?.message as string}
+                            {...register("dfMeetingFrequency")}
+                            error={!!errors.dfMeetingFrequency}
+                            helperText={errors.dfMeetingFrequency?.message as string}
                             variant="outlined"
                         />
                     </Grid>
@@ -145,9 +145,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             fullWidth
                             multiline
                             maxRows={4}
-                            {...register("msInvestigationDetails")}
-                            error={!!errors.msInvestigationDetails}
-                            helperText={errors.msInvestigationDetails?.message as string}
+                            {...register("dfInvestigationDetails")}
+                            error={!!errors.dfInvestigationDetails}
+                            helperText={errors.dfInvestigationDetails?.message as string}
                             variant="outlined"
                         />
                     </Grid>
@@ -158,9 +158,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             fullWidth
                             multiline
                             maxRows={4}
-                            {...register("msExclusiveVC")}
-                            error={!!errors.msExclusiveVC}
-                            helperText={errors.msExclusiveVC?.message as string}
+                            {...register("dfExclusiveVC")}
+                            error={!!errors.dfExclusiveVC}
+                            helperText={errors.dfExclusiveVC?.message as string}
                             variant="outlined"
                         />
                     </Grid>
@@ -171,9 +171,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             fullWidth
                             multiline
                             maxRows={4}
-                            {...register("msDirectorshipsPolicy")}
-                            error={!!errors.msDirectorshipsPolicy}
-                            helperText={errors.msDirectorshipsPolicy?.message as string}
+                            {...register("dfDirectorshipsPolicy")}
+                            error={!!errors.dfDirectorshipsPolicy}
+                            helperText={errors.dfDirectorshipsPolicy?.message as string}
                             variant="outlined"
                         />
                     </Grid>
@@ -187,9 +187,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 fullWidth
                                 multiline
                                 maxRows={4}
-                                {...register("otConsolidatedInfo")}
-                                error={!!errors.otConsolidatedInfo}
-                                helperText={errors.otConsolidatedInfo?.message as string}
+                                {...register("dfConsolidatedInfo")}
+                                error={!!errors.dfConsolidatedInfo}
+                                helperText={errors.dfConsolidatedInfo?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
                             />
@@ -199,9 +199,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 fullWidth
                                 multiline
                                 maxRows={4}
-                                {...register("otNAVFrequency")}
-                                error={!!errors.otNAVFrequency}
-                                helperText={errors.otNAVFrequency?.message as string}
+                                {...register("dfNAVFrequency")}
+                                error={!!errors.dfNAVFrequency}
+                                helperText={errors.dfNAVFrequency?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
                             />
@@ -211,9 +211,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 fullWidth
                                 multiline
                                 maxRows={4}
-                                {...register("otValuationReport")}
-                                error={!!errors.otValuationReport}
-                                helperText={errors.otValuationReport?.message as string}
+                                {...register("dfValuationReport")}
+                                error={!!errors.dfValuationReport}
+                                helperText={errors.dfValuationReport?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
                             />
@@ -223,9 +223,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 fullWidth
                                 multiline
                                 maxRows={4}
-                                {...register("otNAVGuidelines")}
-                                error={!!errors.otNAVGuidelines}
-                                helperText={errors.otNAVGuidelines?.message as string}
+                                {...register("dfNAVGuidelines")}
+                                error={!!errors.dfNAVGuidelines}
+                                helperText={errors.dfNAVGuidelines?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
                             />

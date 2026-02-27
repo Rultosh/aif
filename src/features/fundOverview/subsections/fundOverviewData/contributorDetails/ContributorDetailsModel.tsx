@@ -57,42 +57,56 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
   const dispatch = useAppDispatch();
   const contributorDetailsState = useAppSelector(selectContributorDetails)
 
-  function handleSubmitForm() {
-    console.log("Saving contributorDetailsFormData", contributorDetailsFormData)
-    if (contributorDetailsFormData.id) {
-      dispatch(
+  async function handleSubmitForm(data: IContributorDetails, shouldClose: boolean = false) {
+    console.log("Saving contributorDetailsFormData", data)
+    let response: any;
+    if (data.id) {
+      response = await dispatch(
         updateContributorDetailsAsync(
-          wrapArgument(actionUid, contributorDetailsFormData)
+          wrapArgument(actionUid, data)
         )
       )
     } else {
-      console.log(contributorDetailsFormData)
-      dispatch(
+      console.log(data)
+      response = await dispatch(
         createContributorDetailsAsync(
-          wrapArgument(actionUid, contributorDetailsFormData)
+          wrapArgument(actionUid, data)
         )
       )
-      // setContributorDetailsFormData({ ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId })
     }
-    handleCloseModal();
+
+    if (response.type.endsWith('/fulfilled')) {
+      const savedData = response.payload;
+      const combinedData = { ...data, ...savedData };
+      setContributorDetailsFormData(combinedData);
+      reset(combinedData);
+
+      if (shouldClose) {
+        handleCloseModal();
+      }
+    }
   }
 
   const handleCloseModal = () => {
-    reset();
+    reset(defaultContributorDetails);
+    setContributorDetailsFormData(defaultContributorDetails);
     props.handleClose();
   }
 
   useEffect(() => {
-    let data = { ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId };
+    // Only reset if the modal is being opened or if the passed-in data ID has changed significantly
+    if (props.open && (!contributorDetailsFormData.id || props.contributorDetailsFormData.id !== contributorDetailsFormData.id)) {
+      let data = { ...props.contributorDetailsFormData, prelimApplicationId: props.prelimApplicationId };
 
-    // Auto-set 'Sponsor' for the first record if name is empty
-    if (!data.name && (!contributorDetailsState.contributorDetails || contributorDetailsState.contributorDetails.length === 0)) {
-      data.name = 'Sponsor';
+      // Auto-set 'Sponsor' for the first record if name is empty
+      if (!data.name && (!contributorDetailsState.contributorDetails || contributorDetailsState.contributorDetails.length === 0)) {
+        data.name = 'Sponsor';
+      }
+
+      setContributorDetailsFormData(data)
+      reset(data);
     }
-
-    setContributorDetailsFormData(data)
-    reset(data);
-  }, [props.contributorDetailsFormData, props.open, contributorDetailsState.contributorDetails])
+  }, [props.contributorDetailsFormData, props.open])
 
   const percentageFields = ['percentOfCorpus', 'percentOfActualCorpusRaisedPrev'];
 
@@ -191,9 +205,12 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
   const isFirstTime = watch("isFirstTimeContributing");
 
   const onSubmit = (data: any) => {
-    console.log(data);
-    setContributorDetailsFormData(data);
-    handleSubmitForm();
+    // Determine if it was a 'Save' (close) or 'Submit' (stay open) based on the ID in state
+    const isUpdate = !!contributorDetailsFormData.id;
+    console.log("Submitting form. isUpdate:", isUpdate, "ID:", contributorDetailsFormData.id, "data:", data);
+
+    // Pass shouldClose based on whether it's an update
+    handleSubmitForm(data, isUpdate);
   };
 
   const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
@@ -412,32 +429,26 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
             </>
           )}
 
-          <Grid item xs={12}>
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-                  <Typography variant="body2" sx={{ mb: 1 }}>Letter Of Intent</Typography>
-                  <UploadComponents id={`contributorLetterOfIntent${contributorDetailsFormData.id || uuid()}`} signed={false} />
-                </Box>
+          {contributorDetailsFormData.id && (
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+                    <Typography variant="body2" sx={{ mb: 1 }}>Letter Of Intent</Typography>
+                    <UploadComponents id={`contributorLetterOfIntent${contributorDetailsFormData.id}`} signed={false} />
+                  </Box>
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
-
-          {/* <Grid item xs={12}>
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Supporting Documents</Typography>
-            <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-              <Typography variant="body2" sx={{ mb: 1 }}>Letter Of Intent For Each Contributor</Typography>
-              <UploadComponents id={`sdLetterOfIntent${contributorDetailsFormData.id || uuid()}`} signed={false} />
-            </Box>
-          </Grid> */}
+          )}
 
           <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
             <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
               Cancel
             </Button>
             <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
-              Submit
+              {contributorDetailsFormData.id ? "Save" : "Submit"}
             </Button>
           </Grid>
         </Grid>
