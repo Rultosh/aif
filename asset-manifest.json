@@ -1,22 +1,33 @@
 {
   "files": {
-    "main.css": "/vcf/static/css/main.57ba7985.css",
-    "main.js": "/vcf/static/js/main.6636c99d.js",
+    "main.css": "/vcf/static/css/main.fadfbe05.css",
+    "main.js": "/vcf/static/js/main.81551ca3.js",
     "static/js/787.51358596.chunk.js": "/vcf/static/js/787.51358596.chunk.js",
+    "static/media/login_videos.mp4": "/vcf/static/media/login_videos.7124616488525dc40951.mp4",
+    "static/media/signup_ai.jpeg": "/vcf/static/media/signup_ai.0145f0050347981ce5fb.jpeg",
+    "static/media/Poppins-Regular.ttf": "/vcf/static/media/Poppins-Regular.4211496d0e075ffe7c2f.ttf",
+    "static/media/Poppins-Medium.ttf": "/vcf/static/media/Poppins-Medium.c5eb70982e90502d0d01.ttf",
+    "static/media/Poppins-SemiBold.ttf": "/vcf/static/media/Poppins-SemiBold.090bd619384bb8d4c289.ttf",
+    "static/media/Poppins-Bold.ttf": "/vcf/static/media/Poppins-Bold.300a4da54f1e6258b6f7.ttf",
+    "static/media/Workflow.jpeg": "/vcf/static/media/Workflow.d328947de37207b42840.jpeg",
     "static/media/ffs_final_logo.png": "/vcf/static/media/ffs_final_logo.c901212437c02084e3ee.png",
     "static/media/logo.png": "/vcf/static/media/logo.3e734f47327c87f77f63.png",
     "static/media/logo_nps.png": "/vcf/static/media/logo_nps.617037e99183a3902fb4.png",
-    "static/media/email.svg": "/vcf/static/media/email.65856aadb519b42d5169f9b7aa41129f.svg",
+    "static/media/setting.svg": "/vcf/static/media/setting.546055f1fe33dcc597c8a96f1932faad.svg",
+    "static/media/hide.svg": "/vcf/static/media/hide.d0319bd5a15d6851cc842905708fde06.svg",
+    "static/media/view.svg": "/vcf/static/media/view.be50200984e14c97f934a9f336b85afd.svg",
+    "static/media/email_list.svg": "/vcf/static/media/email_list.0bc8837b92fd146105ecf1350448fbc6.svg",
+    "static/media/history.svg": "/vcf/static/media/history.7de436fccd33f3cb3031552c33f34925.svg",
+    "static/media/user.svg": "/vcf/static/media/user.9a16c19dc267f254fc270860c8c3525d.svg",
     "index.html": "/vcf/index.html",
     "static/media/arrow_sign_in.svg": "/vcf/static/media/arrow_sign_in.5b18f91415abd8ee3045.svg",
     "static/media/arrow_check_eligibility.svg": "/vcf/static/media/arrow_check_eligibility.d38c700522abe43e21f1.svg",
-    "static/media/list.svg": "/vcf/static/media/list.19bed99baaea1ab3f9f3d81c7a92f3a5.svg",
-    "main.57ba7985.css.map": "/vcf/static/css/main.57ba7985.css.map",
-    "main.6636c99d.js.map": "/vcf/static/js/main.6636c99d.js.map",
+    "main.fadfbe05.css.map": "/vcf/static/css/main.fadfbe05.css.map",
+    "main.81551ca3.js.map": "/vcf/static/js/main.81551ca3.js.map",
     "787.51358596.chunk.js.map": "/vcf/static/js/787.51358596.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.57ba7985.css",
-    "static/js/main.6636c99d.js"
+    "static/css/main.fadfbe05.css",
+    "static/js/main.81551ca3.js"
   ]
 }
