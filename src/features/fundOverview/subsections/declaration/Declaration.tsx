@@ -208,12 +208,14 @@ const Declaration = (props: any) => {
                                         {
                                             id: "kycBoardDirectors",
                                             text: "1. Details and KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment Management Team to be provided in the format attached in Annexure I and Annexure II. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address: permanent and correspondent), Two passport size photograph for purpose of KYC.",
-                                            templateLabel: "Download Template"
+                                            templateLabel: "Download Template",
+                                            href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip"
                                         },
                                         {
                                             id: "boardResolution",
                                             text: "2. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM",
-                                            templateLabel: "Download Template"
+                                            templateLabel: "Download Template",
+                                            href: "/vcf/templates/Annexure_II_KYC_Form.xlsx"
                                         }
                                     ].map((item, index) => (
                                         <Box key={item.id} sx={{ mb: index === 0 ? 4 : 0, p: 2, borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'rgba(0,0,0,0.01)' }}>
@@ -225,6 +227,7 @@ const Declaration = (props: any) => {
                                                     variant="outlined"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
+                                                    href={item.href}
                                                     sx={{
                                                         textTransform: 'none',
                                                         borderRadius: '6px',
@@ -333,7 +336,7 @@ const Declaration = (props: any) => {
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
-                                                    href="/templates/SASF_Fund Track Record Template.xlsx"
+                                                    href="/vcf/templates/Past_Track_Record_Template.docx"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
                                                     sx={{

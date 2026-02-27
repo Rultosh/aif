@@ -192,6 +192,8 @@ export const Home = (pros: any) => {
 
         const stageDescription = stage === "PRELIM" ? "Preliminary application" : "Detailed application";
 
+        if(stage !== "PRELIM") return "Approved.";
+
         switch (status) {
             case "CREATED":
                 return "Pending submission";
@@ -276,11 +278,12 @@ export const Home = (pros: any) => {
                                                     transition: 'background-color 0.2s ease'
                                                 }}
                                             >
-                                                {row.stage === "PRELIM" ? <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
-                                                    {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/selfrating`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+                                                {row.stage === "PRELIM" ? 
+                                                    <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
+                                                        {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/selfrating`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
                                                     {/* {isGoodToShowApplication(row) ? <a href={`#/preliminary/${row.id}/${String(getPath(row.status))}`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>} */}
                                                 </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
-                                                    {isGoodToShowApplication(row) ? <a href={`#/detailed/${row.detailedApplicationId}/SidbiReference`} style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+                                                    {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
                                                 </TableCell>}
                                                 <TableCell align="center" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
                                                 <TableCell align="center" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
