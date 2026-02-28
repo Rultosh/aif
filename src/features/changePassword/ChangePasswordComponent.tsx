@@ -240,7 +240,7 @@ const ChangePassword = (props:any) => {
                                         </Grid>
                                         
                                     </Box>
-                                    <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, email us at vcfapplication@sidbi.in</Typography>
+                                    <Typography sx={{ flex: 1, mt: '10px', textAlign: "center" }}>For any help, email us at aif.investment@npstrust.org.in</Typography>
                                 </CardContent>
 
                             </Card>

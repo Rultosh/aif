@@ -67,7 +67,7 @@ const Landing = () => {
             if (['USERADMIN'].includes(usersState.role)) {
                 navigate('/admin');
             } else if (['ADMIN'].includes(usersState.role)) {
-                navigate('/preliminary/15/preview');
+                navigate('/home');
             } else {
                 navigate('/home');
             }

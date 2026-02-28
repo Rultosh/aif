@@ -139,7 +139,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     amountInvested: Yup.number().typeError("Must be a number").required("Amount is required"),
     dateOfInvestment: Yup.string().required("Date of investment is required").nullable(),
     dateofExitorWriteOff: Yup.string().required("Date of exit or write off is required").nullable(),
-    exitOrWriteOff: Yup.string().required("Required").nullable(),
+    // exitOrWriteOff: Yup.string().required("Required").nullable(),
     moic: Yup.string().required("MOIC is required").nullable(),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
     comment: Yup.string().required("Comment on the Exit/Write off Process is required").nullable(),
@@ -158,6 +158,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     resolver: yupResolver(investmentValidationSchema),
   });
 
+  console.log("Submit Error", leadErrors);
+
   const {
     control: nonLeadControl,
     register: nonLeadRegister,
@@ -168,6 +170,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   } = useForm({
     resolver: yupResolver(investmentValidationSchema),
   });
+
+  console.log("Submit Error", leadErrors);
 
   const onLeadSubmit = (data: any) => {
     const payload = { ...data, teamMemberId: Number(investmentPartnerFormData.id) };

@@ -193,7 +193,7 @@ const ResetPassword = () => {
                             <Divider sx={{ my: 4 }} />
 
                             <Typography variant="body2" sx={{ color: '#666666', textAlign: 'center' }}>
-                                Need help? Contact us at <Link href="mailto:vcfapplication@sidbi.in" sx={{ color: '#FF671F', textDecoration: 'none', fontWeight: 600 }}>vcfapplication@sidbi.in</Link>
+                                Need help? Contact us at <Link href="mailto:aif.investment@npstrust.org.in" sx={{ color: '#FF671F', textDecoration: 'none', fontWeight: 600 }}>aif.investment@npstrust.org.in</Link>
                             </Typography>
                         </Box>
                     </CardContent>
