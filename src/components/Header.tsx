@@ -113,7 +113,7 @@ const Header = (props: any) => {
                       </>
                     )}
 
-                    <Link
+                    {/* <Link
                       to="/setPassword"
                       style={{
                         cursor: 'pointer',
@@ -124,7 +124,7 @@ const Header = (props: any) => {
                       }}
                     >
                       Reset Password
-                    </Link>
+                    </Link> */}
 
                     <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
                     {/* <Box component="span" sx={{ opacity: 0.6, color: '#ffffff', fontSize: '18px' }}>|</Box> */}

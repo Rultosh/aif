@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import {questions} from '../eligibilityQuesioner/elegibilityQuestions'
 
 type InitialState = {
 
@@ -34,17 +35,47 @@ const eligibilityResultsSlice = createSlice({
   initialState,
   reducers: {
     updateResults:  (state, action: PayloadAction<resultSchema>) => {
-    
+
+      console.log(action.payload)
+      
       for (let id in action.payload){
-        if(action.payload[id as keyof resultSchema] === 'no'){
-          console.log("not eligible")
-          state.eligibleToApply= false;
-          break
+        
+        // if(action.payload[id as keyof resultSchema] === 'no'){
+        //   console.log("not eligible")
+        //   state.eligibleToApply= false;
+        //   break
+        // }
+        // else{
+        //   console.log("eligible")
+        //   state.eligibleToApply= true;
+        // }
+
+        state.eligibleToApply = true;
+
+        try {
+          console.log(action.payload[id as keyof resultSchema])
+          console.log(questions.eligibilityQuestions
+              ['Fund of funds'])
+          console.log(questions.eligibilityQuestions
+              ['Fund of funds']
+              [Number(id as keyof resultSchema) - 1]
+                .elibibleOptions)
+          console.log(questions.eligibilityQuestions
+              ['Fund of funds']
+              [Number(id as keyof resultSchema) - 1]
+                .elibibleOptions.includes(action.payload[id as keyof resultSchema]))
+
+          if(!questions.eligibilityQuestions
+              ['Fund of funds']
+              [Number(id as keyof resultSchema) - 1]
+                .elibibleOptions.includes(action.payload[id as keyof resultSchema])) {
+              state.eligibleToApply = false;
+              break; 
+          }  
+        } catch(ex) {
+          console.error(ex);
         }
-        else{
-          console.log("eligible")
-          state.eligibleToApply= true;
-        }
+        
       }
       state.loading = false;
     },
