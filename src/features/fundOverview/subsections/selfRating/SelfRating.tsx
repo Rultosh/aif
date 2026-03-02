@@ -253,7 +253,10 @@ export const SelfRating = (props: any) => {
                         transition: 'transform 0.2s, box-shadow 0.2s',
                         '&:hover': {
                             transform: 'translateY(-2px)',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                            '& .question-text': {
+                                color: '#FF671F'
+                            }
                         }
                     }}>
                         <CardContent sx={{ p: 3, width: '100%' }}>
@@ -261,7 +264,7 @@ export const SelfRating = (props: any) => {
                                 <Grid item xs={12}>
                                     <FormControl fullWidth>
                                         <Box sx={{ mb: 2 }}>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062' }}>
+                                            <Typography variant="subtitle1" className="question-text" sx={{ fontWeight: 700, color: '#000000', transition: 'color 0.2s ease' }}>
                                                 {qes}
                                             </Typography>
                                         </Box>
@@ -277,7 +280,12 @@ export const SelfRating = (props: any) => {
                                                     <FormControlLabel
                                                         onChange={() => calculateScore(selfQuestions[i], val, idxVal)}
                                                         value={val}
-                                                        control={<Radio color="primary" />}
+                                                        control={<Radio sx={{
+                                                            color: 'primary',
+                                                            '&.Mui-checked': {
+                                                                color: '#FF671F',
+                                                            },
+                                                        }} />}
                                                         label={<Typography variant="body2">{val}</Typography>}
                                                     />
                                                 </Grid>
@@ -353,13 +361,13 @@ export const SelfRating = (props: any) => {
             <Card sx={{
                 display: 'flex',
                 mb: 3,
-                borderRadius: '16px',
+                borderRadius: '6px',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 border: '1px solid rgba(0,0,0,0.05)'
             }}>
                 <CardContent sx={{ p: 4, width: '100%' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062' }}>
+                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#1842B6' }}>
                             Initial Assessment
                         </Typography>
 
@@ -406,7 +414,7 @@ export const SelfRating = (props: any) => {
                                     backgroundColor: 'rgba(54, 48, 98, 0.02)',
                                     border: '1px dashed rgba(54, 48, 98, 0.2)'
                                 }}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062' }}>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
                                         First Time Fund Manager?
                                     </Typography>
                                     <FormControlLabel
@@ -418,10 +426,21 @@ export const SelfRating = (props: any) => {
                                                     handleChangeFundManagerType({ target: { name: "managerType", value } });
                                                 }}
                                                 color="primary"
+                                                sx={{
+                                                    '& .MuiSwitch-switchBase': {
+                                                        color: '#FF671F',
+                                                    },
+                                                    '& .MuiSwitch-switchBase.Mui-checked': {
+                                                        color: '#FF671F',
+                                                    },
+                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                        backgroundColor: '#FF671F',
+                                                    },
+                                                }}
                                             />
                                         }
                                         label={
-                                            <Typography variant="body2" sx={{ fontWeight: 600, color: managerType === "First Time Fund Manager" || !managerType ? '#363062' : '#666' }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 600, color: managerType === "First Time Fund Manager" || !managerType ? '#000000' : '#666' }}>
                                                 {managerType === "First Time Fund Manager" || !managerType ? "Yes" : "No"}
                                             </Typography>
                                         }
@@ -470,11 +489,11 @@ export const SelfRating = (props: any) => {
                                     startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
                                     sx={{
                                         textTransform: 'none',
-                                        borderRadius: '8px',
+                                        borderRadius: '6px',
                                         px: 6,
                                         py: 1.5,
                                         fontWeight: 700,
-                                        backgroundColor: '#363062',
+                                        backgroundColor: '#FF671F',
                                         color: 'white',
                                         boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                         '&:hover': {
@@ -494,11 +513,11 @@ export const SelfRating = (props: any) => {
                                     disabled={isLoading}
                                     sx={{
                                         textTransform: 'none',
-                                        borderRadius: '8px',
+                                        borderRadius: '6px',
                                         px: 4,
                                         py: 1.5,
                                         fontWeight: 700,
-                                        backgroundColor: '#363062',
+                                        backgroundColor: '#FF671F',
                                         color: 'white',
                                         boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                         '&:hover': {
@@ -536,7 +555,7 @@ export const SelfRating = (props: any) => {
                         width: isLoading ? '80px' : '48px',
                         height: '48px',
                         borderRadius: '12px 0 0 12px',
-                        backgroundColor: '#363062',
+                        backgroundColor: '#FF671F',
                         color: 'white',
                         transition: 'all 0.3s ease',
                         boxShadow: '-2px 0 10px rgba(54, 48, 98, 0.3)',
@@ -564,7 +583,7 @@ export const SelfRating = (props: any) => {
                     }
                 }}
             >
-                <DialogTitle sx={{ fontWeight: 800, color: '#363062', pb: 1 }}>
+                <DialogTitle sx={{ fontWeight: 800, color: '#000000', pb: 1 }}>
                     {modalType === 'success' ? 'Assessment Successful' : 'Assessment Result'}
                 </DialogTitle>
                 <DialogContent>
@@ -585,11 +604,11 @@ export const SelfRating = (props: any) => {
                             variant="contained"
                             sx={{
                                 textTransform: 'none',
-                                borderRadius: '8px',
+                                borderRadius: '6px',
                                 px: 3,
                                 py: 1,
                                 fontWeight: 700,
-                                backgroundColor: '#363062'
+                                backgroundColor: '#FF671F'
                             }}
                         >
                             Continue to Fund Overview
@@ -600,12 +619,12 @@ export const SelfRating = (props: any) => {
                             variant="outlined"
                             sx={{
                                 textTransform: 'none',
-                                borderRadius: '8px',
+                                borderRadius: '6px',
                                 px: 4,
                                 py: 1,
                                 fontWeight: 700,
-                                color: '#363062',
-                                borderColor: '#363062'
+                                color: '#000000',
+                                borderColor: '#FF671F'
                             }}
                         >
                             OK

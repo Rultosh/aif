@@ -206,7 +206,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     }).nullable(),
     moic: Yup.string().required("MOIC is required").nullable(),
     grossIrr: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Gross IRR is required").nullable(),
-    timeTakenFromSourcingToClosure: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Time taken from sourcing to closure is required").nullable(),
+    timeTakenFromSourcingToClosure: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Time taken from sourcing to closure is required").min(0, "Time cannot be negative").nullable(),
     // conflictOfInterest: Yup.string().required("Conflict of Interest is required").nullable(),
     stakeOfEmployee: Yup.string().nullable(),
     investmentStageFundingRound: Yup.string().required("Investment Stage / Funding Round is required").nullable(),
@@ -528,6 +528,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               type="number"
               id="timeTakenFromSourcingToClosure"
               label="Time Taken From Sourcing To Closure (In Months)"
+              inputProps={{ min: 0 }}
               value={investmentPastFormData.timeTakenFromSourcingToClosure || ''}
               {...register("timeTakenFromSourcingToClosure")}
               error={!!errors.timeTakenFromSourcingToClosure}

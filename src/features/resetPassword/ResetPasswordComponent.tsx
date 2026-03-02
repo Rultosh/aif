@@ -34,15 +34,33 @@ const ResetPassword = () => {
     const dispatch = useAppDispatch()
     const [formData, setFormData] = useState(defaultIResetPassword);
     const state = useAppSelector(selectedforgotPassword)
+    console.log("state", state)
     const [emailSent, setEmailSent] = useState(false);
+    const [error, setError] = useState<string>("");
+    const [serverError, setServerError] = useState<string>("");
 
-    function handleSubmitForm() {
-        setEmailSent(true)
-        dispatch(
-            resetUserPasswordAsync(
-                wrapArgument(actionUid, formData)
-            )
-        )
+    async function handleSubmitForm() {
+        // clear previous errors
+        setError("");
+        setServerError("");
+
+        if (!formData["username"] || formData["username"].trim() === "") {
+            setError("Email address is required");
+            return;
+        }
+
+        try {
+            await dispatch(
+                resetUserPasswordAsync(
+                    wrapArgument(actionUid, formData)
+                )
+            ).unwrap();
+            // only mark sent when request succeeds
+            setEmailSent(true);
+        } catch (err: any) {
+            // display error above the button
+            setServerError(err?.message || err || "Failed to send reset email");
+        }
     }
 
     const handleChange = (ev: any) => {
@@ -144,8 +162,19 @@ const ResetPassword = () => {
                                             onChange={handleChange}
                                             placeholder="Enter your email"
                                             sx={fieldSx}
+                                            error={!!error}
+                                            helperText={error}
                                         />
                                     </Grid>
+
+                                    {/* show server-side error message above the button */}
+                                    {serverError && (
+                                        <Grid item xs={12}>
+                                            <Typography sx={{ color: '#d32f2f', textAlign: 'left' }}>
+                                                {serverError}
+                                            </Typography>
+                                        </Grid>
+                                    )}
 
                                     <Grid item xs={12}>
                                         <Button
@@ -167,14 +196,6 @@ const ResetPassword = () => {
                                             Send Email
                                         </Button>
                                     </Grid>
-
-                                    {state.response_resetPassword && (
-                                        <Grid item xs={12}>
-                                            <Typography sx={{ color: '#000', textAlign: 'center', mt: 2 }}>
-                                                {state.response_resetPassword}
-                                            </Typography>
-                                        </Grid>
-                                    )}
                                 </Grid>
                             ) : (
                                 <Box sx={{ textAlign: 'center', py: 4 }}>

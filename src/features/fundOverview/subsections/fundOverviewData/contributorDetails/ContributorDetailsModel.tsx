@@ -173,7 +173,13 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    amount: Yup.string().required("Amount is required"),
+    amount: Yup.string()
+      .required("Amount is required")
+      .test("amount-not-negative", "Amount cannot be negative", function (value: any) {
+        if (!value) return true;
+        const num = parseFloat(value);
+        return !isNaN(num) && num >= 0;
+      }),
     percentOfCorpus: Yup.string().required("Percent Of Corpus is required"),
     contributionType: Yup.string().required("Contribution Type is required"),
     categoryOfContributor: Yup.string().required("Category of Contributor is required"),
@@ -181,11 +187,28 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     isFirstTimeContributing: Yup.string().required("This field is required"),
     amountContributedPrev: Yup.string().when('isFirstTimeContributing', {
       is: 'No',
-      then: Yup.string().required("Amount Contributed is required"),
+      then: Yup.string()
+        .required("Amount Contributed is required")
+        .test("amount-contributed-not-negative", "Amount cannot be negative", function (value: any) {
+          if (!value) return true;
+          const num = parseFloat(value);
+          return !isNaN(num) && num >= 0;
+        }),
     }),
     percentOfActualCorpusRaisedPrev: Yup.string().when('isFirstTimeContributing', {
       is: 'No',
-      then: Yup.string().required("% of Actual Corpus raised is required"),
+      then: Yup.string()
+        .required("% of Actual Corpus raised is required")
+        .test("percentage-not-negative", "Percentage cannot be negative", function (value: any) {
+          if (!value) return true;
+          const num = parseFloat(value);
+          return !isNaN(num) && num >= 0;
+        })
+        // .test("percentage-not-exceeded", "Percentage cannot exceed 100", function (value: any) {
+        //   if (!value) return true;
+        //   const num = parseFloat(value);
+        //   return !isNaN(num) && num <= 100;
+        // }),
     }),
   });
 
@@ -257,6 +280,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               type='number'
               id="amount"
               label="Commitment Amount (₹ Crore)"
+              inputProps={{ min: 0 }}
               value={contributorDetailsFormData.amount || ''}
               {...register("amount")}
               error={!!errors.amount}
@@ -398,8 +422,10 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
+                  type='number'
                   id="amountContributedPrev"
                   label="Amount Contributed In Last Fund"
+                  inputProps={{ min: 0 }}
                   value={contributorDetailsFormData.amountContributedPrev || ''}
                   {...register("amountContributedPrev")}
                   error={!!errors.amountContributedPrev}
@@ -413,8 +439,10 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
+                  type="number"
                   id="percentOfActualCorpusRaisedPrev"
                   label="% Of Actual Corpus Raised In Last Fund"
+                  inputProps={{ min: 0 }}
                   value={contributorDetailsFormData.percentOfActualCorpusRaisedPrev || ''}
                   {...register("percentOfActualCorpusRaisedPrev")}
                   error={!!errors.percentOfActualCorpusRaisedPrev}
