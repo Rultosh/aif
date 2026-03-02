@@ -106,7 +106,7 @@ export const FundOverview = (props: any) => {
         <Container maxWidth="xl" sx={{ pt: '90px', pb: '50px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '30px' }}>
                 <Box>
-                    {/* <Typography variant="h5" sx={{ fontWeight: 700, color: '#363062', mb: 0.5 }}>
+                    {/* <Typography variant="h5" sx={{ fontWeight: 700, color: '#1842B6', mb: 0.5 }}>
                         {pageTitle}
                     </Typography> */}
                     <Breadcrumbs aria-label="breadcrumb">
@@ -126,7 +126,7 @@ export const FundOverview = (props: any) => {
                             Application
                         </LinkMui>
                         <Typography variant="body2"
-                            sx={{ color: '#363062', fontWeight: 600, display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
+                            sx={{ color: '#1842B6', fontWeight: 600, display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
                         >
                             {currentStep}
                         </Typography>
@@ -154,7 +154,7 @@ export const FundOverview = (props: any) => {
                             const isDisabled = (isNew && isPending) || (isFailed && isPending);
 
                             // Colors from reference
-                            const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#363062' : '#818181');
+                            const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#1842B6' : '#818181');
 
                             return (
                                 <Box

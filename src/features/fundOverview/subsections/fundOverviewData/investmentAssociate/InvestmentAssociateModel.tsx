@@ -280,7 +280,11 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
       .nullable(),
     name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    age: Yup.string().required("Age is required"),
+    age: Yup.number()
+      .typeError("Age must be a number")
+      .min(0, "Age cannot be negative")
+      .required("Age is required")
+      .nullable(),
     qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     investmentExperience: Yup.string().required("VC/PE Experience is required").nullable(),
     description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
@@ -394,6 +398,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 type="number"
                 id="age"
                 label="Age"
+                inputProps={{ min: 0 }}
                 value={investmentAssociateFormData.age || ''}
                 {...register("age")}
                 error={!!errors.age}

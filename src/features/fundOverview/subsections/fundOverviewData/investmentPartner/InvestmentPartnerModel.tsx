@@ -136,7 +136,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
 
   const investmentValidationSchema = Yup.object().shape({
     nameOfCompany: Yup.string().required("Name of company is required").nullable(),
-    amountInvested: Yup.number().typeError("Must be a number").required("Amount is required"),
+    amountInvested: Yup.number().typeError("Must be a number").required("Amount is required").min(0, "Amount cannot be negative"),
     dateOfInvestment: Yup.string().required("Date of investment is required").nullable(),
     dateofExitorWriteOff: Yup.string().required("Date of exit or write off is required").nullable(),
     exitOrWriteOff: Yup.string().required("Required").nullable(),
@@ -266,12 +266,17 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       .nullable(),
     name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    age: Yup.string().required("Age is required").nullable(),
+    age: Yup.number()
+      .typeError("Age must be a number")
+      .min(0, "Age cannot be negative")
+      .required("Age is required")
+      .nullable(),
     qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     description: Yup.string().required("Brief details of VC/PE Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     vcpeExperience: Yup.string().required("VC/PE Experience is required").nullable(),
     areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    yearsWorkedTogether: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("No. Of Years Worked Together Among Partners is required"),
+    yearsWorkedTogether: Yup.number().transform((val) => (isNaN(val) ? undefined : val))
+      .min(0, "Years worked together cannot be negative").required("No. Of Years Worked Together Among Partners is required"),
     legalCasesPending: Yup.string().required("Details Of Legal Cases Pending If Any In Court Of Law is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
   });
 
@@ -394,6 +399,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 type="number"
                 id="age"
                 label="Age"
+                inputProps={{ min: 0 }}
                 value={investmentPartnerFormData.age || ''}
                 {...register("age")}
                 error={!!errors.age}
@@ -487,6 +493,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 type="number"
                 id="yearsWorkedTogether"
                 label="No. Of Years Worked Together Among Partners"
+                inputProps={{ min: 0 }}
                 value={investmentPartnerFormData.yearsWorkedTogether || ''}
                 {...register("yearsWorkedTogether")}
                 error={!!errors.yearsWorkedTogether}
@@ -553,6 +560,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         type="number"
                         label="Amount Invested (₹ Crore)"
                         size="small"
+                        inputProps={{ min: 0 }}
                         {...leadRegister("amountInvested")}
                         error={!!leadErrors.amountInvested}
                         helperText={leadErrors.amountInvested?.message as string}
@@ -777,6 +785,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         type="number"
                         label="Amount Invested (₹ Crore)"
                         size="small"
+                        inputProps={{ min: 0 }}
                         {...nonLeadRegister("amountInvested")}
                         error={!!nonLeadErrors.amountInvested}
                         helperText={nonLeadErrors.amountInvested?.message as string}

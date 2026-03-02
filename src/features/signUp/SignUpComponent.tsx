@@ -180,7 +180,10 @@ const SignUp = () => {
             .string()
             .matches(/^[A-Za-z ]*$/, 'Please enter valid contact person')
             .required("Contact Person is required"),
-        sebiRegistrationDate: Yup.date().nullable().required("SEBI Registration Date is required"),
+        sebiRegistrationDate: Yup.date()
+            .nullable()
+            .max(new Date(), "SEBI Registration Date cannot be a future date")
+            .required("SEBI Registration Date is required"),
         username: Yup
             .string()
             .required("Email is required")
@@ -357,6 +360,8 @@ const SignUp = () => {
                                                 {...field}
                                                 label="SEBI - Registration Date"
                                                 inputFormat='DD/MM/YYYY'
+                                                disableFuture
+                                                maxDate={dayjs()}
                                                 onChange={(newValue) => field.onChange(newValue)}
                                                 renderInput={(params) => (
                                                     <TextField
