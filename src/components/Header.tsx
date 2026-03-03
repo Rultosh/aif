@@ -41,7 +41,7 @@ const Header = (props: any) => {
     window.location.reload(); // Hard reload to clear all state if no logout action is available
   }
 
-  const navItems = ['FAQs', 'Help', 'vcfapplication@sidbi.in'];
+  const navItems = ['FAQs', 'Help', 'aif.investment@npstrust.org.in'];
   let count = 0;
   return (
     <>
@@ -113,7 +113,7 @@ const Header = (props: any) => {
                       </>
                     )}
 
-                    <Link
+                    {/* <Link
                       to="/setPassword"
                       style={{
                         cursor: 'pointer',
@@ -124,7 +124,7 @@ const Header = (props: any) => {
                       }}
                     >
                       Reset Password
-                    </Link>
+                    </Link> */}
 
                     <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
                     {/* <Box component="span" sx={{ opacity: 0.6, color: '#ffffff', fontSize: '18px' }}>|</Box> */}
@@ -159,14 +159,14 @@ const Header = (props: any) => {
                       onClose={() => setAnchorEl(null)}
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                      PaperProps={{ sx: { zIndex: 2000 } }}
+                      // PaperProps={{ sx: { zIndex: 2000 } }}
                       MenuListProps={{
                         'aria-labelledby': 'user-avatar-button',
                       }}
-                      slotProps={{
-                        paper: {
+                        PaperProps={{
                           elevation: 0,
                           sx: {
+                            zIndex: 2000,
                             overflow: 'visible',
                             filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                             mt: 1.5,
@@ -189,8 +189,7 @@ const Header = (props: any) => {
                               zIndex: 0,
                             },
                           },
-                        },
-                      }}
+                        }}
                     >
                       <MenuItem onClick={() => { setAnchorEl(null); handleLogout(); }}>Logout</MenuItem>
                     </Menu>

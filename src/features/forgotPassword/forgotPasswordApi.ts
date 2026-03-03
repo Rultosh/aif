@@ -26,8 +26,8 @@ export function resetForgotPassword(email:IResetPassword) {
 }
 
 export function changePassword(passwordDetails:IChangePassword) {
-  passwordDetails.oldPasswordWithSaltAndIv = encryptData(passwordDetails.oldPassword);
-  passwordDetails.oldPassword = undefined;
+  // passwordDetails.oldPasswordWithSaltAndIv = encryptData(passwordDetails.oldPassword);
+  // passwordDetails.oldPassword = undefined;
   passwordDetails.passwordWithSaltAndIv = encryptData(passwordDetails.password);
   passwordDetails.password = undefined;
   passwordDetails.matchingPassword = undefined;

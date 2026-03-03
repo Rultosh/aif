@@ -26,7 +26,6 @@ const EligibilityResults = () => {
 
     useEffect(() => {
         dispatch(updateResults(tempRes))
-
     }, [])
 
     let resultTextSuccess = {

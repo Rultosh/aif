@@ -9,13 +9,14 @@ import loginIconImg from '../../images/aif_login_icon.png'
 import uuid from "react-uuid";
 import { useEffect, useState } from "react";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
-import { setUserPasswordAsync, selectedforgotPassword } from './forgotPasswordSlice'
+import { setUserPasswordAsync, selectedforgotPassword, changeUserPasswordAsync } from './forgotPasswordSlice'
 import { defaultIForgotPassword } from './IForgotPassword'
 import { ModalComponent } from '../../components/ModalComponent'
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import signupBg from '../../images/signup_ai.jpeg';
 import viewIcon from '../../images/view.svg';
 import hideIcon from '../../images/hide.svg';
+import { defaultIChangePassword } from "../changePassword/IChangePassword";
 
 const ForgotPassword = () => {
     const fieldSx = {
@@ -55,11 +56,21 @@ const ForgotPassword = () => {
     function handleSubmitForm() {
         setPasswordSet(true)
         setShowResponse(true)
-        dispatch(
-            setUserPasswordAsync(
-                wrapArgument(actionUid, formData)
+        if(token) {
+            dispatch(
+                setUserPasswordAsync(
+                    wrapArgument(actionUid, formData)
+                )
             )
-        )
+        } else {
+            dispatch(
+                changeUserPasswordAsync(
+                    wrapArgument(actionUid, 
+                        {...defaultIChangePassword, 
+                            passwordWithSaltAndIv: formData.passwordWithSaltAndIv})
+                )
+            )
+        }
     }
 
     const handleChange = (ev: any) => {
@@ -258,7 +269,7 @@ const ForgotPassword = () => {
                             <Divider sx={{ my: 4 }} />
 
                             <Typography variant="body2" sx={{ color: '#666666', textAlign: 'center' }}>
-                                Need help? Contact us at <Link href="mailto:vcfapplication@sidbi.in" sx={{ color: '#FF671F', textDecoration: 'none', fontWeight: 600 }}>vcfapplication@sidbi.in</Link>
+                                Need help? Contact us at <Link href="mailto:aif.investment@npstrust.org.in" sx={{ color: '#FF671F', textDecoration: 'none', fontWeight: 600 }}>aif.investment@npstrust.org.in</Link>
                             </Typography>
                         </Box>
                     </CardContent>
