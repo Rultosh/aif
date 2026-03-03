@@ -204,11 +204,11 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
           const num = parseFloat(value);
           return !isNaN(num) && num >= 0;
         })
-        // .test("percentage-not-exceeded", "Percentage cannot exceed 100", function (value: any) {
-        //   if (!value) return true;
-        //   const num = parseFloat(value);
-        //   return !isNaN(num) && num <= 100;
-        // }),
+      // .test("percentage-not-exceeded", "Percentage cannot exceed 100", function (value: any) {
+      //   if (!value) return true;
+      //   const num = parseFloat(value);
+      //   return !isNaN(num) && num <= 100;
+      // }),
     }),
   });
 
@@ -236,7 +236,27 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     handleSubmitForm(data, isUpdate);
   };
 
-  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
+  const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#FF671F',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#FF671F',
+      },
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#FF671F',
+    },
+  };
+
+  const controlSx = {
+    color: '#FF671F',
+    '&.Mui-checked': {
+      color: '#FF671F',
+    },
+  };
 
   return <Modal
     open={props.open}
@@ -245,7 +265,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     aria-describedby="modal-modal-description"
   >
     <Box sx={style}>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details Of Contributor To The Fund</Typography>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details Of Contributor To The Fund</Typography>
       <Box component="form">
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
@@ -317,7 +337,9 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth variant="outlined" error={!!errors.contributionType} sx={fieldSx}>
-              <InputLabel id="contributionType-label">Type</InputLabel>
+              <InputLabel id="contributionType-label" sx={{
+                '&.Mui-focused': { color: '#FF671F' }
+              }}>Type</InputLabel>
               <Controller
                 name="contributionType"
                 control={control}
@@ -341,7 +363,9 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth variant="outlined" error={!!errors.categoryOfContributor} sx={fieldSx}>
-              <InputLabel id="categoryOfContributor-label">Category Of Contributor</InputLabel>
+              <InputLabel id="categoryOfContributor-label" sx={{
+                '&.Mui-focused': { color: '#FF671F' }
+              }}>Category Of Contributor</InputLabel>
               <Controller
                 name="categoryOfContributor"
                 control={control}
@@ -408,8 +432,8 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                       setContributorDetailsFormData(prev => ({ ...prev, isFirstTimeContributing: e.target.value }));
                     }}
                   >
-                    <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
-                    <FormControlLabel value="No" control={<Radio />} label="No" />
+                    <FormControlLabel value="Yes" control={<Radio sx={controlSx} />} label="Yes" />
+                    <FormControlLabel value="No" control={<Radio sx={controlSx} />} label="No" />
                   </RadioGroup>
                 )}
               />
@@ -475,7 +499,14 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
             <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
+            <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{
+              borderRadius: '8px', textTransform: 'none', backgroundColor: '#FF671F',
+              '&:hover': {
+                border: '1px solid #FF671F',
+                color: '#FF671F',
+                backgroundColor: 'rgb(255 103 30 / 19%)'
+              }
+            }} >
               {contributorDetailsFormData.id ? "Save" : "Save"}
             </Button>
           </Grid>

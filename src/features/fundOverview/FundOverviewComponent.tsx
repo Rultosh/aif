@@ -21,6 +21,7 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import GridViewIcon from '@mui/icons-material/GridView';
+import signupBg from '../../images/signup_ai.jpeg';
 
 export const FundOverview = (props: any) => {
     // let { shoppingList } = useContext(UserContext);
@@ -103,122 +104,139 @@ export const FundOverview = (props: any) => {
     // const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 
     return (
-        <Container maxWidth="xl" sx={{ pt: '90px', pb: '50px' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '30px' }}>
-                <Box>
-                    {/* <Typography variant="h5" sx={{ fontWeight: 700, color: '#1842B6', mb: 0.5 }}>
+        <>
+            <Container maxWidth="xl" sx={{ pt: '90px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '30px' }}>
+                    <Box>
+                        {/* <Typography variant="h5" sx={{ fontWeight: 700, color: '#1842B6', mb: 0.5 }}>
                         {pageTitle}
                     </Typography> */}
-                    <Breadcrumbs aria-label="breadcrumb">
-                        <LinkMui
-                            sx={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
-                            color="inherit"
-                            href="#/home"
-                        >
-                            <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-                            Home
-                        </LinkMui>
-                        <LinkMui
-                            sx={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
-                            color="inherit"
-                            href="#/home"
-                        >
-                            Application
-                        </LinkMui>
-                        <Typography variant="body2"
-                            sx={{ color: '#1842B6', fontWeight: 600, display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
-                        >
-                            {currentStep}
-                        </Typography>
-                    </Breadcrumbs>
-                </Box>
-                {/* <Box>
+                        <Breadcrumbs aria-label="breadcrumb">
+                            <LinkMui
+                                sx={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
+                                color="inherit"
+                                href="#/home"
+                            >
+                                <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+                                Home
+                            </LinkMui>
+                            <Typography variant="body2"
+                                sx={{ color: '#000080', fontWeight: 600, display: 'flex', alignItems: 'center', fontSize: '0.85rem' }}
+                            >
+                                {currentStep}
+                            </Typography>
+                        </Breadcrumbs>
+                    </Box>
+                    {/* <Box>
                     <Button variant="contained" sx={{ backgroundColor: '#34344b', color: 'white', fontWeight: 600, textTransform: 'capitalize' }} startIcon={<KeyboardDoubleArrowLeftIcon />} className='btn-dark' href="#/home">Back To Application List</Button>
                 </Box> */}
-            </Box>
-            <Box sx={{ flexGrow: 1 }}>
-                {/* Chevron Stepper */}
-                {!['USERADMIN', 'ADMIN'].includes(usersState.role || '') && (
-                    <Box sx={{ width: '100%', mb: 2, display: 'flex', gap: 0.5 }}>
-                        {filteredSteps.map((s, index, array) => {
-                            const isNew = id?.toString() === 'NEW';
-                            const score = Number(selfRatingState.selfRatings.score || 0);
-                            const isFailed = score < 0.7;
-
-                            const currentPath = pathname.toLowerCase();
-                            const activeIndex = array.findIndex(item => currentPath.includes(item.path.toLowerCase()));
-                            const isCompleted = index < activeIndex;
-                            const isActive = index === activeIndex;
-                            const isPending = index > activeIndex;
-
-                            const isDisabled = (isNew && isPending) || (isFailed && isPending);
-
-                            // Colors from reference
-                            const bgColor = isCompleted ? '#2ecc71' : (isActive ? '#1842B6' : '#818181');
-
-                            return (
-                                <Box
-                                    key={s.path}
-                                    onClick={() => !isDisabled && navigate(s.path)}
-                                    sx={{
-                                        flex: 1,
-                                        height: '70px',
-                                        backgroundColor: bgColor,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        px: 4,
-                                        cursor: isDisabled ? 'not-allowed' : 'pointer',
-                                        color: 'white',
-                                        position: 'relative',
-                                        opacity: isDisabled ? 0.6 : 1,
-                                        clipPath: index === 0 ? 'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)' :
-                                            (index === (array.length - 1) ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 20px 50%)' :
-                                                'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%, 20px 50%)'),
-                                        ml: index === 0 ? 0 : -2.5,
-                                        zIndex: array.length - index,
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': { opacity: isDisabled ? 0.6 : 0.9 }
-                                    }}
-                                >
-                                    {/* Left Icon */}
-                                    <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
-                                        {isCompleted ? (
-                                            <CheckCircleIcon sx={{ color: 'white', fontSize: 24 }} />
-                                        ) : isActive ? (
-                                            <Box sx={{
-                                                width: '24px',
-                                                height: '24px',
-                                                borderRadius: '50%',
-                                                border: '2px solid white',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}>
-                                                <Box sx={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'white' }} />
-                                            </Box>
-                                        ) : (
-                                            <LockIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} />
-                                        )}
-                                    </Box>
-
-                                    {/* Labels */}
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                        <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
-                                            {s.label}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            );
-                        })}
-                    </Box>
-                )}
-
-                {/* Sub-content Area */}
-                <Box sx={{ width: '100%', mt: 2 }}>
-                    <Outlet />
                 </Box>
+                <Box sx={{ flexGrow: 1 }}>
+                    {/* Chevron Stepper */}
+                    {!['USERADMIN', 'ADMIN'].includes(usersState.role || '') && (
+                        <Box sx={{ width: '100%', display: 'flex', gap: 0.5 }}>
+                            {filteredSteps.map((s, index, array) => {
+                                const isNew = id?.toString() === 'NEW';
+                                const score = Number(selfRatingState.selfRatings.score || 0);
+                                const isFailed = score < 0.7;
+
+                                const currentPath = pathname.toLowerCase();
+                                const activeIndex = array.findIndex(item => currentPath.includes(item.path.toLowerCase()));
+                                const isCompleted = index < activeIndex;
+                                const isActive = index === activeIndex;
+                                const isPending = index > activeIndex;
+
+                                const isDisabled = (isNew && isPending) || (isFailed && isPending);
+
+                                // Colors from reference
+                                const bgColor = isCompleted ? '#FF671F' : (isActive ? '#000080' : '#818181');
+
+                                return (
+                                    <Box
+                                        key={s.path}
+                                        onClick={() => !isDisabled && navigate(s.path)}
+                                        sx={{
+                                            flex: 1,
+                                            height: '70px',
+                                            backgroundColor: bgColor,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            px: 4,
+                                            cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                            color: 'white',
+                                            position: 'relative',
+                                            opacity: isDisabled ? 0.6 : 1,
+                                            clipPath: index === 0 ? 'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)' :
+                                                (index === (array.length - 1) ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 20px 50%)' :
+                                                    'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%, 20px 50%)'),
+                                            ml: index === 0 ? 0 : -2.5,
+                                            zIndex: array.length - index,
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': { opacity: isDisabled ? 0.6 : 0.9 }
+                                        }}
+                                    >
+                                        {/* Left Icon */}
+                                        <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                                            {isCompleted ? (
+                                                <CheckCircleIcon sx={{ color: 'white', fontSize: 24 }} />
+                                            ) : isActive ? (
+                                                <Box sx={{
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    borderRadius: '50%',
+                                                    border: '2px solid white',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}>
+                                                    <Box sx={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'white' }} />
+                                                </Box>
+                                            ) : (
+                                                <LockIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 20 }} />
+                                            )}
+                                        </Box>
+
+                                        {/* Labels */}
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                            <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+                                                {s.label}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                );
+                            })}
+                        </Box>
+                    )}
+                </Box>
+            </Container>
+            <Box sx={{
+                flexGrow: 1,
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundImage: `url(${signupBg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: 'blur(2px)',
+                    // transform: 'scale(1.05)', // Prevent blurred edges
+                    zIndex: -1
+                }
+            }}>
+                <Box sx={{ height: '20px' }}></Box>
+                {/* Sub-content Area */}
+                <Container maxWidth="xl" sx={{ pb: '20px' }}>
+                    <Box sx={{ width: '100%', mt: 2 }}>
+                        <Outlet />
+                    </Box>
+                </Container>
             </Box>
-        </Container>
+        </>
     )
 }
 

@@ -253,10 +253,7 @@ export const SelfRating = (props: any) => {
                         transition: 'transform 0.2s, box-shadow 0.2s',
                         '&:hover': {
                             transform: 'translateY(-2px)',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                            '& .question-text': {
-                                color: '#FF671F'
-                            }
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
                         }
                     }}>
                         <CardContent sx={{ p: 3, width: '100%' }}>
@@ -367,10 +364,6 @@ export const SelfRating = (props: any) => {
             }}>
                 <CardContent sx={{ p: 4, width: '100%' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#1842B6' }}>
-                            Initial Assessment
-                        </Typography>
-
                         {['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && (
                             <Box sx={{
                                 backgroundColor: '#D586F7',
@@ -404,7 +397,7 @@ export const SelfRating = (props: any) => {
                         }}>
                             <CardContent sx={{ p: 3, width: '100%' }}> */}
                         <Grid container spacing={3}>
-                            <Grid item xs={12}>
+                            <Grid item xs={12} sx={{ paddingTop: '0px !important' }}>
                                 <Box sx={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -497,8 +490,9 @@ export const SelfRating = (props: any) => {
                                         color: 'white',
                                         boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                         '&:hover': {
-                                            backgroundColor: '#4d4585',
-                                            boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                            border: '1px solid #FF671F',
+                                            color: '#FF671F',
+                                            backgroundColor: 'rgb(255 103 30 / 19%)'
                                         }
                                     }}
                                 >
@@ -521,11 +515,12 @@ export const SelfRating = (props: any) => {
                                         color: 'white',
                                         boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                         '&:hover': {
-                                            backgroundColor: '#4d4585',
-                                            boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                            border: '1px solid #FF671F',
+                                            color: '#FF671F',
+                                            backgroundColor: 'rgb(255 103 30 / 19%)'
                                         }
                                     }} >
-                                    Continue to Fund Overview
+                                    Continue to Fund Information
                                 </Button>
                             )}
                         </Box>
@@ -560,8 +555,9 @@ export const SelfRating = (props: any) => {
                         transition: 'all 0.3s ease',
                         boxShadow: '-2px 0 10px rgba(54, 48, 98, 0.3)',
                         '&:hover': {
-                            backgroundColor: '#4d4585',
-                            width: isLoading ? '80px' : '56px',
+                            border: '1px solid #FF671F',
+                            color: '#FF671F',
+                            backgroundColor: '#ffffff'
                         }
                     }}
                 >
@@ -608,10 +604,15 @@ export const SelfRating = (props: any) => {
                                 px: 3,
                                 py: 1,
                                 fontWeight: 700,
-                                backgroundColor: '#FF671F'
+                                backgroundColor: '#FF671F',
+                                '&:hover': {
+                                    border: '1px solid #FF671F',
+                                    color: '#FF671F',
+                                    backgroundColor: 'rgb(255 103 30 / 19%)'
+                                }
                             }}
                         >
-                            Continue to Fund Overview
+                            Continue to Fund Information
                         </Button>
                     ) : (
                         <Button

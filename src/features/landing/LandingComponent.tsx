@@ -193,8 +193,10 @@ const Landing = () => {
                     {/* Main Video Content Centered */}
                     <Box sx={{
                         position: 'relative',
-                        width: '80%',
-                        height: '400px',
+                        // width: '80%',
+                        // height: '400px',
+                        // width: '100%',
+                        height: '100%',
                         borderRadius: '24px',
                         overflow: 'hidden',
                         boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
@@ -352,7 +354,7 @@ const Landing = () => {
                                 sx={{
                                     py: 1.8,
                                     backgroundColor: '#FF671F',
-                                    '&:hover': { backgroundColor: '#e85a15' },
+                                    '&:hover': { backgroundColor: '#FF671F' },
                                     borderRadius: '6px',
                                     fontSize: '16px',
                                     fontWeight: 500,

@@ -99,7 +99,14 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
                     </Box>
                 </Grid>
                 <Grid item xs={11.5}>
-                    <Button onClick={handleOpen} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                    <Button onClick={handleOpen} variant="contained" disableElevation sx={{
+                        textTransform: 'none', mt: 2, mb: 0, backgroundColor: '#000080',
+                        '&:hover': {
+                            border: '1px solid #000080',
+                            color: '#000080',
+                            backgroundColor: 'rgb(208 208 237)'
+                        }
+                    }} >
                         Add
                     </Button>
                     <InvestmentPastModel

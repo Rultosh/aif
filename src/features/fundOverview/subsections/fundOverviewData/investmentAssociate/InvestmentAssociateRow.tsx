@@ -23,11 +23,11 @@ export const InvestmentAssociateRow = (props: InvestmentAssociateRowPros) => {
   const handleClose = () => setOpen(false);
 
   function handleDelete() {
-      dispatch(
-        deleteInvestmentTeamsAssociateLevelAsync(
-          wrapArgument(
-            actionUid, props.row)
-        ))
+    dispatch(
+      deleteInvestmentTeamsAssociateLevelAsync(
+        wrapArgument(
+          actionUid, props.row)
+      ))
   }
 
   return <TableRow key={`${props.row.name}`}>
@@ -40,14 +40,14 @@ export const InvestmentAssociateRow = (props: InvestmentAssociateRowPros) => {
     <TableCell align="center">{String(props.row.investmentExperience)}</TableCell>
     <TableCell align="center">{props.row.areaOfExpertise}</TableCell>
     <TableCell align="center">
-      <Edit onClick={handleOpen}/>&nbsp;
-      <Delete onClick={handleDelete}></Delete>
+      <Edit onClick={handleOpen} sx={{ color: '#2764c8', cursor: 'pointer' }} />&nbsp;&nbsp;
+      <Delete onClick={handleDelete} sx={{ color: '#df3744', cursor: 'pointer' }}></Delete>
     </TableCell>
-    {open?<InvestmentAssociateModel 
-            investmentAssociateFormData={props.row} 
-            open={open} 
-            handleClose={handleClose} 
-            prelimApplicationId={props.row.prelimApplicationId}/>
-          :<></>}
+    {open ? <InvestmentAssociateModel
+      investmentAssociateFormData={props.row}
+      open={open}
+      handleClose={handleClose}
+      prelimApplicationId={props.row.prelimApplicationId} />
+      : <></>}
   </TableRow>
 }

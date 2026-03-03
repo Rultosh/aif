@@ -56,7 +56,7 @@ const ForgotPassword = () => {
     function handleSubmitForm() {
         setPasswordSet(true)
         setShowResponse(true)
-        if(token) {
+        if (token) {
             dispatch(
                 setUserPasswordAsync(
                     wrapArgument(actionUid, formData)
@@ -65,9 +65,11 @@ const ForgotPassword = () => {
         } else {
             dispatch(
                 changeUserPasswordAsync(
-                    wrapArgument(actionUid, 
-                        {...defaultIChangePassword, 
-                            passwordWithSaltAndIv: formData.passwordWithSaltAndIv})
+                    wrapArgument(actionUid,
+                        {
+                            ...defaultIChangePassword,
+                            passwordWithSaltAndIv: formData.passwordWithSaltAndIv
+                        })
                 )
             )
         }
@@ -233,7 +235,7 @@ const ForgotPassword = () => {
                                             sx={{
                                                 py: 1.5,
                                                 backgroundColor: '#FF671F',
-                                                '&:hover': { backgroundColor: '#e85a15' },
+                                                '&:hover': { backgroundColor: '#FF671F' },
                                                 borderRadius: '6px',
                                                 fontSize: '16px',
                                                 fontWeight: 600,

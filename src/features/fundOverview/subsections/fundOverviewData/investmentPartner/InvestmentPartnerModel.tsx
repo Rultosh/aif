@@ -85,7 +85,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
         nameOfCompany: '',
         amountInvested: '',
         dateOfInvestment: null,
-        exitOrWriteOff: '',
+        // exitOrWriteOff: '',
         dateofExitorWriteOff: null,
         irrPercent: '',
         moic: '',
@@ -109,7 +109,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
         nameOfCompany: '',
         amountInvested: '',
         dateOfInvestment: null,
-        exitOrWriteOff: '',
+        // exitOrWriteOff: '',
         dateofExitorWriteOff: null,
         irrPercent: '',
         moic: '',
@@ -143,7 +143,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     moic: Yup.string().required("MOIC is required").nullable(),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
     comment: Yup.string().required("Comment on the Exit/Write off Process is required").nullable(),
-    howWasTheDealSourced: Yup.string().required("This field is required").nullable(), 
+    howWasTheDealSourced: Yup.string().required("This field is required").nullable(),
     addressOfCompany: Yup.string().required("Address of company is required").nullable()
   });
 
@@ -315,7 +315,20 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     }
   };
 
-  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
+  const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#FF671F',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#FF671F',
+      },
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#FF671F',
+    },
+  };
 
   return (
     <Modal
@@ -325,36 +338,38 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details Of Investment Team (At Partner Level)</Typography>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details Of Investment Team (At Partner Level)</Typography>
         <Box component="form">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'flex-end' }}>
               <FormControl sx={{
-                  ...fieldSx,
-                  width: '120px',
-                  '& .MuiOutlinedInput-root': {
-                      ...fieldSx['& .MuiOutlinedInput-root'],
-                      borderTopRightRadius: 0,
-                      borderBottomRightRadius: 0,
-                  }
+                ...fieldSx,
+                width: '120px',
+                '& .MuiOutlinedInput-root': {
+                  ...fieldSx['& .MuiOutlinedInput-root'],
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                }
               }} error={!!errors.title}>
-                  <InputLabel id="title-label">Title</InputLabel>
-                  <Select
-                      required
-                      labelId="title-label"
-                      id="title"
-                      // name="title"
-                      label="Title"
-                      value={investmentPartnerFormData.title || ""}
-                      {...register("title")}
-                      onChange={handleChange}
-                  >
-                      <MenuItem value="Mr.">Mr.</MenuItem>
-                      <MenuItem value="Mrs.">Mrs.</MenuItem>
-                      <MenuItem value="Ms.">Ms.</MenuItem>
-                      <MenuItem value="Dr.">Dr.</MenuItem>
-                  </Select>
-                  {errors.title && <FormHelperText>{errors.title.message as string}</FormHelperText>}
+                <InputLabel id="title-label" sx={{
+                  '&.Mui-focused': { color: '#FF671F' }
+                }}>Title</InputLabel>
+                <Select
+                  required
+                  labelId="title-label"
+                  id="title"
+                  // name="title"
+                  label="Title"
+                  value={investmentPartnerFormData.title || ""}
+                  {...register("title")}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Mr.">Mr.</MenuItem>
+                  <MenuItem value="Mrs.">Mrs.</MenuItem>
+                  <MenuItem value="Ms.">Ms.</MenuItem>
+                  <MenuItem value="Dr.">Dr.</MenuItem>
+                </Select>
+                {errors.title && <FormHelperText>{errors.title.message as string}</FormHelperText>}
               </FormControl>
               <TextField
                 required
@@ -368,14 +383,14 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 variant="outlined"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
-                sx={{ 
-                  ...fieldSx, 
-                  flex: 1, 
+                sx={{
+                  ...fieldSx,
+                  flex: 1,
                   '& .MuiOutlinedInput-root': {
-                      ...fieldSx['& .MuiOutlinedInput-root'],
-                      borderTopLeftRadius: 0,
-                      borderBottomLeftRadius: 0,
-                      ml: '-1px'
+                    ...fieldSx['& .MuiOutlinedInput-root'],
+                    borderTopLeftRadius: 0,
+                    borderBottomLeftRadius: 0,
+                    ml: '-1px'
                   }, '& .MuiFormLabel-asterisk': { display: 'none' }
                 }}
               />
@@ -432,7 +447,9 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth variant="outlined" error={!!errors.vcpeExperience} sx={fieldSx}>
-                <InputLabel id="vcpeExperience-label">VC/PE Experience In Investing</InputLabel>
+                <InputLabel id="vcpeExperience-label" sx={{
+                  '&.Mui-focused': { color: '#FF671F' }
+                }}>VC/PE Experience In Investing</InputLabel>
                 <Controller
                   name="vcpeExperience"
                   control={control}
@@ -534,7 +551,17 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   onClick={() => handleOpenLeadForm()}
                   variant="outlined"
                   size="small"
-                  sx={{ textTransform: 'none', borderRadius: '8px' }}
+                  sx={{
+                    textTransform: 'none',
+                    borderRadius: '8px',
+                    backgroundColor: '#000080',
+                    color: '#fff',
+                    '&:hover': {
+                      border: '1px solid #000080',
+                      color: '#000080',
+                      backgroundColor: 'rgb(208 208 237)'
+                    }
+                  }}
                 >
                   Add Investment
                 </Button>
@@ -699,7 +726,15 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                       <Button onClick={handleCloseLeadForm} size="small" sx={{ textTransform: 'none' }}>Cancel</Button>
-                      <Button onClick={leadHandleSubmit(onLeadSubmit)} variant="contained" size="small" sx={{ textTransform: 'none', backgroundColor: '#363062' }}>Save</Button>
+                      <Button onClick={leadHandleSubmit(onLeadSubmit)} variant="contained" size="small" sx={{
+                        textTransform: 'none',
+                        backgroundColor: '#FF671F',
+                        '&:hover': {
+                          border: '1px solid #FF671F',
+                          color: '#FF671F',
+                          backgroundColor: 'rgb(255 103 30 / 19%)'
+                        }
+                      }}>Save</Button>
                     </Grid>
                   </Grid>
                 </Paper>
@@ -726,7 +761,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                           <TableCell>{inv.nameOfCompany}</TableCell>
                           <TableCell>{inv.amountInvested}</TableCell>
                           <TableCell>{inv.dateOfInvestment ? Moment(inv.dateOfInvestment).format("DD/MM/YYYY") : '-'}</TableCell>
-                          <TableCell>{inv.exitOrWriteOff}</TableCell>
                           <TableCell>{inv.dateofExitorWriteOff && Moment(inv.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
                           <TableCell>{inv.irrPercent}</TableCell>
                           <TableCell>{inv.moic || '-'}</TableCell>
@@ -759,7 +793,17 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   onClick={() => handleOpenNonLeadForm()}
                   variant="outlined"
                   size="small"
-                  sx={{ textTransform: 'none', borderRadius: '8px' }}
+                  sx={{
+                    textTransform: 'none',
+                    borderRadius: '8px',
+                    backgroundColor: '#000080',
+                    color: '#fff',
+                    '&:hover': {
+                      border: '1px solid #000080',
+                      color: '#000080',
+                      backgroundColor: 'rgb(208 208 237)'
+                    }
+                  }}
                 >
                   Add Investment
                 </Button>
@@ -926,7 +970,14 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                       <Button onClick={handleCloseNonLeadForm} size="small" sx={{ textTransform: 'none' }}>Cancel</Button>
-                      <Button onClick={nonLeadHandleSubmit(onNonLeadSubmit)} variant="contained" size="small" sx={{ textTransform: 'none', backgroundColor: '#363062' }}>Save</Button>
+                      <Button onClick={nonLeadHandleSubmit(onNonLeadSubmit)} variant="contained" size="small" sx={{
+                        textTransform: 'none', backgroundColor: '#FF671F',
+                        '&:hover': {
+                          border: '1px solid #FF671F',
+                          color: '#FF671F',
+                          backgroundColor: 'rgb(255 103 30 / 19%)'
+                        }
+                      }}>Save</Button>
                     </Grid>
                   </Grid>
                 </Paper>
@@ -953,7 +1004,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                           <TableCell>{inv.nameOfCompany}</TableCell>
                           <TableCell>{inv.amountInvested}</TableCell>
                           <TableCell>{inv.dateOfInvestment ? Moment(inv.dateOfInvestment).format("DD/MM/YYYY") : '-'}</TableCell>
-                          <TableCell>{inv.exitOrWriteOff}</TableCell>
                           <TableCell>{inv.dateofExitorWriteOff && Moment(inv.dateofExitorWriteOff).format("DD/MM/YYYY")}</TableCell>
                           <TableCell>{inv.irrPercent}</TableCell>
                           <TableCell>{inv.moic || '-'}</TableCell>
@@ -997,10 +1047,28 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
                 Cancel
               </Button>
-              {!investmentPartnerFormData.id && <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
+              {!investmentPartnerFormData.id && <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                backgroundColor: '#FF671F',
+                '&:hover': {
+                  border: '1px solid #FF671F',
+                  color: '#FF671F',
+                  backgroundColor: 'rgb(255 103 30 / 19%)'
+                }
+              }} >
                 Save
               </Button>}
-              {investmentPartnerFormData.id && <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
+              {investmentPartnerFormData.id && <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                backgroundColor: '#FF671F',
+                '&:hover': {
+                  border: '1px solid #FF671F',
+                  color: '#FF671F',
+                  backgroundColor: 'rgb(255 103 30 / 19%)'
+                }
+              }} >
                 Save
               </Button>}
             </Grid>
@@ -1031,6 +1099,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
           </DialogActions>
         </Dialog>
       </Box>
-    </Modal>
+    </Modal >
   );
 }

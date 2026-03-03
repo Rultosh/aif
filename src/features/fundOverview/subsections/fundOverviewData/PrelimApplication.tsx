@@ -245,12 +245,44 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         ...monthFields
     ];
 
-    const numericSx = {
+    const fieldSx = {
         '& .MuiOutlinedInput-root': {
             borderRadius: '8px',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#FF671F',
+        },
+    };
+
+    const numericSx = {
+        ...fieldSx,
+        '& .MuiOutlinedInput-root': {
+            ...fieldSx['& .MuiOutlinedInput-root'],
             '&.Mui-readOnly, & .MuiInputBase-input[readOnly]': {
                 backgroundColor: 'rgba(0, 0, 0, 0.05)',
             }
+        },
+    };
+
+    const controlSx = {
+        color: '#FF671F',
+        '&.Mui-checked': {
+            color: '#FF671F',
+        },
+    };
+
+    const switchSx = {
+        '& .MuiSwitch-switchBase.Mui-checked': {
+            color: '#FF671F',
+            '& + .MuiSwitch-track': {
+                backgroundColor: '#FF671F',
+            },
         },
     };
 
@@ -466,13 +498,15 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     }));
 
     const internalButtonSx = {
-        backgroundColor: '#363062',
+        backgroundColor: '#FF671F',
         color: 'white',
         textTransform: 'none',
         borderRadius: '8px',
         px: 4,
         '&:hover': {
-            backgroundColor: '#4d4585'
+            border: '1px solid #FF671F',
+            color: '#FF671F',
+            backgroundColor: 'rgb(255 103 30 / 19%)'
         }
     };
 
@@ -537,7 +571,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.nameOfTheFund?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                            sx={fieldSx}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -552,7 +586,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.sponsor?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -568,7 +602,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.investmentManager?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -579,7 +613,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 propertyValue={prelimApplicationFormData.fundManager || 0}
                                 onChange={handleSelectChange} />
                         </FormControl> */}
-                        <FormControl fullWidth variant="outlined" error={!!errors.fundManager} sx={{ display: 'flex', borderRadius: '8px' }}>
+                        <FormControl fullWidth variant="outlined" error={!!errors.fundManager} sx={{ ...fieldSx, display: 'flex' }}>
                             <InputLabel id="fundManager-label"
                                 sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}
                             >Fund Manager Experience</InputLabel>
@@ -639,7 +673,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 propertyValue={prelimApplicationFormData.aifCategory || 0}
                                 onChange={handleSelectChange} />
                         </FormControl> */}
-                        <FormControl fullWidth variant="outlined" error={!!errors.aifCategory} sx={{ display: 'flex', borderRadius: '8px' }}>
+                        <FormControl fullWidth variant="outlined" error={!!errors.aifCategory} sx={{ ...fieldSx, display: 'flex' }}>
                             <InputLabel id="aifCategory-label"
                                 sx={{ backgroundColor: 'white', px: 0.5, borderRadius: '8px' }}>AIF Category</InputLabel>
                             <Controller
@@ -688,8 +722,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             });
                                         }}
                                     >
-                                        <FormControlLabel value="Equity Oriented AIF" control={<Radio size="small" />} label="Equity Oriented AIF" />
-                                        <FormControlLabel value="Debt Oriented AIF" control={<Radio size="small" />} label="Debt Oriented AIF" />
+                                        <FormControlLabel value="Equity Oriented AIF" control={<Radio size="small" sx={controlSx} />} label="Equity Oriented AIF" />
+                                        <FormControlLabel value="Debt Oriented AIF" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented AIF" />
                                     </RadioGroup>
                                 )}
                             />
@@ -712,7 +746,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.nameOfTrustee?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -747,11 +781,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                                 fullWidth
                                                 error={!!fieldState.error}
                                                 helperText={fieldState.error?.message}
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '8px'
-                                                    }
-                                                }}
+                                                sx={fieldSx}
                                             />
                                         )}
                                     />
@@ -1039,7 +1069,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                                 error={!!errors.dealSector}
                                                 helperText={errors.dealSector?.message}
                                                 sx={{
-                                                    borderRadius: "8px",
+                                                    ...fieldSx,
                                                     backgroundColor: "white"
                                                 }}
                                             />
@@ -1062,7 +1092,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 handleChange(e);
                             }}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                            sx={fieldSx}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -1078,7 +1108,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             helperText={errors.description?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -1299,7 +1329,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             First Closing Confirmed?
                                         </Typography>
                                         <FormControlLabel
-                                            control={<Switch checked={!!prelimApplicationFormData.firstClosing} onChange={handleToggle} />}
+                                            control={<Switch checked={!!prelimApplicationFormData.firstClosing} onChange={handleToggle} sx={switchSx} />}
                                             label={prelimApplicationFormData.firstClosing ? "Yes" : "No"}
                                             sx={{ mr: 0 }}
                                         />
@@ -1350,7 +1380,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                                             {...params}
                                                             error={invalid}
                                                             helperText={invalid ? "This value is required" : null}
-                                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                                            sx={fieldSx}
                                                         />
                                                     )}
                                                 />
@@ -1402,7 +1432,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                                             {...params}
                                                             error={invalid}
                                                             helperText={invalid ? "This value is required" : null}
-                                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                                                            sx={fieldSx}
                                                         />
                                                     )}
                                                 />
@@ -1412,7 +1442,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 </Grid> */}
 
                                 <Grid item xs={12}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2 }}>                                    
+                                    <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2 }}>
                                         <Button
                                             type="submit"
                                             variant="contained"

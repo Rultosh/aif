@@ -23,17 +23,29 @@ export const UploadComponents = (props: UploadComponentProps) => {
         <Box>
             <DocumentUpload id={props.id} signed={props.signed}
                 onSuccess={handleSuccess}>
-                    
+
                 <Chip
-                icon={<FileUploadIcon sx={{ color: '#ffffff !important' }} />}
-                label="Upload File"
-                size="medium"
-                sx={{ backgroundColor: '#D586F7', width: 'fit-content', color: '#ffffff' }} />
+                    icon={<FileUploadIcon sx={{ color: 'inherit !important' }} />}
+                    label="Upload File"
+                    size="medium"
+                    sx={{
+                        backgroundColor: '#000080',
+                        width: 'fit-content',
+                        color: '#ffffff',
+                        '&:hover': {
+                            border: '1px solid #000080',
+                            color: '#000080',
+                            backgroundColor: 'rgb(208 208 237)',
+                            '& .MuiChip-icon': {
+                                color: '#000080 !important',
+                            }
+                        }
+                    }} />
                 {/* <FileUploadIcon>
                 </FileUploadIcon> */}
             </DocumentUpload>
         </Box>
-            <ListFiles id={props.id} refreshId={refreshId}/>
+        <ListFiles id={props.id} refreshId={refreshId} />
     </>
     );
 }

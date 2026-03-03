@@ -159,13 +159,15 @@ const Declaration = (props: any) => {
     });
 
     const internalButtonSx = {
-        backgroundColor: '#363062',
+        backgroundColor: '#FF671F',
         color: 'white',
         textTransform: 'none',
         borderRadius: '8px',
         px: 4,
         '&:hover': {
-            backgroundColor: '#4d4585'
+            border: '1px solid #FF671F',
+            color: '#FF671F',
+            backgroundColor: 'rgb(255 103 30 / 19%)'
         }
     };
 
@@ -179,11 +181,6 @@ const Declaration = (props: any) => {
                     border: '1px solid rgba(0,0,0,0.05)'
                 }}>
                     <CardContent sx={{ p: 4 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062', mb: 1 }}>
-                            KYC, Supporting Documents & Declaration
-                        </Typography>
-                        <Divider sx={{ borderColor: 'rgba(54, 48, 98, 0.1)', mb: 3 }} />
-
                         {/* Accordion 1: KYC */}
                         <Accordion
                             elevation={0}
@@ -214,7 +211,7 @@ const Declaration = (props: any) => {
                                         {
                                             id: "boardResolution",
                                             text: "2. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM",
-                                            templateLabel: "Download Template",
+                                            // templateLabel: "Download Template",
                                             href: "/vcf/templates/Annexure_II_KYC_Form.xlsx"
                                         }
                                     ].map((item, index) => (
@@ -223,7 +220,7 @@ const Declaration = (props: any) => {
                                                 {item.text}
                                             </Typography>
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
-                                                <Button
+                                                {item.templateLabel && <Button
                                                     variant="outlined"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
@@ -238,8 +235,10 @@ const Declaration = (props: any) => {
                                                     }}
                                                 >
                                                     {item.templateLabel}
-                                                </Button>
-                                                <DocumentChip label="Upload Document" id={`${item.id}${id}`} />
+                                                </Button>}
+                                                <span style={{ marginTop: '10px' }}>
+                                                    <DocumentChip label="Upload Document" id={`${item.id}${id}`} />
+                                                </span>
                                             </Box>
                                         </Box>
                                     ))}
@@ -336,7 +335,7 @@ const Declaration = (props: any) => {
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
-                                                    href="/vcf/templates/Past_Track_Record_Template.docx"
+                                                    href="/vcf/templates/Past_Track_Record_Template.xlsx"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
                                                     sx={{
@@ -350,7 +349,9 @@ const Declaration = (props: any) => {
                                                 >
                                                     Download Template
                                                 </Button>
-                                                <DocumentChip label="Upload Document" id={`pastInvestmentTrackRecord${id}`} />
+                                                <span style={{ marginTop: '10px' }}>
+                                                    <DocumentChip label="Upload Document" id={`pastInvestmentTrackRecord${id}`} />
+                                                </span>
                                             </Box>
                                         ) : (
                                             <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
@@ -470,9 +471,11 @@ const Declaration = (props: any) => {
                                         px: 4,
                                         py: 1.5,
                                         fontWeight: 700,
-                                        backgroundColor: '#363062',
+                                        backgroundColor: '#FF671F',
                                         '&:hover': {
-                                            backgroundColor: '#4d4585'
+                                            border: '1px solid #FF671F',
+                                            color: '#FF671F',
+                                            backgroundColor: 'rgb(255 103 30 / 19%)'
                                         }
                                     }}
                                 >
@@ -517,14 +520,16 @@ const Declaration = (props: any) => {
                             fullWidth
                             onClick={handleSuccessDialogClose}
                             sx={{
-                                backgroundColor: '#363062',
+                                backgroundColor: '#FF671F',
                                 borderRadius: '12px',
                                 py: 1.5,
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '1.1rem',
                                 '&:hover': {
-                                    backgroundColor: '#4d4585'
+                                    border: '1px solid #FF671F',
+                                    color: '#FF671F',
+                                    backgroundColor: 'rgb(255 103 30 / 19%)'
                                 }
                             }}
                         >

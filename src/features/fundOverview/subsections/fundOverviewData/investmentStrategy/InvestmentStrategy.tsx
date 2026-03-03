@@ -96,14 +96,31 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     // errors && console.log('errors', JSON.stringify(errors));
 
     const internalButtonSx = {
-        backgroundColor: '#363062',
+        backgroundColor: '#FF671F',
         color: 'white',
         textTransform: 'none',
         borderRadius: '8px',
         px: 4,
         '&:hover': {
-            backgroundColor: '#4d4585'
+            border: '1px solid #FF671F',
+            color: '#FF671F',
+            backgroundColor: 'rgb(255 103 30 / 19%)'
         }
+    };
+
+    const fieldSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#FF671F',
+        },
     };
 
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
@@ -120,6 +137,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.isStrategyBasis}
                             helperText={errors.isStrategyBasis?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -133,6 +151,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.isComparisonPast}
                             helperText={errors.isComparisonPast?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -146,6 +165,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.isSectorSituations}
                             helperText={errors.isSectorSituations?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -159,6 +179,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.isControlsRights}
                             helperText={errors.isControlsRights?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -172,6 +193,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.isRisksMitigation}
                             helperText={errors.isRisksMitigation?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -185,6 +207,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.isRolledOverInvestments}
                             helperText={errors.isRolledOverInvestments?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -201,7 +224,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 error={!!errors.isGrossReturnObjective}
                                 helperText={errors.isGrossReturnObjective?.message as string}
                                 variant="outlined"
-                                sx={{ mb: 2 }}
+                                sx={{ ...fieldSx, mb: 2 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Target investment size and percentage stake</Typography>
@@ -213,7 +236,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 error={!!errors.isTargetInvestmentSize}
                                 helperText={errors.isTargetInvestmentSize?.message as string}
                                 variant="outlined"
-                                sx={{ mb: 2 }}
+                                sx={{ ...fieldSx, mb: 2 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Target number of investments planned and Average holding period for a typical investment</Typography>
@@ -225,7 +248,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 error={!!errors.isTargetNumberInvestments}
                                 helperText={errors.isTargetNumberInvestments?.message as string}
                                 variant="outlined"
-                                sx={{ mb: 2 }}
+                                sx={{ ...fieldSx, mb: 2 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Exit strategy</Typography>
@@ -237,7 +260,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 error={!!errors.isExitStrategy}
                                 helperText={errors.isExitStrategy?.message as string}
                                 variant="outlined"
-                                sx={{ mb: 2 }}
+                                sx={{ ...fieldSx, mb: 2 }}
                             />
                         </Box>
                     </Grid>
@@ -249,7 +272,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 variant="contained"
                                 sx={internalButtonSx}
                             >
-                                Save and Continue
+                                Save & Continue
                             </Button>
                         </Box>
                     </Grid>

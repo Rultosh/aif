@@ -230,7 +230,20 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     handleSubmitForm();
   };
 
-  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
+  const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#FF671F',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#FF671F',
+      },
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#FF671F',
+    },
+  };
 
   const sectorOptions = [
     "Automobile And Auto Components",
@@ -250,6 +263,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     "Telecommunication",
     "Textiles"
   ];
+  console.log(investmentPastFormData)
 
   return <Modal
     open={props.open}
@@ -258,7 +272,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     aria-describedby="modal-modal-description"
   >
     <Box sx={style}>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details Of Past Investment</Typography>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details Of Past Investment</Typography>
       <Box component="form">
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
@@ -331,7 +345,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                         error={!!errors.sector}
                         helperText={errors.sector?.message as string}
                         sx={{
-                          borderRadius: "8px",
+                          ...fieldSx,
                           backgroundColor: "white"
                         }}
                       />
@@ -400,7 +414,9 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth variant="outlined" error={!!errors.currentStatus} sx={fieldSx}>
-              <InputLabel id="currentStatus-label">Current Status</InputLabel>
+              <InputLabel id="currentStatus-label" sx={{
+                '&.Mui-focused': { color: '#FF671F' }
+              }}>Current Status</InputLabel>
               <Controller
                 name="currentStatus"
                 control={control}
@@ -571,7 +587,14 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
+            <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{
+              borderRadius: '8px', textTransform: 'none', backgroundColor: '#FF671F',
+              '&:hover': {
+                border: '1px solid #FF671F',
+                color: '#FF671F',
+                backgroundColor: 'rgb(255 103 30 / 19%)'
+              }
+            }} >
               Save
             </Button>
           </Grid>
