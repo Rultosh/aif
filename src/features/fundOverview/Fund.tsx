@@ -186,15 +186,17 @@ export const Fund = (props: any) => {
             setIsLoading(false);
         }
     };
-    
+
     const internalButtonSx = {
-        backgroundColor: '#363062',
+        backgroundColor: '#FF671F',
         color: 'white',
         textTransform: 'none',
         borderRadius: '8px',
         px: 4,
         '&:hover': {
-            backgroundColor: '#4d4585'
+            border: '1px solid #FF671F',
+            color: '#FF671F',
+            backgroundColor: 'rgb(255 103 30 / 19%)'
         }
     };
 
@@ -233,7 +235,7 @@ export const Fund = (props: any) => {
                 >
                     <ArrowRightIcon sx={{ fontSize: '2rem', mb: -0.5 }} />
                     <Box sx={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
-                        Save and Continue
+                        Save & Continue
                     </Box>
                 </Button>
             ) : null} */}
@@ -247,10 +249,6 @@ export const Fund = (props: any) => {
             }}>
                 <CardContent sx={{ p: 4 }}>
                     <Box sx={{ mb: 4 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#363062', mb: 1 }}>
-                            Fund Information
-                        </Typography>
-                        <Divider sx={{ borderColor: 'rgba(54, 48, 98, 0.1)', mb: 3 }} />
                         <Typography variant="body2" sx={{ color: '#666', mb: 4 }}>
                             <b>Provide detailed information about the fund, investment team, and track record (All Fields are mandatory).</b>
                         </Typography>
@@ -269,15 +267,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "1"}
                                 onChange={handleChange("1")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "1" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "1" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -289,7 +287,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "1" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "1" ? '#000080' : '#f0f0f0',
                                             color: expanded === "1" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -300,7 +298,7 @@ export const Fund = (props: any) => {
                                         }}>1</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "1" ? '#363062' : '#444'
+                                            color: expanded === "1" ? '#000080' : '#444'
                                         }}>
                                             Fund Overview
                                         </Typography>
@@ -330,15 +328,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "2"}
                                 onChange={handleChange("2")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "2" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "2" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -350,7 +348,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "2" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "2" ? '#000080' : '#f0f0f0',
                                             color: expanded === "2" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -361,7 +359,7 @@ export const Fund = (props: any) => {
                                         }}>2</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "2" ? '#363062' : '#444'
+                                            color: expanded === "2" ? '#000080' : '#444'
                                         }}>
                                             Investment Strategy
                                         </Typography>
@@ -391,15 +389,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "3"}
                                 onChange={handleChange("3")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "3" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "3" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -411,7 +409,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "3" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "3" ? '#000080' : '#f0f0f0',
                                             color: expanded === "3" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -422,7 +420,7 @@ export const Fund = (props: any) => {
                                         }}>3</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "3" ? '#363062' : '#444'
+                                            color: expanded === "3" ? '#000080' : '#444'
                                         }}>
                                             Details Of Key Investment Team (At Partner Level)
                                         </Typography>
@@ -431,7 +429,7 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>                                            
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
                                                 onClick={() => handleAccordionSaveAndContinue("3", "4", null)}
@@ -456,15 +454,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "4"}
                                 onChange={handleChange("4")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "4" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "4" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -476,7 +474,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "4" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "4" ? '#000080' : '#f0f0f0',
                                             color: expanded === "4" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -487,7 +485,7 @@ export const Fund = (props: any) => {
                                         }}>4</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "4" ? '#363062' : '#444'
+                                            color: expanded === "4" ? '#000080' : '#444'
                                         }}>
                                             Details Of Key Investment Team (At Associate Level)
                                         </Typography>
@@ -496,7 +494,7 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>                                           
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
                                                 onClick={() => handleAccordionSaveAndContinue("4", "5", null)}
@@ -521,15 +519,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "5"}
                                 onChange={handleChange("5")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "5" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "5" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -541,7 +539,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "5" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "5" ? '#000080' : '#f0f0f0',
                                             color: expanded === "5" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -552,7 +550,7 @@ export const Fund = (props: any) => {
                                         }}>5</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "5" ? '#363062' : '#444'
+                                            color: expanded === "5" ? '#000080' : '#444'
                                         }}>
                                             Details Of Contributor To the Fund
                                         </Typography>
@@ -561,7 +559,7 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <ContributorDetails prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>                                          
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
                                                 onClick={() => handleAccordionSaveAndContinue("5", "6", null)}
@@ -586,15 +584,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "6"}
                                 onChange={handleChange("6")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "6" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "6" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -606,7 +604,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "6" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "6" ? '#000080' : '#f0f0f0',
                                             color: expanded === "6" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -617,7 +615,7 @@ export const Fund = (props: any) => {
                                         }}>6</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "6" ? '#363062' : '#444'
+                                            color: expanded === "6" ? '#000080' : '#444'
                                         }}>
                                             Investments Made, If Any From the Current Fund
                                         </Typography>
@@ -626,7 +624,7 @@ export const Fund = (props: any) => {
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentPast prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>                                    
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
                                                 onClick={() => handleAccordionSaveAndContinue("6", "7", null)}
@@ -651,15 +649,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "7"}
                                 onChange={handleChange("7")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "7" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "7" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -671,7 +669,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "7" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "7" ? '#000080' : '#f0f0f0',
                                             color: expanded === "7" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -682,7 +680,7 @@ export const Fund = (props: any) => {
                                         }}>7</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "7" ? '#363062' : '#444'
+                                            color: expanded === "7" ? '#000080' : '#444'
                                         }}>
                                             LP Advisory Governance and Investment Committee
                                         </Typography>
@@ -712,15 +710,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "8"}
                                 onChange={handleChange("8")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "8" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "8" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -732,7 +730,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "8" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "8" ? '#000080' : '#f0f0f0',
                                             color: expanded === "8" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -743,7 +741,7 @@ export const Fund = (props: any) => {
                                         }}>8</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "8" ? '#363062' : '#444'
+                                            color: expanded === "8" ? '#000080' : '#444'
                                         }}>
                                             Deal Flow/MIS
                                         </Typography>
@@ -774,15 +772,15 @@ export const Fund = (props: any) => {
                                     '&:before': { display: 'none' },
                                     '&.Mui-expanded': {
                                         boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#363062',
-                                        borderLeft: '6px solid #363062'
+                                        borderColor: '#000080',
+                                        borderLeft: '6px solid #000080'
                                     }
                                 }}
                                 expanded={expanded === "9"}
                                 onChange={handleChange("9")}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "9" ? '#363062' : '#666' }} />}
+                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "9" ? '#000080' : '#666' }} />}
                                     sx={{
                                         px: 3,
                                         py: 1,
@@ -794,7 +792,7 @@ export const Fund = (props: any) => {
                                             width: 32,
                                             height: 32,
                                             borderRadius: '50%',
-                                            backgroundColor: expanded === "9" ? '#363062' : '#f0f0f0',
+                                            backgroundColor: expanded === "9" ? '#000080' : '#f0f0f0',
                                             color: expanded === "9" ? 'white' : '#666',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -805,7 +803,7 @@ export const Fund = (props: any) => {
                                         }}>9</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "9" ? '#363062' : '#444'
+                                            color: expanded === "9" ? '#000080' : '#444'
                                         }}>
                                             Others
                                         </Typography>
@@ -838,8 +836,8 @@ export const Fund = (props: any) => {
                                 borderRadius: '8px',
                                 px: 3,
                                 fontWeight: 600,
-                                color: '#363062',
-                                borderColor: '#363062',
+                                color: '#000080',
+                                borderColor: '#000080',
                                 '&:hover': {
                                     borderColor: '#4d4585',
                                     backgroundColor: 'rgba(54, 48, 98, 0.04)'
@@ -863,12 +861,13 @@ export const Fund = (props: any) => {
                                         px: 6,
                                         py: 1.5,
                                         fontWeight: 700,
-                                        backgroundColor: '#363062',
+                                        backgroundColor: '#FF671F',
                                         color: 'white',
                                         boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                         '&:hover': {
-                                            backgroundColor: '#4d4585',
-                                            boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                            border: '1px solid #FF671F',
+                                            color: '#FF671F',
+                                            backgroundColor: 'rgb(255 103 30 / 19%)'
                                         }
                                     }}
                                 >
@@ -887,12 +886,13 @@ export const Fund = (props: any) => {
                                         px: 4,
                                         py: 1.5,
                                         fontWeight: 700,
-                                        backgroundColor: '#363062',
+                                        backgroundColor: '#FF671F',
                                         color: 'white',
                                         boxShadow: '0 4px 12px rgba(54, 48, 98, 0.2)',
                                         '&:hover': {
-                                            backgroundColor: '#4d4585',
-                                            boxShadow: '0 6px 16px rgba(54, 48, 98, 0.3)'
+                                            border: '1px solid #FF671F',
+                                            color: '#FF671F',
+                                            backgroundColor: 'rgb(255 103 30 / 19%)'
                                         }
                                     }} >
                                     Save & Continue To Declaration
@@ -926,13 +926,14 @@ export const Fund = (props: any) => {
                         width: isLoading ? '80px' : '48px',
                         height: '48px',
                         borderRadius: '12px 0 0 12px',
-                        backgroundColor: '#363062',
+                        backgroundColor: '#FF671F',
                         color: 'white',
                         transition: 'all 0.3s ease',
                         boxShadow: '-2px 0 10px rgba(54, 48, 98, 0.3)',
                         '&:hover': {
-                            backgroundColor: '#4d4585',
-                            width: isLoading ? '80px' : '56px',
+                            border: '1px solid #FF671F',
+                            color: '#FF671F',
+                            backgroundColor: '#ffffff'
                         }
                     }}
                 >

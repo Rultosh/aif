@@ -126,7 +126,7 @@ const Header = (props: any) => {
                       Reset Password
                     </Link> */}
 
-                    <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
+                    {/* <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} /> */}
                     {/* <Box component="span" sx={{ opacity: 0.6, color: '#ffffff', fontSize: '18px' }}>|</Box> */}
                     {/* user avatar menu */}
                     <IconButton

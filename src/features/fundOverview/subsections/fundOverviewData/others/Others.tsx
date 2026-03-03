@@ -84,6 +84,21 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
     const qSx = { mb: 3 };
     const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333', textAlign: 'justify' };
 
+    const fieldSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#FF671F',
+        },
+    };
+
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
         return (
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
@@ -98,6 +113,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.otExternalFirms}
                             helperText={errors.otExternalFirms?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -111,6 +127,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.otMonitoringActivities}
                             helperText={errors.otMonitoringActivities?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -124,6 +141,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.otContributorTerms}
                             helperText={errors.otContributorTerms?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -137,6 +155,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.otPlacementAgents}
                             helperText={errors.otPlacementAgents?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -150,6 +169,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.otDecisionApprovals}
                             helperText={errors.otDecisionApprovals?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -163,6 +183,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.otEmployeeCost}
                             helperText={errors.otEmployeeCost?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 

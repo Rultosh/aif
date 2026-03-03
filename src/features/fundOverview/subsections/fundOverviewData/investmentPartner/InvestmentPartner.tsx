@@ -96,7 +96,14 @@ export const InvestmentPartner = (props: InvestmentPartnerProps) => {
                     </TableContainer>
                 </Grid>
                 <Grid item xs={12}>
-                    <Button onClick={handleOpen} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                    <Button onClick={handleOpen} variant="contained" disableElevation sx={{
+                        textTransform: 'none', mt: 2, mb: 0, backgroundColor: '#000080',
+                        '&:hover': {
+                            border: '1px solid #000080',
+                            color: '#000080',
+                            backgroundColor: 'rgb(208 208 237)'
+                        }
+                    }} >
                         Add
                     </Button>
                     <InvestmentPartnerModel

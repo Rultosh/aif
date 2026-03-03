@@ -40,8 +40,8 @@ export const InvestmentPastRow = (props: InvestmentPastRowPros) => {
     <TableCell align="center">{Moment(String(props.row.dateOfInvestment)).format("DD/MM/YYYY")}</TableCell>
     <TableCell align="center">{String(props.row.briefProfile)}</TableCell>
     <TableCell align="center">
-      <Edit onClick={handleOpen} />&nbsp;
-      <Delete onClick={handleDelete}></Delete>
+      <Edit onClick={handleOpen} sx={{ color: '#1976d2', cursor: 'pointer' }} />&nbsp;
+      <Delete onClick={handleDelete} sx={{ color: '#d32f2f', cursor: 'pointer' }}></Delete>
     </TableCell>
     {open ? <InvestmentPastModel
       investmentPastFormData={props.row}

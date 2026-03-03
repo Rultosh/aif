@@ -91,14 +91,31 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const qSx = { mb: 3 };
     const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333', textAlign: 'justify' };
 
+    const fieldSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#FF671F',
+        },
+    };
+
     const internalButtonSx = {
-        backgroundColor: '#363062',
+        backgroundColor: '#FF671F',
         color: 'white',
         textTransform: 'none',
         borderRadius: '8px',
         px: 4,
         '&:hover': {
-            backgroundColor: '#4d4585'
+            border: '1px solid #FF671F',
+            color: '#FF671F',
+            backgroundColor: 'rgb(255 103 30 / 19%)'
         }
     };
 
@@ -123,6 +140,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.dfTotalDealsEvaluated}
                             helperText={errors.dfTotalDealsEvaluated?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -134,9 +152,10 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.dfCurrentPipeline}
                             helperText={errors.dfCurrentPipeline?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
-                    
+
                     <Grid item xs={12} sx={qSx}>
                         <Typography variant="body1" sx={labelSx}>3. Frequency of meetings to update the contributor.</Typography>
                         <TextField
@@ -147,6 +166,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.dfMeetingFrequency}
                             helperText={errors.dfMeetingFrequency?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -160,6 +180,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.dfInvestigationDetails}
                             helperText={errors.dfInvestigationDetails?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -173,6 +194,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.dfExclusiveVC}
                             helperText={errors.dfExclusiveVC?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -186,6 +208,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.dfDirectorshipsPolicy}
                             helperText={errors.dfDirectorshipsPolicy?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -202,7 +225,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 error={!!errors.dfConsolidatedInfo}
                                 helperText={errors.dfConsolidatedInfo?.message as string}
                                 variant="outlined"
-                                sx={{ mb: 2 }}
+                                sx={{ ...fieldSx, mb: 2 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting.</Typography>
@@ -214,7 +237,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 error={!!errors.dfNAVFrequency}
                                 helperText={errors.dfNAVFrequency?.message as string}
                                 variant="outlined"
-                                sx={{ mb: 2 }}
+                                sx={{ ...fieldSx, mb: 2 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report.</Typography>
@@ -226,7 +249,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 error={!!errors.dfValuationReport}
                                 helperText={errors.dfValuationReport?.message as string}
                                 variant="outlined"
-                                sx={{ mb: 2 }}
+                                sx={{ ...fieldSx, mb: 2 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV.</Typography>
@@ -238,7 +261,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 error={!!errors.dfNAVGuidelines}
                                 helperText={errors.dfNAVGuidelines?.message as string}
                                 variant="outlined"
-                                sx={{ mb: 2 }}
+                                sx={{ ...fieldSx, mb: 2 }}
                             />
                         </Box>
                     </Grid>

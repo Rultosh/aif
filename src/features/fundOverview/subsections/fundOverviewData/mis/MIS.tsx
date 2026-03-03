@@ -254,7 +254,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                     fontWeight: 600
                                 }}
                             >
-                                Save and Continue
+                                Save & Continue
                             </Button>
                         </Box>
                     </Grid>

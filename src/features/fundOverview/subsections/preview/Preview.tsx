@@ -174,6 +174,21 @@ export const Preview = (props: any) => {
         setShowResponse(false)
     };
 
+    const fieldSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#FF671F',
+        },
+    };
+
     return (
         <div className="formAnimation">
             <Card sx={{
@@ -184,9 +199,6 @@ export const Preview = (props: any) => {
                 border: '1px solid rgba(0,0,0,0.05)'
             }}>
                 <CardContent sx={{ p: 4, width: '100%' }}>
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062', mb: 3 }}>
-                        Preview
-                    </Typography>
 
                     <Card sx={{
                         borderRadius: '12px',
@@ -212,7 +224,7 @@ export const Preview = (props: any) => {
                     <Card sx={{
                         mb: 4,
                         borderRadius: '12px',
-                        backgroundColor: 'rgba(54, 48, 98, 0.02)',
+                        backgroundColor: 'white',
                         border: '1px solid rgba(54, 48, 98, 0.1)'
                     }}>
                         <CardContent sx={{ p: 3 }}>
@@ -287,7 +299,7 @@ export const Preview = (props: any) => {
                                 </Box>
                             ) : null}
 
-                            <Box sx={{ p: 2, backgroundColor: 'white', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                            <Box>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062', mb: 2 }}>
                                     Any Comments/Feedback
                                 </Typography>
@@ -304,8 +316,7 @@ export const Preview = (props: any) => {
                                     onChange={handleChange}
                                     placeholder="Provide any context or feedback before processing..."
                                     sx={{
-                                        mb: 3,
-                                        '& .MuiOutlinedInput-root': { borderRadius: '12px' }
+                                        ...fieldSx, mb: 3
                                     }}
                                 />
 

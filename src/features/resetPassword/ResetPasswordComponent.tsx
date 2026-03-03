@@ -184,7 +184,7 @@ const ResetPassword = () => {
                                             sx={{
                                                 py: 1.5,
                                                 backgroundColor: '#FF671F',
-                                                '&:hover': { backgroundColor: '#e85a15' },
+                                                '&:hover': { backgroundColor: '#FF671F' },
                                                 borderRadius: '6px',
                                                 fontSize: '16px',
                                                 fontWeight: 600,

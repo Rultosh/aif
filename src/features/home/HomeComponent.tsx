@@ -263,8 +263,8 @@ export const Home = (pros: any) => {
                                 borderRadius: '4px',
                                 px: 3,
                                 '&:hover': {
-                                    borderColor: '#e85a15',
-                                    color: '#e85a15',
+                                    borderColor: '#FF671F',
+                                    color: '#FF671F',
                                     backgroundColor: 'rgba(255, 103, 30, 0.04)'
                                 }
                             }}
@@ -309,15 +309,15 @@ export const Home = (pros: any) => {
                                             >
                                                 {row.stage === "PRELIM" ?
                                                     <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
-                                                        {isGoodToShowApplication(row) ? 
-                                                            <a href={`#/preliminary/${row.id}/${usersState.role === "USER" ? 'selfrating' : 'preview'}`} 
-                                                                style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> : 
+                                                        {isGoodToShowApplication(row) ?
+                                                            <a href={`#/preliminary/${row.id}/${usersState.role === "USER" ? 'selfrating' : 'preview'}`}
+                                                                style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> :
                                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
                                                                 {row.nameOfTheFund}
                                                             </Typography>}
-                                                </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
-                                                    {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
-                                                </TableCell>}
+                                                    </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
+                                                        {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+                                                    </TableCell>}
                                                 <TableCell align="center" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
                                                 <TableCell align="center" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
                                                 <TableCell align="center" sx={{ color: '#64748b' }}>{row.applicationSubmissionDate ? Moment(String(row.applicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>

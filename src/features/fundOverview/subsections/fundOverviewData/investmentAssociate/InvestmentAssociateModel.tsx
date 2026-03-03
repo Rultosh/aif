@@ -310,7 +310,20 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     await handleSubmitForm(data, isUpdate);
   };
 
-  const fieldSx = { '& .MuiOutlinedInput-root': { borderRadius: '8px' } };
+  const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#FF671F',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#FF671F',
+      },
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#FF671F',
+    },
+  };
 
   return (
     <Modal
@@ -320,7 +333,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#363062' }}>Details of Investment Team (At Associate Level)</Typography>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details of Investment Team (At Associate Level)</Typography>
         <Box component="form">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -333,7 +346,9 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                   borderBottomRightRadius: 0,
                 }
               }} error={!!errors.title}>
-                <InputLabel id="title-label">Title</InputLabel>
+                <InputLabel id="title-label" sx={{
+                  '&.Mui-focused': { color: '#FF671F' }
+                }}>Title</InputLabel>
                 <Select
                   required
                   labelId="title-label"
@@ -427,7 +442,9 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth variant="outlined" error={!!errors.investmentExperience} sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}>
-                <InputLabel id="investmentExperience-label">Investment Experience</InputLabel>
+                <InputLabel id="investmentExperience-label" sx={{
+                  '&.Mui-focused': { color: '#FF671F' }
+                }}>Investment Experience</InputLabel>
                 <Controller
                   name="investmentExperience"
                   control={control}
@@ -503,7 +520,14 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
               <Button onClick={handleCloseModal} variant="outlined" sx={{ borderRadius: '8px', textTransform: 'none' }}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: '#363062', '&:hover': { backgroundColor: '#2a254d' } }} >
+              <Button onClick={handleSubmit(onSubmit)} color='success' variant="contained" disableElevation sx={{
+                borderRadius: '8px', textTransform: 'none', backgroundColor: '#FF671F',
+                '&:hover': {
+                  border: '1px solid #FF671F',
+                  color: '#FF671F',
+                  backgroundColor: 'rgb(255 103 30 / 19%)'
+                }
+              }} >
                 {investmentAssociateFormData.id ? "Save" : "Save"}
               </Button>
             </Grid>
@@ -534,6 +558,6 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
           </DialogActions>
         </Dialog>
       </Box>
-    </Modal>
+    </Modal >
   );
 }

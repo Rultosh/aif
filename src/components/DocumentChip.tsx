@@ -30,12 +30,16 @@ export default function DocumentChip(props: DocumentChipProps) {
         size="medium"
         onClick={() => setOpen(!open)}
         sx={{
-          backgroundColor: '#0295c9',
+          backgroundColor: '#000080',
           color: '#ffffff',
           width: 'fit-content',
           '&:hover': {
-            backgroundColor: '#808080',
-            color: '#ffffff'
+            border: '1px solid #000080',
+            color: '#000080',
+            backgroundColor: 'rgb(208 208 237)',
+            '& .MuiChip-icon': {
+              color: '#000080 !important',
+            }
           }
         }} />
       <ListFiles id={props.id} refreshId={refreshId} />

@@ -592,7 +592,7 @@ const SignUp = () => {
                                         fontWeight: 500,
                                         backgroundColor: '#FF671F',
                                         '&:hover': {
-                                            backgroundColor: '#e85a15',
+                                            backgroundColor: '#FF671F',
                                             boxShadow: '0 6px 16px rgba(255, 103, 31, 0.4)',
                                         },
                                         boxShadow: '0 4px 12px rgba(255, 107, 33, 0.3)',

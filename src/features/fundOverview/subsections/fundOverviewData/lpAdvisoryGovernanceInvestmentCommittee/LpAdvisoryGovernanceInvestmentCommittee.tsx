@@ -83,15 +83,32 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
 
     const qSx = { mb: 3 };
     const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333', textAlign: 'justify' };
-    
+
+    const fieldSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#FF671F',
+            },
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#FF671F',
+        },
+    };
+
     const internalButtonSx = {
-        backgroundColor: '#363062',
+        backgroundColor: '#FF671F',
         color: 'white',
         textTransform: 'none',
         borderRadius: '8px',
         px: 4,
         '&:hover': {
-            backgroundColor: '#4d4585'
+            border: '1px solid #FF671F',
+            color: '#FF671F',
+            backgroundColor: 'rgb(255 103 30 / 19%)'
         }
     };
 
@@ -109,6 +126,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             error={!!errors.lpacDetails}
                             helperText={errors.lpacDetails?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
                     <Grid item xs={12} sx={qSx}>
@@ -121,6 +139,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             error={!!errors.lpacMemberSelectionDetails}
                             helperText={errors.lpacMemberSelectionDetails?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -134,6 +153,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             error={!!errors.lpacBindingApprovalRightsDetails}
                             helperText={errors.lpacBindingApprovalRightsDetails?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -147,6 +167,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             error={!!errors.lpacTotalNumberAndVotingMembersDetails}
                             helperText={errors.lpacTotalNumberAndVotingMembersDetails?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -160,6 +181,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             error={!!errors.lpacDecisionMakingProcess}
                             helperText={errors.lpacDecisionMakingProcess?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -173,6 +195,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             error={!!errors.lpacIndependentMembersDetails}
                             helperText={errors.lpacIndependentMembersDetails?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -186,6 +209,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             error={!!errors.lpacLpParticipationDetails}
                             helperText={errors.lpacLpParticipationDetails?.message as string}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     </Grid>
 
@@ -196,7 +220,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                                 variant="contained"
                                 sx={internalButtonSx}
                             >
-                                Save and Continue
+                                Save & Continue
                             </Button>
                         </Box>
                     </Grid>
