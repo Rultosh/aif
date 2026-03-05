@@ -43,12 +43,15 @@ const ResetPassword = () => {
         // clear previous errors
         setError("");
         setServerError("");
-
+        const emailPattern =/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
         if (!formData["username"] || formData["username"].trim() === "") {
             setError("Email address is required");
             return;
         }
-
+        if(!emailPattern.test(formData["username"] )){
+            setError("Email address is invalid");
+            return;
+        }
         try {
             await dispatch(
                 resetUserPasswordAsync(
@@ -164,6 +167,7 @@ const ResetPassword = () => {
                                             sx={fieldSx}
                                             error={!!error}
                                             helperText={error}
+                                            inputProps={{maxLength :200}}
                                         />
                                     </Grid>
 
