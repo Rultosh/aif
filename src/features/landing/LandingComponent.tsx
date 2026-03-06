@@ -128,7 +128,7 @@ const Landing = () => {
                 }
             })
             .required("Username is required").max(200,"Username cannot be more than 200 charactors"),
-        password: Yup.string().required("Password is required").min(6,"Password cannot be less than 6 charactors").max(200,"Password cannot be more than 200 charactors"),
+        password: Yup.string().required("Password is required").min(4,"Password cannot be less than 4 charactors").max(200,"Password cannot be more than 200 charactors"),
     });
 
     const {
