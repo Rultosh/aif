@@ -408,7 +408,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        nameOfTheFund: Yup.string().required("Name of the Fund is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        nameOfTheFund: Yup.string().required("Name of the Fund is required").matches(/^[a-zA-Z0-9 ]*$/, "Only alphanumeric characters are allowed").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sponsor: Yup.string().required("Sponsor is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         investmentManager: Yup.string().required("Investment Manager is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         fundManager: Yup.string().required("Fund Manager is required").nullable(),
