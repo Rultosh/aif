@@ -27,7 +27,7 @@ export const questionsForFirstTime = {
     {
         "id": 4,
         "text":"Average Investment experience of investment team members (other than Partners/Directors) of Fund Manager" ,
-        "options":["More than 10 years", "More than 5 years but upto 10 years", "More than 3 years but upto 5 years", "Upto 3 years/No related experience"],
+        "options":["More than 10 years", "More than 5 years but upto 10 years", "More than 3 years but upto 5 years", "Upto 3 years"],
         "size":6,
         "contribution": 0.04,
         'weightage':[1,0.75,0.5,0.25]
