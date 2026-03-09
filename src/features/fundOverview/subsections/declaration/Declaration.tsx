@@ -207,13 +207,13 @@ const Declaration = (props: any) => {
                                             text: "1. Details and KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment Management Team to be provided in the format attached in Annexure I and Annexure II. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address: permanent and correspondent), Two passport size photograph for purpose of KYC.",
                                             templateLabel: "Download Template",
                                             href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip"
-                                        },
-                                        {
-                                            id: "boardResolution",
-                                            text: "2. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM",
-                                            // templateLabel: "Download Template",
-                                            href: "/vcf/templates/Annexure_II_KYC_Form.xlsx"
                                         }
+                                        // {
+                                        //     id: "boardResolution",
+                                        //     text: "2. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM",
+                                        //     templateLabel: "Download Template",
+                                        //     href: "/vcf/templates/Annexure_II_KYC_Form.xlsx"
+                                        // }
                                     ].map((item, index) => (
                                         <Box key={item.id} sx={{ mb: index === 0 ? 4 : 0, p: 2, borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'rgba(0,0,0,0.01)' }}>
                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#363062', mb: 2, lineHeight: 1.6 }}>
