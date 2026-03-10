@@ -183,7 +183,11 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     percentOfCorpus: Yup.string().required("Percent Of Corpus is required"),
     contributionType: Yup.string().required("Contribution Type is required"),
     categoryOfContributor: Yup.string().required("Category of Contributor is required"),
-    dateOfCommitment: Yup.string().required("Date of commitment is required").nullable(),
+    dateOfCommitment: Yup.date()
+      .nullable()
+      .transform((curr, orig) => orig === '' ? null : curr)
+      .typeError("Please enter a valid date")
+      .required("Date of commitment is required"),
     isFirstTimeContributing: Yup.string().required("This field is required"),
     amountContributedPrev: Yup.string().when('isFirstTimeContributing', {
       is: 'No',
@@ -249,6 +253,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
     '& .MuiInputLabel-root.Mui-focused': {
       color: '#FF671F',
     },
+    '& .MuiFormLabel-asterisk': { display: 'none' }
   };
 
   const controlSx = {
@@ -319,7 +324,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
           </Grid>
           <Grid item xs={12} md={4}>
             <TextField
-              type="number"
+              type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
               required
               fullWidth
               id="percentOfCorpus"
@@ -392,7 +397,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               <Controller
                 name="dateOfCommitment"
                 control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                render={({ field: { onChange, value }, fieldState: { invalid, error } }) => (
                   <DesktopDatePicker
                     label="Date Of Commitment To The Fund"
                     inputFormat="DD/MM/YYYY"
@@ -406,8 +411,8 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
                       <TextField
                         {...params}
                         fullWidth
-                        error={!!error}
-                        helperText={error?.message}
+                        error={invalid}
+                        helperText={error?.message || null}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     )}
@@ -463,7 +468,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  type="number"
+                  type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                   id="percentOfActualCorpusRaisedPrev"
                   label="% Of Actual Corpus Raised In Last Fund"
                   inputProps={{ min: 0 }}

@@ -137,8 +137,16 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   const investmentValidationSchema = Yup.object().shape({
     nameOfCompany: Yup.string().required("Name of company is required").nullable(),
     amountInvested: Yup.number().typeError("Must be a number").required("Amount is required").min(0, "Amount cannot be negative"),
-    dateOfInvestment: Yup.string().required("Date of investment is required").nullable(),
-    dateofExitorWriteOff: Yup.string().required("Date of exit or write off is required").nullable(),
+    dateOfInvestment: Yup.date()
+      .nullable()
+      .transform((curr, orig) => orig === '' ? null : curr)
+      .typeError("Please enter a valid date")
+      .required("Date of investment is required"),
+    dateofExitorWriteOff: Yup.date()
+      .nullable()
+      .transform((curr, orig) => orig === '' ? null : curr)
+      .typeError("Please enter a valid date")
+      .required("Date of exit or write off is required"),
     // exitOrWriteOff: Yup.string().required("Required").nullable(),
     moic: Yup.string().required("MOIC is required").nullable(),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
@@ -273,6 +281,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     age: Yup.number()
       .typeError("Age must be a number")
       .min(0, "Age cannot be negative")
+      .max(100, "Age cannot be greater than 100")
       .required("Age is required")
       .nullable(),
     qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
@@ -415,7 +424,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               <TextField
                 required
                 fullWidth
-                type="number"
+                type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                 id="age"
                 label="Age"
                 inputProps={{ min: 0 }}
@@ -511,7 +520,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               <TextField
                 required
                 fullWidth
-                type="number"
+                type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                 id="yearsWorkedTogether"
                 label="No. Of Years Worked Together Among Partners"
                 inputProps={{ min: 0 }}
@@ -588,7 +597,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TextField
                         required
                         fullWidth
-                        type="number"
+                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                         label="Amount Invested (₹ Crore)"
                         size="small"
                         inputProps={{ min: 0 }}
@@ -604,7 +613,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         <Controller
                           name="dateOfInvestment"
                           control={leadControl}
-                          render={({ field }) => (
+                          render={({ field, fieldState: { invalid, error } }) => (
                             <DesktopDatePicker
                               label="Date Of Investment"
                               inputFormat="DD/MM/YYYY"
@@ -615,8 +624,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                                   {...params}
                                   size="small"
                                   fullWidth
-                                  error={!!leadErrors.dateOfInvestment}
-                                  helperText={leadErrors.dateOfInvestment?.message as string}
+                                  error={invalid}
+                                  helperText={error?.message || null}
                                   InputLabelProps={{ shrink: true }}
                                   sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                 />
@@ -631,7 +640,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         <Controller
                           name="dateofExitorWriteOff"
                           control={leadControl}
-                          render={({ field }) => (
+                          render={({ field, fieldState: { invalid, error } }) => (
                             <DesktopDatePicker
                               label="Date Of Exit"
                               inputFormat="DD/MM/YYYY"
@@ -642,8 +651,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                                   {...params}
                                   size="small"
                                   fullWidth
-                                  error={!!leadErrors.dateofExitorWriteOff}
-                                  helperText={leadErrors.dateofExitorWriteOff?.message as string}
+                                  error={invalid}
+                                  helperText={error?.message || null}
                                   InputLabelProps={{ shrink: true, required: true }}
                                   sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                 />
@@ -830,7 +839,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TextField
                         required
                         fullWidth
-                        type="number"
+                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                         label="Amount Invested (₹ Crore)"
                         size="small"
                         inputProps={{ min: 0 }}
@@ -846,7 +855,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         <Controller
                           name="dateOfInvestment"
                           control={nonLeadControl}
-                          render={({ field }) => (
+                          render={({ field, fieldState: { invalid, error } }) => (
                             <DesktopDatePicker
                               label="Date Of Investment"
                               inputFormat="DD/MM/YYYY"
@@ -858,8 +867,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                                   required
                                   size="small"
                                   fullWidth
-                                  error={!!nonLeadErrors.dateOfInvestment}
-                                  helperText={nonLeadErrors.dateOfInvestment?.message as string}
+                                  error={invalid}
+                                  helperText={error?.message || null}
                                   InputLabelProps={{ shrink: true, required: true }}
                                   sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                 />
@@ -874,7 +883,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         <Controller
                           name="dateofExitorWriteOff"
                           control={nonLeadControl}
-                          render={({ field }) => (
+                          render={({ field, fieldState: { invalid, error } }) => (
                             <DesktopDatePicker
                               label="Date Of Exit"
                               inputFormat="DD/MM/YYYY"
@@ -886,8 +895,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                                   required
                                   size="small"
                                   fullWidth
-                                  error={!!nonLeadErrors.dateofExitorWriteOff}
-                                  helperText={nonLeadErrors.dateofExitorWriteOff?.message as string}
+                                  error={invalid}
+                                  helperText={error?.message || null}
                                   InputLabelProps={{ shrink: true, required: true }}
                                   sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                                 />

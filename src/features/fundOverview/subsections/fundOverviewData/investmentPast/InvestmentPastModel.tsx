@@ -193,7 +193,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    dateOfInvestment: Yup.string().required("Investment Date is required").nullable(),
+    dateOfInvestment: Yup.date()
+      .nullable()
+      .transform((curr, orig) => orig === '' ? null : curr)
+      .typeError("Please enter a valid date")
+      .required("Investment Date is required"),
     amountInvested: Yup.string().transform((val) => (isNaN(val) ? undefined : val)).required("Deal Size is required").test("max-value", "Value cannot exceed 10000", (value) => {
       if (!value) return true;
       return parseFloat(value) <= 10000;
@@ -295,7 +299,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               <Controller
                 name="dateOfInvestment"
                 control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                render={({ field: { onChange, value }, fieldState: { invalid, error } }) => (
                   <DesktopDatePicker
                     label="Investment Date"
                     inputFormat="DD/MM/YYYY"
@@ -308,8 +312,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                       <TextField
                         {...params}
                         fullWidth
-                        error={!!error}
-                        helperText={error?.message}
+                        error={invalid}
+                        helperText={error?.message || null}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                       />
                     )}
@@ -474,7 +478,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <TextField
               required
               fullWidth
-              type="number"
+              type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
               id="grossIrr"
               label="Gross IRR (%)"
               value={investmentPastFormData.grossIrr || ''}
@@ -541,7 +545,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <TextField
               required
               fullWidth
-              type="number"
+              type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
               id="timeTakenFromSourcingToClosure"
               label="Time Taken From Sourcing To Closure (In Months)"
               inputProps={{ min: 0 }}

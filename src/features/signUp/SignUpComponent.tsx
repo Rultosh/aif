@@ -87,27 +87,27 @@ const SignUp = () => {
         if (ev.target.id == 'username') {
             let username = ev.target.value;
             username = username && username.toLowerCase();
-            if (username != '' &&
-                ((username.substring(username.indexOf('@')) != '@gmail.com') &&
-                    (username.substring(username.indexOf('@')) != '@yahoo.com') &&
-                    (username.substring(username.indexOf('@')) != '@yahoo.co.in') &&
-                    (username.substring(username.indexOf('@')) != '@rediffmail.com') &&
-                    (username.substring(username.indexOf('@')) != '@hotmail.com') &&
-                    (username.substring(username.indexOf('@')) != '@yahoomail.com'))) {
-                setFormDataEmail(true);
-                ev.preventDefault();
-                let copiedValue = { ...formData }
-                let key = ev.target.id ? ev.target.id : ev.target.name;
-                copiedValue[key as keyof typeof formData] = ev.target.value;
-                setFormData(copiedValue);
-            } else {
-                setFormDataEmail(false);
-                ev.preventDefault();
-                let copiedValue = { ...formData }
-                let key = ev.target.id ? ev.target.id : ev.target.name;
-                copiedValue[key as keyof typeof formData] = undefined;
-                setFormData(copiedValue);
-            }
+            // if (username != '' &&
+            //     ((username.substring(username.indexOf('@')) != '@gmail.com') &&
+            //         (username.substring(username.indexOf('@')) != '@yahoo.com') &&
+            //         (username.substring(username.indexOf('@')) != '@yahoo.co.in') &&
+            //         (username.substring(username.indexOf('@')) != '@rediffmail.com') &&
+            //         (username.substring(username.indexOf('@')) != '@hotmail.com') &&
+            //         (username.substring(username.indexOf('@')) != '@yahoomail.com'))) {
+            setFormDataEmail(true);
+            ev.preventDefault();
+            let copiedValue = { ...formData }
+            let key = ev.target.id ? ev.target.id : ev.target.name;
+            copiedValue[key as keyof typeof formData] = ev.target.value;
+            setFormData(copiedValue);
+            // } else {
+            //     setFormDataEmail(false);
+            //     ev.preventDefault();
+            //     let copiedValue = { ...formData }
+            //     let key = ev.target.id ? ev.target.id : ev.target.name;
+            //     copiedValue[key as keyof typeof formData] = undefined;
+            //     setFormData(copiedValue);
+            // }
         } else {
             ev.preventDefault();
             let copiedValue = { ...formData }
@@ -167,7 +167,7 @@ const SignUp = () => {
             .string()
             .trim()
             .test("Invalid input entered", function (value: any) {
-                const pattern = /[<>\/]/;
+                const pattern = /[<>]/;
                 const isNotValidInput = pattern.test(value);
                 if (isNotValidInput) {
                     return false;
@@ -182,6 +182,8 @@ const SignUp = () => {
             .required("Contact Person is required"),
         sebiRegistrationDate: Yup.date()
             .nullable()
+            .transform((curr, orig) => orig === '' ? null : curr)
+            .typeError("Please enter a valid date")
             .max(new Date(), "SEBI Registration Date cannot be a future date")
             .required("SEBI Registration Date is required"),
         username: Yup
@@ -197,10 +199,10 @@ const SignUp = () => {
                     return false;
                 }
                 return true;
-            })
-            .test("organization-email", "Enter your official email id", function (value: any) {
-                return !checkPublicMailsIds(value);
             }),
+        // .test("organization-email", "Enter your official email id", function (value: any) {
+        //     return !checkPublicMailsIds(value);
+        // }),
         title: Yup
             .string()
             .matches(/^[A-Za-z. ]*$/, 'Please enter valid title')
