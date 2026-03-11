@@ -68,17 +68,18 @@ const SignUp = () => {
     const captchaRef = React.createRef<ReCAPTCHA>();
 
     async function handleSubmitForm(data: any) {
-        const captchaResponse = await captchaRef.current?.executeAsync();
-        console.log("recaptcha", captchaResponse);
-        if (captchaResponse !== null && captchaResponse !== undefined) {
-            console.log(data)
-            setShowResponse(true)
-            dispatch(
-                signupUsersAsync(
-                    wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
-                )
-            )
-        }
+        setShowResponse(true)
+        // const captchaResponse = await captchaRef.current?.executeAsync();
+        // console.log("recaptcha", captchaResponse);
+        // if (captchaResponse !== null && captchaResponse !== undefined) {
+        //     console.log(data)
+        //     setShowResponse(true)
+        //     dispatch(
+        //         signupUsersAsync(
+        //             wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
+        //         )
+        //     )
+        // }
     }
 
 
@@ -256,6 +257,8 @@ const SignUp = () => {
     const onSubmit = (data: any) => {
         handleSubmitForm(data);
     };
+
+    console.log("showResponse: ", showResponse, "signupState: ", signupState)
 
     return (
         <Box sx={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
@@ -638,8 +641,11 @@ const SignUp = () => {
                                         aria-labelledby="modal-modal-title"
                                         aria-describedby="modal-modal-description"
                                         className="special_modal"
+                                        title={signupState.status.fetchStatus === 'idle' ? 'Registration Successful' : 'Registration Failed'}
                                         msg={signupState.response}
                                         status={signupState.status.fetchStatus}
+                                        btnText={signupState.status.fetchStatus === 'idle' ? 'Continue to Login' : 'Try Again'}
+                                        onBtnClick={signupState.status.fetchStatus === 'idle' ? () => navigate('/login') : handleClose}
                                     />
                                 </Box>
                             </Grid>
