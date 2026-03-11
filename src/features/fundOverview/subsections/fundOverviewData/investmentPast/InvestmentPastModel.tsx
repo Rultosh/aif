@@ -188,11 +188,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
 
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
   const htmlTagsNotAllowed = "Tags not allowed in input.";
-
+    const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
   const validationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
     sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
     dateOfInvestment: Yup.date()
       .nullable()
       .transform((curr, orig) => orig === '' ? null : curr)
@@ -208,13 +208,13 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       if (!value) return true;
       return parseFloat(String(value)) <= 100;
     }).nullable(),
-    moic: Yup.string().required("MOIC is required").nullable(),
+    moic: Yup.string().required("MOIC is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
     grossIrr: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Gross IRR is required").nullable(),
     timeTakenFromSourcingToClosure: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Time taken from sourcing to closure is required").min(0, "Time cannot be negative").nullable(),
     // conflictOfInterest: Yup.string().required("Conflict of Interest is required").nullable(),
-    stakeOfEmployee: Yup.string().nullable(),
-    investmentStageFundingRound: Yup.string().required("Investment Stage / Funding Round is required").nullable(),
-    investmentStageDealSourced: Yup.string().required("Deal Sourced Information is required").nullable(),
+    stakeOfEmployee: Yup.string().nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+    investmentStageFundingRound: Yup.string().required("Investment Stage / Funding Round is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+    investmentStageDealSourced: Yup.string().required("Deal Sourced Information is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
   });
 
   const {
@@ -292,6 +292,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               variant="outlined"
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+               inputProps={{maxLength :200}}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -352,6 +353,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                           ...fieldSx,
                           backgroundColor: "white"
                         }}
+                         inputProps={{maxLength :200}}
                       />
                     )}
                   />
@@ -397,6 +399,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.briefProfile?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+               inputProps={{maxLength :200}}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -457,6 +460,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               variant="outlined"
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+               inputProps={{maxLength :200}}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -472,6 +476,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               variant="outlined"
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+               inputProps={{maxLength :200}}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -522,6 +527,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.investmentStageFundingRound?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+               inputProps={{maxLength :1000}}
             />
           </Grid>
           <Grid item xs={12}>
@@ -539,6 +545,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.investmentStageDealSourced?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+               inputProps={{maxLength :1000}}
             />
           </Grid>
           <Grid item xs={12} md={12}>
@@ -576,6 +583,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.conflictOfInterest?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+               inputProps={{maxLength :1000}}
             />
           </Grid>
 

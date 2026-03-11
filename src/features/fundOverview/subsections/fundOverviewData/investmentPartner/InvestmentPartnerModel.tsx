@@ -133,9 +133,9 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     setShowNonLeadForm(false);
     setEditingNonLeadInvestment(defaultIIInvestmentResponsibleAsNonLead);
   };
-
+  const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
   const investmentValidationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name of company is required").nullable(),
+    nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
     amountInvested: Yup.number().typeError("Must be a number").required("Amount is required").min(0, "Amount cannot be negative"),
     dateOfInvestment: Yup.date()
       .nullable()
@@ -148,11 +148,11 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       .typeError("Please enter a valid date")
       .required("Date of exit or write off is required"),
     // exitOrWriteOff: Yup.string().required("Required").nullable(),
-    moic: Yup.string().required("MOIC is required").nullable(),
+    moic: Yup.string().required("MOIC is required").nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
     comment: Yup.string().required("Comment on the Exit/Write off Process is required").nullable(),
-    howWasTheDealSourced: Yup.string().required("This field is required").nullable(),
-    addressOfCompany: Yup.string().required("Address of company is required").nullable()
+    howWasTheDealSourced: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
+    addressOfCompany: Yup.string().required("Address of company is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)")
   });
 
   const {
@@ -276,21 +276,21 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       .matches(/^[A-Za-z. ]*$/, 'Please enter valid title')
       .required("Title is required")
       .nullable(),
-    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
+    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
     age: Yup.number()
       .typeError("Age must be a number")
       .min(0, "Age cannot be negative")
       .max(100, "Age cannot be greater than 100")
       .required("Age is required")
       .nullable(),
-    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    description: Yup.string().required("Brief details of VC/PE Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    vcpeExperience: Yup.string().required("VC/PE Experience is required").nullable(),
-    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
+    description: Yup.string().required("Brief details of VC/PE Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
+    vcpeExperience: Yup.string().required("VC/PE Experience is required").nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
+    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
     yearsWorkedTogether: Yup.number().transform((val) => (isNaN(val) ? undefined : val))
       .min(0, "Years worked together cannot be negative").required("No. Of Years Worked Together Among Partners is required"),
-    legalCasesPending: Yup.string().required("Details Of Legal Cases Pending If Any In Court Of Law is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    legalCasesPending: Yup.string().required("Details Of Legal Cases Pending If Any In Court Of Law is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted, except (, . - _)"),
   });
 
   const {
@@ -402,6 +402,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     ml: '-1px'
                   }, '& .MuiFormLabel-asterisk': { display: 'none' }
                 }}
+                inputProps={{maxLength :200}}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -418,6 +419,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                inputProps={{maxLength :200}}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -452,6 +454,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                inputProps={{maxLength :200}}
               />
             </Grid>
             <Grid item xs={12}>
@@ -498,6 +501,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                inputProps={{maxLength :200}}
               />
             </Grid>
             <Grid item xs={12}>
@@ -514,6 +518,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                inputProps={{maxLength :200}}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -549,6 +554,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                inputProps={{maxLength :1000}}
               />
             </Grid>
 
@@ -591,6 +597,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.nameOfCompany?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :200}}
                       />
                     </Grid>
                     <Grid item xs={12} md={3}>
@@ -686,6 +693,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.moic?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :200}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -701,6 +709,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.addressOfCompany?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :1000}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -716,6 +725,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.comment?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :1000}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -731,6 +741,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.howWasTheDealSourced?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :1000}}
                       />
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -833,6 +844,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={nonLeadErrors.nameOfCompany?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :200}}
                       />
                     </Grid>
                     <Grid item xs={12} md={3}>
@@ -930,6 +942,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={nonLeadErrors.moic?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :200}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -945,6 +958,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={nonLeadErrors.addressOfCompany?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :1000}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -960,6 +974,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={nonLeadErrors.comment?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :1000}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -975,6 +990,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={nonLeadErrors.howWasTheDealSourced?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                        inputProps={{maxLength :1000}}
                       />
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>

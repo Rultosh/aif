@@ -39,20 +39,20 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-
+    const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
     const validationSchema = Yup.object().shape({
-        dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable(),
-        dfCurrentPipeline: Yup.string().required("This field is required").nullable(),
+        dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfCurrentPipeline: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
         // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
         // dfConversionRatio: Yup.number().required("This field is required").nullable(),
-        dfMeetingFrequency: Yup.string().required("This field is required").nullable(),
-        dfInvestigationDetails: Yup.string().required("This field is required").nullable(),
-        dfExclusiveVC: Yup.string().required("This field is required").nullable(),
-        dfDirectorshipsPolicy: Yup.string().required("This field is required").nullable(),
-        dfConsolidatedInfo: Yup.string().required("This field is required").nullable(),
-        dfNAVFrequency: Yup.string().required("This field is required").nullable(),
-        dfValuationReport: Yup.string().required("This field is required").nullable(),
-        dfNAVGuidelines: Yup.string().required("This field is required").nullable(),
+        dfMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfDirectorshipsPolicy: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {
@@ -141,6 +141,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfTotalDealsEvaluated?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -153,6 +154,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfCurrentPipeline?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -167,6 +169,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfMeetingFrequency?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -181,6 +184,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfInvestigationDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -195,6 +199,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfExclusiveVC?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -209,6 +214,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfDirectorshipsPolicy?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -226,6 +232,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfConsolidatedInfo?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
+                                inputProps={{maxLength :1000}}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting.</Typography>
@@ -238,6 +245,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfNAVFrequency?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
+                                inputProps={{maxLength :1000}}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report.</Typography>
@@ -250,6 +258,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfValuationReport?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
+                                inputProps={{maxLength :1000}}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV.</Typography>
@@ -262,6 +271,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfNAVGuidelines?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
+                                inputProps={{maxLength :1000}}
                             />
                         </Box>
                     </Grid>
