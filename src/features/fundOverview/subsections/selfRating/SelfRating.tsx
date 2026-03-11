@@ -94,7 +94,8 @@ export const SelfRating = (props: any) => {
 
         // Set isSubmitted based on initial data
         const initialScore = Number(selfRatingState.selfRatings.score || 0);
-        if (selfRatingState.selfRatings.id && initialScore >= 0.7) {
+        // if (selfRatingState.selfRatings.id && initialScore >= 0.7) {
+        if (selfRatingState.selfRatings.id) {
             setIsSubmitted(true);
         } else {
             setIsSubmitted(false);
@@ -328,13 +329,13 @@ export const SelfRating = (props: any) => {
             await handleClickSave();
             const currentScore = Number(selfRatingValue.score || 0);
             // alert(currentScore)
-            if (currentScore >= 0.7) {
+            // if (currentScore >= 0.7) {
                 setModalType('success');
                 setIsSubmitted(true);
-            } else {
-                setModalType('fail');
-                setIsSubmitted(false);
-            }
+            // } else {
+            //     setModalType('fail');
+            //     setIsSubmitted(false);
+            // }
             setShowResultModal(true);
         } catch (error: any) {
             console.error("Submit failure:", error);

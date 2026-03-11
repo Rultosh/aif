@@ -122,7 +122,6 @@ export const FundOverviewData = () => {
                         value={formValue["NameOfTheFund"]}
                         variant="standard"
                         onChange={handleChange}
-
                         sx={{ display: 'flex', ml: 2 }}
                     />
                 </Grid>

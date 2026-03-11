@@ -283,6 +283,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     age: Yup.number()
       .typeError("Age must be a number")
       .min(0, "Age cannot be negative")
+      .max(100, "Age cannot be greater than 100")
       .required("Age is required")
       .nullable(),
     qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
@@ -410,7 +411,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
               <TextField
                 required
                 fullWidth
-                type="number"
+                type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                 id="age"
                 label="Age"
                 inputProps={{ min: 0 }}
