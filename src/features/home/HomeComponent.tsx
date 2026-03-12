@@ -62,7 +62,7 @@ export const Home = (pros: any) => {
     const [selectedRow, setSelectedRow] = useState({} as any);
     const usersState = useAppSelector(selectUsers)
     const [actionUid] = useState(uuid());
-    const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 5 } as IPageInfo)
+    const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 100 } as IPageInfo)
     const [selectedRowHistory, setSelectedRowHistory] = useState(0);
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
