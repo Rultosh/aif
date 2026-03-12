@@ -11,6 +11,7 @@ export interface PrelimApplicationState {
   prelimApplication: IPrelimApplicationData,
   status: IStatus,
   allStatus: IStatus,
+  totalEntries: number,
 }
 
 export interface IPageInfo {
@@ -22,7 +23,8 @@ const initialState: PrelimApplicationState = {
   prelimApplications: [],
   prelimApplication: defaultIPrelimApplicationData,
   status: {},
-  allStatus: {}
+  allStatus: {},
+  totalEntries: 0
 }
 
 export const getPrelimApplicationData = createAsyncThunk(
@@ -56,7 +58,7 @@ export const getPrelimApplicationList = createAsyncThunk(
 );
 
 export const getPrelimApplicationAllList = createAsyncThunk(
-  'prelimApplicationlist/read',
+  'prelimApplicationAllList/read',
   async (args: ActionWrapper<IPageInfo>, { rejectWithValue }) => {
     try {
       if (args.argument) {
@@ -223,6 +225,9 @@ const prelimApplicationDataSlice = createSlice({
       .addCase(getPrelimApplicationList.rejected, (state, action) => {
         state.allStatus.fetchStatus = FetchStatus.FAILED;
         state.allStatus.message = (action.payload as IStatus)?.message;
+      })
+      .addCase(getPrelimApplicationAllList.fulfilled, (state, action: PayloadAction<IPrelimApplicationData[]>) => {
+        state.totalEntries = action.payload?.length || 0;
       })
       .addCase(createApplicationAsync.pending, state => {
         state.status.fetchStatus = FetchStatus.DOING;

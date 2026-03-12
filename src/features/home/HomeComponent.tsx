@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { wrapArgument } from '../../lib/api-status/actionWrapper';
-import { createPrelimApplicationAsync, createShellPrelimApplicationAsync, getPrelimApplicationList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
+import { createPrelimApplicationAsync, createShellPrelimApplicationAsync, getPrelimApplicationList, getPrelimApplicationAllList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
 import logo from '../../images/logo.png';
 import logoNps from '../../images/logo_nps.png';
 import uuid from "react-uuid";
@@ -62,14 +62,14 @@ export const Home = (pros: any) => {
     const [selectedRow, setSelectedRow] = useState({} as any);
     const usersState = useAppSelector(selectUsers)
     const [actionUid] = useState(uuid());
-    const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 5 } as IPageInfo)
+    const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 100 } as IPageInfo)
     const [selectedRowHistory, setSelectedRowHistory] = useState(0);
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
-    const [jumpPage, setJumpPage] = useState("1");
+    const totalEntries = prelimApplications.totalEntries || 0;
 
     const handleChange = (event: SelectChangeEvent) => {
-        let updatedPageInfo = { ...pageInfo, pageSize: parseInt(event.target.value) }
+        let updatedPageInfo = { ...pageInfo, pageSize: parseInt(event.target.value), pageNumber: 0 }
         setPageInfoSelect(parseInt(event.target.value));
         setPageInfo(updatedPageInfo)
         dispatch(getPrelimApplicationList(wrapArgument(
@@ -107,7 +107,9 @@ export const Home = (pros: any) => {
         if (CheckAuth.isUnauthorized) {
             navigate('/login')
         }
-    })
+        // Fetch total count once on mount
+        dispatch(getPrelimApplicationAllList(wrapArgument(actionUid, pageInfo)))
+    }, [])
 
     const tableHeaders = [
         "Fund Name",
@@ -142,24 +144,6 @@ export const Home = (pros: any) => {
     //         </React.Fragment>)
     // }
 
-    const nextPage = () => {
-        let updatedPageInfo = { ...pageInfo, pageNumber: Number(pageInfo.pageNumber) + 1 }
-        setPageInfo(updatedPageInfo)
-        setPageInfoSelect(pageInfo.pageSize);
-        dispatch(getPrelimApplicationList(wrapArgument(
-            actionUid, updatedPageInfo
-        )))
-    }
-
-    const previousPage = () => {
-        let updatedPageInfo = { ...pageInfo, pageNumber: Number(pageInfo.pageNumber) - 1 }
-        setPageInfo(updatedPageInfo)
-        setPageInfoSelect(pageInfo.pageSize);
-        dispatch(getPrelimApplicationList(wrapArgument(
-            actionUid, updatedPageInfo
-        )))
-    }
-
     const goToPage = (pageNo: number) => {
         let updatedPageInfo = { ...pageInfo, pageNumber: pageNo }
         setPageInfo(updatedPageInfo)
@@ -167,13 +151,6 @@ export const Home = (pros: any) => {
         dispatch(getPrelimApplicationList(wrapArgument(
             actionUid, updatedPageInfo
         )))
-    }
-
-    const handleJumpPage = () => {
-        const page = parseInt(jumpPage);
-        if (!isNaN(page) && page > 0) {
-            goToPage(page - 1);
-        }
     }
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
@@ -290,8 +267,8 @@ export const Home = (pros: any) => {
                         boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
                         border: '1px solid #edf2f7'
                     }}>
-                        <TableContainer sx={{ p: '0px' }}>
-                            <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                        <TableContainer sx={{ p: '0px', maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
+                            <Table sx={{ minWidth: 700 }} aria-label="customized table" stickyHeader>
                                 <TableHead sx={{ backgroundColor: '#f8fafc' }}>
                                     <TableRow>
                                         {headerComponent}
@@ -366,115 +343,53 @@ export const Home = (pros: any) => {
 
                         <Box sx={{
                             display: 'flex',
-                            justifyContent: 'flex-end',
+                            justifyContent: 'space-between',
                             alignItems: 'center',
                             p: '25px 24px',
                             gap: 4
                         }}>
-                            <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                                <IconButton
-                                    onClick={previousPage}
-                                    disabled={pageInfo.pageNumber <= 0}
-                                    sx={{
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '4px',
-                                        p: '8px',
-                                        color: '#333'
-                                    }}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Typography sx={{ fontSize: '14px', color: '#333' }}>Items per page:</Typography>
+                                <Select
+                                    value={pageInfoSelect.toString()}
+                                    onChange={handleChange as any}
+                                    size="small"
+                                    sx={{ height: '36px', fontSize: '14px', minWidth: '80px' }}
                                 >
-                                    <ChevronLeftIcon fontSize="small" />
-                                </IconButton>
-
-                                {[1, 2, 3].map((num) => (
-                                    <Box
-                                        key={num}
-                                        onClick={() => goToPage(num - 1)}
-                                        sx={{
-                                            border: '1px solid',
-                                            borderColor: pageInfo.pageNumber === num - 1 ? '#4466c1' : '#e2e8f0',
-                                            borderRadius: '4px',
-                                            width: '36px',
-                                            height: '36px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '14px',
-                                            fontWeight: pageInfo.pageNumber === num - 1 ? 600 : 400,
-                                            color: pageInfo.pageNumber === num - 1 ? '#4466c1' : '#333',
-                                            cursor: 'pointer',
-                                            backgroundColor: '#fff',
-                                            '&:hover': { backgroundColor: '#f8fafc' }
-                                        }}
-                                    >
-                                        {num}
-                                    </Box>
-                                ))}
-
-                                <Typography sx={{ mx: 1, color: '#64748b' }}>...</Typography>
-
-                                <Box
-                                    onClick={() => goToPage(9)}
-                                    sx={{
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '4px',
-                                        width: '36px',
-                                        height: '36px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: '14px',
-                                        color: '#333',
-                                        cursor: 'pointer',
-                                        backgroundColor: '#fff'
-                                    }}
-                                >
-                                    10
-                                </Box>
-
-                                <IconButton
-                                    onClick={nextPage}
-                                    disabled={prelimApplications.prelimApplications.length < pageInfo.pageSize}
-                                    sx={{
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '4px',
-                                        p: '8px',
-                                        color: '#333'
-                                    }}
-                                >
-                                    <ChevronRightIcon fontSize="small" />
-                                </IconButton>
+                                    <MenuItem value={5}>5</MenuItem>
+                                    <MenuItem value={10}>10</MenuItem>
+                                    <MenuItem value={20}>20</MenuItem>
+                                    <MenuItem value={50}>50</MenuItem>
+                                    <MenuItem value={100}>100</MenuItem>
+                                </Select>
                             </Box>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Typography sx={{ fontSize: '14px', color: '#333' }}>Page</Typography>
-                                <Box
-                                    component="input"
-                                    type="text"
-                                    value={jumpPage}
-                                    onChange={(e: any) => setJumpPage(e.target.value)}
+                            {/* <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
+                                Showing {prelimApplications.prelimApplications?.length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {prelimApplications.prelimApplications ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, totalEntries) : 0} of {totalEntries} entries
+                            </Typography> */}
+
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Pagination
+                                    count={Math.ceil(totalEntries / pageInfo.pageSize) || 1}
+                                    page={pageInfo.pageNumber + 1}
+                                    onChange={(event, value) => goToPage(value - 1)}
+                                    color="primary"
+                                    variant="outlined"
+                                    shape="rounded"
                                     sx={{
-                                        width: '45px',
-                                        height: '36px',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '4px',
-                                        textAlign: 'center',
-                                        fontSize: '14px',
-                                        outline: 'none',
-                                        '&:focus': { borderColor: '#4466c1' }
+                                        '& .MuiPaginationItem-root': {
+                                            borderColor: '#e2e8f0',
+                                            color: '#333',
+                                            backgroundColor: '#fff',
+                                            '&.Mui-selected': {
+                                                borderColor: '#4466c1',
+                                                color: '#4466c1',
+                                                backgroundColor: 'transparent',
+                                                fontWeight: 600
+                                            },
+                                        }
                                     }}
                                 />
-                                <Typography
-                                    onClick={handleJumpPage}
-                                    sx={{
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        color: '#1a1a1a',
-                                        cursor: 'pointer',
-                                        '&:hover': { color: '#FF671F' }
-                                    }}
-                                >
-                                    Go
-                                </Typography>
                             </Box>
                         </Box>
                     </Paper>
@@ -484,9 +399,6 @@ export const Home = (pros: any) => {
                         close={closeModel}
                         prelimDetails={selectedRow}
                     ></QueryResolutionModal>
-                        //investmentAssociateFormData={row}
-
-                        //prelimApplicationId={props.row.prelimApplicationId} />
                         : <></>}
 
                     {openHistoryModal ? <HistoryModal
@@ -495,9 +407,6 @@ export const Home = (pros: any) => {
                         close={closeModelHistory}
                         prelimDetails={selectedRowHistory}
                     ></HistoryModal>
-                        //investmentAssociateFormData={row}
-
-                        //prelimApplicationId={props.row.prelimApplicationId} />
                         : <></>}
                 </Container>
             </> : (
