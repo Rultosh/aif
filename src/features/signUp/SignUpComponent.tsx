@@ -69,17 +69,17 @@ const SignUp = () => {
 
     async function handleSubmitForm(data: any) {
         setShowResponse(true)
-        // const captchaResponse = await captchaRef.current?.executeAsync();
-        // console.log("recaptcha", captchaResponse);
-        // if (captchaResponse !== null && captchaResponse !== undefined) {
-        //     console.log(data)
-        //     setShowResponse(true)
-        //     dispatch(
-        //         signupUsersAsync(
-        //             wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
-        //         )
-        //     )
-        // }
+        const captchaResponse = await captchaRef.current?.executeAsync();
+        console.log("recaptcha", captchaResponse);
+        if (captchaResponse !== null && captchaResponse !== undefined) {
+            console.log(data)
+            setShowResponse(true)
+            dispatch(
+                signupUsersAsync(
+                    wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
+                )
+            )
+        }
     }
 
 
