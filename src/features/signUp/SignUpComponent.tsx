@@ -68,7 +68,6 @@ const SignUp = () => {
     const captchaRef = React.createRef<ReCAPTCHA>();
 
     async function handleSubmitForm(data: any) {
-        setShowResponse(true)
         const captchaResponse = await captchaRef.current?.executeAsync();
         console.log("recaptcha", captchaResponse);
         if (captchaResponse !== null && captchaResponse !== undefined) {
