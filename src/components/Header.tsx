@@ -19,8 +19,12 @@ import logoNps from '../images/logo_nps.png';
 // import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 import loginRupeeIconImg from '../images/logo_rupee_symbol.png'
-import { useAppSelector } from '../app/hooks';
-import { selectUsers } from '../features/admin/adminSlice';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
+import { fetchRoleAsync, selectUsers } from '../features/admin/adminSlice';
+import { wrapArgument } from '../lib/api-status/actionWrapper';
+import { useEffect, useState } from "react";
+import uuid from 'react-uuid';
+import { FetchStatus } from '../lib/api-status/IStatus';
 
 const Header = (props: any) => {
 
@@ -28,9 +32,15 @@ const Header = (props: any) => {
   const token = auth.token || localStorage.getItem('token');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const usersState = useAppSelector(selectUsers)
-
-
+  const dispatch = useAppDispatch();
+  const [actionUid] = useState(uuid());
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token && usersState.role === undefined && usersState.status.fetchStatus === FetchStatus.IDLE) {
+      dispatch(fetchRoleAsync(wrapArgument(actionUid, undefined)));
+    }
+  }, [token, usersState.role, usersState.status.fetchStatus, dispatch, actionUid]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
