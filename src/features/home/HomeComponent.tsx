@@ -167,13 +167,17 @@ export const Home = (pros: any) => {
         let color: "success" | "error" | "warning" | "info" | "default" | "primary" | "secondary" = "default";
         let label = String(getStatusDescription(row.stage, status));
 
-        if (status === 'APPROVED') {
+        if (status === 'APPROVED' || label === 'Approved') {
             color = "success";
         } else if (status === 'REJECTED' || status === 'CLOSED') {
             color = "error";
         } else if (status === 'SUBMITTED' || status === 'REVISE') {
             color = "warning";
-        } else if (status === 'CREATED' || status === 'TEMP_CLOSED') {
+        } else if (status === 'CREATED') {
+            color = "primary";
+        } else if (status === 'TEMP_CLOSED') {
+            color = "default";
+        } else {
             color = "default";
         }
 
@@ -293,16 +297,16 @@ export const Home = (pros: any) => {
                                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
                                                                 {row.nameOfTheFund}
                                                             </Typography>}
-                                                    </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
+                                                    </TableCell> : <TableCell align="left" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
                                                         {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
                                                     </TableCell>}
-                                                <TableCell align="center" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
-                                                <TableCell align="center" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
-                                                <TableCell align="center" sx={{ color: '#64748b' }}>{row.applicationSubmissionDate ? Moment(String(row.applicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>
-                                                {/* <TableCell align="center" sx={{ color: '#64748b' }}>{row.detailedApplicationSubmissionDate ? Moment(String(row.detailedApplicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell> */}
-                                                <TableCell align="center" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.sdTotalTargetCorpus)}</TableCell>
-                                                <TableCell align="center" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
-                                                <TableCell align="center">
+                                                <TableCell align="left" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
+                                                <TableCell align="left" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
+                                                <TableCell align="left" sx={{ color: '#64748b', width: '20%' }}>{row.applicationSubmissionDate ? Moment(String(row.applicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>
+                                                {/* <TableCell align="left" sx={{ color: '#64748b' }}>{row.detailedApplicationSubmissionDate ? Moment(String(row.detailedApplicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell> */}
+                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.sdTotalTargetCorpus)}</TableCell>
+                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
+                                                <TableCell align="left">
                                                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
                                                         <Tooltip title="Download Preview">
                                                             <IconButton size="small" sx={{ color: '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
