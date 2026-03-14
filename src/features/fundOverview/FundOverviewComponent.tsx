@@ -33,6 +33,7 @@ export const FundOverview = (props: any) => {
     const prelimApplicationState = useAppSelector(selectPrelimApplication);
     const selfRatingState = useAppSelector(selectSelfRatings);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
+    console.log('usersState ', usersState)
     const navigate = useNavigate();
 
     const { pathname } = useLocation();
@@ -133,7 +134,7 @@ export const FundOverview = (props: any) => {
                 </Box>
                 <Box sx={{ flexGrow: 1 }}>
                     {/* Chevron Stepper */}
-                    {!['USERADMIN', 'ADMIN'].includes(usersState.role || '') && (
+                    { (usersState.role != undefined && !['USERADMIN', 'ADMIN'].includes(usersState.role || '')) && (
                         <Box sx={{ width: '100%', display: 'flex', gap: 0.5 }}>
                             {filteredSteps.map((s, index, array) => {
                                 const isNew = id?.toString() === 'NEW';

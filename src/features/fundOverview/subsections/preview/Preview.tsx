@@ -15,7 +15,7 @@ import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import DocumentChip from "../../../../components/DocumentChip";
 import client from '../../../../app/api'
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { selectUsers } from '../../../admin/adminSlice'
+import { fetchRoleAsync, selectUsers } from '../../../admin/adminSlice'
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -77,6 +77,11 @@ export const Preview = (props: any) => {
             dispatch(getPrelimApplicationData(
                 wrapArgument(actionUid, Number(id))
             ))
+        }
+
+        // Fetch user role if missing (on refresh)
+        if (localStorage.getItem('token') && usersState.role === undefined && usersState.status.fetchStatus === FetchStatus.IDLE) {
+            dispatch(fetchRoleAsync(wrapArgument(actionUid, undefined)));
         }
     }, [])
 

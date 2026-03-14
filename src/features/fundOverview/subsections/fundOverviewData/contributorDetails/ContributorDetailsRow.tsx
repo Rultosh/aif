@@ -33,13 +33,13 @@ export const ContributorDetailsRow = (props: ContributorDetailsRowPros) => {
   }
 
   return <TableRow key={`${props.row.name}`}>
-    <TableCell align="center" component="th" scope="row">
+    <TableCell align="justify" component="th" scope="row">
       {props.row.name}
     </TableCell>
-    <TableCell align="center">{String(props.row.amount)}</TableCell>
-    <TableCell align="center">{String(props.row.percentOfCorpus)}</TableCell>
-    <TableCell align="center">{String(props.row.contributionType)}</TableCell>
-    <TableCell align="center">
+    <TableCell align="left">{String(props.row.amount)}</TableCell>
+    <TableCell align="left">{String(props.row.percentOfCorpus)}</TableCell>
+    <TableCell align="left">{String(props.row.contributionType)}</TableCell>
+    <TableCell align="left">
       <Edit onClick={handleOpen} sx={{ cursor: 'pointer', color: '#1976d2' }} />&nbsp;
       {props.row.name !== 'Sponsor' && (
         <Delete onClick={() => setDeleteConfirmOpen(true)} sx={{ cursor: 'pointer', color: '#d32f2f' }} />

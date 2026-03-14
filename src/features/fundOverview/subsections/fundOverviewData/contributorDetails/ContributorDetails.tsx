@@ -60,7 +60,7 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
     for (let i = 0; i < tableHeaders.length; i++) {
         headerComponent.push(
             <React.Fragment >
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
+                <TableCell align="left" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
             </React.Fragment>)
     }
 
@@ -95,10 +95,10 @@ export const ContributorDetails = (props: ContributorDetailsProps) => {
                                                     })
                                                 }
                                                     <TableRow>
-                                                        <TableCell align="center" component="th" scope="row" sx={{ fontWeight: 700 }}>
+                                                        <TableCell align="left" component="th" scope="row" sx={{ fontWeight: 700 }}>
                                                             Total Amount Contributed
                                                         </TableCell>
-                                                        <TableCell align="center" sx={{ fontWeight: 700 }}>{totalAmountwithstate}</TableCell>
+                                                        <TableCell align="left" sx={{ fontWeight: 700 }}>{totalAmountwithstate}</TableCell>
                                                     </TableRow>
                                                 </> : <></>
                                             }
