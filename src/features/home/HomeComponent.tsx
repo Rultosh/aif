@@ -101,7 +101,7 @@ export const Home = (pros: any) => {
             actionUid, pageInfo
         )))
     }, [prelimApplications.prelimApplication])
-    console.log(prelimApplications.prelimApplication);
+
     useEffect(() => {
         console.log("checking homeunauth", CheckAuth.isUnauthorized)
         if (CheckAuth.isUnauthorized) {
@@ -213,6 +213,7 @@ export const Home = (pros: any) => {
         }
 
     }
+
     return (
         <div className="homeComp">
             <NavigationBar></NavigationBar>
@@ -364,9 +365,9 @@ export const Home = (pros: any) => {
                                 </Select>
                             </Box>
 
-                            {/* <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
+                            <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
                                 Showing {prelimApplications.prelimApplications?.length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {prelimApplications.prelimApplications ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, totalEntries) : 0} of {totalEntries} entries
-                            </Typography> */}
+                            </Typography>
 
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <Pagination
