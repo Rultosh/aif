@@ -32,14 +32,14 @@ export const InvestmentPastRow = (props: InvestmentPastRowPros) => {
   }
 
   return <TableRow key={`${props.row.nameOfCompany}`}>
-    <TableCell align="center" component="th" scope="row">
+    <TableCell align="left" component="th" scope="row">
       {props.row.nameOfCompany}
     </TableCell>
-    <TableCell align="center">{props.row.sector}</TableCell>
-    <TableCell align="center">{String(props.row.amountInvested)}</TableCell>
-    <TableCell align="center">{Moment(String(props.row.dateOfInvestment)).format("DD/MM/YYYY")}</TableCell>
-    <TableCell align="center">{String(props.row.briefProfile)}</TableCell>
-    <TableCell align="center">
+    <TableCell align="left">{props.row.sector}</TableCell>
+    <TableCell align="left">{String(props.row.amountInvested)}</TableCell>
+    <TableCell align="left">{Moment(String(props.row.dateOfInvestment)).format("DD/MM/YYYY")}</TableCell>
+    <TableCell align="justify">{String(props.row.briefProfile)}</TableCell>
+    <TableCell align="left">
       <Edit onClick={handleOpen} sx={{ color: '#1976d2', cursor: 'pointer' }} />&nbsp;
       <Delete onClick={handleDelete} sx={{ color: '#d32f2f', cursor: 'pointer' }}></Delete>
     </TableCell>
