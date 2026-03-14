@@ -136,6 +136,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since Fund inception and Conversion ratio for transactions sourced to those completed.</Typography>
                         <TextField
                             fullWidth
+                            maxRows={4}
                             {...register("dfTotalDealsEvaluated")}
                             error={!!errors.dfTotalDealsEvaluated}
                             helperText={errors.dfTotalDealsEvaluated?.message as string}
@@ -149,6 +150,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         <Typography variant="body1" sx={labelSx}>2. What is the current pipeline of deals under consideration? Give details and timeline for investment.</Typography>
                         <TextField
                             fullWidth
+                            maxRows={4}
                             {...register("dfCurrentPipeline")}
                             error={!!errors.dfCurrentPipeline}
                             helperText={errors.dfCurrentPipeline?.message as string}
