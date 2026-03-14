@@ -353,7 +353,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                           ...fieldSx,
                           backgroundColor: "white"
                         }}
-                         inputProps={{maxLength :200}}
+                         
                       />
                     )}
                   />
