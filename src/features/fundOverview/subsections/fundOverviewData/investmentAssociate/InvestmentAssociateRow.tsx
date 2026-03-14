@@ -31,15 +31,15 @@ export const InvestmentAssociateRow = (props: InvestmentAssociateRowPros) => {
   }
 
   return <TableRow key={`${props.row.name}`}>
-    <TableCell align="center" component="th" scope="row">
+    <TableCell align="left" component="th" scope="row">
       {props.row.name}
     </TableCell>
-    <TableCell align="center">{props.row.designation}</TableCell>
-    <TableCell align="center">{String(props.row.age)}</TableCell>
-    <TableCell align="center">{props.row.qualification}</TableCell>
-    <TableCell align="center">{String(props.row.investmentExperience)}</TableCell>
-    <TableCell align="center">{props.row.areaOfExpertise}</TableCell>
-    <TableCell align="center">
+    <TableCell align="left">{props.row.designation}</TableCell>
+    <TableCell align="left">{String(props.row.age)}</TableCell>
+    <TableCell align="left">{props.row.qualification}</TableCell>
+    <TableCell align="left">{String(props.row.investmentExperience)}</TableCell>
+    <TableCell align="justify">{props.row.areaOfExpertise}</TableCell>
+    <TableCell align="left">
       <Edit onClick={handleOpen} sx={{ color: '#2764c8', cursor: 'pointer' }} />&nbsp;&nbsp;
       <Delete onClick={handleDelete} sx={{ color: '#df3744', cursor: 'pointer' }}></Delete>
     </TableCell>

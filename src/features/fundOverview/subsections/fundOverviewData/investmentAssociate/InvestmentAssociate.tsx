@@ -60,7 +60,7 @@ export const InvestmentAssociate = (props: InvestmentAssociateProps) => {
     for (let i = 0; i < tableHeaders.length; i++) {
         headerComponent.push(
             <React.Fragment >
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
+                <TableCell align="justify" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
             </React.Fragment>)
     }
 
