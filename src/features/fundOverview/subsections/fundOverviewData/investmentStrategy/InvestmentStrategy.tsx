@@ -38,22 +38,22 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-
+    const freeformRegx=/^[a-zA-Z0-9_\.\- ]+$/;
     const validationSchema = Yup.object().shape({
-        isStrategyBasis: Yup.string().required("This field is required").nullable(),
+        isStrategyBasis: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
         // isFocusSectors: Yup.string().required("This field is required").nullable(),
-        isComparisonPast: Yup.string().required("This field is required").nullable(),
+        isComparisonPast: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
         // isSignificantChange: Yup.string().required("This field is required").nullable(),
-        isSectorSituations: Yup.string().required("This field is required").nullable(),
-        isControlsRights: Yup.string().required("This field is required").nullable(),
+        isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isControlsRights: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
         // isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
-        isRisksMitigation: Yup.string().required("This field is required").nullable(),
-        isRolledOverInvestments: Yup.string().required("This field is required").nullable(),
-        isGrossReturnObjective: Yup.string().required("This field is required").nullable(),
-        isTargetInvestmentSize: Yup.string().required("This field is required").nullable(),
-        isTargetNumberInvestments: Yup.string().required("This field is required").nullable(),
+        isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isRolledOverInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isGrossReturnObjective: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isTargetInvestmentSize: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isTargetNumberInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
         // isAverageHoldingPeriod: Yup.string().required("This field is required").nullable(),
-        isExitStrategy: Yup.string().required("This field is required").nullable(),
+        isExitStrategy: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
     });
 
     const {
@@ -123,6 +123,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         },
     };
 
+
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
         return (
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
@@ -138,6 +139,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isStrategyBasis?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -152,6 +154,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isComparisonPast?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -166,6 +169,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isSectorSituations?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -180,6 +184,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isControlsRights?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -194,6 +199,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isRisksMitigation?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -208,6 +214,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isRolledOverInvestments?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -225,6 +232,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isGrossReturnObjective?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
+                                inputProps={{maxLength :1000}}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Target investment size and percentage stake</Typography>
@@ -237,6 +245,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isTargetInvestmentSize?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
+                                inputProps={{maxLength :1000}}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Target number of investments planned and Average holding period for a typical investment</Typography>
@@ -249,6 +258,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isTargetNumberInvestments?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
+                                inputProps={{maxLength :1000}}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Exit strategy</Typography>
@@ -261,6 +271,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isExitStrategy?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
+                                inputProps={{maxLength :1000}}
                             />
                         </Box>
                     </Grid>

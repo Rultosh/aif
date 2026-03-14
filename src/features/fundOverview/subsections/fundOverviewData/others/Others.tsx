@@ -37,14 +37,14 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-
+    const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
     const validationSchema = Yup.object().shape({
-        otExternalFirms: Yup.string().required("This field is required").nullable(),
-        otMonitoringActivities: Yup.string().required("This field is required").nullable(),
-        otContributorTerms: Yup.string().required("This field is required").nullable(),
-        otPlacementAgents: Yup.string().required("This field is required").nullable(),
-        otDecisionApprovals: Yup.string().required("This field is required").nullable(),
-        otEmployeeCost: Yup.string().required("This field is required").nullable(),
+        otExternalFirms: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        otMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        otContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        otPlacementAgents: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        otDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        otEmployeeCost: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {
@@ -114,6 +114,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otExternalFirms?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -128,6 +129,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otMonitoringActivities?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -142,6 +144,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otContributorTerms?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -156,6 +159,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otPlacementAgents?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -170,6 +174,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otDecisionApprovals?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -184,6 +189,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otEmployeeCost?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 

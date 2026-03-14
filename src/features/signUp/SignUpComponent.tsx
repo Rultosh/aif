@@ -154,7 +154,7 @@ const SignUp = () => {
             .string()
             .trim()
             .test("Invalid input entered", function (value: any) {
-                const pattern = /[<>\/]/;
+                const pattern =/^[A-Za-z0-9]+$/;
                 const isNotValidInput = pattern.test(value);
                 if (isNotValidInput) {
                     return false;
@@ -167,9 +167,9 @@ const SignUp = () => {
             .string()
             .trim()
             .test("Invalid input entered", function (value: any) {
-                const pattern = /[<>]/;
+                const pattern = /^[A-Za-z0-9]+$/;
                 const isNotValidInput = pattern.test(value);
-                if (isNotValidInput) {
+                if (!isNotValidInput) {
                     return false;
                 } else {
                     return true;
@@ -352,6 +352,7 @@ const SignUp = () => {
                                     helperText={errors.sebiRegistration?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
+                                    inputProps={{maxLength :200}}
                                 />
                             </Grid>
                             <Grid item xs={4}>
@@ -394,6 +395,7 @@ const SignUp = () => {
                                     helperText={errors.companyName?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
+                                    inputProps={{maxLength :200}}
                                 />
                             </Grid>
 
@@ -444,6 +446,7 @@ const SignUp = () => {
                                                 ml: '-1px'
                                             }
                                         }}
+                                        inputProps={{maxLength :200}}
                                     />
                                 </Box>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', px: 1 }}>
@@ -472,6 +475,7 @@ const SignUp = () => {
                                     helperText={errors.username?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
+                                    inputProps={{maxLength :200}}
                                 />
                             </Grid>
 
@@ -488,6 +492,7 @@ const SignUp = () => {
                                     helperText={errors.phoneNumber?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
+                                    inputProps={{max :10}}
                                 />
                             </Grid>
 
@@ -580,6 +585,7 @@ const SignUp = () => {
                                     helperText={errors.address?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
+                                    inputProps={{maxLength :500}}
                                 />
                             </Grid>
 

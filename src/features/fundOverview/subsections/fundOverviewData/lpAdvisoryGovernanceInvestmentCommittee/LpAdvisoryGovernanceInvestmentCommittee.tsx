@@ -37,15 +37,15 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-
+    const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
     const validationSchema = Yup.object().shape({
-        lpacDetails: Yup.string().required("This field is required").nullable(),
-        lpacMemberSelectionDetails: Yup.string().required("This field is required").nullable(),
-        lpacLpParticipationDetails: Yup.string().required("This field is required").nullable(),
-        lpacBindingApprovalRightsDetails: Yup.string().required("This field is required").nullable(),
-        lpacTotalNumberAndVotingMembersDetails: Yup.string().required("This field is required").nullable(),
-        lpacDecisionMakingProcess: Yup.string().required("This field is required").nullable(),
-        lpacIndependentMembersDetails: Yup.string().required("This field is required").nullable(),
+        lpacDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        lpacMemberSelectionDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        lpacLpParticipationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        lpacBindingApprovalRightsDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        lpacTotalNumberAndVotingMembersDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        lpacDecisionMakingProcess: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        lpacIndependentMembersDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {
@@ -127,6 +127,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
                     <Grid item xs={12} sx={qSx}>
@@ -140,6 +141,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacMemberSelectionDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -154,6 +156,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacBindingApprovalRightsDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -168,6 +171,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacTotalNumberAndVotingMembersDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -182,6 +186,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacDecisionMakingProcess?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -196,6 +201,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacIndependentMembersDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
@@ -210,6 +216,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacLpParticipationDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{maxLength :1000}}
                         />
                     </Grid>
 
