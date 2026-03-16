@@ -403,7 +403,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         }
     }
 
-    console.log((dealSubSectorValues as any)[String(prelimApplicationFormData?.dealSector || 0)]?.values, prelimApplicationFormData?.dealSubsector);
+   // console.log((dealSubSectorValues as any)[String(prelimApplicationFormData?.dealSector || 0)]?.values, prelimApplicationFormData?.dealSubsector);
 
     const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
     const htmlTagsNotAllowed = "Tags not allowed in input.";
@@ -423,7 +423,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             .max(new Date(), "Date cannot be a future date")
             .required("This value is required"),
         dealSector: Yup.string().required("Deal Sector is required").nullable(),
-        dealSubsector: Yup.string().required("Deal Sub Sector is required").nullable(),
+       // dealSubsector: Yup.string().required("Deal Sub Sector is required").nullable(),
         nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         contributionSought: Yup.string().required("Contribution Sought is required").test("test-name", "Enter value that cannot exceed 25% of target corpus", function (value: any) {
             let sdTotalTargetCorpusVal = Number(prelimApplicationFormData.sdTotalTargetCorpus || '0');
@@ -463,7 +463,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         targetReturnIRR: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Target Return must be a number").required("Target Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         fundSetupCost: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Fund set up cost must be a number").required("Fund set up cost is required").min(0, "Negative values not allowed"),
         otherExpenses: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Other Expenses must be a number").required("Other Expenses is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
-        justificationForHurdleCarryInterestRate: Yup.string().required("Justification for Hurdle and carry interest rate is required").nullable(),
+        //justificationForHurdleCarryInterestRate: Yup.string().required("Justification for Hurdle and carry interest rate is required").nullable(),
     });
 
     const {

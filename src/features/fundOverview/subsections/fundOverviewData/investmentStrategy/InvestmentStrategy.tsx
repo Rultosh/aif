@@ -48,7 +48,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         // isFocusSectors: Yup.string().required("This field is required").nullable(),
         isComparisonPast: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isSignificantChange: Yup.string().required("This field is required").nullable(),
-        isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        //isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         isControlsRights: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
         isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),

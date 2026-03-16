@@ -43,12 +43,12 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
     const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
     const validationSchema = Yup.object().shape({
-        otExternalFirms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+       // otExternalFirms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         otMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         otContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otPlacementAgents: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        //otPlacementAgents: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         otDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otEmployeeCost: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        //otEmployeeCost: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {

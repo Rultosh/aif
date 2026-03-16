@@ -357,7 +357,7 @@ export const Preview = (props: any) => {
                                     {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'SUBMITTED') && (
                                         <Box sx={{ display: 'flex', gap: 2 }}>
                                             <Button color='success' id='approve' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Approve
+                                                Forward
                                             </Button>
                                             <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revise
@@ -365,13 +365,13 @@ export const Preview = (props: any) => {
                                             <Button color='error' id='reject' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Reject
                                             </Button>
-                                            <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                                            {/*<Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
                                             <Button color='error' id='tempClose' onClick={handleClickSaveCloseAction} variant="outlined" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Temp Close
                                             </Button>
                                             <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="outlined" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Permanent Close
-                                            </Button>
+                                            </Button>*/}
                                         </Box>
                                     )}
 

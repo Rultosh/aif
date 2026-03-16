@@ -45,7 +45,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
     const validationSchema = Yup.object().shape({
         dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfCurrentPipeline: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        //dfCurrentPipeline: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
         // dfConversionRatio: Yup.number().required("This field is required").nullable(),
         dfMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
@@ -54,7 +54,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         dfDirectorshipsPolicy: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        //dfValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     });
 
