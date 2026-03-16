@@ -68,7 +68,7 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
     for (let i = 0; i < tableHeaders.length; i++) {
         headerComponent.push(
             <React.Fragment >
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
+                <TableCell align="left" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
             </React.Fragment>)
     }
 

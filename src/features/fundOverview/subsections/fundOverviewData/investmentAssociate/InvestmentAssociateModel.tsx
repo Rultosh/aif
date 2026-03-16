@@ -502,6 +502,8 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 error={!!errors.areaOfExpertise}
                 helperText={errors.areaOfExpertise?.message as string}
                 variant="outlined"
+                multiline
+                maxRows={4}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
