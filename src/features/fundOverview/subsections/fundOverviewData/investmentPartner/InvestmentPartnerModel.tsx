@@ -501,7 +501,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 200 }}
+                inputProps={{maxLength :1000}}
               />
             </Grid>
             <Grid item xs={12}>
