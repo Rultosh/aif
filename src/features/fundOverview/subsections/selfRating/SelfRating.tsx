@@ -14,6 +14,7 @@ import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import { selectUsers } from '../../../admin/adminSlice'
+import { Controller } from "react-hook-form";
 // import { useForm } from "react-hook-form";
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import * as Yup from "yup";
@@ -41,6 +42,29 @@ export const SelfRating = (props: any) => {
     const usersState = useAppSelector(selectUsers)
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
+    const controlSx = {
+        color: '#FF671F',
+        '&.Mui-checked': {
+            color: '#FF671F',
+        },
+    };
+
+    const getRefinedQuestions = (mType: string | undefined, aifType: string | undefined) => {
+        const manager = mType || "First Time Fund Manager";
+        const category = aifType || "Equity Oriented Fund";
+
+        const questions = manager === "First Time Fund Manager"
+            ? JSON.parse(JSON.stringify(questionsForFirstTime.selfRatingQuestions))
+            : JSON.parse(JSON.stringify(questionsForMoreThanOne.selfRatingQuestions));
+
+        const qIndex = manager === "First Time Fund Manager" ? 10 : 14;
+
+        if (category === "Debt Oriented Fund") {
+            questions[qIndex].options = [">=18%", ">=15% & <18%", ">=12% & <15%", "<12%"];
+        }
+        return questions;
+    };
+
     // const selfRatingCookie = getCookie('selfRating') || '0';
     // const [selfRating, setSelfRating] = useCookie('selfRating', selfRatingCookie);
 
@@ -69,15 +93,16 @@ export const SelfRating = (props: any) => {
 
         // Initialize questions and scoreboard based on loaded data
         const currentManagerType = selfRatingState.selfRatings.managerType || "First Time Fund Manager";
-        const questions = currentManagerType === "First Time Fund Manager"
-            ? questionsForFirstTime.selfRatingQuestions
-            : questionsForMoreThanOne.selfRatingQuestions;
+        const currentOrientedType = selfRatingState.selfRatings.fundType || "Equity Oriented Fund";
+
+        const questions = getRefinedQuestions(String(currentManagerType), String(currentOrientedType));
 
         setSelfQuestions(questions);
         setManagerType(currentManagerType);
 
+
         const newScoreBoard: any = {};
-        questions.forEach((q, index) => {
+        questions.forEach((q: any, index: number) => {
             const answer = selfRatingState.selfRatings[`q${index + 1}` as keyof ISelfRating];
             if (answer) {
                 const optIndex = q.options.indexOf(String(answer));
@@ -191,15 +216,23 @@ export const SelfRating = (props: any) => {
         e.preventDefault?.();
         const copiedValue: any = { ...defaultIISelfRating };
         const key = e.target.id ? e.target.id : e.target.name;
-        copiedValue[key] = e.target.value;
-        console.log("managerType", e.target.value as String);
-        setManagerType(e.target.value as String);
-        setSelfQuestions(e.target.value === "First Time Fund Manager" ?
-            questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
+        const newValue = e.target.value;
+        copiedValue[key] = newValue;
+
+        const mType = key === "managerType" ? newValue : (managerType || "First Time Fund Manager");
+        const aifType = key === "fundType" ? newValue : (copiedValue.fundType || "Equity Oriented Fund");
+
+        console.log("managerType", mType);
+        setManagerType(mType);
+
+        const questions = getRefinedQuestions(String(mType), String(aifType));
+        setSelfQuestions(questions);
+
         setScoreBoard({});
         setSelfRatingValue(copiedValue);
         setIsSubmitted(false);
     };
+
 
 
     const handleChange = (e: any, idx: any) => {
@@ -330,8 +363,8 @@ export const SelfRating = (props: any) => {
             const currentScore = Number(selfRatingValue.score || 0);
             // alert(currentScore)
             // if (currentScore >= 0.7) {
-                setModalType('success');
-                setIsSubmitted(true);
+            setModalType('success');
+            setIsSubmitted(true);
             // } else {
             //     setModalType('fail');
             //     setIsSubmitted(false);
@@ -400,45 +433,58 @@ export const SelfRating = (props: any) => {
                         <Grid container spacing={3}>
                             <Grid item xs={12} sx={{ paddingTop: '0px !important' }}>
                                 <Box sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
                                     p: 2,
                                     borderRadius: '12px',
                                     backgroundColor: 'rgba(54, 48, 98, 0.02)',
                                     border: '1px dashed rgba(54, 48, 98, 0.2)'
                                 }}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
-                                        First Time Fund Manager?
-                                    </Typography>
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={managerType === "First Time Fund Manager" || !managerType}
-                                                onChange={(e) => {
-                                                    const value = e.target.checked ? "First Time Fund Manager" : "Experienced Fund Manager";
-                                                    handleChangeFundManagerType({ target: { name: "managerType", value } });
-                                                }}
-                                                color="primary"
-                                                sx={{
-                                                    '& .MuiSwitch-switchBase': {
-                                                        color: '#FF671F',
-                                                    },
-                                                    '& .MuiSwitch-switchBase.Mui-checked': {
-                                                        color: '#FF671F',
-                                                    },
-                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                                        backgroundColor: '#FF671F',
-                                                    },
-                                                }}
-                                            />
-                                        }
-                                        label={
-                                            <Typography variant="body2" sx={{ fontWeight: 600, color: managerType === "First Time Fund Manager" || !managerType ? '#000000' : '#666' }}>
-                                                {managerType === "First Time Fund Manager" || !managerType ? "Yes" : "No"}
-                                            </Typography>
-                                        }
-                                    />
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
+                                            First time IM/AMC?
+                                        </Typography>
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    checked={managerType === "First Time Fund Manager" || !managerType}
+                                                    onChange={(e) => {
+                                                        const value = e.target.checked ? "First Time Fund Manager" : "Experienced Fund Manager";
+                                                        handleChangeFundManagerType({ target: { name: "managerType", value } });
+                                                    }}
+                                                    color="primary"
+                                                    sx={{
+                                                        '& .MuiSwitch-switchBase': {
+                                                            color: '#FF671F',
+                                                        },
+                                                        '& .MuiSwitch-switchBase.Mui-checked': {
+                                                            color: '#FF671F',
+                                                        },
+                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                            backgroundColor: '#FF671F',
+                                                        },
+                                                    }}
+                                                />
+                                            }
+                                            label={
+                                                <Typography variant="body2" sx={{ fontWeight: 600, color: managerType === "First Time Fund Manager" || !managerType ? '#000000' : '#666' }}>
+                                                    {managerType === "First Time Fund Manager" || !managerType ? "Yes" : "No"}
+                                                </Typography>
+                                            }
+                                        />
+                                    </Box>
+                                    <Box>
+                                        <RadioGroup
+                                            row
+                                            value={selfRatingValue.fundType || "Equity Oriented Fund"}
+                                            name="fundType"
+                                            onChange={(e) => {
+                                                handleChangeFundManagerType(e);
+                                            }}
+                                        >
+                                            <FormControlLabel value="Equity Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Equity Oriented Fund" />
+                                            <FormControlLabel value="Debt Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented Fund" />
+                                        </RadioGroup>
+                                    </Box>
+
                                 </Box>
                             </Grid>
                         </Grid>

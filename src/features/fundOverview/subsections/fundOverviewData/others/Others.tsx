@@ -8,6 +8,9 @@ import uuid from "react-uuid";
 import { FetchStatus } from "../../../../../lib/api-status/IStatus";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import DownloadIcon from '@mui/icons-material/Download';
+import { useParams } from 'react-router-dom';
+import DocumentChip from "../../../../../components/DocumentChip";
 import * as Yup from "yup";
 
 interface PrelimApplicationProps {
@@ -17,6 +20,7 @@ interface PrelimApplicationProps {
 }
 
 const Others = forwardRef((props: PrelimApplicationProps, ref) => {
+    const { id } = useParams();
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
@@ -37,14 +41,14 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
+    const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
     const validationSchema = Yup.object().shape({
-        otExternalFirms: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otPlacementAgents: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otEmployeeCost: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        otExternalFirms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otPlacementAgents: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otEmployeeCost: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {
@@ -104,22 +108,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>1. List of external firms (legal, technical, financial/accounting/valuation etc.) who are assisting / would be assisting the Investment Manager in the due diligence process.</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            maxRows={4}
-                            {...register("otExternalFirms")}
-                            error={!!errors.otExternalFirms}
-                            helperText={errors.otExternalFirms?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{maxLength :1000}}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>2. List the activities involved in monitoring and follow-up of investments? And How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same.</Typography>
+                        <Typography variant="body1" sx={labelSx}>1. List the activities involved in monitoring and follow-up of investments? And How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -129,12 +118,12 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otMonitoringActivities?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. Are all contributors governed by same terms and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor (along with reasons).</Typography>
+                        <Typography variant="body1" sx={labelSx}>2. Are all contributors governed by same terms and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor (along with reasons).</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -144,27 +133,12 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otContributorTerms?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. Has the Investment Manager or the Fund or the sponsor of anyone associated with the fund engaged any placement agents? If yes, please provide details of funds raised and payment(s) made / to be made to the agents. Please also clarify as to who is bearing the cost of the agents?</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            maxRows={4}
-                            {...register("otPlacementAgents")}
-                            error={!!errors.otPlacementAgents}
-                            helperText={errors.otPlacementAgents?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{maxLength :1000}}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. Who approves investment and divestment decisions? Please give details of the process of evaluation of the deals and approvals/investments/exits thereafter.</Typography>
+                        <Typography variant="body1" sx={labelSx}>3. Who approves investment and divestment decisions? Please give details of the process of evaluation of the deals and approvals/investments/exits thereafter.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -174,23 +148,49 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otDecisionApprovals?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>6. What is the overall employee cost for the last 3 years? Please indicate the CTC bands of various grades of employees (total, fixed & variable).</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            maxRows={4}
-                            {...register("otEmployeeCost")}
-                            error={!!errors.otEmployeeCost}
-                            helperText={errors.otEmployeeCost?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{maxLength :1000}}
-                        />
+                    <Grid item xs={12}>
+                        <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 0 }}>
+                            Empanelled list of external firms
+                        </Typography>
+
+                        <Box sx={{
+                            p: 3,
+                            border: '1px solid rgba(0,0,0,0.08)',
+                            borderRadius: '16px',
+                            backgroundColor: '#fafafa'
+                        }}>
+                            {Number(id) ? (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                                    <Button
+                                        variant="outlined"
+                                        href="/vcf/templates/Past_Track_Record_Template.xlsx"
+                                        size="small"
+                                        startIcon={<DownloadIcon />}
+                                        sx={{
+                                            textTransform: 'none',
+                                            borderRadius: '6px',
+                                            borderColor: 'rgba(54, 48, 98, 0.3)',
+                                            color: '#363062',
+                                            '&:hover': { borderColor: '#363062', backgroundColor: 'rgba(54, 48, 98, 0.05)' },
+                                            mb: '17px'
+                                        }}
+                                    >
+                                        Download Template
+                                    </Button>
+                                    <span style={{ marginTop: '10px' }}>
+                                        <DocumentChip label="Upload Document" id={`sdEmpanelledListOfExternalFirms${id}`} />
+                                    </span>
+                                </Box>
+                            ) : (
+                                <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                    Please save the form to upload documents.
+                                </Typography>
+                            )}
+                        </Box>
                     </Grid>
 
                     {/* <Grid item xs={12}>

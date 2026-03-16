@@ -9,6 +9,8 @@ import { FetchStatus } from "../../../../../lib/api-status/IStatus";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import DownloadIcon from '@mui/icons-material/Download';
+import { useParams } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
 
@@ -19,6 +21,7 @@ interface PrelimApplicationProps {
 }
 
 const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
+    const { id } = useParams();
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
@@ -39,20 +42,20 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
+    const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
     const validationSchema = Yup.object().shape({
-        dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        dfCurrentPipeline: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfCurrentPipeline: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
         // dfConversionRatio: Yup.number().required("This field is required").nullable(),
-        dfMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        dfInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        dfExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        dfDirectorshipsPolicy: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        dfConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        dfNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        dfValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        dfNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        dfMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfDirectorshipsPolicy: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {
@@ -142,26 +145,12 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfTotalDealsEvaluated?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>2. What is the current pipeline of deals under consideration? Give details and timeline for investment.</Typography>
-                        <TextField
-                            fullWidth
-                            maxRows={4}
-                            {...register("dfCurrentPipeline")}
-                            error={!!errors.dfCurrentPipeline}
-                            helperText={errors.dfCurrentPipeline?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{maxLength :1000}}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. Frequency of meetings to update the contributor.</Typography>
+                        <Typography variant="body1" sx={labelSx}>2. Frequency of meetings to update the contributor.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -171,12 +160,12 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfMeetingFrequency?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employee(s) of the Investment Manager have been investigated by any regulatory authority during the last 5 years? If yes, please give full details of the same.</Typography>
+                        <Typography variant="body1" sx={labelSx}>3. Has any of the member(s) of the Board of Directors of Investment Manager, Trustee, Sponsor or employee(s) of the Investment Manager have been investigated by any regulatory authority during the last 5 years? If yes, please give full details of the same.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -186,12 +175,12 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfInvestigationDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. Is the Investment Manager exclusively handling VC business or is it also doing any other business or activity?</Typography>
+                        <Typography variant="body1" sx={labelSx}>4. Is the Investment Manager exclusively handling VC/PE/Private Credit business or is it also doing any other business or activity?</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -201,12 +190,12 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfExclusiveVC?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>6. How many directorships does each Investment Manager (employee) hold?</Typography>
+                        <Typography variant="body1" sx={labelSx}>5. How many directorships does each Investment Manager (employee) hold in the investee company?</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -216,15 +205,15 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfDirectorshipsPolicy?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>7. What is the reporting structure/procedure for the contributors (quarterly/ half-yearly/annual).</Typography>
+                    <Grid item xs={12}>
+                        <Typography variant="body1" sx={labelSx}>6. What is the reporting structure/procedure for the contributors.</Typography>
 
                         <Box sx={{ ml: 2 }}>
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Consolidated information of investee companies.</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) What information about the portfolio companies is consolidated and reported to investors, and what is the frequency of such reporting?</Typography>
                             <TextField
                                 fullWidth
                                 multiline
@@ -234,10 +223,10 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfConsolidatedInfo?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting.</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting (quarterly/ half-yearly).</Typography>
                             <TextField
                                 fullWidth
                                 multiline
@@ -247,23 +236,10 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfNAVFrequency?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report.</Typography>
-                            <TextField
-                                fullWidth
-                                multiline
-                                maxRows={4}
-                                {...register("dfValuationReport")}
-                                error={!!errors.dfValuationReport}
-                                helperText={errors.dfValuationReport?.message as string}
-                                variant="outlined"
-                                sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{maxLength :1000}}
-                            />
-
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV.</Typography>
+                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Guidelines for calculating NAV.</Typography>
                             <TextField
                                 fullWidth
                                 multiline
@@ -273,8 +249,49 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfNAVGuidelines?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
+                        </Box>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 0 }}>
+                            Details of Current Pipeline of Deals Under Consideration
+                        </Typography>
+
+                        <Box sx={{
+                            p: 3,
+                            border: '1px solid rgba(0,0,0,0.08)',
+                            borderRadius: '16px',
+                            backgroundColor: '#fafafa'
+                        }}>
+                            {Number(id) ? (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                                    <Button
+                                        variant="outlined"
+                                        href="/vcf/templates/Past_Track_Record_Template.xlsx"
+                                        size="small"
+                                        startIcon={<DownloadIcon />}
+                                        sx={{
+                                            textTransform: 'none',
+                                            borderRadius: '6px',
+                                            borderColor: 'rgba(54, 48, 98, 0.3)',
+                                            color: '#363062',
+                                            '&:hover': { borderColor: '#363062', backgroundColor: 'rgba(54, 48, 98, 0.05)' },
+                                            mb: '17px'
+                                        }}
+                                    >
+                                        Download Template
+                                    </Button>
+                                    <span style={{ marginTop: '10px' }}>
+                                        <DocumentChip label="Upload Document" id={`sdDetailsOfCurrentPipelineOfDealsUnderConsideration${id}`} />
+                                    </span>
+                                </Box>
+                            ) : (
+                                <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                    Please save the form to upload documents.
+                                </Typography>
+                            )}
                         </Box>
                     </Grid>
 

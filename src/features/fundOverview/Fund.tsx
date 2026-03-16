@@ -1,4 +1,4 @@
-import { Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, CircularProgress } from "@mui/material";
+import { Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, CircularProgress, Switch, FormControlLabel } from "@mui/material";
 import FundOverviewData from "./subsections/fundOverviewData/FundOverviewData";
 import InvestmentPartner from "./subsections/fundOverviewData/investmentPartner/InvestmentPartner";
 import InvestmentStrategy from "./subsections/fundOverviewData/investmentStrategy/InvestmentStrategy";
@@ -27,6 +27,7 @@ export const Fund = (props: any) => {
     const [prelimApplicationId, setPrelimApplicationId] = useState(id);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [hasInvestment, setHasInvestment] = useState(false);
 
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
 
@@ -422,7 +423,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "3" ? '#000080' : '#444'
                                         }}>
-                                            Details Of Key Investment Team (At Partner Level)
+                                            Details Of Key Investment Team (At KMP Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -487,7 +488,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "4" ? '#000080' : '#444'
                                         }}>
-                                            Details Of Key Investment Team (At Associate Level)
+                                            Details of Investment Team Members (Other than KMP) – Maximum 5 Members
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -532,6 +533,11 @@ export const Fund = (props: any) => {
                                         px: 3,
                                         py: 1,
                                         backgroundColor: expanded === "5" ? 'rgba(54, 48, 98, 0.02)' : 'transparent',
+                                        '& .MuiAccordionSummary-content': {
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center'
+                                        }
                                     }}
                                 >
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -552,22 +558,69 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "5" ? '#000080' : '#444'
                                         }}>
-                                            Details Of Contributor To the Fund
+                                            Has any investment been made under the Fund?
                                         </Typography>
+                                    </Box>
+                                    <Box onClick={(e) => e.stopPropagation()}>
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    checked={hasInvestment}
+                                                    onChange={(e) => setHasInvestment(e.target.checked)}
+                                                    color="primary"
+                                                    size="small"
+                                                    sx={{
+                                                        '& .MuiSwitch-switchBase': {
+                                                            color: '#FF671F',
+                                                        },
+                                                        '& .MuiSwitch-switchBase.Mui-checked': {
+                                                            color: '#FF671F',
+                                                        },
+                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                            backgroundColor: '#FF671F',
+                                                        },
+                                                    }}
+                                                />
+                                            }
+                                            label={
+                                                <Typography variant="body2" sx={{ fontWeight: 600, color: hasInvestment ? '#000080' : '#666' }}>
+                                                    {hasInvestment ? "Yes" : "No"}
+                                                </Typography>
+                                            }
+                                        />
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <ContributorDetails prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleAccordionSaveAndContinue("5", "6", null)}
-                                                sx={internalButtonSx}
-                                            >
-                                                Save & Continue
-                                            </Button>
-                                        </Box>
+                                        {hasInvestment ? (
+                                            <>
+                                                <InvestmentPast prelimApplicationId={Number(prelimApplicationId)} />
+                                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => handleAccordionSaveAndContinue("5", "6", null)}
+                                                        sx={internalButtonSx}
+                                                    >
+                                                        Save & Continue
+                                                    </Button>
+                                                </Box>
+                                            </>
+                                        ) : (
+                                            <Box sx={{ p: 2, textAlign: 'center' }}>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    Select 'Yes' to view or add investments.
+                                                </Typography>
+                                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => handleAccordionSaveAndContinue("5", "6", null)}
+                                                        sx={internalButtonSx}
+                                                    >
+                                                        Continue
+                                                    </Button>
+                                                </Box>
+                                            </Box>
+                                        )}
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
@@ -617,22 +670,18 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "6" ? '#000080' : '#444'
                                         }}>
-                                            Investments Made, If Any From the Current Fund
+                                            LP Advisory Governance and Investment Committee
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <InvestmentPast prelimApplicationId={Number(prelimApplicationId)} />
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleAccordionSaveAndContinue("6", "7", null)}
-                                                sx={internalButtonSx}
-                                            >
-                                                Save & Continue
-                                            </Button>
-                                        </Box>
+                                        <LpAdvisoryGovernanceInvestmentCommittee
+                                            ref={lpAdvisoryGovernanceInvestmentCommitteeRef}
+                                            prelimApplicationId={String(prelimApplicationId)}
+                                            setPrelimApplicationId={handleApplicationIdCreation}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("6", "7", null)}
+                                        />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
@@ -682,14 +731,14 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "7" ? '#000080' : '#444'
                                         }}>
-                                            LP Advisory Governance and Investment Committee
+                                            Deal Flow/MIS
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <LpAdvisoryGovernanceInvestmentCommittee
-                                            ref={lpAdvisoryGovernanceInvestmentCommitteeRef}
+                                        <DealFlow
+                                            ref={dealFlowRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("7", "8", null)}
@@ -698,6 +747,7 @@ export const Fund = (props: any) => {
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
+
                         {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["8"]}
@@ -722,68 +772,6 @@ export const Fund = (props: any) => {
                                     sx={{
                                         px: 3,
                                         py: 1,
-                                        backgroundColor: expanded === "8" ? 'rgba(54, 48, 98, 0.02)' : 'transparent',
-                                    }}
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Box sx={{
-                                            width: 32,
-                                            height: 32,
-                                            borderRadius: '50%',
-                                            backgroundColor: expanded === "8" ? '#000080' : '#f0f0f0',
-                                            color: expanded === "8" ? 'white' : '#666',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            mr: 2,
-                                            fontWeight: 700,
-                                            fontSize: '0.9rem'
-                                        }}>8</Box>
-                                        <Typography sx={{
-                                            fontWeight: 700,
-                                            color: expanded === "8" ? '#000080' : '#444'
-                                        }}>
-                                            Deal Flow/MIS
-                                        </Typography>
-                                    </Box>
-                                </AccordionSummary>
-                                <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
-                                    <Box sx={{ pt: 2 }}>
-                                        <DealFlow
-                                            ref={dealFlowRef}
-                                            prelimApplicationId={String(prelimApplicationId)}
-                                            setPrelimApplicationId={handleApplicationIdCreation}
-                                            onSaveSuccess={() => handleAccordionSaveAndContinue("8", "9", null)}
-                                        />
-                                    </Box>
-                                </AccordionDetails>
-                            </Accordion>
-                        </Grid> : <></>}
-
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
-                            <Accordion
-                                ref={accordionRefs["9"]}
-                                elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#000080',
-                                        borderLeft: '6px solid #000080'
-                                    }
-                                }}
-                                expanded={expanded === "9"}
-                                onChange={handleChange("9")}
-                            >
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon sx={{ color: expanded === "9" ? '#000080' : '#666' }} />}
-                                    sx={{
-                                        px: 3,
-                                        py: 1,
                                         backgroundColor: expanded === "9" ? 'rgba(54, 48, 98, 0.02)' : 'transparent',
                                     }}
                                 >
@@ -800,10 +788,10 @@ export const Fund = (props: any) => {
                                             mr: 2,
                                             fontWeight: 700,
                                             fontSize: '0.9rem'
-                                        }}>9</Box>
+                                        }}>8</Box>
                                         <Typography sx={{
                                             fontWeight: 700,
-                                            color: expanded === "9" ? '#000080' : '#444'
+                                            color: expanded === "8" ? '#000080' : '#444'
                                         }}>
                                             Others
                                         </Typography>
@@ -815,7 +803,7 @@ export const Fund = (props: any) => {
                                             ref={othersRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
-                                            onSaveSuccess={() => handleAccordionSaveAndContinue("9", null, null)}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("8", null, null)}
                                         />
                                     </Box>
                                 </AccordionDetails>

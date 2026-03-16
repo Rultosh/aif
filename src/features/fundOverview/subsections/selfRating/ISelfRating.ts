@@ -18,7 +18,8 @@ export interface ISelfRating {
   q14: string | undefined,
   q15: string | undefined,
   q16: string | undefined,
-  q17: string | undefined
+  q17: string | undefined,
+  fundType: string | undefined,
   q1Comments: string | undefined,
   q2Comments: string | undefined,
   q3Comments: string | undefined,
@@ -60,6 +61,7 @@ export const defaultIISelfRating = {
   q15: undefined,
   q16: undefined,
   q17: undefined,
+  fundType: "Equity Oriented Fund",
   q1Comments: undefined,
   q2Comments: undefined,
   q3Comments: undefined,
