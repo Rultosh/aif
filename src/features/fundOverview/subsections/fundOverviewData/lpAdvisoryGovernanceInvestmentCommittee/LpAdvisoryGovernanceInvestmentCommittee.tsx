@@ -37,15 +37,15 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
+    const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
     const validationSchema = Yup.object().shape({
-        lpacDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        lpacMemberSelectionDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        lpacLpParticipationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        lpacBindingApprovalRightsDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        lpacTotalNumberAndVotingMembersDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        lpacDecisionMakingProcess: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        lpacIndependentMembersDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        lpacDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        lpacMemberSelectionDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        lpacLpParticipationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        lpacBindingApprovalRightsDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        lpacTotalNumberAndVotingMembersDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        lpacDecisionMakingProcess: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        lpacIndependentMembersDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {
@@ -127,7 +127,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
                     <Grid item xs={12} sx={qSx}>
@@ -141,27 +141,12 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacMemberSelectionDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. Does LPAC have binding approval rights or only advisory powers? Provide details.</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            maxRows={4}
-                            {...register("lpacBindingApprovalRightsDetails")}
-                            error={!!errors.lpacBindingApprovalRightsDetails}
-                            helperText={errors.lpacBindingApprovalRightsDetails?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{maxLength :1000}}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. Total Number of Investment Committee members and the number of voting vs. non-voting members</Typography>
+                        <Typography variant="body1" sx={labelSx}>3. Total Number of Investment Committee members and the number of voting vs. non-voting members</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -171,12 +156,12 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacTotalNumberAndVotingMembersDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. Decisions in IC are taken through simple majority/Unanimously/Veto Rights.</Typography>
+                        <Typography variant="body1" sx={labelSx}>4. Decisions in IC are taken through simple majority/Unanimously/Veto Rights.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -186,12 +171,12 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacDecisionMakingProcess?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>6. Are any IC members independent? If yes, please provide details.</Typography>
+                        <Typography variant="body1" sx={labelSx}>5. Are any IC members independent? If yes, please provide details.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -201,12 +186,12 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacIndependentMembersDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>7. Can LPs participate in IC discussions? If yes, in what capacity?</Typography>
+                        <Typography variant="body1" sx={labelSx}>6. Can LPs participate in IC discussions? If yes, in what capacity?</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -216,7 +201,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacLpParticipationDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 

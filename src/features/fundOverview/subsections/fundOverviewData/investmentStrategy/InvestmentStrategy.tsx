@@ -9,6 +9,9 @@ import { FetchStatus } from "../../../../../lib/api-status/IStatus";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import DocumentChip from "../../../../../components/DocumentChip";
+import { useParams } from 'react-router-dom';
+import DownloadIcon from '@mui/icons-material/Download';
 import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
 
 interface PrelimApplicationProps {
@@ -18,6 +21,7 @@ interface PrelimApplicationProps {
 }
 
 const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
+    const { id } = useParams();
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
@@ -38,22 +42,22 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx=/^[a-zA-Z0-9_\.\- ]+$/;
+    const freeformRegx = /^[a-zA-Z0-9_\.\- ]+$/;
     const validationSchema = Yup.object().shape({
-        isStrategyBasis: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isStrategyBasis: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isFocusSectors: Yup.string().required("This field is required").nullable(),
-        isComparisonPast: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isComparisonPast: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isSignificantChange: Yup.string().required("This field is required").nullable(),
-        isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
-        isControlsRights: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isControlsRights: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
-        isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
-        isRolledOverInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
-        isGrossReturnObjective: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
-        isTargetInvestmentSize: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
-        isTargetNumberInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isRolledOverInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isGrossReturnObjective: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isTargetInvestmentSize: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isTargetNumberInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isAverageHoldingPeriod: Yup.string().required("This field is required").nullable(),
-        isExitStrategy: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted"),
+        isExitStrategy: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
     });
 
     const {
@@ -139,7 +143,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isStrategyBasis?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
@@ -154,27 +158,12 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isComparisonPast?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. Are there any sectors or types of transactions/situations you would not invest in? If yes, please give details and reasons for the same.</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            maxRows={4}
-                            {...register("isSectorSituations")}
-                            error={!!errors.isSectorSituations}
-                            helperText={errors.isSectorSituations?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{maxLength :1000}}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
+                        <Typography variant="body1" sx={labelSx}>3. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -184,12 +173,12 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isControlsRights?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. What are the risks associated with the investments planned under this Fund, and what strategies will be implemented to mitigate those risks?</Typography>
+                        <Typography variant="body1" sx={labelSx}>4. What are the risks associated with the investments planned under this Fund, and what strategies will be implemented to mitigate those risks?</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -199,12 +188,12 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isRisksMitigation?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>6. Have any investments been carried forward or rolled over from previous fund(s)? If yes, please provide the relevant details.</Typography>
+                        <Typography variant="body1" sx={labelSx}>5. Have any investments been carried forward or rolled over from previous fund(s)? If yes, please provide the relevant details.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -214,12 +203,12 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isRolledOverInvestments?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>7. Describe the following investment considerations:</Typography>
+                    <Grid item xs={12}>
+                        <Typography variant="body1" sx={labelSx}>6. Describe the following investment considerations:</Typography>
 
                         <Box sx={{ ml: 2 }}>
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Gross return objective of the overall fund</Typography>
@@ -232,7 +221,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isGrossReturnObjective?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Target investment size and percentage stake</Typography>
@@ -245,7 +234,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isTargetInvestmentSize?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Target number of investments planned and Average holding period for a typical investment</Typography>
@@ -258,7 +247,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isTargetNumberInvestments?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Exit strategy</Typography>
@@ -271,10 +260,52 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isExitStrategy?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
                         </Box>
                     </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 0 }}>
+                            Risk Assessment and Mitigation Plan
+                        </Typography>
+
+                        <Box sx={{
+                            p: 3,
+                            border: '1px solid rgba(0,0,0,0.08)',
+                            borderRadius: '16px',
+                            backgroundColor: '#fafafa'
+                        }}>
+                            {Number(id) ? (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                                    <Button
+                                        variant="outlined"
+                                        href="/vcf/templates/Past_Track_Record_Template.xlsx"
+                                        size="small"
+                                        startIcon={<DownloadIcon />}
+                                        sx={{
+                                            textTransform: 'none',
+                                            borderRadius: '6px',
+                                            borderColor: 'rgba(54, 48, 98, 0.3)',
+                                            color: '#363062',
+                                            '&:hover': { borderColor: '#363062', backgroundColor: 'rgba(54, 48, 98, 0.05)' },
+                                            mb: '17px'
+                                        }}
+                                    >
+                                        Download Template
+                                    </Button>
+                                    <span style={{ marginTop: '10px' }}>
+                                        <DocumentChip label="Upload Document" id={`sdRiskAssessmentAndMitigationPlan${id}`} />
+                                    </span>
+                                </Box>
+                            ) : (
+                                <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                    Please save the form to upload documents.
+                                </Typography>
+                            )}
+                        </Box>
+                    </Grid>
+
 
                     <Grid item xs={12}>
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, gap: 2 }}>

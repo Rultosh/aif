@@ -151,18 +151,18 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     setShowNonLeadForm(false);
     setEditingNonLeadInvestment(defaultIIInvestmentResponsibleAsNonLead);
   };
-  const freeformRegx=/^[a-zA-Z0-9_\.\-, ]+$/;
+  const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
   const investmentValidationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+    nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     amountInvested: Yup.number().typeError("Must be a number").required("Amount is required"),
     dateOfInvestment: Yup.string().required("Date of investment is required").nullable(),
     dateofExitorWriteOff: Yup.string().required("Date of exit or write off is required").nullable(),
-    exitOrWriteOff: Yup.string().required("Required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-    moic: Yup.string().required("MOIC is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+    exitOrWriteOff: Yup.string().required("Required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    moic: Yup.string().required("MOIC is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
-    comment: Yup.string().required("Comment is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-    howWasTheDealSourced: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-    addressOfCompany: Yup.string().required("Address of company is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)")
+    comment: Yup.string().required("Comment is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    howWasTheDealSourced: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    addressOfCompany: Yup.string().required("Address of company is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)")
   });
 
   const {
@@ -278,18 +278,18 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
       .matches(/^[A-Za-z. ]*$/, 'Please enter valid title')
       .required("Title is required")
       .nullable(),
-    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     age: Yup.number()
       .typeError("Age must be a number")
       .min(0, "Age cannot be negative")
       .max(100, "Age cannot be greater than 100")
       .required("Age is required")
       .nullable(),
-    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-    investmentExperience: Yup.string().required("VC/PE Experience is required").nullable(),
-    description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    investmentExperience: Yup.string().required("VC/PE/Private Credit Experience In Investing is required").nullable(),
+    description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
   });
 
   const {
@@ -334,7 +334,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details of Investment Team (At Associate Level)</Typography>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details of Investment Team Members (Other than KMP) – Maximum 5 Members</Typography>
         <Box component="form">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -389,7 +389,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                     ml: '-1px'
                   }, '& .MuiFormLabel-asterisk': { display: 'none' }
                 }}
-                inputProps={{maxLength :200}}
+                inputProps={{ maxLength: 200 }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -406,7 +406,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{maxLength :200}}
+                inputProps={{ maxLength: 200 }}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -441,14 +441,14 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{maxLength :200}}
+                inputProps={{ maxLength: 200 }}
               />
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth variant="outlined" error={!!errors.investmentExperience} sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}>
                 <InputLabel id="investmentExperience-label" sx={{
                   '&.Mui-focused': { color: '#FF671F' }
-                }}>Investment Experience</InputLabel>
+                }}>VC/PE/Private Credit Experience In Investing</InputLabel>
                 <Controller
                   name="investmentExperience"
                   control={control}
@@ -456,7 +456,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                     <Select
                       {...field}
                       labelId="investmentExperience-label"
-                      label="Investment Experience"
+                      label="VC/PE/Private Credit Experience In Investing"
                       onChange={(e) => {
                         field.onChange(e);
                         handleChange(e);
@@ -477,7 +477,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 required
                 fullWidth
                 id="description"
-                label="Brief Details Of VC/PE Experience"
+                label="Brief Details Of VC/PE/Private Credit Experience"
                 value={investmentAssociateFormData.description || ''}
                 {...register("description")}
                 error={!!errors.description}
@@ -507,7 +507,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{maxLength :200}}
+                inputProps={{ maxLength: 200 }}
               />
             </Grid>
             {investmentAssociateFormData.id && (

@@ -35,16 +35,23 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
     const [actionUid] = useState(uuid())
     const investmentPastsState = useAppSelector(selectInvestmentPast)
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const [isModelOpen, setIsModelOpen] = useState(false);
+    const handleOpen = () => setIsModelOpen(true);
+    const handleClose = () => setIsModelOpen(false);
+    const [hasInvestment, setHasInvestment] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (investmentPastsState.investmentPasts && investmentPastsState.investmentPasts.length > 0) {
+            setHasInvestment(true);
+        }
+    }, [investmentPastsState.investmentPasts])
 
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsAssociateLevelAsync', props.prelimApplicationId);
         dispatch(fetchInvestmentPastAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
-        setOpen(false)
+        setIsModelOpen(false)
     }, [investmentPastsState.actionStatus.fetchStatus === FetchStatus.IDLE, prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     useEffect(() => {
@@ -52,7 +59,7 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
         dispatch(fetchInvestmentPastAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
-        setOpen(false)
+        setIsModelOpen(false)
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     const tableHeaders = [
@@ -67,7 +74,7 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
 
     for (let i = 0; i < tableHeaders.length; i++) {
         headerComponent.push(
-            <React.Fragment >
+            <React.Fragment key={i}>
                 <TableCell align="left" sx={{ fontWeight: 'bold' }}>{tableHeaders[i]}</TableCell>
             </React.Fragment>)
     }
@@ -88,7 +95,7 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
                                     <TableBody>
                                         {investmentPastsState.investmentPasts && investmentPastsState.investmentPasts.length > 0 ?
                                             investmentPastsState.investmentPasts.map((row: IInvestmentPast) => (
-                                                <InvestmentPastRow row={row} />
+                                                <InvestmentPastRow key={row.id?.toString()} row={row} />
                                             )) : <TableRow><TableCell colSpan={7}>No Rows To Display</TableCell></TableRow>
                                         }
                                     </TableBody> : <TableBody>
@@ -110,9 +117,9 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
                         Add
                     </Button>
                     <InvestmentPastModel
-                        key='add-investment-past    '
+                        key='add-investment-past'
                         investmentPastFormData={defaultInvestmentPast}
-                        open={open}
+                        open={isModelOpen}
                         handleClose={handleClose}
                         prelimApplicationId={props.prelimApplicationId} />
                 </Grid>

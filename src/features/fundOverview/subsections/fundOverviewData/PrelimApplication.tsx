@@ -824,7 +824,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="termOfFund"
-                            label="Term of the Fund (Months)"
+                            label="Term of the Fund (Years)"
                             {...register("termOfFund")}
                             error={!!errors.termOfFund}
                             helperText={errors.termOfFund?.message as string}
@@ -843,7 +843,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="commitmentPeriod"
-                            label="Commitment Period (Months)"
+                            label="Commitment Period (Years)"
                             value={prelimApplicationFormData.commitmentPeriod || ''}
                             {...register("commitmentPeriod")}
                             error={!!errors.commitmentPeriod}
@@ -878,7 +878,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="targetReturnIRR"
-                            label="Target Return in the Fund (IRR in %)"
+                            label="Target Gross Return of the Fund (IRR in %)"
                             value={prelimApplicationFormData.targetReturnIRR || ''}
                             {...register("targetReturnIRR")}
                             error={!!errors.targetReturnIRR}
@@ -895,7 +895,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="managementFees"
-                            label="Management Fee (%)"
+                            label="Management Fee p.a. (%)"
                             value={prelimApplicationFormData.managementFees || ''}
                             {...register("managementFees")}
                             error={!!errors.managementFees}
@@ -912,17 +912,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="fundSetupCost"
-                            label="Fund Set Up Cost (₹ Crore)"
+                            label="Fund Set Up Cost (%)"
                             value={prelimApplicationFormData.fundSetupCost || ''}
                             {...register("fundSetupCost")}
                             error={!!errors.fundSetupCost}
-                            helperText={
-                                errors.fundSetupCost
-                                    ? (errors.fundSetupCost.message as string)
-                                    : (prelimApplicationFormData?.fundSetupCost
-                                        ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.fundSetupCost)) * 10000000)
-                                        : '')
-                            }
+                            helperText={errors.fundSetupCost?.message as string}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
@@ -935,7 +929,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="otherExpenses"
-                            label="Other Expenses (%)"
+                            label="Operating Expenses (%)"
                             value={prelimApplicationFormData.otherExpenses || ''}
                             {...register("otherExpenses")}
                             error={!!errors.otherExpenses}
@@ -963,23 +957,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
                         />
                     </Grid>
-                    <Grid item xs={12} md={4}>
-                        <TextField
-                            required
-                            fullWidth
-                            id="justificationForHurdleCarryInterestRate"
-                            label="Justification For Hurdle and Carried Interest Rate"
-                            value={prelimApplicationFormData.justificationForHurdleCarryInterestRate || ''}
-                            {...register("justificationForHurdleCarryInterestRate")}
-                            error={!!errors.justificationForHurdleCarryInterestRate}
-                            helperText={errors.justificationForHurdleCarryInterestRate?.message as string}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            variant="outlined"
-                            sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                        />
-                    </Grid>
-
                     <Grid item xs={12} md={4}>
                         {/* <FormControl variant="outlined" sx={{ display: 'flex', borderRadius: '8px' }}>
                             <InputLabel id="demo-simple-select-standard-label"
@@ -1049,51 +1026,14 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 key={"Textiles"} value={"Textiles"}>Textiles</MenuItem>
                             </Select>
                         </FormControl> */}
-                        <FormControl fullWidth>
-                            <Controller
-                                name="dealSector"
-                                control={control}
-                                render={({ field }) => (
-                                    <Autocomplete
-                                        {...field}
-                                        options={dealSectorOptions}
-                                        value={(field.value as any) || null}
-                                        onChange={(event, newValue) => {
-                                            field.onChange(newValue);
-                                            handleChange({
-                                                target: {
-                                                    name: "dealSector",
-                                                    value: newValue || ""
-                                                }
-                                            } as any);
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Deal Sector"
-                                                variant="outlined"
-                                                error={!!errors.dealSector}
-                                                helperText={errors.dealSector?.message}
-                                                sx={{
-                                                    ...fieldSx,
-                                                    backgroundColor: "white"
-                                                }}
-                                            />
-                                        )}
-                                    />
-                                )}
-                            />
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
                         <TextField
                             fullWidth
-                            id="dealSubsector"
-                            label="Deal Sub Sector"
-                            value={prelimApplicationFormData.dealSubsector || ''}
-                            {...register("dealSubsector")}
-                            error={!!errors.dealSubsector}
-                            helperText={errors.dealSubsector?.message as string}
+                            id="dealSector"
+                            label="Deal Sector"
+                            value={prelimApplicationFormData.dealSector || ''}
+                            {...register("dealSector")}
+                            error={!!errors.dealSector}
+                            helperText={errors.dealSector?.message as string}
                             onChange={(e) => {
                                 handleChange(e);
                             }}
@@ -1101,12 +1041,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             sx={fieldSx}
                         />
                     </Grid>
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} md={12}>
                         <TextField
                             required
                             fullWidth
                             id="description"
                             label="Sector Description/Stage"
+                            maxRows={4}
                             placeholder="e.g. Seed, Series A..."
                             value={prelimApplicationFormData.description || ''}
                             {...register("description")}
@@ -1373,7 +1314,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             render={({ fieldState: { invalid, error } }) => (
                                                 <DesktopDatePicker
                                                     inputFormat="DD/MM/YYYY"
-                                                    label="Closing Date"
+                                                    label={prelimApplicationFormData.firstClosing ? "Closing Date" : "Expected Closing Date"}
                                                     value={prelimApplicationFormData.sdFirstClosingDomesticAmountDate || null}
                                                     onChange={(newValue: any) => {
                                                         setValue('sdFirstClosingDomesticAmountDate', newValue);
