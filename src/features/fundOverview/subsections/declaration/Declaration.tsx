@@ -383,7 +383,7 @@ const Declaration = (props: any) => {
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
-                                                    href="/vcf/templates/Past_Track_Record_Template.xlsx"
+                                                    href="/vcf/templates/Details of Current Contributors of Fund.xlsx"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
                                                     sx={{
