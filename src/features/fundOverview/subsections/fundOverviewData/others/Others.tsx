@@ -167,7 +167,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
-                                        href="/vcf/templates/Past_Track_Record_Template.xlsx"
+                                        href="/vcf/templates/Empanelled list of external Firms.xlsx"
                                         size="small"
                                         startIcon={<DownloadIcon />}
                                         sx={{
