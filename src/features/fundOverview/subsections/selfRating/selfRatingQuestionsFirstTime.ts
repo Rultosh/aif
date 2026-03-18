@@ -43,7 +43,7 @@ export const questionsForFirstTime = {
         {
             "id": 6,
             "text": "Working relation among KMPs of IM/AMC",
-            "options": ["Atleast two KMPs working together for more than 10 years in AIF business", "Atleast two KMPs working together for more than 5 years in AIF business", "Atleast two KMPs working together for more than 2 years but upto 5 years in AIF business", "Atleast two KMPs working together for less than 2 years in AIF business"],
+            "options": ["Atleast two KMPs working together for more than 10 years in AIF business", "Atleast two KMPs working together for more than 5 years in AIF business", "Atleast two KMPs working together for more than 2 years in AIF business", "Atleast two KMPs working together for less than 2 years in AIF business"],
             "size": 12,
             "contribution": 0.04,
             'weightage': [1, 0.75, 0.5, 0.25]
@@ -52,10 +52,10 @@ export const questionsForFirstTime = {
             "id": 7,
             "text": "LP Advisory Committee/Advisory Board",
             "options": [
-                "The Fund had an Advisory Board / LP Advisory Committee, with more than 50% of the seats allocated to institutional investors.",
-                "The Fund had an Advisory Board / LP Advisory Committee with representation from major investors, collectively accounting for at least 50% of the total targeted corpus in the last fund.",
-                "The Fund propose to have such Board/Committee",
-                "The Fund do not propose to have such Board/Committee"
+                "The Fund had an Advisory Board / LP Advisory Committee, with more than 50% of the seats allocated to institutional investors in the last fund",
+                "The Fund had an Advisory Board / LP Advisory Committee with representation from major investors, collectively accounting for at least 50% of the total targeted corpus in the last fund",
+                "The Fund proposes to have such Board/Committee",
+                "The Fund does not propose to have such Board/Committee"
             ],
             "size": 12,
             "contribution": 0.125,
@@ -65,7 +65,7 @@ export const questionsForFirstTime = {
             "id": 8,
             "text": "Profile of Auditors engaged/proposed to be engaged by the Fund",
             "options": [
-                "Big 5 Auditors/propose to engage one of Big 5 auditors",
+                "Big 5 Auditors/proposes to engage one of Big 5 auditors",
                 "Not from Big 5 list, but reputed auditors with atleast 20 partners",
                 "Other than above"
             ],
@@ -80,7 +80,7 @@ export const questionsForFirstTime = {
                 "Confirmed commitments of more than 40% of targeted corpus already raised",
                 "Confirmed commitments of more than 25% of targeted corpus already raised",
                 " Confirmed commitments of more than 15% of targeted corpus already raised",
-                "Confirmed commitments of less than 15% of targeted corpus already raised/No confirmed commitments raised so far"
+                "Confirmed commitments of less than 15% of targeted corpus already raised"
             ],
             "size": 12,
             "contribution": 0.0875,

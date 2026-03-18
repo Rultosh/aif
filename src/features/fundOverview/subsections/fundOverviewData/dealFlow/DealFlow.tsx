@@ -36,6 +36,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         }
     }, [prelimAppicationId, actionUid, dispatch]);
 
+    const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
+
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
             setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
@@ -51,11 +53,16 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         dfMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfDirectorshipsPolicy: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfDirectorshipsPolicy: aifCategoryType === 'Equity Oriented AIF'
+            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)")
+            : Yup.string().nullable(),
         dfConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         //dfValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {
@@ -180,7 +187,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. Is the Investment Manager exclusively handling VC/PE/Private Credit business or is it also doing any other business or activity?</Typography>
+                        <Typography variant="body1" sx={labelSx}>4. Is the Investment Manager exclusively handling AIF business or is it also doing any other business or activity?</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -194,8 +201,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         />
                     </Grid>
 
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. How many directorships does each Investment Manager (employee) hold in the investee company?</Typography>
+                    {aifCategoryType === 'Equity Oriented AIF' && (<Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>5. Do any Investment Manager (employees) hold directorships in investee companies? If yes, please provide details.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -208,9 +215,54 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
+                    )}
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '6' : '5'}. List the activities involved in monitoring and follow-up of investments? And How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same.</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            maxRows={4}
+                            {...register("dfMonitoringActivities")}
+                            error={!!errors.dfMonitoringActivities}
+                            helperText={errors.dfMonitoringActivities?.message as string}
+                            variant="outlined"
+                            sx={fieldSx}
+                            inputProps={{ maxLength: 1000 }}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '7' : '6'}. Are all contributors governed by same terms and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor (along with reasons).</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            maxRows={4}
+                            {...register("dfContributorTerms")}
+                            error={!!errors.dfContributorTerms}
+                            helperText={errors.dfContributorTerms?.message as string}
+                            variant="outlined"
+                            sx={fieldSx}
+                            inputProps={{ maxLength: 1000 }}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sx={qSx}>
+                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '8' : '7'}. Who approves investment and divestment decisions? Please give details of the process of evaluation of the deals and approvals/investments/exits thereafter.</Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            maxRows={4}
+                            {...register("dfDecisionApprovals")}
+                            error={!!errors.dfDecisionApprovals}
+                            helperText={errors.dfDecisionApprovals?.message as string}
+                            variant="outlined"
+                            sx={fieldSx}
+                            inputProps={{ maxLength: 1000 }}
+                        />
+                    </Grid>
 
                     <Grid item xs={12}>
-                        <Typography variant="body1" sx={labelSx}>6. What is the reporting structure/procedure for the contributors.</Typography>
+                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '9' : '8'}. What is the reporting structure/procedure for the contributors.</Typography>
 
                         <Box sx={{ ml: 2 }}>
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) What information about the portfolio companies is consolidated and reported to investors, and what is the frequency of such reporting?</Typography>
@@ -285,6 +337,47 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
                                         <DocumentChip label="Upload Document" id={`sdDetailsOfCurrentPipelineOfDealsUnderConsideration${id}`} />
+                                    </span>
+                                </Box>
+                            ) : (
+                                <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                    Please save the form to upload documents.
+                                </Typography>
+                            )}
+                        </Box>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 0 }}>
+                            Empanelled list of external firms
+                        </Typography>
+
+                        <Box sx={{
+                            p: 3,
+                            border: '1px solid rgba(0,0,0,0.08)',
+                            borderRadius: '16px',
+                            backgroundColor: '#fafafa'
+                        }}>
+                            {Number(id) ? (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                                    <Button
+                                        variant="outlined"
+                                        href="/vcf/templates/Empanelled list of external Firms.xlsx"
+                                        size="small"
+                                        startIcon={<DownloadIcon />}
+                                        sx={{
+                                            textTransform: 'none',
+                                            borderRadius: '6px',
+                                            borderColor: 'rgba(54, 48, 98, 0.3)',
+                                            color: '#363062',
+                                            '&:hover': { borderColor: '#363062', backgroundColor: 'rgba(54, 48, 98, 0.05)' },
+                                            mb: '17px'
+                                        }}
+                                    >
+                                        Download Template
+                                    </Button>
+                                    <span style={{ marginTop: '10px' }}>
+                                        <DocumentChip label="Upload Document" id={`sdEmpanelledListOfExternalFirms${id}`} />
                                     </span>
                                 </Box>
                             ) : (

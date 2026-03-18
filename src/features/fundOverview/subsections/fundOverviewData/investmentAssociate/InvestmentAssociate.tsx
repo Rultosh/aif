@@ -53,7 +53,7 @@ export const InvestmentAssociate = (props: InvestmentAssociateProps) => {
         ))
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
-    const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Investment Experience", "Area Of Expertise", "Action"]
+    const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Experience in AIF Business", "Area Of Expertise", "Action"]
 
     let headerComponent = []
 

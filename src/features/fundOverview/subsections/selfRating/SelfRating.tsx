@@ -57,10 +57,14 @@ export const SelfRating = (props: any) => {
             ? JSON.parse(JSON.stringify(questionsForFirstTime.selfRatingQuestions))
             : JSON.parse(JSON.stringify(questionsForMoreThanOne.selfRatingQuestions));
 
-        const qIndex = manager === "First Time Fund Manager" ? 10 : 14;
+        const qIndices = manager === "First Time Fund Manager" ? [10] : [13, 14];
 
         if (category === "Debt Oriented Fund") {
-            questions[qIndex].options = [">=18%", ">=15% & <18%", ">=12% & <15%", "<12%"];
+            qIndices.forEach(idx => {
+                if (questions[idx]) {
+                    questions[idx].options = [">=18%", ">=15% & <18%", ">=12% & <15%", "<12%"];
+                }
+            });
         }
         return questions;
     };
@@ -354,6 +358,7 @@ export const SelfRating = (props: any) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showResultModal, setShowResultModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [modalType, setModalType] = useState<'success' | 'fail'>('success');
 
     const handleSubmitClick = async () => {
@@ -524,7 +529,7 @@ export const SelfRating = (props: any) => {
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                             {!isSubmitted ? (
                                 <Button
-                                    onClick={handleSubmitClick}
+                                    onClick={() => setShowConfirmModal(true)}
                                     variant="contained"
                                     disabled={isLoading || !allAnswered}
                                     startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
@@ -590,7 +595,7 @@ export const SelfRating = (props: any) => {
                 }}
             >
                 <Button
-                    onClick={(e) => !isSubmitted ? handleSubmitClick() : handleNextClick(e)}
+                    onClick={(e) => !isSubmitted ? setShowConfirmModal(true) : handleNextClick(e)}
                     variant="contained"
                     disabled={isLoading || (!isSubmitted && !allAnswered)}
                     sx={{
@@ -615,6 +620,67 @@ export const SelfRating = (props: any) => {
                     </Box>
                 </Button>
             </Box>
+            {/* Confirmation Modal */}
+            <Dialog
+                open={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                PaperProps={{
+                    sx: {
+                        borderRadius: '16px',
+                        p: 1,
+                        maxWidth: '400px'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 800, color: '#000000', pb: 1 }}>
+                    Confirm Submission
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1" sx={{ color: '#444', lineHeight: 1.6 }}>
+                        Are you sure you want to proceed with submission?
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, pt: 1 }}>
+                    <Button
+                        onClick={() => setShowConfirmModal(false)}
+                        variant="outlined"
+                        sx={{
+                            textTransform: 'none',
+                            borderRadius: '6px',
+                            px: 3,
+                            py: 1,
+                            fontWeight: 700,
+                            color: '#000000',
+                            borderColor: '#FF671F'
+                        }}
+                    >
+                        No
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setShowConfirmModal(false);
+                            handleSubmitClick();
+                        }}
+                        variant="contained"
+                        sx={{
+                            textTransform: 'none',
+                            borderRadius: '6px',
+                            px: 3,
+                            py: 1,
+                            fontWeight: 700,
+                            backgroundColor: '#FF671F',
+                            '&:hover': {
+                                border: '1px solid #FF671F',
+                                color: '#FF671F',
+                                backgroundColor: 'rgb(255 103 30 / 19%)'
+                            }
+                        }}
+                    >
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             {/* Assessment Result Modal */}
             <Dialog
                 open={showResultModal}

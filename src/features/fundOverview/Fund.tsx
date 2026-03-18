@@ -488,7 +488,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "4" ? '#000080' : '#444'
                                         }}>
-                                            Details of Investment Team Members (Other than KMP) – Maximum 5 Members
+                                            Details of Investment Team Members (Other than KMP) – Maximum 5 Senior Members
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -558,7 +558,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "5" ? '#000080' : '#444'
                                         }}>
-                                            Has any investment been made under the Fund?
+                                            Have any investments been undertaken by the Fund?
                                         </Typography>
                                     </Box>
                                     <Box onClick={(e) => e.stopPropagation()}>
@@ -670,7 +670,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "6" ? '#000080' : '#444'
                                         }}>
-                                            LP Advisory Governance and Investment Committee
+                                            Limited Partner Advisory Committee (LPAC), Governance and Investment Committee (IC)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -741,14 +741,14 @@ export const Fund = (props: any) => {
                                             ref={dealFlowRef}
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
-                                            onSaveSuccess={() => handleAccordionSaveAndContinue("7", "8", null)}
+                                            onSaveSuccess={() => handleAccordionSaveAndContinue("7", null, null)}
                                         />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
 
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                        {/* {Number(prelimApplicationId) ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["8"]}
                                 elevation={0}
@@ -808,13 +808,13 @@ export const Fund = (props: any) => {
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
-                        </Grid> : <></>}
+                        </Grid> : <></>} */}
                     </Grid>
 
 
-                    <Divider sx={{ mb: 3 }} />
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Button
+                    {/* <Divider sx={{ mb: 3 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> */}
+                    {/* <Button
                             onClick={(e) => handleNextClick({ navTo: 'previous' })}
                             startIcon={<ArrowLeftIcon />}
                             variant="outlined"
@@ -832,11 +832,11 @@ export const Fund = (props: any) => {
                                 }
                             }} >
                             Back To Initial Assessment
-                        </Button>
+                        </Button> */}
 
 
 
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                    {/* <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                             {!isSubmitted ? (
                                 <Button
                                     onClick={handleSubmitClick}
@@ -886,8 +886,8 @@ export const Fund = (props: any) => {
                                     Save & Continue To Declaration
                                 </Button>
                             )}
-                        </Box>
-                    </Box>
+                        </Box> */}
+                    {/* </Box> */}
 
                 </CardContent>
             </Card>

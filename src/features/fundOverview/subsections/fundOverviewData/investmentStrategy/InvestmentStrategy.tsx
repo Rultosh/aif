@@ -43,18 +43,32 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
     const freeformRegx = /^[a-zA-Z0-9_\.\- ]+$/;
+    const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
+
     const validationSchema = Yup.object().shape({
         isStrategyBasis: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isFocusSectors: Yup.string().required("This field is required").nullable(),
         isComparisonPast: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isSignificantChange: Yup.string().required("This field is required").nullable(),
         //isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
-        isControlsRights: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isControlsRights: aifCategoryType === 'Equity Oriented AIF'
+            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            : Yup.string().nullable(),
+        isRightsProtections: aifCategoryType === 'Debt Oriented AIF'
+            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            : Yup.string().nullable(),
         // isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
-        isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
-        isRolledOverInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        // isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isRolledOverInvestments: aifCategoryType === 'Equity Oriented AIF'
+            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            : Yup.string().nullable(),
         isGrossReturnObjective: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
-        isTargetInvestmentSize: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isTargetInvestmentSize: aifCategoryType === 'Equity Oriented AIF'
+            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            : Yup.string().nullable(),
+        isTargetInvestmentSizePerTransaction: aifCategoryType === 'Debt Oriented AIF'
+            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            : Yup.string().nullable(),
         isTargetNumberInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isAverageHoldingPeriod: Yup.string().required("This field is required").nullable(),
         isExitStrategy: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
@@ -162,53 +176,59 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                         />
                     </Grid>
 
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>3. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            maxRows={4}
-                            {...register("isControlsRights")}
-                            error={!!errors.isControlsRights}
-                            helperText={errors.isControlsRights?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
-                        />
-                    </Grid>
+                    {aifCategoryType === 'Equity Oriented AIF' && (
+                        <Grid item xs={12} sx={qSx}>
+                            <Typography variant="body1" sx={labelSx}>3. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("isControlsRights")}
+                                error={!!errors.isControlsRights}
+                                helperText={errors.isControlsRights?.message as string}
+                                variant="outlined"
+                                sx={fieldSx}
+                                inputProps={{ maxLength: 1000 }}
+                            />
+                        </Grid>
+                    )}
 
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>4. What are the risks associated with the investments planned under this Fund, and what strategies will be implemented to mitigate those risks?</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            maxRows={4}
-                            {...register("isRisksMitigation")}
-                            error={!!errors.isRisksMitigation}
-                            helperText={errors.isRisksMitigation?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
-                        />
-                    </Grid>
+                    {aifCategoryType === 'Debt Oriented AIF' && (
+                        <Grid item xs={12} sx={qSx}>
+                            <Typography variant="body1" sx={labelSx}>3. What rights and protections does the fund obtain in its investments, and how are these covenants enforced? How does the fund ensure timely repayment or exit?</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("isRightsProtections")}
+                                error={!!errors.isRightsProtections}
+                                helperText={errors.isRightsProtections?.message as string}
+                                variant="outlined"
+                                sx={fieldSx}
+                                inputProps={{ maxLength: 1000 }}
+                            />
+                        </Grid>
+                    )}
 
-                    <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>5. Have any investments been carried forward or rolled over from previous fund(s)? If yes, please provide the relevant details.</Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            maxRows={4}
-                            {...register("isRolledOverInvestments")}
-                            error={!!errors.isRolledOverInvestments}
-                            helperText={errors.isRolledOverInvestments?.message as string}
-                            variant="outlined"
-                            sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
-                        />
-                    </Grid>
+                    {aifCategoryType === 'Equity Oriented AIF' && (
+                        <Grid item xs={12} sx={qSx}>
+                            <Typography variant="body1" sx={labelSx}>4. Have any investments been carried forward or rolled over from previous fund(s)? If yes, please provide the relevant details.</Typography>
+                            <TextField
+                                fullWidth
+                                multiline
+                                maxRows={4}
+                                {...register("isRolledOverInvestments")}
+                                error={!!errors.isRolledOverInvestments}
+                                helperText={errors.isRolledOverInvestments?.message as string}
+                                variant="outlined"
+                                sx={fieldSx}
+                                inputProps={{ maxLength: 1000 }}
+                            />
+                        </Grid>
+                    )}
 
                     <Grid item xs={12}>
-                        <Typography variant="body1" sx={labelSx}>6. Describe the following investment considerations:</Typography>
+                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '5. Describe the following investment considerations:' : '4. Describe the following investment considerations:'}</Typography>
 
                         <Box sx={{ ml: 2 }}>
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Gross return objective of the overall fund</Typography>
@@ -224,18 +244,39 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 inputProps={{ maxLength: 1000 }}
                             />
 
-                            <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Target investment size and percentage stake</Typography>
-                            <TextField
-                                fullWidth
-                                multiline
-                                maxRows={4}
-                                {...register("isTargetInvestmentSize")}
-                                error={!!errors.isTargetInvestmentSize}
-                                helperText={errors.isTargetInvestmentSize?.message as string}
-                                variant="outlined"
-                                sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
-                            />
+                            {aifCategoryType === 'Equity Oriented AIF' && (
+                                <>
+                                    <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Target investment size and percentage stake</Typography>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        maxRows={4}
+                                        {...register("isTargetInvestmentSize")}
+                                        error={!!errors.isTargetInvestmentSize}
+                                        helperText={errors.isTargetInvestmentSize?.message as string}
+                                        variant="outlined"
+                                        sx={{ ...fieldSx, mb: 2 }}
+                                        inputProps={{ maxLength: 1000 }}
+                                    />
+                                </>
+                            )}
+
+                            {aifCategoryType === 'Debt Oriented AIF' && (
+                                <>
+                                    <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) What is the target investment size per transaction, and what proportion of each debt issuance does the fund typically subscribe to?</Typography>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        maxRows={4}
+                                        {...register("isTargetInvestmentSizePerTransaction")}
+                                        error={!!errors.isTargetInvestmentSizePerTransaction}
+                                        helperText={errors.isTargetInvestmentSizePerTransaction?.message as string}
+                                        variant="outlined"
+                                        sx={{ ...fieldSx, mb: 2 }}
+                                        inputProps={{ maxLength: 1000 }}
+                                    />
+                                </>
+                            )}
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Target number of investments planned and Average holding period for a typical investment</Typography>
                             <TextField
@@ -280,7 +321,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
-                                        href="/vcf/templates/Investments in Lead Role.xlsx"
+                                        href="/vcf/templates/Risk Assessment and Mitigation Plan.xlsx"
                                         size="small"
                                         startIcon={<DownloadIcon />}
                                         sx={{
