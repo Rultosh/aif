@@ -123,8 +123,8 @@ export const SelfRating = (props: any) => {
 
         // Set isSubmitted based on initial data
         const initialScore = Number(selfRatingState.selfRatings.score || 0);
-        // if (selfRatingState.selfRatings.id && initialScore >= 0.7) {
-        if (selfRatingState.selfRatings.id) {
+        if (selfRatingState.selfRatings.id && initialScore >= 0.5) {
+        // if (selfRatingState.selfRatings.id) {
             setIsSubmitted(true);
         } else {
             setIsSubmitted(false);
@@ -367,13 +367,13 @@ export const SelfRating = (props: any) => {
             await handleClickSave();
             const currentScore = Number(selfRatingValue.score || 0);
             // alert(currentScore)
-            // if (currentScore >= 0.7) {
-            setModalType('success');
-            setIsSubmitted(true);
-            // } else {
-            //     setModalType('fail');
-            //     setIsSubmitted(false);
-            // }
+            if (currentScore >= 0.5) {
+                setModalType('success');
+                setIsSubmitted(true);
+            } else {
+                setModalType('fail');
+                setIsSubmitted(false);
+            }
             setShowResultModal(true);
         } catch (error: any) {
             console.error("Submit failure:", error);
@@ -416,7 +416,7 @@ export const SelfRating = (props: any) => {
                                 gap: 1
                             }}>
                                 <Typography variant="subtitle2" sx={{ fontWeight: 600, opacity: 0.9 }}>Total Score:</Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 800 }}>{selfRatingValue.score || 0}</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 800 }}>{(Number(selfRatingValue.score || 0) * 10) || 0}</Typography>
                             </Box>
                         )}
                     </Box>
