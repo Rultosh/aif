@@ -3,14 +3,14 @@ export const questionsForFirstTime = {
         {
             "id": 1,
             "text": "Sponsor's Commitment to the proposed Fund",
-            "options": [">=10% of corpus", ">=5% but less than 10% of corpus", ">=2.50% but less than 5% corpus", "Lower of 2.50% or Rs.5 Cr of corpus as per SEBI Regulations"],
+            "options": [">=10% of corpus", ">=5% but less than 10% of corpus", ">=2.50% but less than 5% corpus", "Lower of 2.50% or ₹5 Cr of corpus as per SEBI Regulations"],
             "size": 6,
             "contribution": 0.2,
             'weightage': [1, 0.75, 0, 0]
         },
         {
             "id": 2,
-            "text": "Age Profile of Key Management Personnel of IM/AMC",
+            "text": "Age Profile of Key Management Personnel (KMP) of IM/AMC",
             "options": ["Average age is less than 45 years", "Average age is between 45 and 55 years", "Average age is between 55 and 60 years", "Average age is more than 60 years"],
             "size": 6,
             "contribution": 0.04,
@@ -18,7 +18,7 @@ export const questionsForFirstTime = {
         },
         {
             "id": 3,
-            "text": "Average Investment Experience of Key Management Personnel of IM/AMC",
+            "text": "Average Investment Experience of KMP of IM/AMC",
             "options": ["More than 20 years", "More than 15 years but upto 20 years", "More than 10 years but upto 15 years", "Upto 10 years"],
             "size": 6,
             "contribution": 0.04,

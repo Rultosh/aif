@@ -22,6 +22,8 @@ import IconButtonIcon from '@mui/material/IconButton';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CheckIcon from '@mui/icons-material/Check';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 // Image imports removed as they have been replaced by video
 
 import ReCAPTCHA from "react-google-recaptcha";
@@ -371,9 +373,62 @@ const Landing = () => {
                                 )}
                             </Button>
 
-                            <Typography sx={{ textAlign: 'center', fontSize: '15px', color: '#000000', fontWeight: 500 }}>
+                            <Typography sx={{ textAlign: 'center', fontSize: '15px', color: '#000000', fontWeight: 500, mb: 3 }}>
                                 Don't have account? <Box component="span" sx={{ color: '#FF671F', fontWeight: 500, cursor: 'pointer' }} onClick={() => navigate('/signUp')}>Registration Here</Box>
                             </Typography>
+
+                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                                <Button
+                                    variant="outlined"
+                                    component="a"
+                                    href="/files/User Manual.pdf"
+                                    target="_blank"
+                                    download="User Manual.pdf"
+                                    startIcon={<MenuBookIcon sx={{ color: '#fff' }} />}
+                                    sx={{
+                                        flex: 1,
+                                        color: '#fff',
+                                        borderColor: '#FF671F',
+                                        backgroundColor: '#FF671F',
+                                        textTransform: 'none',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        '&:hover': {
+                                            backgroundColor: '#FF671F',
+                                            borderColor: '#FF671F',
+                                        }
+                                    }}
+                                >
+                                    User Manual
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    component="a"
+                                    href="/files/FAQs.pdf"
+                                    target="_blank"
+                                    download="FAQs.pdf"
+                                    startIcon={<HelpOutlineIcon sx={{ color: '#fff' }} />}
+                                    sx={{
+                                        flex: 1,
+                                        color: '#fff',
+                                        borderColor: '#FF671F',
+                                        backgroundColor: '#FF671F',
+                                        textTransform: 'none',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        '&:hover': {
+                                            backgroundColor: '#FF671F',
+                                            borderColor: '#FF671F',
+                                        }
+                                    }}
+                                >
+                                    FAQs
+                                </Button>
+                            </Box>
 
                             {errorMsg && (
                                 <Typography variant="subtitle2" sx={{ mt: 3, textAlign: "center", color: 'red', fontWeight: 600 }}>

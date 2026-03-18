@@ -36,6 +36,11 @@ const Header = (props: any) => {
   const [actionUid] = useState(uuid());
   const navigate = useNavigate();
 
+  const handleProfileClick = () => {
+    setAnchorEl(null);
+    navigate('/profile');
+  };
+
   useEffect(() => {
     if (token && usersState.role === undefined && usersState.status.fetchStatus === FetchStatus.IDLE) {
       dispatch(fetchRoleAsync(wrapArgument(actionUid, undefined)));
@@ -201,6 +206,7 @@ const Header = (props: any) => {
                           },
                         }}
                     >
+                      <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
                       <MenuItem onClick={() => { setAnchorEl(null); handleLogout(); }}>Logout</MenuItem>
                     </Menu>
                   </>

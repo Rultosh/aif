@@ -470,8 +470,10 @@ export const SelfRating = (props: any) => {
                                                 </Typography>
                                             }
                                         />
-                                    </Box>
-                                    <Box>
+                                    </Box><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
+                                            Type of Fund?
+                                        </Typography>
                                         <RadioGroup
                                             row
                                             value={selfRatingValue.fundType || "Equity Oriented Fund"}
@@ -484,7 +486,6 @@ export const SelfRating = (props: any) => {
                                             <FormControlLabel value="Debt Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented Fund" />
                                         </RadioGroup>
                                     </Box>
-
                                 </Box>
                             </Grid>
                         </Grid>

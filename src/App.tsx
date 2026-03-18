@@ -18,6 +18,7 @@ import Declaration from './features/fundOverview/subsections/declaration/Declara
 import Preview from './features/fundOverview/subsections/preview/Preview'
 import Home from './features/home/HomeComponent'
 import Admin from './features/admin/AdminComponent'
+import ProfileComponent from './features/profile/ProfileComponent'
 import { ProfileNew } from './features/fundOverview/subsections/profile-new/ProfileNew';
 import Workflow from './components/Workflow'
 import DetailedApplication2A from './features/DetailedApplicationComponent/subsections/2A/detailedApplication2A';
@@ -111,6 +112,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Home checkUnAuth={CheckAuth.isUnauthorized} />
+              </PrivateRoute>
+            }>
+          </Route>
+
+          <Route path='profile'
+            element={
+              <PrivateRoute>
+                <ProfileComponent />
               </PrivateRoute>
             }>
           </Route>
