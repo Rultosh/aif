@@ -22,6 +22,8 @@ import IconButtonIcon from '@mui/material/IconButton';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CheckIcon from '@mui/icons-material/Check';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 // Image imports removed as they have been replaced by video
 
 import ReCAPTCHA from "react-google-recaptcha";
@@ -127,8 +129,8 @@ const Landing = () => {
                     return true;
                 }
             })
-            .required("Username is required").max(200,"Username cannot be more than 200 charactors"),
-        password: Yup.string().required("Password is required").min(4,"Password cannot be less than 4 charactors").max(200,"Password cannot be more than 200 charactors"),
+            .required("Username is required").max(200, "Username cannot be more than 200 charactors"),
+        password: Yup.string().required("Password is required").min(4, "Password cannot be less than 4 charactors").max(200, "Password cannot be more than 200 charactors"),
     });
 
     const {
@@ -179,7 +181,7 @@ const Landing = () => {
                 size={'invisible'}
                 sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
             />
-            <Box sx={{ height: '100vh', display: 'flex', overflow: 'hidden' }}>
+            <Box sx={{ pt: '3%', height: '100vh', display: 'flex', overflow: 'hidden' }}>
                 {/* Left Section - Video Background on White */}
                 <Box sx={{
                     flex: 1.6,
@@ -197,7 +199,7 @@ const Landing = () => {
                         // height: '400px',
                         // width: '100%',
                         height: '100%',
-                        borderRadius: '24px',
+                        // borderRadius: '24px',
                         overflow: 'hidden',
                         boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
                         backgroundColor: '#000',
@@ -371,9 +373,62 @@ const Landing = () => {
                                 )}
                             </Button>
 
-                            <Typography sx={{ textAlign: 'center', fontSize: '15px', color: '#000000', fontWeight: 500 }}>
+                            <Typography sx={{ textAlign: 'center', fontSize: '15px', color: '#000000', fontWeight: 500, mb: 3 }}>
                                 Don't have account? <Box component="span" sx={{ color: '#FF671F', fontWeight: 500, cursor: 'pointer' }} onClick={() => navigate('/signUp')}>Registration Here</Box>
                             </Typography>
+
+                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                                <Button
+                                    variant="outlined"
+                                    component="a"
+                                    href="/files/User Manual.pdf"
+                                    target="_blank"
+                                    download="User Manual.pdf"
+                                    startIcon={<MenuBookIcon sx={{ color: '#fff' }} />}
+                                    sx={{
+                                        flex: 1,
+                                        color: '#fff',
+                                        borderColor: '#FF671F',
+                                        backgroundColor: '#FF671F',
+                                        textTransform: 'none',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        '&:hover': {
+                                            backgroundColor: '#FF671F',
+                                            borderColor: '#FF671F',
+                                        }
+                                    }}
+                                >
+                                    User Manual
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    component="a"
+                                    href="/files/FAQs.pdf"
+                                    target="_blank"
+                                    download="FAQs.pdf"
+                                    startIcon={<HelpOutlineIcon sx={{ color: '#fff' }} />}
+                                    sx={{
+                                        flex: 1,
+                                        color: '#fff',
+                                        borderColor: '#FF671F',
+                                        backgroundColor: '#FF671F',
+                                        textTransform: 'none',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        '&:hover': {
+                                            backgroundColor: '#FF671F',
+                                            borderColor: '#FF671F',
+                                        }
+                                    }}
+                                >
+                                    FAQs
+                                </Button>
+                            </Box>
 
                             {errorMsg && (
                                 <Typography variant="subtitle2" sx={{ mt: 3, textAlign: "center", color: 'red', fontWeight: 600 }}>

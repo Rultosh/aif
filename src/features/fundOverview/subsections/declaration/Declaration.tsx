@@ -32,7 +32,6 @@ const Declaration = (props: any) => {
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
     const [agreed, setAgreed] = useState<boolean>(!!prelimApplicationState.prelimApplication.declarationAccepted);
     const [expanded, setExpanded] = useState<string | false>("1");
-    const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
     const validationSchema = Yup.object().shape({
         sdDescription: Yup.string().label("Capital Raised Till Date").nullable(),
@@ -61,23 +60,18 @@ const Declaration = (props: any) => {
 
     const handleClick = async (ev: any, navTo: string) => {
         if (navTo === 'previous') {
-            navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/selfRating`)
+            navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/fund`)
         } else {
             await handleSubmit(async (data) => {
                 try {
                     await handleClickSave(data);
-                    setShowSuccessDialog(true);
+                    navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
                 } catch (error: any) {
                     console.error("Save failure:", error);
                     alert(error?.message || "An unexpected error occurred while saving.");
                 }
             })();
         }
-    }
-
-    const handleSuccessDialogClose = () => {
-        setShowSuccessDialog(false);
-        navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
     }
 
     useEffect(() => {
@@ -331,6 +325,45 @@ const Declaration = (props: any) => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
+                                        Details of contributors of Current Fund
+                                    </Typography>
+
+                                    <Box sx={{
+                                        p: 3,
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                        borderRadius: '16px',
+                                        backgroundColor: '#fafafa'
+                                    }}>
+                                        {Number(id) ? (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    href="/vcf/templates/Details of contributors of Current Fund.xlsx"
+                                                    size="small"
+                                                    startIcon={<DownloadIcon />}
+                                                    sx={{
+                                                        textTransform: 'none',
+                                                        borderRadius: '6px',
+                                                        borderColor: 'rgba(54, 48, 98, 0.3)',
+                                                        color: '#363062',
+                                                        '&:hover': { borderColor: '#363062', backgroundColor: 'rgba(54, 48, 98, 0.05)' },
+                                                        mb: '17px'
+                                                    }}
+                                                >
+                                                    Download Template
+                                                </Button>
+                                                <span style={{ marginTop: '10px' }}>
+                                                    <DocumentChip label="Upload Document" id={`detailsOfContributorToTheFund${id}`} />
+                                                </span>
+                                            </Box>
+                                        ) : (
+                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                                Please save the form to upload documents.
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
                                         Past Investment Track Record Of IM/AMC
                                     </Typography>
 
@@ -360,45 +393,6 @@ const Declaration = (props: any) => {
                                                 </Button>
                                                 <span style={{ marginTop: '10px' }}>
                                                     <DocumentChip label="Upload Document" id={`pastInvestmentTrackRecord${id}`} />
-                                                </span>
-                                            </Box>
-                                        ) : (
-                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
-                                                Please save the form to upload documents.
-                                            </Typography>
-                                        )}
-                                    </Box>
-                                    
-                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
-                                        Details Of Contributor To the Fund
-                                    </Typography>
-
-                                    <Box sx={{
-                                        p: 3,
-                                        border: '1px solid rgba(0,0,0,0.08)',
-                                        borderRadius: '16px',
-                                        backgroundColor: '#fafafa'
-                                    }}>
-                                        {Number(id) ? (
-                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
-                                                <Button
-                                                    variant="outlined"
-                                                    href="/vcf/templates/Details of Current Contributors of Fund.xlsx"
-                                                    size="small"
-                                                    startIcon={<DownloadIcon />}
-                                                    sx={{
-                                                        textTransform: 'none',
-                                                        borderRadius: '6px',
-                                                        borderColor: 'rgba(54, 48, 98, 0.3)',
-                                                        color: '#363062',
-                                                        '&:hover': { borderColor: '#363062', backgroundColor: 'rgba(54, 48, 98, 0.05)' },
-                                                        mb: '17px'
-                                                    }}
-                                                >
-                                                    Download Template
-                                                </Button>
-                                                <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" id={`detailsOfContributorToTheFund${id}`} />
                                                 </span>
                                             </Box>
                                         ) : (
@@ -443,7 +437,7 @@ const Declaration = (props: any) => {
                                 <Box sx={{ mt: 2, borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)' }}>
                                     <Box sx={{ p: 3, backgroundColor: 'rgba(54, 48, 98, 0.04)' }}>
                                         <Typography variant="h6" sx={{ fontWeight: 700, color: '#363062' }}>
-                                            I / We (Partner/Directors) hereby declare that:
+                                            I / We (KMP) hereby declare that:
                                         </Typography>
                                     </Box>
 
@@ -504,7 +498,7 @@ const Declaration = (props: any) => {
                                         backgroundColor: 'rgba(54, 48, 98, 0.04)'
                                     }
                                 }} >
-                                Back to Initial Assessment
+                                Back to Fund Information
                             </Button>
 
                             <Box>
@@ -533,112 +527,6 @@ const Declaration = (props: any) => {
                         </Box>
                     </CardContent>
                 </Card>
-
-                <Dialog
-                    open={showSuccessDialog}
-                    TransitionComponent={Zoom}
-                    keepMounted
-                    onClose={handleSuccessDialogClose}
-                    PaperProps={{
-                        sx: {
-                            borderRadius: '24px',
-                            padding: '24px',
-                            maxWidth: '450px',
-                            textAlign: 'center'
-                        }
-                    }}
-                >
-                    <DialogContent>
-                        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-                            <Box className="checkmark-wrapper">
-                                <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                                    <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-                                    <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                </svg>
-                            </Box>
-                        </Box>
-                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062', mb: 2 }}>
-                            Success!
-                        </Typography>
-                        <Typography variant="body1" sx={{ color: '#666', mb: 4, lineHeight: 1.6 }}>
-                            Your application has been received successfully. Our team is working on it and will update you soon.
-                        </Typography>
-                        <Button
-                            variant="contained"
-                            fullWidth
-                            onClick={handleSuccessDialogClose}
-                            sx={{
-                                backgroundColor: '#FF671F',
-                                borderRadius: '12px',
-                                py: 1.5,
-                                textTransform: 'none',
-                                fontWeight: 700,
-                                fontSize: '1.1rem',
-                                '&:hover': {
-                                    border: '1px solid #FF671F',
-                                    color: '#FF671F',
-                                    backgroundColor: 'rgb(255 103 30 / 19%)'
-                                }
-                            }}
-                        >
-                            Continue to Preview
-                        </Button>
-                    </DialogContent>
-                </Dialog>
-
-                <style>
-                    {`
-                    .checkmark__circle {
-                        stroke-dasharray: 166;
-                        stroke-dashoffset: 166;
-                        stroke-width: 2;
-                        stroke-miterlimit: 10;
-                        stroke: #7ac142;
-                        fill: none;
-                        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-                    }
-
-                    .checkmark {
-                        width: 100px;
-                        height: 100px;
-                        border-radius: 50%;
-                        display: block;
-                        stroke-width: 2;
-                        stroke: #fff;
-                        stroke-miterlimit: 10;
-                        box-shadow: inset 0px 0px 0px #7ac142;
-                        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
-                    }
-
-                    .checkmark__check {
-                        transform-origin: 50% 50%;
-                        stroke-dasharray: 48;
-                        stroke-dashoffset: 48;
-                        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-                    }
-
-                    @keyframes stroke {
-                        100% {
-                            stroke-dashoffset: 0;
-                        }
-                    }
-
-                    @keyframes scale {
-                        0%, 100% {
-                            transform: none;
-                        }
-                        50% {
-                            transform: scale3d(1.1, 1.1, 1);
-                        }
-                    }
-
-                    @keyframes fill {
-                        100% {
-                            box-shadow: inset 0px 0px 0px 50px #7ac142;
-                        }
-                    }
-                    `}
-                </style>
             </div>
         </LocalizationProvider>
     )

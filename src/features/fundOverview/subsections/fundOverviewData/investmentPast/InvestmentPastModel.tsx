@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, FormControl, FormControlLabel, FormHelperText, Grid, InputLabel, MenuItem, Modal, Radio, RadioGroup, Select, TextField, Typography, Autocomplete } from "@mui/material";
 import { useState, useEffect } from "react"
 import { createInvestmentPastAsync, updateInvestmentPastAsync } from './investmentPastSlice'
-import { useAppDispatch } from '../../../../../app/hooks'
+import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { defaultInvestmentPast, IInvestmentPast } from "./IInvestmentPast";
@@ -12,6 +12,8 @@ import UploadComponents from "../../../../DetailedApplicationComponent/subsectio
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
+import { PrelimApplicationState, selectPrelimApplication } from "../prelimApplicationDataSlice";
 
 interface InvestmentPastModelProps {
   investmentPastFormData: IInvestmentPast,
@@ -54,6 +56,9 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
   const [investmentPastFormData, setInvestmentPastFormData] = useState(defaultInvestmentPast)
 
   const dispatch = useAppDispatch();
+
+  const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
+  const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
 
   function handleSubmitForm() {
     console.log("Saving investment Past", investmentPastFormData)
@@ -217,10 +222,12 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     }).nullable(),
     currentStatus: Yup.string().required("Current Status is required").nullable(),
     instrumentType: Yup.string().required("Instrument Type is required").nullable(),
-    shareholdingInvestee: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Shareholding in investee company is required").test("max-value", "Value cannot exceed 100", (value) => {
-      if (!value) return true;
-      return parseFloat(String(value)) <= 100;
-    }).nullable(),
+    shareholdingInvestee: aifCategoryType === 'Equity Oriented AIF'
+      ? Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Shareholding in investee company is required").test("max-value", "Value cannot exceed 100", (value) => {
+        if (!value) return true;
+        return parseFloat(String(value)) <= 100;
+      }).nullable()
+      : Yup.string().nullable(),
     moic: Yup.string().required("MOIC is required").nullable().matches(/^[0-9]+(\.[0-9]{1,2})?$/, "Only numbers and up to 2 decimal places are allowed"),
     grossIrr: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Gross IRR is required").nullable(),
     timeTakenFromSourcingToClosure: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Time taken from sourcing to closure is required").min(0, "Time cannot be negative").nullable(),
@@ -337,6 +344,22 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             </LocalizationProvider>
           </Grid>
           <Grid item xs={12} md={6}>
+            <TextField
+              required
+              fullWidth
+              id="sector"
+              label="Sector"
+              value={investmentPastFormData.sector || ''}
+              {...register("sector")}
+              error={!!errors.sector}
+              helperText={errors.sector?.message as string}
+              variant="outlined"
+              onChange={handleChange}
+              sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+              inputProps={{ maxLength: 200 }}
+            />
+          </Grid>
+          {/* <Grid item xs={12} md={6}>
             <FormControl fullWidth>
               <Controller
                 name="sector"
@@ -373,7 +396,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                 )}
               />
             </FormControl>
-          </Grid>
+          </Grid> */}
           <Grid item xs={12} md={6}>
             <TextField
               required
@@ -415,7 +438,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               inputProps={{ maxLength: 200 }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+
+          {aifCategoryType === 'Equity Oriented AIF' && (<Grid item xs={12} md={4}>
             <TextField
               required
               fullWidth
@@ -432,7 +456,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          )}
+          <Grid item xs={12} md={aifCategoryType === 'Equity Oriented AIF' ? 4 : 6}>
             <FormControl fullWidth variant="outlined" error={!!errors.currentStatus} sx={fieldSx}>
               <InputLabel id="currentStatus-label" sx={{
                 '&.Mui-focused': { color: '#FF671F' }
@@ -460,7 +485,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               {errors.currentStatus && <FormHelperText>{errors.currentStatus.message as string}</FormHelperText>}
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={aifCategoryType === 'Equity Oriented AIF' ? 4 : 6}>
             <TextField
               required
               fullWidth

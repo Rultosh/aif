@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup, TextField } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup, TextField, Dialog, DialogContent, Zoom } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
@@ -40,6 +40,12 @@ export const Preview = (props: any) => {
     const [actionUid] = useState(uuid());
     const usersState = useAppSelector(selectUsers)
     const [showResponse, setShowResponse] = useState(false);
+    const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
+    const handleSuccessDialogClose = () => {
+        setShowSuccessDialog(false);
+        navigate('/home')
+    }
 
 
     /*const validationSchema = Yup.object().shape({
@@ -114,14 +120,24 @@ export const Preview = (props: any) => {
 
         // if (await checkAllDocsOk(id, "prelims")) {
         console.log("prelimId", Number(id))
-        dispatch(
-            createApplicationAsync(
-                wrapArgument(
-                    actionUid, { id: Number(id), statusComments: commentPreview, status: ev.target.id }
+        try {
+            await dispatch(
+                createApplicationAsync(
+                    wrapArgument(
+                        actionUid, { id: Number(id), statusComments: commentPreview, status: ev.target.id }
+                    )
                 )
-            )
-        );
-        navigate('/home')
+            ).unwrap();
+
+            if (ev.target.id === 'submit') {
+                setShowSuccessDialog(true);
+            } else {
+                navigate('/home')
+            }
+        } catch (error) {
+            console.error("Save failure:", error);
+            alert("An unexpected error occurred while saving.");
+        }
         // }
         // else {
         //     setShowResponse(true);
@@ -414,6 +430,112 @@ export const Preview = (props: any) => {
                     )}
                 </CardContent >
             </Card >
+
+            <Dialog
+                open={showSuccessDialog}
+                TransitionComponent={Zoom}
+                keepMounted
+                onClose={handleSuccessDialogClose}
+                PaperProps={{
+                    sx: {
+                        borderRadius: '24px',
+                        padding: '24px',
+                        maxWidth: '450px',
+                        textAlign: 'center'
+                    }
+                }}
+            >
+                <DialogContent>
+                    <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+                        <Box className="checkmark-wrapper">
+                            <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                                <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                            </svg>
+                        </Box>
+                    </Box>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#363062', mb: 2 }}>
+                        Success!
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#666', mb: 4, lineHeight: 1.6 }}>
+                        Your application has been received successfully. Our team is working on it and will update you soon.
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={handleSuccessDialogClose}
+                        sx={{
+                            backgroundColor: '#FF671F',
+                            borderRadius: '12px',
+                            py: 1.5,
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            fontSize: '1.1rem',
+                            '&:hover': {
+                                border: '1px solid #FF671F',
+                                color: '#FF671F',
+                                backgroundColor: 'rgb(255 103 30 / 19%)'
+                            }
+                        }}
+                    >
+                        Continue to Home
+                    </Button>
+                </DialogContent>
+            </Dialog>
+
+            <style>
+                {`
+                .checkmark__circle {
+                    stroke-dasharray: 166;
+                    stroke-dashoffset: 166;
+                    stroke-width: 2;
+                    stroke-miterlimit: 10;
+                    stroke: #7ac142;
+                    fill: none;
+                    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+                }
+
+                .checkmark {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                    display: block;
+                    stroke-width: 2;
+                    stroke: #fff;
+                    stroke-miterlimit: 10;
+                    box-shadow: inset 0px 0px 0px #7ac142;
+                    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+                }
+
+                .checkmark__check {
+                    transform-origin: 50% 50%;
+                    stroke-dasharray: 48;
+                    stroke-dashoffset: 48;
+                    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+                }
+
+                @keyframes stroke {
+                    100% {
+                        stroke-dashoffset: 0;
+                    }
+                }
+
+                @keyframes scale {
+                    0%, 100% {
+                        transform: none;
+                    }
+                    50% {
+                        transform: scale3d(1.1, 1.1, 1);
+                    }
+                }
+
+                @keyframes fill {
+                    100% {
+                        box-shadow: inset 0px 0px 0px 50px #7ac142;
+                    }
+                }
+                `}
+            </style>
         </div>
     );
 }

@@ -287,8 +287,8 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
       .required("Age is required")
       .nullable(),
     qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    investmentExperience: Yup.string().required("VC/PE/Private Credit Experience In Investing is required").nullable(),
-    description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    investmentExperience: Yup.string().required("Experience in AIF Business is required").nullable(),
+    description: Yup.string().required("Brief Details Of AIF Business Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
   });
 
@@ -334,7 +334,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details of Investment Team Members (Other than KMP) – Maximum 5 Members</Typography>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details of Investment Team Members (Other than KMP) – Maximum 5 Senior Members</Typography>
         <Box component="form">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -448,7 +448,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
               <FormControl fullWidth variant="outlined" error={!!errors.investmentExperience} sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}>
                 <InputLabel id="investmentExperience-label" sx={{
                   '&.Mui-focused': { color: '#FF671F' }
-                }}>VC/PE/Private Credit Experience In Investing</InputLabel>
+                }}>Experience in AIF Business</InputLabel>
                 <Controller
                   name="investmentExperience"
                   control={control}
@@ -456,7 +456,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                     <Select
                       {...field}
                       labelId="investmentExperience-label"
-                      label="VC/PE/Private Credit Experience In Investing"
+                      label="Experience in AIF Business"
                       onChange={(e) => {
                         field.onChange(e);
                         handleChange(e);
@@ -477,7 +477,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 required
                 fullWidth
                 id="description"
-                label="Brief Details Of VC/PE/Private Credit Experience"
+                label="Brief Details Of AIF Business Experience"
                 value={investmentAssociateFormData.description || ''}
                 {...register("description")}
                 error={!!errors.description}
@@ -488,7 +488,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{maxLength :1000}}
+                inputProps={{ maxLength: 1000 }}
               />
             </Grid>
             <Grid item xs={12}>

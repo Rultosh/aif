@@ -35,7 +35,7 @@ export const InvestmentPastRow = (props: InvestmentPastRowPros) => {
     <TableCell align="left" component="th" scope="row">
       {props.row.nameOfCompany}
     </TableCell>
-    <TableCell align="left">{props.row.sector}</TableCell>
+    {/* <TableCell align="left">{props.row.sector}</TableCell> */}
     <TableCell align="left">{String(props.row.amountInvested)}</TableCell>
     <TableCell align="left">{Moment(String(props.row.dateOfInvestment)).format("DD/MM/YYYY")}</TableCell>
     <TableCell align="justify">{String(props.row.briefProfile)}</TableCell>

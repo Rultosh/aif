@@ -18,6 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import FormHelperText from '@mui/material/FormHelperText';
 import dayjs, { Dayjs } from "dayjs";
+import { selectUsers } from '../../../admin/adminSlice';
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -26,6 +27,7 @@ interface PrelimApplicationProps {
 }
 
 const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) => {
+    const usersState = useAppSelector(selectUsers);
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
@@ -65,6 +67,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         }
     }, [])
 
+    const [aifNameData, setAifNameData] = useState('');
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
             console.log('useEffect', prelimAppicationId, prelimApplicationState.prelimApplication)
@@ -72,7 +75,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             reset(prelimApplicationState.prelimApplication);
             setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id));
         }
-    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus])
+        
+        if (usersState.me) {
+            setAifNameData(usersState.me.companyName || '');
+        }
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me])
 
     const setDateValue = (key: String, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
@@ -567,17 +574,20 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         </FormControl> */}
                     <Grid item xs={12} md={4}>
                         <TextField
+                            InputProps={{
+                                readOnly: true,
+                            }}
                             required
                             fullWidth
                             id="nameOfTheFund"
                             label="Name of the Fund"
-                            value={prelimApplicationFormData.nameOfTheFund || ''}
+                            value={prelimApplicationFormData.nameOfTheFund || aifNameData}
                             {...register("nameOfTheFund")}
                             error={!!errors.nameOfTheFund}
                             helperText={errors.nameOfTheFund?.message as string}
                             onChange={handleChange}
                             variant="outlined"
-                            sx={fieldSx}
+                            sx={{ ...fieldSx, backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
                         />
                     </Grid>
                     <Grid item xs={12} md={4}>
