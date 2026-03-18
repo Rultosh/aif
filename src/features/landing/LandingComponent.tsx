@@ -127,8 +127,8 @@ const Landing = () => {
                     return true;
                 }
             })
-            .required("Username is required").max(200,"Username cannot be more than 200 charactors"),
-        password: Yup.string().required("Password is required").min(4,"Password cannot be less than 4 charactors").max(200,"Password cannot be more than 200 charactors"),
+            .required("Username is required").max(200, "Username cannot be more than 200 charactors"),
+        password: Yup.string().required("Password is required").min(4, "Password cannot be less than 4 charactors").max(200, "Password cannot be more than 200 charactors"),
     });
 
     const {
@@ -179,7 +179,7 @@ const Landing = () => {
                 size={'invisible'}
                 sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
             />
-            <Box sx={{ height: '100vh', display: 'flex', overflow: 'hidden' }}>
+            <Box sx={{ pt: '3%', height: '100vh', display: 'flex', overflow: 'hidden' }}>
                 {/* Left Section - Video Background on White */}
                 <Box sx={{
                     flex: 1.6,
@@ -197,7 +197,7 @@ const Landing = () => {
                         // height: '400px',
                         // width: '100%',
                         height: '100%',
-                        borderRadius: '24px',
+                        // borderRadius: '24px',
                         overflow: 'hidden',
                         boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
                         backgroundColor: '#000',
