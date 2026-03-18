@@ -204,7 +204,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
   const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
   const validationSchema = Yup.object().shape({
     nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+    // sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     dateOfInvestment: Yup.date()
       .nullable()
@@ -292,7 +292,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details Of Current Investment</Typography>
       <Box component="form">
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <TextField
               required
               fullWidth
@@ -308,7 +308,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               inputProps={{ maxLength: 200 }}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Controller
                 name="dateOfInvestment"
@@ -336,7 +336,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={12} md={6}>
+          {/* <Grid item xs={12} md={6}>
             <FormControl fullWidth>
               <Controller
                 name="sector"
@@ -373,8 +373,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
                 )}
               />
             </FormControl>
-          </Grid>
-          <Grid item xs={12} md={6}>
+          </Grid> */}
+          <Grid item xs={12} md={4}>
             <TextField
               required
               fullWidth
