@@ -147,7 +147,8 @@ export const FundOverview = (props: any) => {
                                 const isActive = index === activeIndex;
                                 const isPending = index > activeIndex;
 
-                                const isDisabled = (isNew && isPending) || (isFailed && isPending);
+                                const isSelfRatingSubmitted = !!selfRatingState.selfRatings.id;
+                                const isDisabled = (isNew && isPending) || (isFailed && isPending) || (isSelfRatingSubmitted && s.path === 'selfrating');
 
                                 // Colors from reference
                                 const bgColor = isCompleted ? '#FF671F' : (isActive ? '#000080' : '#818181');

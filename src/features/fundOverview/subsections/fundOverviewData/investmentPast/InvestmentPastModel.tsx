@@ -435,7 +435,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.briefProfile?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 200 }}
+              inputProps={{ maxLength: 1000 }}
             />
           </Grid>
 

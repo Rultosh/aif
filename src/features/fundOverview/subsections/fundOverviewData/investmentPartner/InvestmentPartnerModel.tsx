@@ -512,6 +512,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               <TextField
                 required
                 fullWidth
+                multiline
+                maxRows={4}
                 id="areaOfExpertise"
                 label="Area Of Expertise"
                 value={investmentPartnerFormData.areaOfExpertise || ''}
