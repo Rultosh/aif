@@ -577,6 +577,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             InputProps={{
                                 readOnly: true,
                             }}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
                             required
                             fullWidth
                             id="nameOfTheFund"

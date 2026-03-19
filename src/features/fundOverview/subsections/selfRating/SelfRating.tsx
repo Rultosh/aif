@@ -83,6 +83,12 @@ export const SelfRating = (props: any) => {
     })
 
     useEffect(() => {
+        if (selfRatingState.selfRatings?.id && selfRatingState.status.fetchStatus === FetchStatus.IDLE) {
+            navigate(`/preliminary/${id}/fund`, { replace: true });
+        }
+    }, [selfRatingState.selfRatings?.id, selfRatingState.status.fetchStatus, id, navigate]);
+
+    useEffect(() => {
         dispatch(
             fetchSelfRatingAsync(
                 wrapArgument(actionUid,
@@ -124,7 +130,7 @@ export const SelfRating = (props: any) => {
         // Set isSubmitted based on initial data
         const initialScore = Number(selfRatingState.selfRatings.score || 0);
         if (selfRatingState.selfRatings.id && initialScore >= 0.5) {
-        // if (selfRatingState.selfRatings.id) {
+            // if (selfRatingState.selfRatings.id) {
             setIsSubmitted(true);
         } else {
             setIsSubmitted(false);
