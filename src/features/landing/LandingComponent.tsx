@@ -37,7 +37,8 @@ import * as Yup from "yup";
 import loginVideo from '../../videos/login_videos.mp4';
 import viewIcon from '../../images/view.svg';
 import hideIcon from '../../images/hide.svg';
-
+import user_manual from '../../files/user_manual.pdf';
+import faq from '../../files/FAQs.pdf';
 const Landing = () => {
 
     const navigate = useNavigate()
@@ -381,7 +382,7 @@ const Landing = () => {
                                 <Button
                                     variant="outlined"
                                     component="a"
-                                    href="/files/User Manual.pdf"
+                                    href={user_manual}
                                     target="_blank"
                                     download="User Manual.pdf"
                                     startIcon={<MenuBookIcon sx={{ color: '#fff' }} />}
@@ -406,7 +407,7 @@ const Landing = () => {
                                 <Button
                                     variant="outlined"
                                     component="a"
-                                    href="/files/FAQs.pdf"
+                                    href={faq}
                                     target="_blank"
                                     download="FAQs.pdf"
                                     startIcon={<HelpOutlineIcon sx={{ color: '#fff' }} />}
