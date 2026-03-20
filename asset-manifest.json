@@ -1,9 +1,10 @@
 {
   "files": {
     "main.css": "/vcf/static/css/main.f4eb9ad0.css",
-    "main.js": "/vcf/static/js/main.9e8d8293.js",
+    "main.js": "/vcf/static/js/main.1c5733c6.js",
     "static/js/787.51358596.chunk.js": "/vcf/static/js/787.51358596.chunk.js",
     "static/media/login_videos.mp4": "/vcf/static/media/login_videos.7124616488525dc40951.mp4",
+    "static/media/user_manual.pdf": "/vcf/static/media/user_manual.00a99601cba3d987bcae.pdf",
     "static/media/signup_ai.jpeg": "/vcf/static/media/signup_ai.0145f0050347981ce5fb.jpeg",
     "static/media/Poppins-Regular.ttf": "/vcf/static/media/Poppins-Regular.4211496d0e075ffe7c2f.ttf",
     "static/media/Poppins-Medium.ttf": "/vcf/static/media/Poppins-Medium.c5eb70982e90502d0d01.ttf",
@@ -23,11 +24,11 @@
     "static/media/arrow_sign_in.svg": "/vcf/static/media/arrow_sign_in.228104960787599be75a.svg",
     "static/media/arrow_check_eligibility.svg": "/vcf/static/media/arrow_check_eligibility.7fe4472e8e96a76b31f6.svg",
     "main.f4eb9ad0.css.map": "/vcf/static/css/main.f4eb9ad0.css.map",
-    "main.9e8d8293.js.map": "/vcf/static/js/main.9e8d8293.js.map",
+    "main.1c5733c6.js.map": "/vcf/static/js/main.1c5733c6.js.map",
     "787.51358596.chunk.js.map": "/vcf/static/js/787.51358596.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f4eb9ad0.css",
-    "static/js/main.9e8d8293.js"
+    "static/js/main.1c5733c6.js"
   ]
 }
