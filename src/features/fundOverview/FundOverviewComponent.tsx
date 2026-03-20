@@ -10,7 +10,7 @@ import profileImg from '../../images/profile.png'
 import IconButton from '@mui/material/IconButton';
 import { selectUsers } from '../admin/adminSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import { selectPrelimApplication } from "../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
+import { selectPrelimApplication, PrelimApplicationState } from "../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
 import { selectSelfRatings } from "../fundOverview/subsections/selfRating/selfRatingSlice"
 // import { UserContext } from '../../App';
 // import useCookie, { getCookie } from 'react-use-cookie';
@@ -22,6 +22,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import GridViewIcon from '@mui/icons-material/GridView';
 import signupBg from '../../images/signup_ai.jpeg';
+import RestrictedPage from '../../components/RestrictedPage';
 
 export const FundOverview = (props: any) => {
     // let { shoppingList } = useContext(UserContext);
@@ -30,10 +31,12 @@ export const FundOverview = (props: any) => {
     const { id } = useParams();
     const [localId, setLocalId] = useState<string>();
     const usersState = useAppSelector(selectUsers)
-    const prelimApplicationState = useAppSelector(selectPrelimApplication);
+    const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const selfRatingState = useAppSelector(selectSelfRatings);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
+    console.log('statusPrelims', statusPrelims)
     console.log('usersState ', usersState)
+    console.log('prelimApplicationState', prelimApplicationState)
     const navigate = useNavigate();
 
     const { pathname } = useLocation();
@@ -102,6 +105,11 @@ export const FundOverview = (props: any) => {
 
     const currentStep = filteredSteps.find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
 
+    const isRestricted = (
+        (['USERADMIN', 'ADMIN'].includes(usersState.role || '')) ||
+        (usersState.role === 'USER' && (statusPrelims !== 'CREATED' && statusPrelims !== '' && statusPrelims !== undefined))
+    ) && ['selfrating', 'fund', 'declaration', 'profile'].some(path => pathname.toLowerCase().includes(path));
+
     // const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 
     return (
@@ -134,7 +142,7 @@ export const FundOverview = (props: any) => {
                 </Box>
                 <Box sx={{ flexGrow: 1 }}>
                     {/* Chevron Stepper */}
-                    {(usersState.role != undefined && !['USERADMIN', 'ADMIN'].includes(usersState.role || '')) && (
+                    {(!isRestricted && (usersState.role != undefined && !['USERADMIN', 'ADMIN'].includes(usersState.role || ''))) && (
                         <Box sx={{ width: '100%', display: 'flex', gap: 0.5 }}>
                             {filteredSteps.map((s, index, array) => {
                                 const isNew = id?.toString() === 'NEW';
@@ -215,26 +223,31 @@ export const FundOverview = (props: any) => {
                 flexGrow: 1,
                 position: 'relative',
                 overflow: 'hidden',
-                '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundImage: `url(${signupBg})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    filter: 'blur(2px)',
-                    // transform: 'scale(1.05)', // Prevent blurred edges
-                    zIndex: -1
-                }
+                ...(!isRestricted && {
+                    '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundImage: `url(${signupBg})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        filter: 'blur(2px)',
+                        zIndex: -1
+                    }
+                })
             }}>
                 <Box sx={{ height: '20px' }}></Box>
                 {/* Sub-content Area */}
                 <Container maxWidth="xl" sx={{ pb: '20px' }}>
                     <Box sx={{ width: '100%', mt: 2 }}>
-                        <Outlet />
+                        {isRestricted ? (
+                            <RestrictedPage />
+                        ) : (
+                            <Outlet />
+                        )}
                     </Box>
                 </Container>
             </Box>

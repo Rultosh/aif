@@ -30,6 +30,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const usersState = useAppSelector(selectUsers);
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
+    console.log('prelimApplicationState', prelimApplicationState)
     const [actionUid] = useState(uuid());
     const [prelimAppicationId, setPrelimApplicationId] = useState(props.prelimApplicationId);
     const [firstClosingSwitch, setfirstClosingSwitch] = useState(false);
@@ -75,7 +76,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             reset(prelimApplicationState.prelimApplication);
             setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id));
         }
-        
+
         if (usersState.me) {
             setAifNameData(usersState.me.companyName || '');
         }
@@ -410,7 +411,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         }
     }
 
-   // console.log((dealSubSectorValues as any)[String(prelimApplicationFormData?.dealSector || 0)]?.values, prelimApplicationFormData?.dealSubsector);
+    // console.log((dealSubSectorValues as any)[String(prelimApplicationFormData?.dealSector || 0)]?.values, prelimApplicationFormData?.dealSubsector);
 
     const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
     const htmlTagsNotAllowed = "Tags not allowed in input.";
@@ -430,7 +431,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             .max(new Date(), "Date cannot be a future date")
             .required("This value is required"),
         dealSector: Yup.string().required("Deal Sector is required").nullable(),
-       // dealSubsector: Yup.string().required("Deal Sub Sector is required").nullable(),
+        // dealSubsector: Yup.string().required("Deal Sub Sector is required").nullable(),
         nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         contributionSought: Yup.string().required("Contribution Sought is required").test("test-name", "Enter value that cannot exceed 25% of target corpus", function (value: any) {
             let sdTotalTargetCorpusVal = Number(prelimApplicationFormData.sdTotalTargetCorpus || '0');
