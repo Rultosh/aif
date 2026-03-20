@@ -313,10 +313,46 @@ const Declaration = (props: any) => {
                                                 <Grid item xs="auto">
                                                     <DocumentChip label="Organisation Structure" id={`sdOrganisationStructure${id}`} />
                                                 </Grid>
-                                                <Grid item xs="auto">
-                                                    <DocumentChip label="Details of Investment Committee Members" id={`sdDetailsOfInvestmentCommitteeMembers${id}`} />
-                                                </Grid>
                                             </Grid>
+                                        ) : (
+                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                                                Please save the form to upload documents.
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
+                                        Details of Investment Committee Members
+                                    </Typography>
+
+                                    <Box sx={{
+                                        p: 3,
+                                        border: '1px solid rgba(0,0,0,0.08)',
+                                        borderRadius: '16px',
+                                        backgroundColor: '#fafafa'
+                                    }}>
+                                        {Number(id) ? (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    href="/vcf/templates/Details of Investment Committee Members.xlsx"
+                                                    size="small"
+                                                    startIcon={<DownloadIcon />}
+                                                    sx={{
+                                                        textTransform: 'none',
+                                                        borderRadius: '6px',
+                                                        borderColor: 'rgba(54, 48, 98, 0.3)',
+                                                        color: '#363062',
+                                                        '&:hover': { borderColor: '#363062', backgroundColor: 'rgba(54, 48, 98, 0.05)' },
+                                                        mb: '17px'
+                                                    }}
+                                                >
+                                                    Download Template
+                                                </Button>
+                                                <span style={{ marginTop: '10px' }}>
+                                                    <DocumentChip label="Upload Document" id={`detailsOfInvestmentCommitteeMembers${id}`} />
+                                                </span>
+                                            </Box>
                                         ) : (
                                             <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
                                                 Please save the form to upload documents.
@@ -377,7 +413,7 @@ const Declaration = (props: any) => {
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
-                                                    href="/vcf/templates/Past_Track_Record_Template.xlsx"
+                                                    href="/vcf/templates/Past Investment Track Record of IM or AMC.xlsx"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
                                                     sx={{
