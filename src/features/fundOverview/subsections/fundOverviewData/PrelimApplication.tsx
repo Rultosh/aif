@@ -227,11 +227,12 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     }
 
     const handleToggle = () => {
+        const newValue = !prelimApplicationFormData.firstClosing;
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
-        copiedValue.firstClosing = !firstClosingSwitch;
+        copiedValue.firstClosing = newValue;
         setPrelimApplicationFormData(copiedValue);
-        setfirstClosingSwitch(!firstClosingSwitch)
-    }
+        setValue("firstClosing", newValue);
+    };
 
     const percentageFields = [
         'preferredReturn', 'otherExpenses', 'targetReturnIRR', 'managementFees',

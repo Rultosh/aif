@@ -9,7 +9,7 @@ import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useState, useEffect, useRef } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
 import PrelimApplicationData from "./subsections/fundOverviewData/PrelimApplication";
-import { clearPrelimApplication, selectPrelimApplication } from "./subsections/fundOverviewData/prelimApplicationDataSlice";
+import { clearPrelimApplication, selectPrelimApplication, updatePrelimApplicationAsync } from "./subsections/fundOverviewData/prelimApplicationDataSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { FetchStatus } from "../../lib/api-status/IStatus";
 import UploadComponents from "../DetailedApplicationComponent/subsections/uploadComponents";
@@ -19,6 +19,8 @@ import Others from "./subsections/fundOverviewData/others/Others";
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { wrapArgument } from "../../lib/api-status/actionWrapper";
+import uuid from "react-uuid";
 
 export const Fund = (props: any) => {
 
@@ -27,9 +29,11 @@ export const Fund = (props: any) => {
     const [prelimApplicationId, setPrelimApplicationId] = useState(id);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [hasInvestment, setHasInvestment] = useState(false);
-
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
+    const [hasInvestment, setHasInvestment] = useState(false);
+    useEffect(() => {
+        setHasInvestment(prelimApplicationState.prelimApplication.hasInvestment);
+    }, [prelimApplicationState.prelimApplication.hasInvestment]);
 
     const handleApplicationIdCreation = (value: String | undefined) => {
         if (value) setPrelimApplicationId(String(value));
@@ -199,6 +203,14 @@ export const Fund = (props: any) => {
             color: '#FF671F',
             backgroundColor: 'rgb(255 103 30 / 19%)'
         }
+    };
+
+    const [actionUid] = useState(uuid());
+    const updateHasInvestment = async (hasInvestment: boolean) => {
+        setHasInvestment(hasInvestment)
+        if (Number(prelimApplicationId)) {
+            await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, {...prelimApplicationState.prelimApplication, hasInvestment})));
+        } 
     };
 
     return (
@@ -566,7 +578,7 @@ export const Fund = (props: any) => {
                                             control={
                                                 <Switch
                                                     checked={hasInvestment}
-                                                    onChange={(e) => setHasInvestment(e.target.checked)}
+                                                    onChange={(e) => updateHasInvestment(e.target.checked)}
                                                     color="primary"
                                                     size="small"
                                                     sx={{
