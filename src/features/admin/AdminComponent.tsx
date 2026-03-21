@@ -1,4 +1,4 @@
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, TableCell, IconButton, Paper, Table, TableBody, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, TableCell, IconButton, Paper, Table, TableBody, TableContainer, TableHead, TableRow, Tooltip, Switch, FormControlLabel } from "@mui/material";
 import logo from '../../images/logo.png'
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -9,7 +9,7 @@ import React, * as Rect from 'react'
 import uuid from "react-uuid";
 import NavigationBar from '../../components/NavigationBar'
 import { defaultISignup } from "../signUp/ISignup";
-import { fetchUsersAsync, selectUsers } from './adminSlice'
+import { fetchUsersAsync, selectUsers, updateUserOtpRequiredAsync } from './adminSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
 import { Delete, Edit } from '@mui/icons-material'
@@ -74,7 +74,7 @@ const Admin = (props: any) => {
 
     };
 
-    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Approve"]
+    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Email OTP", "Approve"]
 
     let adminHeaderComponent = []
 
@@ -116,6 +116,29 @@ const Admin = (props: any) => {
                                                 <TableCell align="center">{row.address}</TableCell>
                                                 <TableCell align="center">{row.role}</TableCell>
                                                 <TableCell align="center">{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY")}</TableCell>
+                                                <TableCell align="center">
+                                                    <Tooltip title="Require email OTP at login (only when MFA is enabled on the server)">
+                                                        <FormControlLabel
+                                                            sx={{ m: 0, justifyContent: 'center' }}
+                                                            control={
+                                                                <Switch
+                                                                    size="small"
+                                                                    checked={!!row.otpRequired}
+                                                                    onChange={(_, checked) => {
+                                                                        if (row.id != null) {
+                                                                            dispatch(updateUserOtpRequiredAsync(
+                                                                                wrapArgument(actionUid, { id: Number(row.id), otpRequired: checked })
+                                                                            ));
+                                                                        }
+                                                                    }}
+                                                                    color="primary"
+                                                                />
+                                                            }
+                                                            label=""
+                                                            labelPlacement="end"
+                                                        />
+                                                    </Tooltip>
+                                                </TableCell>
                                                 <TableCell align="center">
                                                     {row.role == 'REGISTERED' ? <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} /> : <></>}
                                                 </TableCell>

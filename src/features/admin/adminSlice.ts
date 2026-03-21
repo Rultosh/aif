@@ -3,7 +3,7 @@ import { RootState } from "../../app/store"
 import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
 import {IUser, IUserApprove} from "./IUser"
-import {fetchUsers, approveUser, whoAmI} from './adminApi'
+import {fetchUsers, approveUser, whoAmI, patchUserOtpRequired} from './adminApi'
 import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 
 
@@ -73,6 +73,22 @@ export const approveUsersAsync = createAsyncThunk(
   }
 )
 
+export const updateUserOtpRequiredAsync = createAsyncThunk(
+  'users/updateOtpRequired',
+  async (args: ActionWrapper<{ id: number; otpRequired: boolean }>, { rejectWithValue }) => {
+    try {
+      if (!args.argument) {
+        return rejectWithValue({ message: 'Missing data' });
+      }
+      const { id, otpRequired } = args.argument;
+      const response = await patchUserOtpRequired(id, otpRequired);
+      return response.data as IUser;
+    } catch (reason) {
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -121,6 +137,12 @@ const usersSlice = createSlice({
     )
     .addCase(fetchRoleAsync.rejected, (state, action) => {
       state.status.fetchStatus = FetchStatus.FAILED;
+    })
+    .addCase(updateUserOtpRequiredAsync.fulfilled, (state, action: PayloadAction<IUser>) => {
+      const updated = action.payload;
+      state.users = state.users.map((row) =>
+        row.id === updated.id ? { ...row, ...updated } : row
+      );
     })
   }
 })

@@ -14,6 +14,8 @@ export interface IUser extends IEntity {
   sebiRegistrationDate: Date | undefined,
   registeredOn: Date | undefined,
   role: undefined,
+  /** When true and server MFA is on, user must complete email OTP at login. */
+  otpRequired?: boolean,
 }
 
 export const defaultIUser : IUser = {
@@ -31,6 +33,7 @@ export const defaultIUser : IUser = {
   sebiRegistration: undefined,
   sebiRegistrationDate: undefined,
   registeredOn: undefined,
+  otpRequired: false,
 }
 
 export interface IUserApprove {

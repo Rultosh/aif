@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { RootState } from "../../app/store"
 import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
-import { authenticate } from "./authenticationApi"
+import { authenticate, verifyMfa } from "./authenticationApi"
 import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 import { Password } from "@mui/icons-material"
 
@@ -12,17 +12,25 @@ type Password = {
     iv: String | undefined,
 }
 
+export type MfaPendingState = {
+    challengeId: string
+    maskedEmail?: string | null
+    expiresInSeconds?: number | null
+}
+
 type InitialState = {
     token: String | undefined,
     response: string | undefined,
     status: IStatus,
-    actionStatus: IStatus
+    actionStatus: IStatus,
+    mfaPending: MfaPendingState | undefined,
 }
 const initialState: InitialState = {
     token: undefined,
     response: undefined,
     status: { fetchStatus: FetchStatus.IDLE },
-    actionStatus: { fetchStatus: FetchStatus.IDLE }
+    actionStatus: { fetchStatus: FetchStatus.IDLE },
+    mfaPending: undefined,
 }
 
 export interface ILoginRequest {
@@ -39,8 +47,16 @@ export const defaultLoginRequest = {
     captchaResponse: undefined,
 }
 
-interface ILoginResponse {
-    currentUser: String
+export interface ILoginResponse {
+    mfaRequired?: boolean
+    currentUser?: string
+    challengeId?: string | null
+    expiresInSeconds?: number | null
+    maskedEmail?: string | null
+}
+
+interface IMfaVerifyResponse {
+    currentUser: string
 }
 
 export const authenticateThunk = createAsyncThunk(
@@ -50,10 +66,25 @@ export const authenticateThunk = createAsyncThunk(
     try {
       if(args.argument) {
         const response = await authenticate(args.argument);
-        return response.data;
+        return response.data as ILoginResponse;
       }
     } catch(reason) {
       console.log(reason)
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
+
+export const verifyMfaThunk = createAsyncThunk(
+  'auth/verifyMfa',
+  async (args: ActionWrapper<{ challengeId: string; otp: string }>, { rejectWithValue }) => {
+    try {
+      if (!args.argument) {
+        return rejectWithValue({ message: 'Missing verification data' });
+      }
+      const response = await verifyMfa(args.argument);
+      return response.data as IMfaVerifyResponse;
+    } catch (reason) {
       return rejectWithValue(getError(reason));
     }
   }
@@ -66,6 +97,9 @@ const authticationSlice = createSlice({
     clearErrorMessage:  (state) => {
       state.status.fetchStatus = FetchStatus.IDLE;
     },
+    clearMfaPending: (state) => {
+      state.mfaPending = undefined;
+    },
     setErrorMessage:  (state, action: PayloadAction<string>) => {
       state.response = action.payload
       state.status.fetchStatus = FetchStatus.FAILED
@@ -77,15 +111,46 @@ const authticationSlice = createSlice({
     })
     .addCase(
         authenticateThunk.fulfilled,
-      (state, action: PayloadAction<ILoginResponse>) => {
-        console.log(action.payload);
-        state.token = action.payload.currentUser;
-        console.log(JSON.stringify(state));
-        state.response = undefined;
-        localStorage.setItem('token', String(state.token));
+      (state, action: PayloadAction<ILoginResponse | undefined>) => {
+        const payload = action.payload;
+        console.log(payload);
+        if (payload?.mfaRequired === true && payload.challengeId) {
+          state.mfaPending = {
+            challengeId: payload.challengeId,
+            maskedEmail: payload.maskedEmail,
+            expiresInSeconds: payload.expiresInSeconds,
+          };
+          state.response = undefined;
+          state.status.fetchStatus = FetchStatus.IDLE;
+          return;
+        }
+        if (payload?.currentUser) {
+          state.token = payload.currentUser;
+          state.mfaPending = undefined;
+          console.log(JSON.stringify(state));
+          state.response = undefined;
+          localStorage.setItem('token', String(state.token));
+        }
         state.status.fetchStatus = FetchStatus.IDLE;
       }
     )
+    .addCase(verifyMfaThunk.pending, (state) => {
+      state.status.fetchStatus = FetchStatus.DOING;
+    })
+    .addCase(verifyMfaThunk.fulfilled, (state, action: PayloadAction<IMfaVerifyResponse | undefined>) => {
+      const token = action.payload?.currentUser;
+      if (token) {
+        state.token = token;
+        state.mfaPending = undefined;
+        state.response = undefined;
+        localStorage.setItem('token', String(state.token));
+      }
+      state.status.fetchStatus = FetchStatus.IDLE;
+    })
+    .addCase(verifyMfaThunk.rejected, (state, action: any) => {
+      state.response = action.payload?.message;
+      state.status.fetchStatus = FetchStatus.FAILED;
+    })
     .addCase(authenticateThunk.rejected, (state, action: any) => {
       // let errStr = "unknown error. please contact support"
       // const errOut = "Invalid Username / Password entered. Try again!"
@@ -98,6 +163,7 @@ const authticationSlice = createSlice({
 })
 
 export default authticationSlice.reducer
-export const { setErrorMessage, clearErrorMessage } = authticationSlice.actions
+export const { setErrorMessage, clearErrorMessage, clearMfaPending } = authticationSlice.actions
 
 export const selectAuthenticatedUser = (state: RootState) => state.auth;
+export const selectMfaPending = (state: RootState) => state.auth.mfaPending;

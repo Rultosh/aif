@@ -281,9 +281,9 @@ export const Home = (pros: any) => {
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row) => {
+                                        prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row, index) => {
                                             return <TableRow
-                                                key={`${row.nameOfTheFund}`}
+                                                key={row.id != null ? `prelim-${row.id}` : `prelim-row-${index}`}
                                                 sx={{
                                                     '&:hover': { backgroundColor: '#f1f5f9' },
                                                     transition: 'background-color 0.2s ease'

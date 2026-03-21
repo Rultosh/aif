@@ -14,3 +14,11 @@ export function authenticate(loginRequest: ILoginRequest) {
         url: `/auth/authenticate`
     });    
 }
+
+export function verifyMfa(params: { challengeId: string; otp: string }) {
+    return api({
+        method: 'post',
+        data: params,
+        url: `/auth/mfa/verify`,
+    });
+}

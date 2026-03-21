@@ -9,7 +9,7 @@ import { validateUser } from './landingSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import '../../index.css'
 import loginIconImg from '../../images/aif_login_icon.png'
-import { authenticateThunk, clearErrorMessage, defaultLoginRequest, selectAuthenticatedUser, setErrorMessage } from "../../components/auth/authenticationSlice";
+import { authenticateThunk, clearErrorMessage, clearMfaPending, defaultLoginRequest, selectAuthenticatedUser, selectMfaPending, setErrorMessage, verifyMfaThunk } from "../../components/auth/authenticationSlice";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
@@ -44,6 +44,7 @@ const Landing = () => {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
     const state = useAppSelector(selectAuthenticatedUser)
+    const mfaPending = useAppSelector(selectMfaPending)
     const [toastOpen, setToastOpen] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const initialState = defaultLoginRequest
@@ -52,6 +53,7 @@ const Landing = () => {
     const isValidUser = useAppSelector(state => state.landing.validUser);
     const [actionId] = useState(uuid());
     const [showPassword, setShowPassword] = useState(false);
+    const [otpValue, setOtpValue] = useState('');
     const usersState = useAppSelector(selectUsers)
     // console.log(usersState)
 
@@ -235,9 +237,71 @@ const Landing = () => {
                 }}>
                     <Box sx={{ width: '100%', maxWidth: '380px' }}>
                         <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#000000' }}>
-                            Login
+                            {mfaPending ? 'Enter verification code' : 'Login'}
                         </Typography>
 
+                        {mfaPending ? (
+                            <Box component="form" onSubmit={(e) => {
+                                e.preventDefault();
+                                const otp = otpValue.trim();
+                                if (otp.length < 4) {
+                                    dispatch(setErrorMessage('Please enter the verification code from your email.'));
+                                    return;
+                                }
+                                dispatch(verifyMfaThunk(wrapArgument(actionId, {
+                                    challengeId: mfaPending.challengeId,
+                                    otp,
+                                })));
+                            }}>
+                                <Typography sx={{ mb: 2, fontSize: '14px', color: '#333' }}>
+                                    We sent a one-time code to <strong>{mfaPending.maskedEmail ?? 'your email'}</strong>.
+                                    {mfaPending.expiresInSeconds != null && (
+                                        <span> It expires in about {Math.ceil(mfaPending.expiresInSeconds / 60)} minutes.</span>
+                                    )}
+                                </Typography>
+                                <TextField
+                                    fullWidth
+                                    label="Verification code"
+                                    placeholder="6-digit code"
+                                    value={otpValue}
+                                    onChange={(e) => setOtpValue(e.target.value.replace(/\s/g, ''))}
+                                    inputProps={{ maxLength: 12, inputMode: 'numeric' as const, autoComplete: 'one-time-code' }}
+                                    sx={{ mb: 2, '& .MuiOutlinedInput-root': { backgroundColor: '#fff', borderRadius: '6px' } }}
+                                />
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    disabled={state.status.fetchStatus === FetchStatus.DOING}
+                                    sx={{
+                                        py: 1.8,
+                                        backgroundColor: '#FF671F',
+                                        '&:hover': { backgroundColor: '#FF671F' },
+                                        borderRadius: '6px',
+                                        fontSize: '16px',
+                                        fontWeight: 500,
+                                        textTransform: 'none',
+                                        mb: 2,
+                                    }}
+                                >
+                                    {state.status.fetchStatus === FetchStatus.DOING ? (
+                                        <CircularProgress size={24} sx={{ color: '#fff' }} />
+                                    ) : (
+                                        'Verify & continue'
+                                    )}
+                                </Button>
+                                <Typography
+                                    sx={{ fontSize: '14px', color: '#1942b6', fontWeight: 500, cursor: 'pointer', textAlign: 'center' }}
+                                    onClick={() => {
+                                        setOtpValue('');
+                                        dispatch(clearMfaPending());
+                                        captchaRef.current?.reset();
+                                    }}
+                                >
+                                    Back to login
+                                </Typography>
+                            </Box>
+                        ) : (
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <Box sx={{ mb: 2 }}>
                                 <Typography sx={{ fontWeight: 500, mb: 0.5, color: '#000000', fontSize: '14px' }}>
@@ -437,6 +501,7 @@ const Landing = () => {
                                 </Typography>
                             )}
                         </form>
+                        )}
                     </Box>
                 </Box>
             </Box>

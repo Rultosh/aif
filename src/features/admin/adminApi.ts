@@ -23,3 +23,11 @@ export function whoAmI() {
   });
 }
 
+export function patchUserOtpRequired(userId: number, otpRequired: boolean) {
+  return api({
+    method: 'patch',
+    url: `useradmin/users/${userId}/otp-required`,
+    data: { otpRequired },
+  });
+}
+
