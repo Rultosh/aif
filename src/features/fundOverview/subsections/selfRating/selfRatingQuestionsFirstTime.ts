@@ -35,7 +35,7 @@ export const questionsForFirstTime = {
         {
             "id": 5,
             "text": "Share of employees (other than KMP) in Carry/Bonus/Stock Option",
-            "options": [">=40%", ">=30% & <40%", ">=20% & <30%", "<20%", "No Carry"],
+            "options": [">=40%", ">=30% & <40%", ">=20% & <30%", "<20%"],
             "size": 2,
             "contribution": 10,
             'weightage': [1, 0.75, 0.5, 0.25]
