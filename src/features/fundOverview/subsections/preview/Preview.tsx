@@ -39,6 +39,16 @@ export const Preview = (props: any) => {
     const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
     const [actionUid] = useState(uuid());
     const usersState = useAppSelector(selectUsers)
+    const reviewedById = prelimApplicationState.prelimApplication.reviewedByUserId
+    const currentUserId = usersState.me?.id
+    const isCurrentUserForwarder =
+        reviewedById != null &&
+        currentUserId != null &&
+        Number(reviewedById) === Number(currentUserId)
+    /** Approve enabled only when no forwarder is recorded (legacy) or current user is not that forwarder. */
+    const approveDisabled =
+        reviewedById != null &&
+        (currentUserId == null || Number(reviewedById) === Number(currentUserId))
     const [showResponse, setShowResponse] = useState(false);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
@@ -364,7 +374,7 @@ export const Preview = (props: any) => {
                                 )}
 
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                                    {(!(statusPrelims == 'SUBMITTED') && usersState.role == 'USER') && (
+                                    {(usersState.role == 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE')) && (
                                         <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', px: 4, fontWeight: 700, backgroundColor: '#4caf50' }}>
                                             Submit Application
                                         </Button>
@@ -372,8 +382,8 @@ export const Preview = (props: any) => {
 
                                     {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'SUBMITTED') && (
                                         <Box sx={{ display: 'flex', gap: 2 }}>
-                                            <Button color='success' id='approve' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Forward
+                                            <Button color='success' id='review' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Forward for approval
                                             </Button>
                                             <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revise
@@ -391,6 +401,35 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
+                                    {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'REVIEWED') && (
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                            {isCurrentUserForwarder && (
+                                                <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 480 }}>
+                                                    Another administrator must approve. You forwarded this application for approval.
+                                                </Typography>
+                                            )}
+                                            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                                                <Button
+                                                    color='success'
+                                                    id='approve'
+                                                    onClick={handleClickSave}
+                                                    variant="contained"
+                                                    disabled={approveDisabled}
+                                                    title={approveDisabled ? 'Only an administrator other than the one who forwarded may approve.' : undefined}
+                                                    sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}
+                                                >
+                                                    Approve
+                                                </Button>
+                                                <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                    Revise
+                                                </Button>
+                                                <Button color='error' id='reject' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                    Reject
+                                                </Button>
+                                            </Box>
+                                        </Box>
+                                    )}
+
                                     {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'TEMP_CLOSED') && (
                                         <Button color='primary' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                             Reopen Application
@@ -402,7 +441,7 @@ export const Preview = (props: any) => {
                     </Card>
 
                     <Button
-                        disabled={(statusPrelims == 'SUBMITTED') || usersState.role == 'ADMIN'}
+                        disabled={(statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'APPROVED') || usersState.role == 'ADMIN'}
                         onClick={(e) => handleClick(e, "previous")}
                         startIcon={<ArrowLeftIcon />}
                         variant="outlined"

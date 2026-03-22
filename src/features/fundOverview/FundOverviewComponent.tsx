@@ -84,7 +84,7 @@ export const FundOverview = (props: any) => {
         };
 
     const isUserPermittedToView = () => {
-        if (usersState.role == 'USER' && !(['SUBMITTED', 'APPROVED'].includes(statusPrelims.toString()))) {
+        if (usersState.role == 'USER' && !(['SUBMITTED', 'REVIEWED', 'APPROVED'].includes(statusPrelims.toString()))) {
             return true;
         }
         return false

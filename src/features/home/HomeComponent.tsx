@@ -155,9 +155,9 @@ export const Home = (pros: any) => {
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
         let role = usersState.role;
-        if ((row.status === 'SUBMITTED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && role == 'ADMIN')
+        if ((row.status === 'SUBMITTED' || row.status === 'REVIEWED' || row.status === 'APPROVED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && role == 'ADMIN')
             return true
-        if (['CLOSE', 'REVISE', 'CREATED'].includes(String(row.status)) && role == 'USER')
+        if (['CLOSE', 'REVISE', 'CREATED', 'APPROVED'].includes(String(row.status)) && role == 'USER')
             return true
         return false
     }
@@ -171,7 +171,7 @@ export const Home = (pros: any) => {
             color = "success";
         } else if (status === 'REJECTED' || status === 'CLOSED') {
             color = "error";
-        } else if (status === 'SUBMITTED' || status === 'REVISE') {
+        } else if (status === 'SUBMITTED' || status === 'REVIEWED' || status === 'REVISE') {
             color = "warning";
         } else if (status === 'CREATED') {
             color = "primary";
@@ -187,7 +187,7 @@ export const Home = (pros: any) => {
         if (usersState.role == 'ADMIN') {
             return 'preview'
         }
-        let path = (status && ['SUBMITTED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED'].includes(status.toString())) ? 'preview' : 'fund'
+        let path = (status && ['SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED'].includes(status.toString())) ? 'preview' : 'fund'
         return path;
     }
 
@@ -195,13 +195,18 @@ export const Home = (pros: any) => {
 
         const stageDescription = stage === "PRELIM" ? "Preliminary application" : "Detailed application";
 
-        if (stage !== "PRELIM") return "Approved";
+        if (stage !== "PRELIM") {
+            if (status === "REVIEWED") return "Pending final approval";
+            return "Approved";
+        }
 
         switch (status) {
             case "CREATED":
                 return "Pending submission";
             case "SUBMITTED":
                 return "Pending review";
+            case "REVIEWED":
+                return "Pending final approval";
             case "REVISE":
                 return "Pending revision";
             case "APPROVED":

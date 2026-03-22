@@ -53,6 +53,15 @@ export const CarryDistribution = (props: any) => {
     const [prilimFormData, setPrilimFormData] = useState(defaultIDetailedApplication);
     const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
     const usersState = useAppSelector(selectUsers)
+    const reviewedByIdDetailed = prilimFormData.reviewedByUserId
+    const currentAdminId = usersState.me?.id
+    const isCurrentUserForwarderDetailed =
+        reviewedByIdDetailed != null &&
+        currentAdminId != null &&
+        Number(reviewedByIdDetailed) === Number(currentAdminId)
+    const approveDisabled =
+        reviewedByIdDetailed != null &&
+        (currentAdminId == null || Number(reviewedByIdDetailed) === Number(currentAdminId))
     const [deleteClicked, setDeleteClicked] = useState(false);
     const [showResponse, setShowResponse] = useState(false);
 
@@ -1186,7 +1195,7 @@ console.log(prilimFormData);
 
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                                {!(prilimFormData.status == 'SUBMITTED' || prilimFormData.status == 'TEMP_CLOSED' || prilimFormData.status == 'CLOSED') ? <><Button
+                                {!(prilimFormData.status == 'SUBMITTED' || prilimFormData.status == 'REVIEWED' || prilimFormData.status == 'TEMP_CLOSED' || prilimFormData.status == 'CLOSED') ? <><Button
                                     //onClick={(e) => handleClickSave(e, "submit")}
                                     // onClick={handleClickSubmit}
                                     onClick={handleClickSubmit}
@@ -1213,15 +1222,46 @@ console.log(prilimFormData);
                                 </> : ['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') ?
 
                                     <>
-                                        <Button color='success' id='approve' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                                            Approve
-                                        </Button>
-                                        <Button color='warning' id='revise' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                                            Revise
-                                        </Button>
-                                        <Button color='error' id='reject' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
-                                            Reject
-                                        </Button>
+                                        {prilimFormData.status === 'SUBMITTED' && (
+                                            <>
+                                                <Button color='success' id='review' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                                    Forward for approval
+                                                </Button>
+                                                <Button color='warning' id='revise' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                                    Revise
+                                                </Button>
+                                                <Button color='error' id='reject' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                                    Reject
+                                                </Button>
+                                            </>
+                                        )}
+                                        {prilimFormData.status === 'REVIEWED' && (
+                                            <>
+                                                {isCurrentUserForwarderDetailed && (
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 3, mb: 1, ml: 2, maxWidth: 480 }}>
+                                                        Another administrator must approve. You forwarded this application for approval.
+                                                    </Typography>
+                                                )}
+                                                <Button
+                                                    color='success'
+                                                    id='approve'
+                                                    onClick={handleClickSubmit}
+                                                    variant="contained"
+                                                    disableElevation
+                                                    disabled={approveDisabled}
+                                                    title={approveDisabled ? 'Only an administrator other than the one who forwarded may approve.' : undefined}
+                                                    sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }}
+                                                >
+                                                    Approve
+                                                </Button>
+                                                <Button color='warning' id='revise' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                                    Revise
+                                                </Button>
+                                                <Button color='error' id='reject' onClick={handleClickSubmit} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
+                                                    Reject
+                                                </Button>
+                                            </>
+                                        )}
                                     </> : <></>}
                             </Box>
                         </Grid>
@@ -1245,7 +1285,7 @@ console.log(prilimFormData);
                         </Grid>
                         <Grid item xs={4} sx={{ justifyContent: 'right' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'row-reverse' }}>
-                                {(['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && prilimFormData.status === 'SUBMITTED') ?
+                                {(['ADMIN', 'USERADMIN'].includes(usersState.role != undefined ? usersState.role : '') && (prilimFormData.status === 'SUBMITTED' || prilimFormData.status === 'REVIEWED')) ?
                                     <>
                                         <Button color='error' id='permClose' onClick={handleClickSaveCloseAction} variant="contained" disableElevation sx={{ textTransform: 'none', mt: 3, mb: 3, ml: 2 }} >
                                             Close

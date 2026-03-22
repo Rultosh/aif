@@ -9,6 +9,7 @@ export interface IDetailedApplication extends IEntity {
   disputes : string | undefined,
   prelimApplicationId: string | undefined,
   status: string | undefined,
+  reviewedByUserId: number | undefined,
   actionDate: Date | undefined
 }
 
@@ -23,6 +24,7 @@ export const defaultIDetailedApplication : IDetailedApplication = {
   disputes : undefined , 
   prelimApplicationId: undefined,
   status: undefined,
+  reviewedByUserId: undefined,
   actionDate: undefined,
 }
 

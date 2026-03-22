@@ -3,6 +3,8 @@ import { Dayjs } from "dayjs";
 export interface IPrelimApplicationData {
   id: Number | undefined,
   status: String | undefined,
+  /** Admin who forwarded for approval; cannot be the same user who approves. */
+  reviewedByUserId: Number | undefined,
   createdBy: Number | undefined,
   createdByName: String | undefined,
   parentId: Number | undefined,
@@ -128,6 +130,7 @@ export interface IPrelimApplicationData {
 export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   id: undefined,
   status: undefined,
+  reviewedByUserId: undefined,
   createdBy: undefined,
   createdByName: undefined,
   parentId: undefined,
