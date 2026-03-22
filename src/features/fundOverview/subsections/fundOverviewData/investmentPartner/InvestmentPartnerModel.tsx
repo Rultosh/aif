@@ -859,7 +859,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   <Grid item xs={12} md={6}>
                     <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
                       <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Experience</Typography>
-                      <UploadComponents id={`sdPartnerResume${investmentPartnerFormData.id || uuid()}`} signed={false} />
+                      <UploadComponents id={`sdPartnerResume${props.prelimApplicationId || uuid()}`} signed={false} />
                     </Box>
                   </Grid>
                 </Grid>
