@@ -842,7 +842,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         Download Template
                       </Button>
                       <span style={{ marginTop: '10px' }}>
-                        <DocumentChip label="Upload Document" id={`sdRiskAssessmentAndMitigationPlan${id}`} />
+                        <DocumentChip label="Upload Document" id={`docDetailsOfInvestmentsUndertakenByThePartnerInThePast10Years${investmentPartnerFormData.id}`} />
                       </span>
                     </Box>
                   ) : (
