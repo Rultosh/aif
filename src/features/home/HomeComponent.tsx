@@ -157,7 +157,7 @@ export const Home = (pros: any) => {
         let role = usersState.role;
         if ((row.status === 'SUBMITTED' || row.status === 'REVIEWED' || row.status === 'APPROVED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && role == 'ADMIN')
             return true
-        if (['CLOSE', 'REVISE', 'CREATED', 'APPROVED'].includes(String(row.status)) && role == 'USER')
+        if ((row.status === 'CREATED' || row.status === 'REVISE') && role == 'USER')
             return true
         return false
     }

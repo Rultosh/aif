@@ -10,7 +10,9 @@ import profileImg from '../../images/profile.png'
 import IconButton from '@mui/material/IconButton';
 import { selectUsers } from '../admin/adminSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import { selectPrelimApplication, PrelimApplicationState } from "../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
+import { getPrelimApplicationData, selectPrelimApplication, PrelimApplicationState } from "../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice"
+import { wrapArgument } from '../../lib/api-status/actionWrapper'
+import uuid from 'react-uuid'
 import { selectSelfRatings } from "../fundOverview/subsections/selfRating/selfRatingSlice"
 // import { UserContext } from '../../App';
 // import useCookie, { getCookie } from 'react-use-cookie';
@@ -23,6 +25,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import GridViewIcon from '@mui/icons-material/GridView';
 import signupBg from '../../images/signup_ai.jpeg';
 import RestrictedPage from '../../components/RestrictedPage';
+import { FetchStatus, ResponseCode } from '../../lib/api-status/IStatus';
 
 export const FundOverview = (props: any) => {
     // let { shoppingList } = useContext(UserContext);
@@ -30,13 +33,12 @@ export const FundOverview = (props: any) => {
 
     const { id } = useParams();
     const [localId, setLocalId] = useState<string>();
+    const dispatch = useAppDispatch();
+    const [actionUid] = useState(uuid());
     const usersState = useAppSelector(selectUsers)
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const selfRatingState = useAppSelector(selectSelfRatings);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
-    console.log('statusPrelims', statusPrelims)
-    console.log('usersState ', usersState)
-    console.log('prelimApplicationState', prelimApplicationState)
     const navigate = useNavigate();
 
     const { pathname } = useLocation();
@@ -59,6 +61,19 @@ export const FundOverview = (props: any) => {
             // navigate("/preliminary/1/selfrating")
         }
     });
+
+    /** Draft (CREATED) or returned for revision (REVISE)—both use the preliminary wizard; other statuses cannot. */
+    const USER_PRELIM_ALLOWED_STATUSES = ['CREATED', 'REVISE'] as const;
+    const isNewApplicationRoute = !id || String(id).toUpperCase() === 'NEW';
+
+    useEffect(() => {
+        if (isNewApplicationRoute) return;
+        const numericId = Number(id);
+        if (Number.isNaN(numericId)) return;
+        if (Number(prelimApplicationState.prelimApplication.id) !== numericId) {
+            dispatch(getPrelimApplicationData(wrapArgument(actionUid, numericId)));
+        }
+    }, [id, dispatch, actionUid, isNewApplicationRoute, prelimApplicationState.prelimApplication.id]);
 
     type dropDownValues = {
         data: any,
@@ -105,10 +120,27 @@ export const FundOverview = (props: any) => {
 
     const currentStep = filteredSteps.find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
 
-    const isRestricted = (
-        (['USERADMIN', 'ADMIN'].includes(usersState.role || '')) ||
-        (usersState.role === 'USER' && (statusPrelims !== 'CREATED' && statusPrelims !== '' && statusPrelims !== undefined))
-    ) && ['selfrating', 'fund', 'declaration', 'profile'].some(path => pathname.toLowerCase().includes(path));
+    const userCannotAccessPreliminary =
+        usersState.role === 'USER' &&
+        !isNewApplicationRoute &&
+        statusPrelims !== '' &&
+        statusPrelims !== undefined &&
+        !(USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(String(statusPrelims));
+
+    /** Admins review after submit; no access while application is still draft (CREATED). */
+    const adminCannotAccessPreliminary =
+        ['USERADMIN', 'ADMIN'].includes(usersState.role || '') &&
+        !isNewApplicationRoute &&
+        statusPrelims !== '' &&
+        statusPrelims !== undefined &&
+        String(statusPrelims) === 'CREATED';
+
+    const applicationNotFound =
+        !isNewApplicationRoute &&
+        prelimApplicationState.status.fetchStatus === FetchStatus.FAILED &&
+        prelimApplicationState.status.responseCode === ResponseCode.NOT_FOUND;
+
+    const isRestricted = applicationNotFound || adminCannotAccessPreliminary || userCannotAccessPreliminary;
 
     // const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 

@@ -3,7 +3,7 @@ import { ActionWrapper } from '../../../../lib/api-status/actionWrapper'
 import { fetchFundOverviewData, fetchFundOverviewList, fetchFundOverviewAllList, patchPrelimApplication, postPrelimApplication, postApplication, postPrelimApplicationShell } from './fundOverviewDataApi'
 import { getError } from '../../../../lib/api-status/errorHandler'
 import { defaultIPrelimApplicationData, IPrelimApplicationData, IApplicationData } from './IPrelimApplicationData'
-import { FetchStatus, IStatus } from '../../../../lib/api-status/IStatus'
+import { FetchStatus, IStatus, ResponseCode } from '../../../../lib/api-status/IStatus'
 import { RootState } from '../../../../app/store'
 
 export interface PrelimApplicationState {
@@ -156,17 +156,26 @@ const prelimApplicationDataSlice = createSlice({
     builder
       .addCase(getPrelimApplicationData.pending, state => {
         state.status.fetchStatus = FetchStatus.DOING;
+        state.status.responseCode = undefined;
+        state.status.message = undefined;
       })
       .addCase(
         getPrelimApplicationData.fulfilled,
         (state, action: PayloadAction<IPrelimApplicationData>) => {
           state.prelimApplication = action.payload
           state.status.fetchStatus = FetchStatus.IDLE;
+          state.status.responseCode = undefined;
+          state.status.message = undefined;
         }
       )
       .addCase(getPrelimApplicationData.rejected, (state, action) => {
+        const payload = action.payload as IStatus | undefined;
         state.status.fetchStatus = FetchStatus.FAILED;
-        state.status.message = (action.payload as IStatus)?.message;
+        state.status.message = payload?.message;
+        state.status.responseCode = payload?.responseCode;
+        if (payload?.responseCode === ResponseCode.NOT_FOUND) {
+          state.prelimApplication = { ...defaultIPrelimApplicationData };
+        }
       })
 
       .addCase(createShellPrelimApplicationAsync.pending, state => {

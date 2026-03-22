@@ -26,8 +26,8 @@ const RestrictedPage = () => {
                 <Typography variant="body1" color="text.secondary" paragraph>
                     You do not have permission to view this page. This section is restricted based on your role.
                 </Typography>
-                <Button variant="contained" color="primary" onClick={() => navigate(-1)} sx={{ mt: 2, backgroundColor: '#FF671F !important' }}>
-                    Go Back
+                <Button variant="contained" color="primary" onClick={() => navigate('/home')} sx={{ mt: 2, backgroundColor: '#FF671F !important' }}>
+                    Home
                 </Button>
             </Box>
         </Container>
