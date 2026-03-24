@@ -154,7 +154,7 @@ const SignUp = () => {
             .string()
             .trim()
             .test("Invalid input entered", function (value: any) {
-                const pattern =/^[A-Za-z0-9]+$/;
+                const pattern =/^[A-Za-z0-9 .-_]+$/;
                 const isNotValidInput = pattern.test(value);
                 if (!isNotValidInput) {
                     return false;

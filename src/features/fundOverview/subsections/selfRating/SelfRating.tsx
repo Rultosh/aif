@@ -372,8 +372,9 @@ export const SelfRating = (props: any) => {
         try {
             await handleClickSave();
             const currentScore = Number(selfRatingValue.score || 0);
-            // alert(currentScore)
-            if (currentScore >= 0.5) {
+            const averageScore = Math.round((currentScore/selfQuestions.length));
+            //alert(averageScore)
+            if (averageScore >= 5) {
                 setModalType('success');
                 setIsSubmitted(true);
             } else {
