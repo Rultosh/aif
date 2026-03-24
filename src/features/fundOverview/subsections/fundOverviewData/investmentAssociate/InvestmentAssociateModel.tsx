@@ -151,7 +151,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     setShowNonLeadForm(false);
     setEditingNonLeadInvestment(defaultIIInvestmentResponsibleAsNonLead);
   };
-  const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
+  const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/]+$/;
   const investmentValidationSchema = Yup.object().shape({
     nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     amountInvested: Yup.number().typeError("Must be a number").required("Amount is required"),

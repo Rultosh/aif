@@ -43,7 +43,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[a-zA-Z0-9_\.\- ]+$/;
+    const freeformRegx = /^[a-zA-Z0-9_\.\- _(),/]+$/;
     const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
 
     const validationSchema = Yup.object().shape({

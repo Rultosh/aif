@@ -131,7 +131,8 @@ export const SelfRating = (props: any) => {
 
         // Set isSubmitted based on initial data
         const initialScore = Number(selfRatingState.selfRatings.score || 0);
-        if (selfRatingState.selfRatings.id && initialScore >= 0.5) {
+        const averageScore = initialScore / selfQuestions.length;
+        if (selfRatingState.selfRatings.id && averageScore >= 5) {
             // if (selfRatingState.selfRatings.id) {
             setIsSubmitted(true);
         } else {
@@ -375,8 +376,8 @@ export const SelfRating = (props: any) => {
             setHasJustSubmitted(true);
             await handleClickSave();
             const currentScore = Number(selfRatingValue.score || 0);
-            const averageScore = Math.round((currentScore / selfQuestions.length));
-            //alert(averageScore)
+            const averageScore = (currentScore / selfQuestions.length);
+            // alert(averageScore)
             if (averageScore >= 5) {
                 setModalType('success');
                 setIsSubmitted(true);
@@ -402,6 +403,10 @@ export const SelfRating = (props: any) => {
             setIsLoading(false);
         }
     };
+
+    const handleHomeClick= async(e:any) =>{
+         navigate('/home');
+    }
 
     return (
         <div className="formAnimation">
@@ -761,7 +766,7 @@ export const SelfRating = (props: any) => {
                         <Button
                             onClick={(e) => {
                                 setShowResultModal(false);
-                                handleNextClick(e);
+                                handleHomeClick(e);
                             }}
                             variant="contained"
                             sx={{
@@ -778,7 +783,7 @@ export const SelfRating = (props: any) => {
                                 }
                             }}
                         >
-                            Continue to Fund Information
+                            Back to Home
                         </Button>
                     )}
                 </DialogActions>

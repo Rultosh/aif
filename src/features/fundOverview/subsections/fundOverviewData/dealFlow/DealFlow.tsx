@@ -45,7 +45,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
+    const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/]+$/;
     const validationSchema = Yup.object().shape({
         dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         //dfCurrentPipeline: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),

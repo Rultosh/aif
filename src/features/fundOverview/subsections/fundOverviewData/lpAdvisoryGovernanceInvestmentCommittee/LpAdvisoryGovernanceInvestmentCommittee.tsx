@@ -38,7 +38,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[a-zA-Z0-9_\.\-, ]+$/;
+    const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/]+$/;
     const validationSchema = Yup.object().shape({
         lpacDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         lpacMemberSelectionDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
