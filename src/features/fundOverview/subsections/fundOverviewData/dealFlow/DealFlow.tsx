@@ -1,4 +1,4 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography, CircularProgress } from "@mui/material";
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
 import { getPrelimApplicationData, PrelimApplicationState, selectPrelimApplication, updatePrelimApplicationAsync } from "../prelimApplicationDataSlice";
@@ -13,6 +13,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useParams } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
+import { useDebounceEffect } from "../../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -69,11 +70,21 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
+
+    const watchedFields = watch();
+
+    useDebounceEffect(() => {
+        if (Number(prelimAppicationId) && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
+            console.log('Auto-saving DealFlow...');
+            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...watchedFields })));
+        }
+    }, [watchedFields], 2000);
 
     const onSubmit = async (data: IPrelimApplicationData) => {
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
@@ -138,7 +149,25 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         },
     };
 
-    if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED) {
+        return (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>
+                <Button 
+                    variant="outlined" 
+                    onClick={() => {
+                        if (Number(prelimAppicationId)) {
+                            dispatch(getPrelimApplicationData(wrapArgument(actionUid, Number(prelimAppicationId))));
+                        }
+                    }}
+                >
+                    Retry
+                </Button>
+            </Box>
+        );
+    }
+
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE || prelimApplicationState.prelimApplication?.id) {
         return (
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
@@ -405,7 +434,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         );
     }
 
-    return <Box sx={{ p: 3 }}><Typography>Loading...</Typography></Box>;
+    return <Box sx={{ p: 3, textAlign: 'center' }}><CircularProgress size={24} sx={{ color: '#FF671F', mr: 2 }} /><Typography component="span">Loading...</Typography></Box>;
 });
 
 export default DealFlow;

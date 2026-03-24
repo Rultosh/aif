@@ -82,11 +82,13 @@ export const SelfRating = (props: any) => {
         // }
     })
 
+    const [hasJustSubmitted, setHasJustSubmitted] = useState(false);
+
     useEffect(() => {
-        if (selfRatingState.selfRatings?.id && selfRatingState.status.fetchStatus === FetchStatus.IDLE) {
+        if (!hasJustSubmitted && selfRatingState.selfRatings?.id && selfRatingState.status.fetchStatus === FetchStatus.IDLE) {
             navigate(`/preliminary/${id}/fund`, { replace: true });
         }
-    }, [selfRatingState.selfRatings?.id, selfRatingState.status.fetchStatus, id, navigate]);
+    }, [selfRatingState.selfRatings?.id, selfRatingState.status.fetchStatus, id, navigate, hasJustSubmitted]);
 
     useEffect(() => {
         dispatch(
@@ -370,9 +372,10 @@ export const SelfRating = (props: any) => {
     const handleSubmitClick = async () => {
         setIsLoading(true);
         try {
+            setHasJustSubmitted(true);
             await handleClickSave();
             const currentScore = Number(selfRatingValue.score || 0);
-            const averageScore = Math.round((currentScore/selfQuestions.length));
+            const averageScore = Math.round((currentScore / selfQuestions.length));
             //alert(averageScore)
             if (averageScore >= 5) {
                 setModalType('success');
@@ -383,6 +386,7 @@ export const SelfRating = (props: any) => {
             }
             setShowResultModal(true);
         } catch (error: any) {
+            setHasJustSubmitted(false);
             console.error("Submit failure:", error);
             alert(error?.message || "An unexpected error occurred while submitting.");
         } finally {
@@ -691,7 +695,10 @@ export const SelfRating = (props: any) => {
             {/* Assessment Result Modal */}
             <Dialog
                 open={showResultModal}
-                onClose={() => setShowResultModal(false)}
+                onClose={(e) => {
+                    setShowResultModal(false);
+                    handleNextClick(e);
+                }}
                 PaperProps={{
                     sx: {
                         borderRadius: '16px',
@@ -736,20 +743,42 @@ export const SelfRating = (props: any) => {
                             Continue to Fund Information
                         </Button>
                     ) : (
+                        // <Button
+                        //     onClick={() => setShowResultModal(false)}
+                        //     variant="outlined"
+                        //     sx={{
+                        //         textTransform: 'none',
+                        //         borderRadius: '6px',
+                        //         px: 4,
+                        //         py: 1,
+                        //         fontWeight: 700,
+                        //         color: '#000000',
+                        //         borderColor: '#FF671F'
+                        //     }}
+                        // >
+                        //     OK
+                        // </Button>                        
                         <Button
-                            onClick={() => setShowResultModal(false)}
-                            variant="outlined"
+                            onClick={(e) => {
+                                setShowResultModal(false);
+                                handleNextClick(e);
+                            }}
+                            variant="contained"
                             sx={{
                                 textTransform: 'none',
                                 borderRadius: '6px',
-                                px: 4,
+                                px: 3,
                                 py: 1,
                                 fontWeight: 700,
-                                color: '#000000',
-                                borderColor: '#FF671F'
+                                backgroundColor: '#FF671F',
+                                '&:hover': {
+                                    border: '1px solid #FF671F',
+                                    color: '#FF671F',
+                                    backgroundColor: 'rgb(255 103 30 / 19%)'
+                                }
                             }}
                         >
-                            OK
+                            Continue to Fund Information
                         </Button>
                     )}
                 </DialogActions>
