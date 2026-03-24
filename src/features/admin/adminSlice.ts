@@ -3,7 +3,7 @@ import { RootState } from "../../app/store"
 import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
 import {IUser, IUserApprove} from "./IUser"
-import {fetchUsers, approveUser, whoAmI, patchUserOtpRequired} from './adminApi'
+import {fetchUsers, approveUser, whoAmI, patchUserOtpRequired, deleteUser} from './adminApi'
 import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 
 
@@ -89,6 +89,21 @@ export const updateUserOtpRequiredAsync = createAsyncThunk(
   }
 );
 
+export const deleteUserAsync = createAsyncThunk(
+  'users/delete',
+  async (args: ActionWrapper<number>, { rejectWithValue }) => {
+    try {
+      if (args.argument == null) {
+        return rejectWithValue({ message: 'Missing user id' });
+      }
+      await deleteUser(args.argument);
+      return args.argument;
+    } catch (reason) {
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -143,6 +158,9 @@ const usersSlice = createSlice({
       state.users = state.users.map((row) =>
         row.id === updated.id ? { ...row, ...updated } : row
       );
+    })
+    .addCase(deleteUserAsync.fulfilled, (state, action: PayloadAction<number>) => {
+      state.users = state.users.filter((row) => row.id !== action.payload);
     })
   }
 })

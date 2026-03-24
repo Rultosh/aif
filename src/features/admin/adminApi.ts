@@ -31,3 +31,10 @@ export function patchUserOtpRequired(userId: number, otpRequired: boolean) {
   });
 }
 
+export function deleteUser(userId: number) {
+  return api({
+    method: 'delete',
+    url: `useradmin/users/${userId}`,
+  });
+}
+

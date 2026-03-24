@@ -9,7 +9,7 @@ import React, * as Rect from 'react'
 import uuid from "react-uuid";
 import NavigationBar from '../../components/NavigationBar'
 import { defaultISignup } from "../signUp/ISignup";
-import { fetchUsersAsync, selectUsers, updateUserOtpRequiredAsync } from './adminSlice'
+import { deleteUserAsync, fetchUsersAsync, selectUsers, updateUserOtpRequiredAsync } from './adminSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
 import { Delete, Edit } from '@mui/icons-material'
@@ -74,7 +74,20 @@ const Admin = (props: any) => {
 
     };
 
-    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Email OTP", "Approve"]
+    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Email OTP", "Approve", "Delete"]
+    const handleDeleteUser = (row: IUser) => {
+        if (row.id == null) {
+            return;
+        }
+        const confirmed = window.confirm(`Delete user ${row.username}? This action cannot be undone.`);
+        if (!confirmed) {
+            return;
+        }
+        dispatch(deleteUserAsync(
+            wrapArgument(actionUid, Number(row.id))
+        ));
+    }
+
 
     let adminHeaderComponent = []
 
@@ -141,6 +154,9 @@ const Admin = (props: any) => {
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     {row.role == 'REGISTERED' ? <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} /> : <></>}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Delete sx={{ cursor: 'pointer', color: '#d32f2f' }} onClick={() => handleDeleteUser(row)} />
                                                 </TableCell>
                                                 
                                             </TableRow>
