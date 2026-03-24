@@ -125,7 +125,8 @@ export const FundOverview = (props: any) => {
         !isNewApplicationRoute &&
         statusPrelims !== '' &&
         statusPrelims !== undefined &&
-        !(USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(String(statusPrelims));
+        !(USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(String(statusPrelims)) &&
+        !pathname.toLowerCase().includes('preview');
 
     /** Admins review after submit; no access while application is still draft (CREATED). */
     const adminCannotAccessPreliminary =

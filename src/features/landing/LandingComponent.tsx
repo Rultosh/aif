@@ -120,19 +120,11 @@ const Landing = () => {
     const validationSchema = Yup.object().shape({
         username: Yup.string()
             .trim()
-            .test("email-regex", "Enter a valid Email", function (value: any) {
-                const EmailRegex =
-                    /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-
-                const IsValidEmail = EmailRegex.test(value);
-
-                if (!IsValidEmail) {
-                    return false;
-                } else {
-                    return true;
-                }
+            .test("sebi-regex", "Invalid Login ID entered", function (value: any) {
+                const sebiRegex = /^[A-Za-z0-9/ -]+$/;
+                return sebiRegex.test(value);
             })
-            .required("Username is required").max(200, "Username cannot be more than 200 charactors"),
+            .required("Login ID is required").max(200, "Login ID cannot be more than 200 characters"),
         password: Yup.string().required("Password is required").min(4, "Password cannot be less than 4 charactors").max(200, "Password cannot be more than 200 charactors"),
     });
 
@@ -302,205 +294,205 @@ const Landing = () => {
                                 </Typography>
                             </Box>
                         ) : (
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <Box sx={{ mb: 2 }}>
-                                <Typography sx={{ fontWeight: 500, mb: 0.5, color: '#000000', fontSize: '14px' }}>
-                                    Email Id
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    placeholder="Enter Email Id"
-                                    {...register("username")}
-                                    error={!!errors.username}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fff',
-                                            borderRadius: '6px',
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                borderColor: '#FF671F',
-                                            },
-                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                borderColor: '#FF671F',
-                                            },
-                                        },
-                                    }}
-                                />
-                                {errors.username && (
-                                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-                                        {errors.username.message as string}
+                            <form onSubmit={handleSubmit(onSubmit)}>
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography sx={{ fontWeight: 500, mb: 0.5, color: '#000000', fontSize: '14px' }}>
+                                        Login ID
                                     </Typography>
-                                )}
-                            </Box>
+                                    <TextField
+                                        fullWidth
+                                        placeholder="Enter Login ID"
+                                        {...register("username")}
+                                        error={!!errors.username}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                backgroundColor: '#fff',
+                                                borderRadius: '6px',
+                                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#FF671F',
+                                                },
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#FF671F',
+                                                },
+                                            },
+                                        }}
+                                    />
+                                    {errors.username && (
+                                        <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                                            {errors.username.message as string}
+                                        </Typography>
+                                    )}
+                                </Box>
 
-                            <Box sx={{ mb: 1 }}>
-                                <Typography sx={{ fontWeight: 500, mb: 0.5, color: '#000000', fontSize: '14px' }}>
-                                    Password
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    type={showPassword ? 'text' : 'password'}
-                                    placeholder="Enter Password"
-                                    {...register("password")}
-                                    error={!!errors.password}
-                                    onKeyPress={handleKeyPress}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButtonIcon
-                                                    onClick={() => setShowPassword(!showPassword)}
-                                                    edge="end"
-                                                >
-                                                    {showPassword ? (
-                                                        <Box component="img" src={viewIcon} sx={{ width: '20px', height: '20px' }} />
-                                                    ) : (
-                                                        <Box component="img" src={hideIcon} sx={{ width: '20px', height: '20px' }} />
-                                                    )}
-                                                </IconButtonIcon>
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#fff',
-                                            borderRadius: '6px',
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                borderColor: '#FF671F',
-                                            },
-                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                borderColor: '#FF671F',
-                                            },
-                                        }
-                                    }}
-                                />
-                                {errors.password && (
-                                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-                                        {errors.password.message as string}
+                                <Box sx={{ mb: 1 }}>
+                                    <Typography sx={{ fontWeight: 500, mb: 0.5, color: '#000000', fontSize: '14px' }}>
+                                        Password
                                     </Typography>
-                                )}
-                            </Box>
-
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                <FormControlLabel
-                                    sx={{ ml: -0.5 }}
-                                    control={
-                                        <Checkbox
-                                            size="small"
-                                            icon={<Box sx={{ width: 18, height: 18, bgcolor: '#fff', border: '1px solid rgba(0,0,0,0.2)', borderRadius: '4px' }} />}
-                                            checkedIcon={
-                                                <Box sx={{
-                                                    width: 18,
-                                                    height: 18,
-                                                    bgcolor: '#fff',
-                                                    border: '1px solid #FF671F',
-                                                    borderRadius: '4px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}>
-                                                    <CheckIcon sx={{ fontSize: 13, color: '#FF671F' }} />
-                                                </Box>
+                                    <TextField
+                                        fullWidth
+                                        type={showPassword ? 'text' : 'password'}
+                                        placeholder="Enter Password"
+                                        {...register("password")}
+                                        error={!!errors.password}
+                                        onKeyPress={handleKeyPress}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButtonIcon
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                        edge="end"
+                                                    >
+                                                        {showPassword ? (
+                                                            <Box component="img" src={viewIcon} sx={{ width: '20px', height: '20px' }} />
+                                                        ) : (
+                                                            <Box component="img" src={hideIcon} sx={{ width: '20px', height: '20px' }} />
+                                                        )}
+                                                    </IconButtonIcon>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                backgroundColor: '#fff',
+                                                borderRadius: '6px',
+                                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#FF671F',
+                                                },
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#FF671F',
+                                                },
                                             }
-                                            sx={{ p: 0.5, mr: 0.5 }}
-                                        />
-                                    }
-                                    label={<Typography sx={{ fontSize: '14px', color: '#000000', fontWeight: 500 }}>Remember Me</Typography>}
-                                />
-                                <Typography
-                                    sx={{ fontSize: '14px', color: '#1942b6', fontWeight: 500, cursor: 'pointer' }}
-                                    onClick={() => navigate('/resetpassword')}
-                                >
-                                    Forgot Password?
-                                </Typography>
-                            </Box>
+                                        }}
+                                    />
+                                    {errors.password && (
+                                        <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                                            {errors.password.message as string}
+                                        </Typography>
+                                    )}
+                                </Box>
 
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                disabled={state.status.fetchStatus === FetchStatus.DOING || usersState.status.fetchStatus === FetchStatus.DOING || (!!state.token && usersState.role === undefined)}
-                                sx={{
-                                    py: 1.8,
-                                    backgroundColor: '#FF671F',
-                                    '&:hover': { backgroundColor: '#FF671F' },
-                                    borderRadius: '6px',
-                                    fontSize: '16px',
-                                    fontWeight: 500,
-                                    textTransform: 'none',
-                                    boxShadow: '0 4px 12px rgba(255, 107, 33, 0.3)',
-                                    mb: 2.5,
-                                    position: 'relative'
-                                }}
-                            >
-                                {(state.status.fetchStatus === FetchStatus.DOING || usersState.status.fetchStatus === FetchStatus.DOING || (!!state.token && usersState.role === undefined)) ? (
-                                    <CircularProgress size={24} sx={{ color: '#fff' }} />
-                                ) : (
-                                    'Login'
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                    <FormControlLabel
+                                        sx={{ ml: -0.5 }}
+                                        control={
+                                            <Checkbox
+                                                size="small"
+                                                icon={<Box sx={{ width: 18, height: 18, bgcolor: '#fff', border: '1px solid rgba(0,0,0,0.2)', borderRadius: '4px' }} />}
+                                                checkedIcon={
+                                                    <Box sx={{
+                                                        width: 18,
+                                                        height: 18,
+                                                        bgcolor: '#fff',
+                                                        border: '1px solid #FF671F',
+                                                        borderRadius: '4px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center'
+                                                    }}>
+                                                        <CheckIcon sx={{ fontSize: 13, color: '#FF671F' }} />
+                                                    </Box>
+                                                }
+                                                sx={{ p: 0.5, mr: 0.5 }}
+                                            />
+                                        }
+                                        label={<Typography sx={{ fontSize: '14px', color: '#000000', fontWeight: 500 }}>Remember Me</Typography>}
+                                    />
+                                    <Typography
+                                        sx={{ fontSize: '14px', color: '#1942b6', fontWeight: 500, cursor: 'pointer' }}
+                                        onClick={() => navigate('/resetpassword')}
+                                    >
+                                        Forgot Password?
+                                    </Typography>
+                                </Box>
+
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    disabled={state.status.fetchStatus === FetchStatus.DOING || usersState.status.fetchStatus === FetchStatus.DOING || (!!state.token && usersState.role === undefined)}
+                                    sx={{
+                                        py: 1.8,
+                                        backgroundColor: '#FF671F',
+                                        '&:hover': { backgroundColor: '#FF671F' },
+                                        borderRadius: '6px',
+                                        fontSize: '16px',
+                                        fontWeight: 500,
+                                        textTransform: 'none',
+                                        boxShadow: '0 4px 12px rgba(255, 107, 33, 0.3)',
+                                        mb: 2.5,
+                                        position: 'relative'
+                                    }}
+                                >
+                                    {(state.status.fetchStatus === FetchStatus.DOING || usersState.status.fetchStatus === FetchStatus.DOING || (!!state.token && usersState.role === undefined)) ? (
+                                        <CircularProgress size={24} sx={{ color: '#fff' }} />
+                                    ) : (
+                                        'Login'
+                                    )}
+                                </Button>
+
+                                <Typography sx={{ textAlign: 'center', fontSize: '15px', color: '#000000', fontWeight: 500, mb: 3 }}>
+                                    Don't have account? <Box component="span" sx={{ color: '#FF671F', fontWeight: 500, cursor: 'pointer' }} onClick={() => navigate('/signUp')}>Registration Here</Box>
+                                </Typography>
+
+                                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                                    <Button
+                                        variant="outlined"
+                                        component="a"
+                                        href={user_manual}
+                                        target="_blank"
+                                        download="User Manual.pdf"
+                                        startIcon={<MenuBookIcon sx={{ color: '#fff' }} />}
+                                        sx={{
+                                            flex: 1,
+                                            color: '#fff',
+                                            borderColor: '#FF671F',
+                                            backgroundColor: '#FF671F',
+                                            textTransform: 'none',
+                                            fontSize: '14px',
+                                            fontWeight: 600,
+                                            padding: '8px 16px',
+                                            borderRadius: '8px',
+                                            '&:hover': {
+                                                backgroundColor: '#FF671F',
+                                                borderColor: '#FF671F',
+                                            }
+                                        }}
+                                    >
+                                        User Manual
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        component="a"
+                                        href={faq}
+                                        target="_blank"
+                                        download="FAQs.pdf"
+                                        startIcon={<HelpOutlineIcon sx={{ color: '#fff' }} />}
+                                        sx={{
+                                            flex: 1,
+                                            color: '#fff',
+                                            borderColor: '#FF671F',
+                                            backgroundColor: '#FF671F',
+                                            textTransform: 'none',
+                                            fontSize: '14px',
+                                            fontWeight: 600,
+                                            padding: '8px 16px',
+                                            borderRadius: '8px',
+                                            '&:hover': {
+                                                backgroundColor: '#FF671F',
+                                                borderColor: '#FF671F',
+                                            }
+                                        }}
+                                    >
+                                        FAQs
+                                    </Button>
+                                </Box>
+
+                                {errorMsg && (
+                                    <Typography variant="subtitle2" sx={{ mt: 3, textAlign: "center", color: 'red', fontWeight: 600 }}>
+                                        {errorMsg}
+                                    </Typography>
                                 )}
-                            </Button>
-
-                            <Typography sx={{ textAlign: 'center', fontSize: '15px', color: '#000000', fontWeight: 500, mb: 3 }}>
-                                Don't have account? <Box component="span" sx={{ color: '#FF671F', fontWeight: 500, cursor: 'pointer' }} onClick={() => navigate('/signUp')}>Registration Here</Box>
-                            </Typography>
-
-                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                                <Button
-                                    variant="outlined"
-                                    component="a"
-                                    href={user_manual}
-                                    target="_blank"
-                                    download="User Manual.pdf"
-                                    startIcon={<MenuBookIcon sx={{ color: '#fff' }} />}
-                                    sx={{
-                                        flex: 1,
-                                        color: '#fff',
-                                        borderColor: '#FF671F',
-                                        backgroundColor: '#FF671F',
-                                        textTransform: 'none',
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        padding: '8px 16px',
-                                        borderRadius: '8px',
-                                        '&:hover': {
-                                            backgroundColor: '#FF671F',
-                                            borderColor: '#FF671F',
-                                        }
-                                    }}
-                                >
-                                    User Manual
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    component="a"
-                                    href={faq}
-                                    target="_blank"
-                                    download="FAQs.pdf"
-                                    startIcon={<HelpOutlineIcon sx={{ color: '#fff' }} />}
-                                    sx={{
-                                        flex: 1,
-                                        color: '#fff',
-                                        borderColor: '#FF671F',
-                                        backgroundColor: '#FF671F',
-                                        textTransform: 'none',
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        padding: '8px 16px',
-                                        borderRadius: '8px',
-                                        '&:hover': {
-                                            backgroundColor: '#FF671F',
-                                            borderColor: '#FF671F',
-                                        }
-                                    }}
-                                >
-                                    FAQs
-                                </Button>
-                            </Box>
-
-                            {errorMsg && (
-                                <Typography variant="subtitle2" sx={{ mt: 3, textAlign: "center", color: 'red', fontWeight: 600 }}>
-                                    {errorMsg}
-                                </Typography>
-                            )}
-                        </form>
+                            </form>
                         )}
                     </Box>
                 </Box>

@@ -128,18 +128,20 @@ export const Preview = (props: any) => {
 
         setActionDateError(undefined);
 
+        const intendedStatus = ev?.currentTarget?.id || ev?.target?.id;
+
         // if (await checkAllDocsOk(id, "prelims")) {
-        console.log("prelimId", Number(id))
+        console.log("prelimId", Number(id), "intendedStatus", intendedStatus)
         try {
             await dispatch(
                 createApplicationAsync(
                     wrapArgument(
-                        actionUid, { id: Number(id), statusComments: commentPreview, status: ev.target.id }
+                        actionUid, { id: Number(id), statusComments: commentPreview, status: intendedStatus }
                     )
                 )
             ).unwrap();
 
-            if (ev.target.id === 'submit') {
+            if (intendedStatus === 'submit') {
                 setShowSuccessDialog(true);
             } else {
                 navigate('/home')
@@ -158,6 +160,7 @@ export const Preview = (props: any) => {
     async function handleClickSaveCloseAction(ev: any) {
 
         setActionDateError(undefined);
+        const intendedStatus = ev?.currentTarget?.id || ev?.target?.id;
 
         if (actionDate === null || actionDate == undefined) {
             setActionDateError("Please entre an action date.");
@@ -170,7 +173,7 @@ export const Preview = (props: any) => {
                         id: Number(id),
                         statusComments: commentPreview,
                         actionDate: actionDate,
-                        status: ev.target.id
+                        status: intendedStatus
                     }
                     )
                 )
@@ -198,7 +201,7 @@ export const Preview = (props: any) => {
         console.log(data);
         setCommentPreview(data);
         // setInvestmentResponsibleAsLead({ ...teamMember, prelimApplicationId: Number(id) })
-        handleClickSave(e);
+        handleClickSave({ target: { id: 'submit' } });
     };
 
     const handleClose = () => {
@@ -383,7 +386,7 @@ export const Preview = (props: any) => {
                                     {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'SUBMITTED') && (
                                         <Box sx={{ display: 'flex', gap: 2 }}>
                                             <Button color='success' id='review' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Forward for approval
+                                                Forward for Recommendation
                                             </Button>
                                             <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revise

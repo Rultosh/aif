@@ -322,7 +322,7 @@ const Declaration = (props: any) => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ fontWeight: 800, color: '#363062', mb: 3, mt: 4 }}>
-                                        Details of Investment Committee Members
+                                        Details of Investment Committee Member of Current Fund
                                     </Typography>
 
                                     <Box sx={{

@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Stack, Switch, TextField, Typography, Autocomplete } from "@mui/material";
+import { Box, Button, Card, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Stack, Switch, TextField, Typography, Autocomplete, CircularProgress } from "@mui/material";
 import UploadIcon from '@mui/icons-material/Upload';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
@@ -19,6 +19,7 @@ import * as Yup from "yup";
 import FormHelperText from '@mui/material/FormHelperText';
 import dayjs, { Dayjs } from "dayjs";
 import { selectUsers } from '../../../admin/adminSlice';
+import { useDebounceEffect } from "../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -89,6 +90,19 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
 
         setPrelimApplicationFormData(copiedValue)
     };
+
+    const hasChanged = (current: any, original: any) => {
+        if (!original) return true;
+        // Compare relevant fields only or a simple JSON stringify (limited but works for this flat-ish object)
+        return JSON.stringify(current) !== JSON.stringify(original);
+    };
+
+    useDebounceEffect(() => {
+        if (Number(prelimAppicationId) && hasChanged(prelimApplicationFormData, prelimApplicationState.prelimApplication)) {
+            console.log('Auto-saving PrelimApplicationData...');
+            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationFormData)));
+        }
+    }, [prelimApplicationFormData], 2000);
 
     const savePrelimApplicationForm = async (data: IPrelimApplicationData) => {
         // console.log("onSubmit called", data);
@@ -525,7 +539,31 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         }
     };
 
-    if (prelimApplicationState.status.fetchStatus == FetchStatus.IDLE)
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED)
+        return (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="h6" color="error" gutterBottom>
+                    Failed to load data
+                </Typography>
+                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                    {prelimApplicationState.status.message || "An unexpected error occurred while fetching application data."}
+                </Typography>
+                <Button
+                    variant="outlined"
+                    onClick={() => {
+                        if (Number(prelimAppicationId)) {
+                            dispatch(getPrelimApplicationData(
+                                wrapArgument(actionUid, Number(prelimAppicationId))
+                            ))
+                        }
+                    }}
+                >
+                    Retry
+                </Button>
+            </Box>
+        );
+
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE || prelimApplicationState.prelimApplication?.id)
         return (
             // <form onSubmit={savePrelimApplicationForm}>
             <Box component="form" sx={{ p: 0 }}>
@@ -1420,29 +1458,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                     </Grid>
                 </Grid>
             </Box >
-        );
-    else if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED)
-        return (
-            <Box sx={{ p: 3, textAlign: 'center' }}>
-                <Typography variant="h6" color="error" gutterBottom>
-                    Failed to load data
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                    {prelimApplicationState.status.message || "An unexpected error occurred while fetching application data."}
-                </Typography>
-                <Button
-                    variant="outlined"
-                    onClick={() => {
-                        if (Number(prelimAppicationId)) {
-                            dispatch(getPrelimApplicationData(
-                                wrapArgument(actionUid, Number(prelimAppicationId))
-                            ))
-                        }
-                    }}
-                >
-                    Retry
-                </Button>
-            </Box>
         );
     else
         return <Box sx={{ p: 3, textAlign: 'center' }}><Typography>Loading...</Typography></Box>

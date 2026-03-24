@@ -209,8 +209,8 @@ export const Fund = (props: any) => {
     const updateHasInvestment = async (hasInvestment: boolean) => {
         setHasInvestment(hasInvestment)
         if (Number(prelimApplicationId)) {
-            await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, {...prelimApplicationState.prelimApplication, hasInvestment})));
-        } 
+            await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationState.prelimApplication, hasInvestment })));
+        }
     };
 
     return (
@@ -435,7 +435,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "3" ? '#000080' : '#444'
                                         }}>
-                                            Details Of Key Investment Team (At KMP Level)
+                                            Details Of Investment Team (At KMP Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
