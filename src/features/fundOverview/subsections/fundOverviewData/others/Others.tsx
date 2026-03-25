@@ -211,7 +211,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" id={`sdEmpanelledListOfExternalFirms${id}`} />
+                                        <DocumentChip label="Upload Document" validationTitle="Empanelled list of external Firms" id={`sdEmpanelledListOfExternalFirms${id}`} />
                                     </span>
                                 </Box>
                             ) : (

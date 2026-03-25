@@ -11,6 +11,7 @@ interface DocumentChipProps {
   id: String
   label: String
   signed?: boolean | undefined
+  validationTitle?: string
 }
 
 export default function DocumentChip(props: DocumentChipProps) {
@@ -22,7 +23,7 @@ export default function DocumentChip(props: DocumentChipProps) {
     setRefreshId(uuid())
   }
 
-  return (<DocumentUpload id={props.id} onSuccess={onUploadSuccess} signed={props.signed}>
+  return (<DocumentUpload id={props.id} onSuccess={onUploadSuccess} signed={props.signed} validationTitle={props.validationTitle}>
     <div>
       <Chip
         icon={<Upload sx={{ color: '#ffffff !important' }} />}

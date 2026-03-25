@@ -8,6 +8,7 @@ interface DocumentChipProps {
   onSuccess: (id: String, url: String) => void | undefined,
   children: ReactElement | undefined
   signed?: boolean | undefined
+  validationTitle?: string
 }
 
 interface IFileUploadInfo {
@@ -30,6 +31,13 @@ export default function DocumentChip(props: DocumentChipProps) {
 
     acceptedFiles.forEach((file: File) => {
       console.log(file);
+      if (props.validationTitle) {
+        const fileNameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
+        if (fileNameWithoutExtension.toLowerCase() !== props.validationTitle.toLowerCase()) {
+          setError("Upload the file correctly");
+          return;
+        }
+      }
       setFileInfo({ "file": file });
 
       console.log('uploading...', file);

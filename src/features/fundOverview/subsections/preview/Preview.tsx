@@ -325,7 +325,7 @@ export const Preview = (props: any) => {
                                                     <Typography variant="body2" sx={{ fontWeight: 600, m: 0 }}>Upload the signed Application</Typography>
                                                     <br />
 
-                                                    <DocumentChip label="Upload" id={`unsignedDocument${id}`} />
+                                                    <DocumentChip label="Upload" validationTitle="Signed Application" id={`unsignedDocument${id}`} />
                                                 </CardContent>
                                             </Card>
                                         </Grid>
