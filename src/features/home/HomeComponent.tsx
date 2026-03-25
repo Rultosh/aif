@@ -300,7 +300,7 @@ export const Home = (pros: any) => {
                                                             <a href={`#/preliminary/${row.id}/${usersState.role === "USER" ? 'selfrating' : 'preview'}`}
                                                                 style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> :
                                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                                                                <>{row.nameOfTheFund} ({row.id})</>
+                                                                {row.nameOfTheFund}
                                                             </Typography>}
                                                     </TableCell> : <TableCell align="left" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
                                                         {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}

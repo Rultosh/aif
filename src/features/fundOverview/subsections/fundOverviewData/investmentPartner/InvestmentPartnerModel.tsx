@@ -842,7 +842,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         Download Template
                       </Button>
                       <span style={{ marginTop: '10px' }}>
-                        <DocumentChip label="Upload Document" id={`docDetailsOfInvestmentsUndertakenByThePartnerInThePast10Years${investmentPartnerFormData.id}`} />
+                        <DocumentChip label="Upload Document" validationTitle="Details of investments undertaken by the Partner in the past 10 years" id={`docDetailsOfInvestmentsUndertakenByThePartnerInThePast10Years${investmentPartnerFormData.id}`} />
                       </span>
                     </Box>
                   ) : (

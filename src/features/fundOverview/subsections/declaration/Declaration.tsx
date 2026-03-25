@@ -200,13 +200,15 @@ const Declaration = (props: any) => {
                                             id: "kycBoardDirectors",
                                             text: "1. Details and KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment Management Team to be provided in the format attached in Annexure I and Annexure II. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address: permanent and correspondent), Two passport size photograph for purpose of KYC.",
                                             templateLabel: "Download Template",
-                                            href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip"
+                                            href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip",
+                                            validationTitle: "annexure-I-template-and-list-of-docs"
                                         },
                                         {
                                             id: "boardResolution",
                                             text: "2. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM",
                                             // templateLabel: "Download Template",
-                                            href: "/vcf/templates/Annexure_II_KYC_Form.xlsx"
+                                            href: "/vcf/templates/Annexure_II_KYC_Form.xlsx",
+                                            validationTitle: "Annexure_II_KYC_Form"
                                         }
                                     ].map((item, index) => (
                                         <Box key={item.id} sx={{ mb: index === 0 ? 4 : 0, p: 2, borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'rgba(0,0,0,0.01)' }}>
@@ -231,7 +233,7 @@ const Declaration = (props: any) => {
                                                     {item.templateLabel}
                                                 </Button>}
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" id={`${item.id}${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle={item.validationTitle} id={`${item.id}${id}`} />
                                                 </span>
                                             </Box>
                                         </Box>
@@ -278,40 +280,40 @@ const Declaration = (props: any) => {
                                         {Number(id) ? (
                                             <Grid container spacing={2}>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${id}`} />
+                                                    <DocumentChip label="Private Placement Memorandum" validationTitle="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Latest Investor Presentation" id={`sdLatestInvestorPresentation${id}`} />
+                                                    <DocumentChip label="Latest Investor Presentation" validationTitle="Latest Investor Presentation" id={`sdLatestInvestorPresentation${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="IM Agreement" id={`sdImAgreement${id}`} />
+                                                    <DocumentChip label="IM Agreement" validationTitle="IM Agreement" id={`sdImAgreement${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Trust Deed" id={`sdTrustDeal${id}`} />
+                                                    <DocumentChip label="Trust Deed" validationTitle="Trust Deed" id={`sdTrustDeal${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="SEBI Registration Certificate" id={`sdSEBICertificate${id}`} />
+                                                    <DocumentChip label="SEBI Registration Certificate" validationTitle="SEBI Registration Certificate" id={`sdSEBICertificate${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Shareholding Pattern of Sponsor/IM" id={`sdShareholdingPattern${id}`} />
+                                                    <DocumentChip label="Shareholding Pattern of Sponsor/IM" validationTitle="Shareholding Pattern of Sponsor/IM" id={`sdShareholdingPattern${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Policy of Carry" id={`sdPolicyOfCarry${id}`} />
+                                                    <DocumentChip label="Policy of Carry" validationTitle="Policy of Carry" id={`sdPolicyOfCarry${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Draft Contribution Agreement" id={`sdContributionAgreement${id}`} />
+                                                    <DocumentChip label="Draft Contribution Agreement" validationTitle="Draft Contribution Agreement" id={`sdContributionAgreement${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Investment and Other Policies" id={`sdInvestmentPolicy${id}`} />
+                                                    <DocumentChip label="Investment and Other Policies" validationTitle="Investment and Other Policies" id={`sdInvestmentPolicy${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Sample Investment Committee Note" id={`sdInvestmentCommitteeNote${id}`} />
+                                                    <DocumentChip label="Sample Investment Committee Note" validationTitle="Sample Investment Committee Note" id={`sdInvestmentCommitteeNote${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="HR Policy" id={`sdHrPolicy${id}`} />
+                                                    <DocumentChip label="HR Policy" validationTitle="HR Policy" id={`sdHrPolicy${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Organisation Structure" id={`sdOrganisationStructure${id}`} />
+                                                    <DocumentChip label="Organisation Structure" validationTitle="Organisation Structure" id={`sdOrganisationStructure${id}`} />
                                                 </Grid>
                                             </Grid>
                                         ) : (
@@ -350,7 +352,7 @@ const Declaration = (props: any) => {
                                                     Download Template
                                                 </Button>
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" id={`detailsOfInvestmentCommitteeMembers${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle="Details of Investment Committee Member of Current Fund" id={`detailsOfInvestmentCommitteeMembers${id}`} />
                                                 </span>
                                             </Box>
                                         ) : (
@@ -389,7 +391,7 @@ const Declaration = (props: any) => {
                                                     Download Template
                                                 </Button>
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" id={`detailsOfContributorToTheFund${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle="Details of contributors of Current Fund" id={`detailsOfContributorToTheFund${id}`} />
                                                 </span>
                                             </Box>
                                         ) : (
@@ -428,7 +430,7 @@ const Declaration = (props: any) => {
                                                     Download Template
                                                 </Button>
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" id={`pastInvestmentTrackRecord${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle="Past Investment Track Record Of IM or AMC" id={`pastInvestmentTrackRecord${id}`} />
                                                 </span>
                                             </Box>
                                         ) : (
