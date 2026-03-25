@@ -61,6 +61,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
         formState: { errors },
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
+        mode: "all",
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 

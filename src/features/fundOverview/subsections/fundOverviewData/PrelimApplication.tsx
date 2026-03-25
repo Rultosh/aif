@@ -73,20 +73,33 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
             console.log('useEffect', prelimAppicationId, prelimApplicationState.prelimApplication)
-            setPrelimApplicationFormData(prelimApplicationState.prelimApplication)
-            reset(prelimApplicationState.prelimApplication);
-            setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id));
+            let data = { ...prelimApplicationState.prelimApplication };
+            
+            // Auto-populate from user state if field is empty
+            if (!data.nameOfTheFund && usersState.me?.companyName) {
+                data.nameOfTheFund = usersState.me.companyName;
+            }
+            
+            setPrelimApplicationFormData(data)
+            reset(data);
+            setPrelimApplicationId(String(data.id));
         }
 
         if (usersState.me) {
             setAifNameData(usersState.me.companyName || '');
+            
+            // If the form data exists but name is missing, and we have user data, sync it
+            if (prelimApplicationState.prelimApplication?.id && !prelimApplicationFormData.nameOfTheFund && usersState.me.companyName) {
+                setValue("nameOfTheFund", usersState.me.companyName, { shouldValidate: true });
+                setPrelimApplicationFormData(prev => ({ ...prev, nameOfTheFund: usersState.me.companyName || '' }));
+            }
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me])
 
     const setDateValue = (key: String, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
 
-        copiedValue[key as keyof IPrelimApplicationData] = value;
+        setValue(key as keyof IPrelimApplicationData, value, { shouldValidate: true });
 
         setPrelimApplicationFormData(copiedValue)
     };
@@ -496,10 +509,12 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         getValues,
         setValue,
         reset,
-        formState: { errors },
+        watch,
+        formState: { errors, isValid },
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
-        // defaultValues: prelimApplicationFormData
+        mode: "all",
+        defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
     const onSubmit = (data: IPrelimApplicationData) => {
