@@ -137,7 +137,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         }
 
         if (monthFields.includes(id)) {
-            value = value.replace(/[^0-9]/g, '');
+            value = value.replace(/[^0-9.]/g, '');
         }
 
         if (percentageFields.includes(id)) {

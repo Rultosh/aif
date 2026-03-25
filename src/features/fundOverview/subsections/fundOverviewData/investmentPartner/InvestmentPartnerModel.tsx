@@ -246,7 +246,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     const name = ev.target.name || ev.target.id;
 
     if (name === 'yearsWorkedTogether') {
-      value = value.replace(/[^0-9]/g, '');
+      value = value.replace(/[^0-9.]/g, '');
     }
 
     let copiedValue: IInvestmentPartner = { ...investmentPartnerFormData };
@@ -524,7 +524,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 200 }}
+                inputProps={{ maxLength: 1000 }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
