@@ -405,7 +405,8 @@ export const SelfRating = (props: any) => {
     };
 
     const handleHomeClick= async(e:any) =>{
-         navigate('/home');
+         localStorage.removeItem('token');
+         navigate('/login');
     }
 
     return (
