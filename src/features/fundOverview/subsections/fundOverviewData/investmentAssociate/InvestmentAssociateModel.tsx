@@ -174,6 +174,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     formState: { errors: leadErrors },
   } = useForm({
     resolver: yupResolver(investmentValidationSchema),
+    mode: "all",
   });
 
   const {
@@ -185,6 +186,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     formState: { errors: nonLeadErrors },
   } = useForm({
     resolver: yupResolver(investmentValidationSchema),
+    mode: "all",
   });
 
   const onLeadSubmit = (data: any) => {
@@ -250,7 +252,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     let copiedValue: IInvestmentAssociate = { ...investmentAssociateFormData };
     copiedValue[name as keyof IInvestmentAssociate] = value;
 
-    setValue(name as any, value);
+    setValue(name as any, value, { shouldValidate: true });
     setInvestmentAssociateFormData(copiedValue)
   };
 
@@ -301,6 +303,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    mode: "all",
   });
 
   const onSubmit = async (data: any) => {

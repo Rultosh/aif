@@ -98,8 +98,11 @@ const SignUp = () => {
             ev.preventDefault();
             let copiedValue = { ...formData }
             let key = ev.target.id ? ev.target.id : ev.target.name;
-            copiedValue[key as keyof typeof formData] = ev.target.value;
+            let value = ev.target.value;
+            copiedValue[key as keyof typeof formData] = value;
             setFormData(copiedValue);
+            // Sync with react-hook-form
+            setValue(key as any, value, { shouldValidate: true });
             // } else {
             //     setFormDataEmail(false);
             //     ev.preventDefault();
@@ -112,7 +115,8 @@ const SignUp = () => {
             ev.preventDefault();
             let copiedValue = { ...formData }
             let key = ev.target.id ? ev.target.id : ev.target.name;
-            copiedValue[key as keyof typeof formData] = ev.target.value;
+            let value = ev.target.value;
+            copiedValue[key as keyof typeof formData] = value;
 
             if (key === 'state') {
                 copiedValue.city = undefined;
@@ -122,6 +126,8 @@ const SignUp = () => {
             }
 
             setFormData(copiedValue);
+            // Sync with react-hook-form and trigger validation
+            setValue(key as any, value, { shouldValidate: true });
         }
     };
 
@@ -249,6 +255,7 @@ const SignUp = () => {
         handleSubmit,
         formState: { errors },
     } = useForm<ISignup>({
+        mode: "all",
         resolver: yupResolver(validationSchema),
         defaultValues: defaultISignup
     });

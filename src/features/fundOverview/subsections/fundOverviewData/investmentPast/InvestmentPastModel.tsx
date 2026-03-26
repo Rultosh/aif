@@ -154,7 +154,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     let copiedValue: IInvestmentPast = { ...investmentPastFormData };
     copiedValue[name as keyof IInvestmentPast] = value;
 
-    setValue(name as any, value);
+    setValue(name as any, value, { shouldValidate: true });
     setInvestmentPastFormData(copiedValue)
   };
 
@@ -167,7 +167,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       if (isNaN(numValue)) return;
       if (numValue < 0) numValue = Math.abs(numValue);
       const formattedValue = numValue.toFixed(2);
-      setValue(name as any, formattedValue);
+      setValue(name as any, formattedValue, { shouldValidate: true });
       setInvestmentPastFormData(prev => ({
         ...prev,
         [name]: formattedValue
@@ -180,7 +180,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       if (isNaN(numValue)) return;
       if (numValue > 10000) numValue = 10000;
       const formattedValue = numValue.toFixed(2);
-      setValue(name as any, formattedValue);
+      setValue(name as any, formattedValue, { shouldValidate: true });
       setInvestmentPastFormData(prev => ({
         ...prev,
         [name]: formattedValue
@@ -247,6 +247,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    mode: "all",
   });
 
   const onSubmit = (data: any) => {

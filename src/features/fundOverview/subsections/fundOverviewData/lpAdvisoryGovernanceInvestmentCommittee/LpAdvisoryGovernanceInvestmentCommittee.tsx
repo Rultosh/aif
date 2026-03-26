@@ -57,6 +57,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
         formState: { errors },
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
+        mode: "all",
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
