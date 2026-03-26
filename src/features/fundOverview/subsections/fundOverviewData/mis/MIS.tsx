@@ -39,16 +39,16 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx=/^[a-zA-Z0-9_\.\-, _()/]+$/;
+    const freeformRegx = /^[\s\S]*$/;
     const validationSchema = Yup.object().shape({
-        msMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        msInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        msExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        msDirectorshipsPolicy: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
-        otNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx,"No Spl. charactors accepted,except (, . - _)"),
+        msMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        msInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        msExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        msDirectorshipsPolicy: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        otNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     });
 
     const {
@@ -87,7 +87,26 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
     const qSx = { mb: 3 };
     const labelSx = { fontWeight: 600, mb: 1, display: 'block', color: '#333' };
 
-    if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
+    const isFetchFailure = prelimApplicationState.status.fetchStatus === FetchStatus.FAILED && !prelimApplicationState.prelimApplication?.id;
+    if (isFetchFailure) {
+        return (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>
+                <Button
+                    variant="outlined"
+                    onClick={() => {
+                        if (Number(prelimAppicationId)) {
+                            dispatch(getPrelimApplicationData(wrapArgument(actionUid, Number(prelimAppicationId))));
+                        }
+                    }}
+                >
+                    Retry
+                </Button>
+            </Box>
+        );
+    }
+
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE || prelimApplicationState.prelimApplication?.id) {
         return (
             <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
@@ -101,7 +120,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.msMeetingFrequency}
                             helperText={errors.msMeetingFrequency?.message as string}
                             variant="outlined"
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
@@ -158,7 +177,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.msInvestigationDetails}
                             helperText={errors.msInvestigationDetails?.message as string}
                             variant="outlined"
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
@@ -172,7 +191,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.msExclusiveVC}
                             helperText={errors.msExclusiveVC?.message as string}
                             variant="outlined"
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
@@ -186,7 +205,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.msDirectorshipsPolicy}
                             helperText={errors.msDirectorshipsPolicy?.message as string}
                             variant="outlined"
-                            inputProps={{maxLength :1000}}
+                            inputProps={{ maxLength: 1000 }}
                         />
                     </Grid>
 
@@ -204,7 +223,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.otConsolidatedInfo?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting</Typography>
@@ -217,7 +236,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.otNAVFrequency?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report</Typography>
@@ -230,7 +249,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.otValuationReport?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV</Typography>
@@ -243,7 +262,7 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.otNAVGuidelines?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
-                                inputProps={{maxLength :1000}}
+                                inputProps={{ maxLength: 1000 }}
                             />
                         </Box>
                     </Grid>

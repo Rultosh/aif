@@ -34,11 +34,12 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
 
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
+            const isInitialLoad = !prelimApplicationFormData?.id;
             setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
-            reset(prelimApplicationState.prelimApplication);
+            reset(prelimApplicationState.prelimApplication, { keepDirtyValues: !isInitialLoad });
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/]+$/;
+    const freeformRegx = /^[\s\S]*$/;
     const validationSchema = Yup.object().shape({
         lpacDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         lpacMemberSelectionDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
@@ -64,7 +65,10 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
     const watchedFields = watch();
 
     useDebounceEffect(() => {
-        if (Number(prelimAppicationId) && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
+        const isDataLoaded = prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && 
+                           prelimApplicationState.prelimApplication?.id === Number(prelimAppicationId);
+
+        if (isDataLoaded && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
             console.log('Auto-saving LpAdvisoryGovernanceInvestmentCommittee...');
             dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...watchedFields })));
         }
@@ -124,7 +128,7 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
         }
     };
 
-    if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED) {
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED && !prelimApplicationState.prelimApplication?.id) {
         return (
             <Box sx={{ p: 3, textAlign: 'center' }}>
                 <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>

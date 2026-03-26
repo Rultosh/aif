@@ -38,11 +38,12 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
 
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
+            const isInitialLoad = !prelimApplicationFormData?.id;
             setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
-            reset(prelimApplicationState.prelimApplication);
+            reset(prelimApplicationState.prelimApplication, { keepDirtyValues: !isInitialLoad });
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/]+$/;
+    const freeformRegx = /^[\s\S]*$/;
     const validationSchema = Yup.object().shape({
        // otExternalFirms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         otMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
@@ -68,7 +69,10 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
     const watchedFields = watch();
 
     useDebounceEffect(() => {
-        if (Number(prelimAppicationId) && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
+        const isDataLoaded = prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && 
+                           prelimApplicationState.prelimApplication?.id === Number(prelimAppicationId);
+        
+        if (isDataLoaded && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
             console.log('Auto-saving Others...');
             dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...watchedFields })));
         }
@@ -115,7 +119,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
         },
     };
 
-    if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED) {
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED && !prelimApplicationState.prelimApplication?.id) {
         return (
             <Box sx={{ p: 3, textAlign: 'center' }}>
                 <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>
