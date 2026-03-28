@@ -87,7 +87,12 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    
+   const onSubmit = async (data: IPrelimApplicationData) => {
+        await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+        if (props.onSaveSuccess) {
+            props.onSaveSuccess();
+        }
+    }; 
 
     useImperativeHandle(ref, () => ({
         submit: async () => {
