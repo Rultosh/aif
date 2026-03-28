@@ -13,7 +13,6 @@ import DocumentChip from "../../../../../components/DocumentChip";
 import { useParams } from 'react-router-dom';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
-import { useDebounceEffect } from "../../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -88,24 +87,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    const watchedFields = watch();
-
-    useDebounceEffect(() => {
-        const isDataLoaded = prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && 
-                           prelimApplicationState.prelimApplication?.id === Number(prelimAppicationId);
-
-        if (isDataLoaded && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
-            console.log('Auto-saving InvestmentStrategy...');
-            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...watchedFields })));
-        }
-    }, [watchedFields], 2000);
-
-    const onSubmit = async (data: IPrelimApplicationData) => {
-        await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
-        if (props.onSaveSuccess) {
-            props.onSaveSuccess();
-        }
-    };
+    
 
     useImperativeHandle(ref, () => ({
         submit: async () => {

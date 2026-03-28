@@ -9,7 +9,6 @@ import { FetchStatus } from "../../../../../lib/api-status/IStatus";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { useDebounceEffect } from "../../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -61,18 +60,6 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
         mode: "all",
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
-
-    const watchedFields = watch();
-
-    useDebounceEffect(() => {
-        const isDataLoaded = prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && 
-                           prelimApplicationState.prelimApplication?.id === Number(prelimAppicationId);
-
-        if (isDataLoaded && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
-            console.log('Auto-saving LpAdvisoryGovernanceInvestmentCommittee...');
-            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...watchedFields })));
-        }
-    }, [watchedFields], 2000);
 
     const onSubmit = async (data: IPrelimApplicationData) => {
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));

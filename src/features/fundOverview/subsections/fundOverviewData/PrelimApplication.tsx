@@ -19,7 +19,6 @@ import * as Yup from "yup";
 import FormHelperText from '@mui/material/FormHelperText';
 import dayjs, { Dayjs } from "dayjs";
 import { selectUsers } from '../../../admin/adminSlice';
-import { useDebounceEffect } from "../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -134,15 +133,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         });
     };
 
-    useDebounceEffect(() => {
-        const isDataLoaded = prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && 
-                           prelimApplicationState.prelimApplication?.id === Number(prelimAppicationId);
-
-        if (isDataLoaded && JSON.stringify(prelimApplicationFormData) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
-            console.log('Auto-saving...');
-            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationFormData)));
-        }
-    }, [prelimApplicationFormData], 2000);
 
     const savePrelimApplicationForm = async (data: IPrelimApplicationData) => {
         // console.log("onSubmit called", data);

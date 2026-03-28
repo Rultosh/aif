@@ -12,7 +12,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useParams } from 'react-router-dom';
 import DocumentChip from "../../../../../components/DocumentChip";
 import * as Yup from "yup";
-import { useDebounceEffect } from "../../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -65,18 +64,6 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
         mode: "all",
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
-
-    const watchedFields = watch();
-
-    useDebounceEffect(() => {
-        const isDataLoaded = prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && 
-                           prelimApplicationState.prelimApplication?.id === Number(prelimAppicationId);
-        
-        if (isDataLoaded && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
-            console.log('Auto-saving Others...');
-            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...watchedFields })));
-        }
-    }, [watchedFields], 2000);
 
     const onSubmit = async (data: IPrelimApplicationData) => {
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));

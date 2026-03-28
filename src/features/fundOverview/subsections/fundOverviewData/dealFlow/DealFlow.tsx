@@ -13,7 +13,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useParams } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
-import { useDebounceEffect } from "../../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -78,18 +77,6 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         mode: "all",
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
-
-    const watchedFields = watch();
-
-    useDebounceEffect(() => {
-        const isDataLoaded = prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && 
-                           prelimApplicationState.prelimApplication?.id === Number(prelimAppicationId);
-
-        if (isDataLoaded && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
-            console.log('Auto-saving DealFlow...');
-            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...watchedFields })));
-        }
-    }, [watchedFields], 2000);
 
     const onSubmit = async (data: IPrelimApplicationData) => {
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
