@@ -1,16 +1,12 @@
 import api from "../../app/api";
-import { encryptData } from "../../components/auth/encryption";
 import { ISignup } from "./ISignup";
 
-export function signupUser(userDetails: ISignup) {
-  const { password, confirmPassword, ...rest } = userDetails;
+
+
+export function signupUser(userDetails:ISignup) {
   return api({
     method: 'post',
-    data: {
-      ...rest,
-      passwordWithSaltAndIv: encryptData(password ?? ''),
-      confirmPasswordWithSaltAndIv: encryptData(confirmPassword ?? ''),
-    },
+    data: userDetails,
     url: `auth/signup`
   });
 }
