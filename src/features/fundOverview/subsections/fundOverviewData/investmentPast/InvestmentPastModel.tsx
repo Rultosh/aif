@@ -206,7 +206,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
 
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
   const htmlTagsNotAllowed = "Tags not allowed in input.";
-  const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/]+$/;
+  const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/\*\+&@]+$/;
   const validationSchema = Yup.object().shape({
     nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
     sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
