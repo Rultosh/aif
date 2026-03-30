@@ -292,7 +292,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       .nullable(),
     qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
     description: Yup.string().required("Brief details of AIF Business Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
-    vcpeExperience: Yup.string().required("Experience in AIF Business is required").nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
+    vcpeExperience: Yup.string().required("Experience in AIF Business is required").nullable(),
     areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
     yearsWorkedTogether: Yup.number().transform((val) => (isNaN(val) ? undefined : val))
       .min(0, "Years worked together cannot be negative").required("No. Of Years Worked Together Among Partners is required"),
