@@ -214,7 +214,7 @@ const prelimApplicationDataSlice = createSlice({
       .addCase(
         updatePrelimApplicationAsync.fulfilled,
         (state, action: PayloadAction<IPrelimApplicationData>) => {
-          state.prelimApplication = action.payload
+          state.prelimApplication = { ...state.prelimApplication, ...action.payload }
           state.status.fetchStatus = FetchStatus.IDLE;
         }
       )

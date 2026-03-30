@@ -19,7 +19,6 @@ import * as Yup from "yup";
 import FormHelperText from '@mui/material/FormHelperText';
 import dayjs, { Dayjs } from "dayjs";
 import { selectUsers } from '../../../admin/adminSlice';
-import { useDebounceEffect } from "../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -30,13 +29,13 @@ interface PrelimApplicationProps {
 const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) => {
     const usersState = useAppSelector(selectUsers);
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
-    const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
+    const [prelimApplicationFormData, setPrelimApplicationFormData] = useState<IPrelimApplicationData>(prelimApplicationState.prelimApplication || defaultIPrelimApplicationData);
     console.log('prelimApplicationState', prelimApplicationState)
     const [actionUid] = useState(uuid());
     const [prelimAppicationId, setPrelimApplicationId] = useState(props.prelimApplicationId);
     const [firstClosingSwitch, setfirstClosingSwitch] = useState(false);
 
-    const [fundManager] = useState(prelimApplicationFormData.fundManager);
+    const [fundManager] = useState(prelimApplicationState.prelimApplication?.fundManager);
 
     const MIN_DATE = dayjs("2020-01-01");
 
@@ -72,37 +71,68 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const [aifNameData, setAifNameData] = useState('');
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
-            console.log('useEffect', prelimAppicationId, prelimApplicationState.prelimApplication)
-            setPrelimApplicationFormData(prelimApplicationState.prelimApplication)
-            reset(prelimApplicationState.prelimApplication);
-            setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id));
+            console.log('Syncing PrelimApplicationData...', prelimApplicationState.prelimApplication)
+            let data = { ...prelimApplicationState.prelimApplication };
+            
+            // Auto-populate from user state if field is empty
+            if (!data.nameOfTheFund && usersState.me?.companyName) {
+                data.nameOfTheFund = usersState.me.companyName;
+            }
+
+            // Convert date strings to Dayjs objects for the form
+            if (data.dateOfFilingWithSEBI) {
+                data.dateOfFilingWithSEBI = dayjs(data.dateOfFilingWithSEBI as any);
+            }
+            if (data.sdFirstClosingDomesticAmountDate) {
+                data.sdFirstClosingDomesticAmountDate = dayjs(data.sdFirstClosingDomesticAmountDate as any);
+            }
+            
+            const isInitialLoad = !prelimApplicationFormData?.id;
+            setPrelimApplicationFormData(data);
+            reset(data, { keepDirtyValues: !isInitialLoad });
+            setPrelimApplicationId(String(data.id));
         }
 
         if (usersState.me) {
             setAifNameData(usersState.me.companyName || '');
+            
+            // If the form data exists but name is missing, and we have user data, sync it
+            if (prelimApplicationState.prelimApplication?.id && !prelimApplicationFormData.nameOfTheFund && usersState.me.companyName) {
+                setValue("nameOfTheFund", usersState.me.companyName, { shouldValidate: true });
+                setPrelimApplicationFormData(prev => ({ ...prev, nameOfTheFund: usersState.me.companyName || '' }));
+            }
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me])
 
-    const setDateValue = (key: String, value: any) => {
+    const setDateValue = (key: string, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
+        (copiedValue as any)[key] = value;
 
-        copiedValue[key as keyof IPrelimApplicationData] = value;
+        setValue(key as keyof IPrelimApplicationData, value, { shouldValidate: true });
 
         setPrelimApplicationFormData(copiedValue)
     };
 
     const hasChanged = (current: any, original: any) => {
         if (!original) return true;
-        // Compare relevant fields only or a simple JSON stringify (limited but works for this flat-ish object)
-        return JSON.stringify(current) !== JSON.stringify(original);
+        // Compare keys that exist in current to see if they differ from original
+        return Object.keys(current).some(key => {
+            const val1 = current[key];
+            const val2 = original[key];
+            
+            // Handle dayjs objects
+            if (dayjs.isDayjs(val1) || dayjs.isDayjs(val2)) {
+                return !dayjs(val1).isSame(dayjs(val2));
+            }
+
+            // Normal comparison (handle null vs undefined vs "")
+            const normalizedVal1 = (val1 === null || val1 === undefined) ? "" : String(val1);
+            const normalizedVal2 = (val2 === null || val2 === undefined) ? "" : String(val2);
+            
+            return normalizedVal1 !== normalizedVal2;
+        });
     };
 
-    useDebounceEffect(() => {
-        if (Number(prelimAppicationId) && hasChanged(prelimApplicationFormData, prelimApplicationState.prelimApplication)) {
-            console.log('Auto-saving PrelimApplicationData...');
-            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationFormData)));
-        }
-    }, [prelimApplicationFormData], 2000);
 
     const savePrelimApplicationForm = async (data: IPrelimApplicationData) => {
         // console.log("onSubmit called", data);
@@ -234,9 +264,10 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         }
     }
 
-    const handleSelectChange = (id: String, value: any) => {
+    const handleSelectChange = (id: string, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
-        copiedValue[id as keyof IPrelimApplicationData] = value;
+        (copiedValue as any)[id] = value;
+        setValue(id as any, value);
         setPrelimApplicationFormData(copiedValue);
     }
 
@@ -496,10 +527,12 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         getValues,
         setValue,
         reset,
-        formState: { errors },
+        watch,
+        formState: { errors, isValid },
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
-        // defaultValues: prelimApplicationFormData
+        mode: "all",
+        defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
     const onSubmit = (data: IPrelimApplicationData) => {

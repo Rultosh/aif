@@ -13,7 +13,6 @@ import DocumentChip from "../../../../../components/DocumentChip";
 import { useParams } from 'react-router-dom';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
-import { useDebounceEffect } from "../../../../../hooks/useDebounce";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -39,11 +38,12 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
 
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
+            const isInitialLoad = !prelimApplicationFormData?.id;
             setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
-            reset(prelimApplicationState.prelimApplication);
+            reset(prelimApplicationState.prelimApplication, { keepDirtyValues: !isInitialLoad });
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[a-zA-Z0-9_\.\- _(),/]+$/;
+    const freeformRegx = /^[\s\S]*$/; // Allow all characters for multiline fields, or more permissive set
     const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
 
     const validationSchema = Yup.object().shape({
@@ -76,7 +76,6 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     });
 
     const {
-        control,
         register,
         handleSubmit,
         reset,
@@ -84,24 +83,16 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         formState: { errors },
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
+        mode: "all",
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    const watchedFields = watch();
-
-    useDebounceEffect(() => {
-        if (Number(prelimAppicationId) && JSON.stringify(watchedFields) !== JSON.stringify(prelimApplicationState.prelimApplication)) {
-            console.log('Auto-saving InvestmentStrategy...');
-            dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...watchedFields })));
-        }
-    }, [watchedFields], 2000);
-
-    const onSubmit = async (data: IPrelimApplicationData) => {
+   const onSubmit = async (data: IPrelimApplicationData) => {
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
         if (props.onSaveSuccess) {
             props.onSaveSuccess();
         }
-    };
+    }; 
 
     useImperativeHandle(ref, () => ({
         submit: async () => {
@@ -153,7 +144,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     };
 
 
-    if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED) {
+    if (prelimApplicationState.status.fetchStatus === FetchStatus.FAILED && !prelimApplicationState.prelimApplication?.id) {
         return (
             <Box sx={{ p: 3, textAlign: 'center' }}>
                 <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>

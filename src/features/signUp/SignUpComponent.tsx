@@ -177,6 +177,7 @@ const SignUp = () => {
         handleSubmit,
         formState: { errors },
     } = useForm<ISignup>({
+        mode: "all",
         resolver: yupResolver(validationSchema),
         defaultValues: defaultISignup
     });
