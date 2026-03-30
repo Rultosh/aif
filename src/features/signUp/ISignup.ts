@@ -3,6 +3,9 @@ import { IEntity } from "../../lib/api-wrappers/IEntity"
 export interface ISignup extends IEntity {
 
   username: string | undefined,
+  /** Plaintext; stripped before API call; encrypted like login/set-password. */
+  password: string | undefined,
+  confirmPassword: string | undefined,
   companyName: string | undefined,
   contactPerson: string | undefined,
   title: string | undefined,
@@ -20,6 +23,8 @@ export const defaultISignup: ISignup = {
   id: undefined,
   parentId: undefined,
   username: undefined,
+  password: undefined,
+  confirmPassword: undefined,
   companyName: undefined,
   contactPerson: undefined,
   phoneNumber: undefined,

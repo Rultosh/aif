@@ -1,4 +1,5 @@
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, FormControlLabel, FormLabel, Paper, Link } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, FormControlLabel, FormLabel, Paper, Link, InputAdornment } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
 import logo from '../../images/logo.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +16,8 @@ import { selectedSignup } from './signUpSlice'
 import { ModalComponent } from '../../components/ModalComponent'
 import { state, city } from "./stateAndCity";
 import signupBg from '../../images/signup_ai.jpeg';
+import viewIcon from '../../images/view.svg';
+import hideIcon from '../../images/hide.svg';
 
 import { getError } from "../../lib/api-status/errorHandler"
 import ReCAPTCHA from "react-google-recaptcha";
@@ -65,89 +68,10 @@ const SignUp = () => {
     const [showResponse, setShowResponse] = useState(false);
     const [formDataEmail, setFormDataEmail] = useState(false);
     const [registedWithSebi, setRegisteredWithSebi] = useState("no");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
     const captchaRef = React.createRef<ReCAPTCHA>();
-
-    async function handleSubmitForm(data: any) {
-        const captchaResponse = await captchaRef.current?.executeAsync();
-        console.log("recaptcha", captchaResponse);
-        if (captchaResponse !== null && captchaResponse !== undefined) {
-            console.log(data)
-            setShowResponse(true)
-            dispatch(
-                signupUsersAsync(
-                    wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
-                )
-            )
-        }
-    }
-
-
-    const handleChange = (ev: any) => {
-
-        if (ev.target.id == 'username') {
-            let username = ev.target.value;
-            username = username && username.toLowerCase();
-            // if (username != '' &&
-            //     ((username.substring(username.indexOf('@')) != '@gmail.com') &&
-            //         (username.substring(username.indexOf('@')) != '@yahoo.com') &&
-            //         (username.substring(username.indexOf('@')) != '@yahoo.co.in') &&
-            //         (username.substring(username.indexOf('@')) != '@rediffmail.com') &&
-            //         (username.substring(username.indexOf('@')) != '@hotmail.com') &&
-            //         (username.substring(username.indexOf('@')) != '@yahoomail.com'))) {
-            setFormDataEmail(true);
-            ev.preventDefault();
-            let copiedValue = { ...formData }
-            let key = ev.target.id ? ev.target.id : ev.target.name;
-            copiedValue[key as keyof typeof formData] = ev.target.value;
-            setFormData(copiedValue);
-            // } else {
-            //     setFormDataEmail(false);
-            //     ev.preventDefault();
-            //     let copiedValue = { ...formData }
-            //     let key = ev.target.id ? ev.target.id : ev.target.name;
-            //     copiedValue[key as keyof typeof formData] = undefined;
-            //     setFormData(copiedValue);
-            // }
-        } else {
-            ev.preventDefault();
-            let copiedValue = { ...formData }
-            let key = ev.target.id ? ev.target.id : ev.target.name;
-            copiedValue[key as keyof typeof formData] = ev.target.value;
-
-            if (key === 'state') {
-                copiedValue.city = undefined;
-                copiedValue.otherCity = undefined;
-                setValue('city', '');
-                setValue('otherCity', undefined);
-            }
-
-            setFormData(copiedValue);
-        }
-    };
-
-    const handleReset = () => {
-        setShowResponse(false)
-        setFormData(defaultISignup)
-    };
-
-
-    const handleClose = () => {
-        setShowResponse(false)
-        //setFormData(defaultISignup)
-    };
-
-    const checkPublicMailsIds = (email: string) => {
-
-        const domain = email && email.toLowerCase().substring(email.indexOf('@'));
-
-        return (domain == "@gmail.com" ||
-            domain == "@yahoo.com" ||
-            domain == "@yahoo.co.in" ||
-            domain == "@rediffmail.com" ||
-            domain == "@hotmail.com" ||
-            domain == "@yahoomail.com"
-        )
-    }
 
     const validationSchema = Yup.object().shape({
         companyName: Yup
@@ -200,9 +124,14 @@ const SignUp = () => {
                 }
                 return true;
             }),
-        // .test("organization-email", "Enter your official email id", function (value: any) {
-        //     return !checkPublicMailsIds(value);
-        // }),
+        password: Yup
+            .string()
+            .required("Password is required")
+            .min(8, "Password must be at least 8 characters"),
+        confirmPassword: Yup
+            .string()
+            .required("Please re-type your password")
+            .oneOf([Yup.ref("password")], "Passwords must match"),
         title: Yup
             .string()
             .matches(/^[A-Za-z. ]*$/, 'Please enter valid title')
@@ -243,7 +172,6 @@ const SignUp = () => {
     const {
         control,
         setValue,
-        getValues,
         register,
         reset,
         handleSubmit,
@@ -252,6 +180,78 @@ const SignUp = () => {
         resolver: yupResolver(validationSchema),
         defaultValues: defaultISignup
     });
+
+    async function handleSubmitForm(data: any) {
+        setRecaptchaError(null);
+        const captchaResponse = await captchaRef.current?.executeAsync();
+        console.log("recaptcha", captchaResponse);
+        if (captchaResponse !== null && captchaResponse !== undefined) {
+            console.log(data)
+            setShowResponse(true)
+            dispatch(
+                signupUsersAsync(
+                    wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
+                )
+            )
+        } else {
+            setRecaptchaError(
+                "Security check (reCAPTCHA) did not complete. Ensure REACT_APP_RECAPTCHA_SITE_KEY is set and this site’s domain is allowed for that key."
+            );
+        }
+    }
+
+    const handleChange = (ev: any) => {
+
+        if (ev.target.id == 'username') {
+            let username = ev.target.value;
+            username = username && username.toLowerCase();
+            setFormDataEmail(true);
+            ev.preventDefault();
+            let copiedValue = { ...formData }
+            copiedValue.username = username;
+            setFormData(copiedValue);
+            setValue('username', username, { shouldValidate: true, shouldDirty: true });
+        } else {
+            ev.preventDefault();
+            let copiedValue = { ...formData }
+            let key = ev.target.id ? ev.target.id : ev.target.name;
+            copiedValue[key as keyof typeof formData] = ev.target.value;
+
+            if (key === 'state') {
+                copiedValue.city = undefined;
+                copiedValue.otherCity = undefined;
+                setValue('city', '', { shouldValidate: true, shouldDirty: true });
+                setValue('otherCity', undefined, { shouldValidate: true, shouldDirty: true });
+            }
+
+            setFormData(copiedValue);
+            setValue(key as keyof ISignup, copiedValue[key as keyof typeof formData] as never, { shouldValidate: true, shouldDirty: true });
+        }
+    };
+
+    const handleReset = () => {
+        setShowResponse(false)
+        setFormData(defaultISignup)
+    };
+
+
+    const handleClose = () => {
+        setShowResponse(false)
+        //setFormData(defaultISignup)
+    };
+
+    const checkPublicMailsIds = (email: string) => {
+
+        const domain = email && email.toLowerCase().substring(email.indexOf('@'));
+
+        return (domain == "@gmail.com" ||
+            domain == "@yahoo.com" ||
+            domain == "@yahoo.co.in" ||
+            domain == "@rediffmail.com" ||
+            domain == "@hotmail.com" ||
+            domain == "@yahoomail.com"
+        )
+    }
 
     const onSubmit = (data: any) => {
         handleSubmitForm(data);
@@ -496,6 +496,65 @@ const SignUp = () => {
                                 />
                             </Grid>
 
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    type={showPassword ? "text" : "password"}
+                                    id="password"
+                                    label="Password"
+                                    autoComplete="new-password"
+                                    value={formData["password"] || ''}
+                                    {...register("password")}
+                                    error={!!errors.password}
+                                    helperText={(errors.password?.message as string) || "At least 8 characters"}
+                                    onChange={handleChange}
+                                    sx={fieldSx}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    edge="end"
+                                                >
+                                                    <Box component="img" src={showPassword ? viewIcon : hideIcon} sx={{ width: 20, height: 20 }} alt="" />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    id="confirmPassword"
+                                    label="Re-type password"
+                                    autoComplete="new-password"
+                                    value={formData["confirmPassword"] || ''}
+                                    {...register("confirmPassword")}
+                                    error={!!errors.confirmPassword}
+                                    helperText={errors.confirmPassword?.message as string}
+                                    onChange={handleChange}
+                                    sx={fieldSx}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle confirm password visibility"
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                    edge="end"
+                                                >
+                                                    <Box component="img" src={showConfirmPassword ? viewIcon : hideIcon} sx={{ width: 20, height: 20 }} alt="" />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+
                             <Grid item xs={4}>
                                 <FormControl required fullWidth sx={fieldSx}>
                                     <InputLabel id="state-label">State</InputLabel>
@@ -589,6 +648,13 @@ const SignUp = () => {
                                 />
                             </Grid>
 
+                            {recaptchaError && (
+                                <Grid item xs={12}>
+                                    <Typography color="error" variant="body2" sx={{ textAlign: 'center' }}>
+                                        {recaptchaError}
+                                    </Typography>
+                                </Grid>
+                            )}
                             <Grid item xs={12} sx={{ mt: 1, mb: 0, display: 'flex', gap: 3, justifyContent: 'center' }}>
                                 <Button
                                     variant="contained"
