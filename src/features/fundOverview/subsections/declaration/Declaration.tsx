@@ -200,8 +200,7 @@ const Declaration = (props: any) => {
                                             id: "kycBoardDirectors",
                                             text: "1. Details and KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment Management Team to be provided in the format attached in Annexure I and Annexure II. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address: permanent and correspondent), Two passport size photograph for purpose of KYC.",
                                             templateLabel: "Download Template",
-                                            href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip",
-                                            validationTitle: "annexure-I-template-and-list-of-docs"
+                                            href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip"
                                         },
                                         {
                                             id: "boardResolution",
@@ -295,7 +294,7 @@ const Declaration = (props: any) => {
                                                     <DocumentChip label="SEBI Registration Certificate" validationTitle="SEBI Registration Certificate" id={`sdSEBICertificate${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Shareholding Pattern of Sponsor/IM" validationTitle="Shareholding Pattern of Sponsor or IM" id={`sdShareholdingPattern${id}`} />
+                                                    <DocumentChip label="Shareholding Pattern of Sponsor/IM"  id={`sdShareholdingPattern${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
                                                     <DocumentChip label="Policy of Carry" validationTitle="Policy of Carry" id={`sdPolicyOfCarry${id}`} />
@@ -352,7 +351,7 @@ const Declaration = (props: any) => {
                                                     Download Template
                                                 </Button>
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" validationTitle="Details of Investment Committee Member of Current Fund" id={`detailsOfInvestmentCommitteeMembers${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle="Details of Investment Committee Members" id={`detailsOfInvestmentCommitteeMembers${id}`} />
                                                 </span>
                                             </Box>
                                         ) : (
