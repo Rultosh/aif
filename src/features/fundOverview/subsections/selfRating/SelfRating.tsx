@@ -406,6 +406,7 @@ export const SelfRating = (props: any) => {
 
     const handleHomeClick= async(e:any) =>{
          localStorage.removeItem('token');
+         localStorage.removeItem('refreshToken');
          navigate('/login');
          window.location.reload();
     }

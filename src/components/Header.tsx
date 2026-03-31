@@ -49,6 +49,7 @@ const Header = (props: any) => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     // We should ideally dispatch a logout action here if it exists to clear Redux state
     // For now, since redirection happens in App.tsx based on the token which we manually cleared from localStorage,
     // we need to make sure the app re-renders or navigates.

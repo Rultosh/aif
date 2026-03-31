@@ -59,6 +59,7 @@ const NavigationBar = (props: any) => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     navigate('/login');
   }
 

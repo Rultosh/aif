@@ -53,10 +53,12 @@ export interface ILoginResponse {
     challengeId?: string | null
     expiresInSeconds?: number | null
     maskedEmail?: string | null
+    refreshToken?: string | null
 }
 
 interface IMfaVerifyResponse {
     currentUser: string
+    refreshToken?: string | null
 }
 
 export const authenticateThunk = createAsyncThunk(
@@ -130,6 +132,9 @@ const authticationSlice = createSlice({
           console.log(JSON.stringify(state));
           state.response = undefined;
           localStorage.setItem('token', String(state.token));
+          if (payload.refreshToken) {
+            localStorage.setItem('refreshToken', String(payload.refreshToken));
+          }
         }
         state.status.fetchStatus = FetchStatus.IDLE;
       }
@@ -144,6 +149,10 @@ const authticationSlice = createSlice({
         state.mfaPending = undefined;
         state.response = undefined;
         localStorage.setItem('token', String(state.token));
+        const refresh = action.payload?.refreshToken;
+        if (refresh) {
+          localStorage.setItem('refreshToken', String(refresh));
+        }
       }
       state.status.fetchStatus = FetchStatus.IDLE;
     })
