@@ -84,6 +84,7 @@ function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [sessionEndsAt, setSessionEndsAt] = useState<number | null>(null);
   const [secondsRemaining, setSecondsRemaining] = useState<number>(0);
+  const [overallSessionSecondsRemaining, setOverallSessionSecondsRemaining] = useState<number>(0);
 
   const logoutToLogin = () => {
     localStorage.clear();
@@ -97,6 +98,7 @@ function App() {
     try {
       const payload = token.split('.')[1];
       if (!payload) {
+        console.debug('[session-debug] token payload missing');
         return null;
       }
       const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
@@ -105,13 +107,35 @@ function App() {
         '='
       );
       const decodedPayload = JSON.parse(window.atob(paddedPayload));
+      console.debug('[session-debug] decoded jwt payload fields', {
+        keys: Object.keys(decodedPayload || {}),
+        exp: decodedPayload?.exp ?? null,
+        iat: decodedPayload?.iat ?? null,
+        sub: decodedPayload?.sub ?? null,
+        tokenUse: decodedPayload?.token_use ?? null,
+      });
       if (!decodedPayload?.exp) {
+        console.debug('[session-debug] exp claim not present');
         return null;
       }
-      return Number(decodedPayload.exp) * 1000;
+      const expiryMs = Number(decodedPayload.exp) * 1000;
+      console.debug('[session-debug] parsed token expiry', {
+        expiryMs,
+        expiryIso: new Date(expiryMs).toISOString(),
+        nowMs: Date.now(),
+      });
+      return expiryMs;
     } catch (error) {
+      console.debug('[session-debug] failed to parse token expiry', error);
       return null;
     }
+  };
+
+  const formatRemainingTime = (remainingSeconds: number): string => {
+    const safeSeconds = Math.max(remainingSeconds, 0);
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
   };
 
   const refreshTokenManually = async () => {
@@ -137,12 +161,21 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.debug('[session-debug] token check on auth change', {
+      hasToken: !!token,
+      tokenLength: token ? token.length : 0,
+      userLogged,
+    });
     if (!token) {
       setSessionEndsAt(null);
       setShowExpiryDialog(false);
       return;
     }
     const expiry = parseTokenExpiry(token);
+    console.debug('[session-debug] computed session end', {
+      expiryMs: expiry,
+      expiryIso: expiry ? new Date(expiry).toISOString() : null,
+    });
     setSessionEndsAt(expiry);
   }, [userLogged]);
 
@@ -166,6 +199,25 @@ function App() {
     return () => {
       window.clearTimeout(warningTimer);
       window.clearTimeout(logoutTimer);
+    };
+  }, [sessionEndsAt]);
+
+  useEffect(() => {
+    if (!sessionEndsAt) {
+      setOverallSessionSecondsRemaining(0);
+      return;
+    }
+
+    const updateOverallRemaining = () => {
+      const remaining = Math.max(Math.ceil((sessionEndsAt - Date.now()) / 1000), 0);
+      setOverallSessionSecondsRemaining(remaining);
+    };
+
+    updateOverallRemaining();
+    const intervalId = window.setInterval(updateOverallRemaining, 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
     };
   }, [sessionEndsAt]);
 
@@ -196,7 +248,10 @@ function App() {
     <ThemeProvider theme={THEME}>
       <div className="App"  >
         {/* <BackgroundPattern /> */}
-        <Header className="App-header">
+        <Header
+          className="App-header"
+          sessionCountdown={sessionEndsAt ? formatRemainingTime(overallSessionSecondsRemaining) : undefined}
+        >
         </Header>
         <Routes>
           <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>

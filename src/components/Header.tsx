@@ -93,6 +93,21 @@ const Header = (props: any) => {
               {token && <>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <>
+                    {props.sessionCountdown && (
+                      <>
+                        <Typography
+                          sx={{
+                            color: '#fff3cd',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          Session: {props.sessionCountdown}
+                        </Typography>
+                        <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
+                      </>
+                    )}
                     {usersState.role === 'USERADMIN' && (
                       <>
                         <Link
