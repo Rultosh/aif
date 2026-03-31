@@ -44,7 +44,9 @@ import { AdminRoute } from './components/auth/AdminRoute';
 import { UserAdminRoute } from './components/auth/UserAdminRoute';
 import { CheckAuth } from '../src/app/api';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Alert, Button, Snackbar, Typography } from '@mui/material';
 import BackgroundPattern from './components/BackgroundPattern';
+import { refreshAccessToken } from './app/api';
 // import useCookie, { getCookie } from 'react-use-cookie';
 
 // let initialState = {
@@ -77,6 +79,114 @@ function App() {
       "fontFamily": "'Poppins', sans-serif",
     }
   });
+  const navigate = useNavigate();
+  const [showExpiryDialog, setShowExpiryDialog] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [sessionEndsAt, setSessionEndsAt] = useState<number | null>(null);
+  const [secondsRemaining, setSecondsRemaining] = useState<number>(0);
+
+  const logoutToLogin = () => {
+    localStorage.clear();
+    CheckAuth.setIsUnauthorized();
+    setShowExpiryDialog(false);
+    setSessionEndsAt(null);
+    navigate('/login');
+  };
+
+  const parseTokenExpiry = (token: string): number | null => {
+    try {
+      const payload = token.split('.')[1];
+      if (!payload) {
+        return null;
+      }
+      const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const paddedPayload = normalizedPayload.padEnd(
+        normalizedPayload.length + ((4 - (normalizedPayload.length % 4)) % 4),
+        '='
+      );
+      const decodedPayload = JSON.parse(window.atob(paddedPayload));
+      if (!decodedPayload?.exp) {
+        return null;
+      }
+      return Number(decodedPayload.exp) * 1000;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const refreshTokenManually = async () => {
+    setIsRefreshing(true);
+    try {
+      const refreshed = await refreshAccessToken();
+      if (!refreshed) {
+        logoutToLogin();
+        return;
+      }
+      const updatedToken = localStorage.getItem('token');
+      if (updatedToken) {
+        const nextExpiry = parseTokenExpiry(updatedToken);
+        setSessionEndsAt(nextExpiry);
+      }
+      setShowExpiryDialog(false);
+    } catch (error) {
+      logoutToLogin();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setSessionEndsAt(null);
+      setShowExpiryDialog(false);
+      return;
+    }
+    const expiry = parseTokenExpiry(token);
+    setSessionEndsAt(expiry);
+  }, [userLogged]);
+
+  useEffect(() => {
+    if (!sessionEndsAt) {
+      return;
+    }
+
+    const now = Date.now();
+    const warningDelay = Math.max(sessionEndsAt - now - 60000, 0);
+    const logoutDelay = Math.max(sessionEndsAt - now, 0);
+
+    const warningTimer = window.setTimeout(() => {
+      setShowExpiryDialog(true);
+    }, warningDelay);
+
+    const logoutTimer = window.setTimeout(() => {
+      logoutToLogin();
+    }, logoutDelay);
+
+    return () => {
+      window.clearTimeout(warningTimer);
+      window.clearTimeout(logoutTimer);
+    };
+  }, [sessionEndsAt]);
+
+  useEffect(() => {
+    if (!showExpiryDialog || !sessionEndsAt) {
+      setSecondsRemaining(0);
+      return;
+    }
+
+    const updateRemaining = () => {
+      const remaining = Math.max(Math.ceil((sessionEndsAt - Date.now()) / 1000), 0);
+      setSecondsRemaining(remaining);
+    };
+
+    updateRemaining();
+    const intervalId = window.setInterval(updateRemaining, 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [showExpiryDialog, sessionEndsAt]);
 
   //   useEffect(() => {
   //     setSelfRatingLink('0');
@@ -326,6 +436,34 @@ function App() {
             </Route>
           </Route>
         </Routes>
+        <Snackbar
+          open={showExpiryDialog}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          autoHideDuration={null}
+        >
+          <Alert
+            severity="warning"
+            variant="filled"
+            sx={{ width: '100%', alignItems: 'center' }}
+            action={
+              <>
+                <Button onClick={logoutToLogin} color="inherit" size="small">
+                  Logout
+                </Button>
+                <Button onClick={refreshTokenManually} disabled={isRefreshing} color="inherit" size="small">
+                  {isRefreshing ? 'Refreshing...' : 'Refresh token'}
+                </Button>
+              </>
+            }
+          >
+            <Typography sx={{ fontSize: 14 }}>
+              Your session will expire in less than 1 minute. You might lose unsaved information.
+            </Typography>
+            <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+              Time remaining: {secondsRemaining}s
+            </Typography>
+          </Alert>
+        </Snackbar>
       </div>
     </ThemeProvider>
   );
