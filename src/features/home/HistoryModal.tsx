@@ -19,12 +19,11 @@ export const HistoryModal = (props: any) => {
 
 
     useEffect(() => {
-        console.log('calling fetchHistoryAsync');
+        if (!props.open || !id) return;
         dispatch(fetchHistoryAsync(
-            wrapArgument(actionUid, id)
-        ))
-
-    }, [state.actionStatus.fetchStatus === FetchStatus.IDLE, state.status.fetchStatus == FetchStatus.IDLE])
+            wrapArgument(actionUid, String(id))
+        ));
+    }, [props.open, id])
 
     const style = {
         position: 'absolute' as 'absolute',

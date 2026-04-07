@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, Divider, CircularProgress, Snackbar, Alert } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, Divider, CircularProgress, Snackbar, Alert, MenuItem } from "@mui/material";
 import logo from '../../images/logo_nps.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
 import azadiLogo from '../../images/Azadi.png'
@@ -9,7 +9,7 @@ import { validateUser } from './landingSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import '../../index.css'
 import loginIconImg from '../../images/aif_login_icon.png'
-import { authenticateThunk, clearErrorMessage, clearMfaPending, defaultLoginRequest, selectAuthenticatedUser, selectMfaPending, setErrorMessage, verifyMfaThunk } from "../../components/auth/authenticationSlice";
+import { authenticateThunk, clearErrorMessage, clearMfaPending, defaultLoginRequest, selectAuthenticatedUser, selectMfaPending, setActiveRole, setErrorMessage, verifyMfaThunk } from "../../components/auth/authenticationSlice";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
 import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
@@ -40,6 +40,23 @@ import hideIcon from '../../images/hide.svg';
 import user_manual from '../../files/user_manual.pdf';
 import faq from '../../files/FAQs.pdf';
 const Landing = () => {
+    const parseRolesFromToken = (token?: string | null): string[] => {
+        if (!token) return [];
+        try {
+            const payload = token.split('.')[1];
+            if (!payload) return [];
+            const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+            const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), '=');
+            const decoded = JSON.parse(window.atob(padded));
+            const roles = decoded?.rol;
+            if (Array.isArray(roles)) {
+                return roles.map((r) => String(r).toUpperCase());
+            }
+            return [];
+        } catch {
+            return [];
+        }
+    };
 
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
@@ -54,30 +71,37 @@ const Landing = () => {
     const [actionId] = useState(uuid());
     const [showPassword, setShowPassword] = useState(false);
     const [otpValue, setOtpValue] = useState('');
+    const [selectedRole, setSelectedRole] = useState<string>('');
     const usersState = useAppSelector(selectUsers)
     // console.log(usersState)
 
     const captchaRef = React.createRef<ReCAPTCHA>();
 
     useEffect(() => {
-        const token = state.token || localStorage.getItem('token');
+        const token = state.token != null ? String(state.token) : localStorage.getItem('token');
         if (token && usersState.role === undefined && usersState.status.fetchStatus === FetchStatus.IDLE) {
             dispatch(fetchRoleAsync(wrapArgument(actionId, undefined)));
         }
     }, [dispatch, state.token, usersState.role, usersState.status.fetchStatus, actionId]);
 
     useEffect(() => {
-        const token = state.token || localStorage.getItem('token');
-        if (token && usersState.role !== undefined) {
-            if (['USERADMIN'].includes(usersState.role)) {
+        const token = state.token != null ? String(state.token) : localStorage.getItem('token');
+        const activeRole = state.activeRole != null ? String(state.activeRole) : localStorage.getItem('activeRole');
+        const tokenRoles = state.availableRoles?.length > 0 ? state.availableRoles : parseRolesFromToken(token);
+        if (token && state.availableRoles?.length > 1 && !activeRole) {
+            return;
+        }
+        if (token) {
+            const effectiveRole = (activeRole || usersState.role || tokenRoles[0] || '').toUpperCase();
+            if (['USERADMIN'].includes(effectiveRole)) {
                 navigate('/admin');
-            } else if (['ADMIN'].includes(usersState.role)) {
+            } else if (['ADMIN', 'CHECKER', 'MAKER', 'MANAGER', 'USER'].includes(effectiveRole)) {
                 navigate('/home');
             } else {
                 navigate('/home');
             }
         }
-    }, [state.token, usersState.role, navigate]);
+    }, [state.token, state.activeRole, state.availableRoles, usersState.role, navigate]);
 
     useEffect(() => {
         CheckAuth.resetToAuthorized();
@@ -302,6 +326,47 @@ const Landing = () => {
                                 </Typography>
                             </Box>
                         ) : (
+                        state.availableRoles?.length > 1 && !(state.activeRole || localStorage.getItem('activeRole')) ? (
+                            <Box>
+                                <Typography sx={{ mb: 2, fontSize: '14px', color: '#333' }}>
+                                    Select the role you want to use for this session.
+                                </Typography>
+                                <TextField
+                                    select
+                                    fullWidth
+                                    label="Role"
+                                    value={selectedRole}
+                                    onChange={(e) => setSelectedRole(e.target.value)}
+                                    sx={{ mb: 2, '& .MuiOutlinedInput-root': { backgroundColor: '#fff', borderRadius: '6px' } }}
+                                >
+                                    {state.availableRoles.map((role) => (
+                                        <MenuItem key={role} value={role}>{role}</MenuItem>
+                                    ))}
+                                </TextField>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={() => {
+                                        if (!selectedRole) {
+                                            dispatch(setErrorMessage('Please select a role to continue.'));
+                                            return;
+                                        }
+                                        dispatch(setActiveRole(selectedRole));
+                                    }}
+                                    sx={{
+                                        py: 1.8,
+                                        backgroundColor: '#FF671F',
+                                        '&:hover': { backgroundColor: '#FF671F' },
+                                        borderRadius: '6px',
+                                        fontSize: '16px',
+                                        fontWeight: 500,
+                                        textTransform: 'none',
+                                    }}
+                                >
+                                    Continue
+                                </Button>
+                            </Box>
+                        ) : (
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <Box sx={{ mb: 2 }}>
                                 <Typography sx={{ fontWeight: 500, mb: 0.5, color: '#000000', fontSize: '14px' }}>
@@ -417,7 +482,7 @@ const Landing = () => {
                                 type="submit"
                                 fullWidth
                                 variant="contained"
-                                disabled={state.status.fetchStatus === FetchStatus.DOING || usersState.status.fetchStatus === FetchStatus.DOING || (!!state.token && usersState.role === undefined)}
+                                disabled={state.status.fetchStatus === FetchStatus.DOING || usersState.status.fetchStatus === FetchStatus.DOING}
                                 sx={{
                                     py: 1.8,
                                     backgroundColor: '#FF671F',
@@ -431,7 +496,7 @@ const Landing = () => {
                                     position: 'relative'
                                 }}
                             >
-                                {(state.status.fetchStatus === FetchStatus.DOING || usersState.status.fetchStatus === FetchStatus.DOING || (!!state.token && usersState.role === undefined)) ? (
+                                {(state.status.fetchStatus === FetchStatus.DOING || usersState.status.fetchStatus === FetchStatus.DOING) ? (
                                     <CircularProgress size={24} sx={{ color: '#fff' }} />
                                 ) : (
                                     'Login'
@@ -501,6 +566,7 @@ const Landing = () => {
                                 </Typography>
                             )}
                         </form>
+                        )
                         )}
                     </Box>
                 </Box>

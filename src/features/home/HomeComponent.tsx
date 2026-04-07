@@ -1,5 +1,5 @@
 import '../../index.css';
-import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop } from '@mui/material';
+import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NavigationBar from '../../components/NavigationBar'
@@ -31,6 +31,7 @@ import HistoryModal from './HistoryModal'
 // import greyImg from '../../images/grey.png'
 import { selectUsers } from '../admin/adminSlice'
 import { IPrelimApplicationData } from '../fundOverview/subsections/fundOverviewData/IPrelimApplicationData';
+import { IUser } from '../admin/IUser';
 import Moment from 'moment';
 import { CheckAuth } from '../../app/api';
 import { useNavigate } from 'react-router-dom';
@@ -42,6 +43,8 @@ import { ReactComponent as HistoryCustomIcon } from '../../images/history.svg';
 import { ReactComponent as SettingCustomIcon } from '../../images/setting.svg';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { fetchMakerUsers, postWorkflowAction } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
+import FileUploadService from '../../components/FileUploadService';
 
 export const Home = (pros: any) => {
 
@@ -61,12 +64,28 @@ export const Home = (pros: any) => {
     const [openHistoryModal, setOpenHistoryModal] = useState(false);
     const [selectedRow, setSelectedRow] = useState({} as any);
     const usersState = useAppSelector(selectUsers)
+    const activeRole = (useAppSelector(state => state.auth.activeRole) || localStorage.getItem('activeRole') || usersState.role || '').toUpperCase();
     const [actionUid] = useState(uuid());
     const [pageInfo, setPageInfo] = useState({ pageNumber: 0, pageSize: 100 } as IPageInfo)
     const [selectedRowHistory, setSelectedRowHistory] = useState(0);
+    const [assignMakerOpen, setAssignMakerOpen] = useState(false);
+    const [assignMakerRowId, setAssignMakerRowId] = useState<number | null>(null);
+    const [selectedMakerUserId, setSelectedMakerUserId] = useState<string>('');
+    const [assignMakerRemark, setAssignMakerRemark] = useState<string>('Assigned maker');
+    const [makerUsers, setMakerUsers] = useState<IUser[]>([]);
+    const [memoSubmitOpen, setMemoSubmitOpen] = useState(false);
+    const [memoSubmitRowId, setMemoSubmitRowId] = useState<number | null>(null);
+    const [memoSubmitRemark, setMemoSubmitRemark] = useState<string>('Memo submitted');
+    const [memoFile, setMemoFile] = useState<File | null>(null);
+    const [memoError, setMemoError] = useState<string>('');
+    const [memoUploading, setMemoUploading] = useState<boolean>(false);
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
     const totalEntries = prelimApplications.totalEntries || 0;
+    const hasActiveRole = (...roles: string[]) =>
+        roles.some((role) =>
+            activeRole.split(',').map((r) => r.trim().toUpperCase()).includes(role.toUpperCase())
+        );
 
     const handleChange = (event: SelectChangeEvent) => {
         let updatedPageInfo = { ...pageInfo, pageSize: parseInt(event.target.value), pageNumber: 0 }
@@ -111,6 +130,104 @@ export const Home = (pros: any) => {
         dispatch(getPrelimApplicationAllList(wrapArgument(actionUid, pageInfo)))
     }, [])
 
+    useEffect(() => {
+        const loadMakers = async () => {
+            if (!(hasActiveRole('CHECKER') || hasActiveRole('MANAGER'))) return;
+            try {
+                const response = await fetchMakerUsers();
+                setMakerUsers(response.data || []);
+            } catch (error) {
+                setMakerUsers([]);
+            }
+        };
+        loadMakers();
+    }, [activeRole]);
+
+    const openAssignMakerDialog = (rowId: number) => {
+        setAssignMakerRowId(rowId);
+        setSelectedMakerUserId(makerUsers[0]?.id ? String(makerUsers[0].id) : '');
+        setAssignMakerRemark('Assigned maker');
+        setAssignMakerOpen(true);
+    };
+
+    const closeAssignMakerDialog = () => {
+        setAssignMakerOpen(false);
+        setAssignMakerRowId(null);
+    };
+
+    const submitAssignMaker = () => {
+        if (!assignMakerRowId || !selectedMakerUserId) {
+            return;
+        }
+        callAndRefresh(
+            postWorkflowAction(assignMakerRowId, 'assign-maker', {
+                makerUserId: Number(selectedMakerUserId),
+                remark: assignMakerRemark || 'Assigned maker'
+            })
+        );
+        closeAssignMakerDialog();
+    };
+
+    const openMemoSubmitDialog = (rowId: number) => {
+        setMemoSubmitRowId(rowId);
+        setMemoSubmitRemark('Memo submitted');
+        setMemoFile(null);
+        setMemoError('');
+        setMemoSubmitOpen(true);
+    };
+
+    const closeMemoSubmitDialog = () => {
+        setMemoSubmitOpen(false);
+        setMemoSubmitRowId(null);
+        setMemoFile(null);
+        setMemoError('');
+        setMemoUploading(false);
+    };
+
+    const submitMemoWithAttachment = async () => {
+        if (!memoSubmitRowId) return;
+        if (!memoFile) {
+            setMemoError('Please select a memo file (PDF or DOCX).');
+            return;
+        }
+        setMemoUploading(true);
+        setMemoError('');
+        try {
+            const bucket = `memo-${memoSubmitRowId}`;
+            // Keep only the latest memo per application to avoid stale downloads.
+            const existing = await FileUploadService.list(bucket);
+            const existingFiles = existing?.data || [];
+            if (existingFiles.length) {
+                await Promise.all(existingFiles.map((file: any) => FileUploadService.delete(file)));
+            }
+            await FileUploadService.upload(bucket, memoFile, false, () => { });
+            await callAndRefresh(
+                postWorkflowAction(memoSubmitRowId, 'memo-submit', { remark: memoSubmitRemark || 'Memo submitted' })
+            );
+            closeMemoSubmitDialog();
+        } catch (e: any) {
+            setMemoError(e?.response?.data?.message || e?.message || 'Failed to upload memo or submit.');
+            setMemoUploading(false);
+        }
+    };
+
+    const downloadMemoForApplication = async (applicationId: number) => {
+        try {
+            const bucket = `memo-${applicationId}`;
+            const response = await FileUploadService.list(bucket);
+            const files = response?.data || [];
+            if (!files.length) {
+                alert('No memo file found for this application.');
+                return;
+            }
+            const sorted = [...files].sort((a: any, b: any) => Number(b.id) - Number(a.id));
+            const memoFile = sorted[0];
+            window.open(`${memoFile.url}?access_token=${localStorage.getItem('token')}`);
+        } catch (e: any) {
+            alert(e?.response?.data?.message || e?.message || 'Unable to download memo.');
+        }
+    };
+
     const tableHeaders = [
         "Fund Name",
         "Contact Person",
@@ -154,10 +271,12 @@ export const Home = (pros: any) => {
     }
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
-        let role = usersState.role;
-        if ((row.status === 'SUBMITTED' || row.status === 'REVIEWED' || row.status === 'APPROVED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && role == 'ADMIN')
+        let role = activeRole;
+        if ((row.status === 'SUBMITTED' || row.status === 'REVIEWED' || row.status === 'APPROVED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && (role == 'ADMIN' || role == 'CHECKER' || role == 'MANAGER'))
             return true
         if ((row.status === 'CREATED' || row.status === 'REVISE') && role == 'USER')
+            return true
+        if ((row.status === 'MAKER_ASSIGNED' || row.status === 'REVERTED_TO_MAKER' || row.status === 'MEMO_SUBMITTED' || row.status === 'SANCTIONED') && (role == 'CHECKER' || role == 'MAKER' || role == 'MANAGER'))
             return true
         return false
     }
@@ -184,7 +303,7 @@ export const Home = (pros: any) => {
         return <Chip label={label} color={color} size="small" sx={{ fontSize: '0.7rem', fontWeight: 600, borderRadius: '6px' }} />;
     }
     const getPath = (status: String | undefined) => {
-        if (usersState.role == 'ADMIN') {
+        if (activeRole == 'ADMIN' || activeRole == 'CHECKER' || activeRole == 'MANAGER') {
             return 'preview'
         }
         let path = (status && ['SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED'].includes(status.toString())) ? 'preview' : 'fund'
@@ -217,11 +336,120 @@ export const Home = (pros: any) => {
                 return "Temporarily Closed";
             case "CLOSED":
                 return "Closed";
+            case "MAKER_ASSIGNED":
+                return "Maker assigned";
+            case "MEMO_SUBMITTED":
+                return "Memo submitted";
+            case "REVERTED_TO_MAKER":
+                return "Reverted to maker";
+            case "SANCTIONED":
+                return "Sanctioned";
             default:
                 return "Invalid Status";
         }
 
     }
+
+    const callAndRefresh = async (promise: Promise<any>) => {
+        try {
+            await promise;
+            dispatch(getPrelimApplicationList(wrapArgument(actionUid, pageInfo)));
+            dispatch(getPrelimApplicationAllList(wrapArgument(actionUid, pageInfo)));
+        } catch (e: any) {
+            alert(e?.response?.data?.message || e?.message || 'Action failed');
+        }
+    };
+
+    const workflowActionsForRow = (row: IPrelimApplicationData) => {
+        const status = String(row.status || '').toUpperCase();
+        if (hasActiveRole('CHECKER') && status === 'SUBMITTED') {
+            return (
+                <Button size="small" variant="outlined" onClick={() => {
+                    if (typeof row.id !== 'number') {
+                        alert('Invalid application id.');
+                        return;
+                    }
+                    openAssignMakerDialog(row.id);
+                }}>Assign Maker</Button>
+            );
+        }
+        if (hasActiveRole('MAKER') && (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER')) {
+            return (
+                <Button size="small" variant="outlined" onClick={() => {
+                    if (typeof row.id !== 'number') {
+                        alert('Invalid application id.');
+                        return;
+                    }
+                    openMemoSubmitDialog(row.id);
+                }}>Submit Memo</Button>
+            );
+        }
+        if (hasActiveRole('MAKER') && status === 'MEMO_SUBMITTED') {
+            return (
+                <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => {
+                        if (typeof row.id !== 'number') {
+                            alert('Invalid application id.');
+                            return;
+                        }
+                        downloadMemoForApplication(row.id);
+                    }}
+                >
+                    Download Memo
+                </Button>
+            );
+        }
+        if (hasActiveRole('CHECKER') && status === 'MEMO_SUBMITTED') {
+            return (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button size="small" variant="outlined" onClick={() => {
+                        if (typeof row.id !== 'number') {
+                            alert('Invalid application id.');
+                            return;
+                        }
+                        downloadMemoForApplication(row.id);
+                    }}>Download Memo</Button>
+                    <Button size="small" variant="outlined" color="warning" onClick={() => {
+                        const remark = window.prompt('Revert remarks', 'Reverted to maker') || 'Reverted to maker';
+                        callAndRefresh(postWorkflowAction(row.id, 'revert-to-maker', { remark }));
+                    }}>Revert</Button>
+                    <Button size="small" variant="outlined" color="success" onClick={() => {
+                        const remark = window.prompt('Sanction remarks', 'Sanctioned') || 'Sanctioned';
+                        callAndRefresh(postWorkflowAction(row.id, 'sanction', { remark }));
+                    }}>Sanction</Button>
+                </Box>
+            );
+        }
+        if (hasActiveRole('MANAGER')) {
+            return (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button size="small" variant="outlined" onClick={() => {
+                        if (typeof row.id !== 'number') {
+                            alert('Invalid application id.');
+                            return;
+                        }
+                        downloadMemoForApplication(row.id);
+                    }}>Download Memo</Button>
+                    {status !== 'SANCTIONED' && (
+                        <Button size="small" variant="outlined" onClick={() => {
+                            const makerUserIdRaw = window.prompt('New maker user id (leave blank to keep)');
+                            const checkerUserIdRaw = window.prompt('New checker user id (leave blank to keep)');
+                            if (!makerUserIdRaw && !checkerUserIdRaw) return;
+                            const remark = window.prompt('Reassignment remark', 'Reassigned by manager') || 'Reassigned by manager';
+                            callAndRefresh(postWorkflowAction(row.id, 'manager-reassign', {
+                                makerUserId: makerUserIdRaw ? Number(makerUserIdRaw) : null,
+                                checkerUserId: checkerUserIdRaw ? Number(checkerUserIdRaw) : null,
+                                remark
+                            }));
+                        }}>Reassign</Button>
+                    )}
+                </Box>
+            );
+        }
+        return <Typography variant="caption" sx={{ color: '#64748b' }}>-</Typography>;
+    };
 
     return (
         <div className="homeComp">
@@ -240,7 +468,7 @@ export const Home = (pros: any) => {
                                 </Typography>
                             </Breadcrumbs>
                         </Box>
-                        {usersState.role === "USER" && <Button
+                        {activeRole === "USER" && <Button
                             variant="outlined"
                             sx={{
                                 color: '#FF671F',
@@ -297,7 +525,7 @@ export const Home = (pros: any) => {
                                                 {row.stage === "PRELIM" ?
                                                     <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
                                                         {isGoodToShowApplication(row) ?
-                                                            <a href={`#/preliminary/${row.id}/${usersState.role === "USER" ? 'selfrating' : 'preview'}`}
+                                                            <a href={`#/preliminary/${row.id}/${activeRole === "USER" ? 'selfrating' : 'preview'}`}
                                                                 style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> :
                                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
                                                                 {row.nameOfTheFund}
@@ -337,11 +565,7 @@ export const Home = (pros: any) => {
                                                 </TableCell>
                                                 <TableCell align="left">
                                                     <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                                        <Tooltip title={`${row.stage === 'PRELIM' ? row.status : 'APPROVED'}`}>
-                                                            <IconButton size="small" sx={{ p: '2px', color: '#ffc107', '&:hover': { backgroundColor: '#fffbeb' } }}>
-                                                                <SettingCustomIcon style={{ width: '22px', height: '20px', fill: 'currentColor' }} />
-                                                            </IconButton>
-                                                        </Tooltip>
+                                                        {workflowActionsForRow(row)}
                                                     </Box>
                                                 </TableCell>
                                             </TableRow>
@@ -418,6 +642,84 @@ export const Home = (pros: any) => {
                         prelimDetails={selectedRowHistory}
                     ></HistoryModal>
                         : <></>}
+                    <Dialog open={assignMakerOpen} onClose={closeAssignMakerDialog} fullWidth maxWidth="sm">
+                        <DialogTitle>Assign Maker</DialogTitle>
+                        <DialogContent>
+                            <FormControl fullWidth sx={{ mt: 1 }}>
+                                <InputLabel id="assign-maker-user-label">Maker User</InputLabel>
+                                <Select
+                                    labelId="assign-maker-user-label"
+                                    value={selectedMakerUserId}
+                                    label="Maker User"
+                                    onChange={(e) => setSelectedMakerUserId(e.target.value)}
+                                >
+                                    {makerUsers.map((user) => (
+                                        <MenuItem key={user.id} value={String(user.id)}>
+                                            {user.contactPerson || user.username} ({user.username})
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <TextField
+                                fullWidth
+                                sx={{ mt: 2 }}
+                                label="Remark"
+                                value={assignMakerRemark}
+                                onChange={(e) => setAssignMakerRemark(e.target.value)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={closeAssignMakerDialog}>Cancel</Button>
+                            <Button onClick={submitAssignMaker} variant="contained" disabled={!selectedMakerUserId}>
+                                Assign
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={memoSubmitOpen} onClose={closeMemoSubmitDialog} fullWidth maxWidth="sm">
+                        <DialogTitle>Submit Memo</DialogTitle>
+                        <DialogContent>
+                            <TextField
+                                fullWidth
+                                sx={{ mt: 1 }}
+                                label="Remark"
+                                value={memoSubmitRemark}
+                                onChange={(e) => setMemoSubmitRemark(e.target.value)}
+                            />
+                            <Box sx={{ mt: 2 }}>
+                                <Button variant="outlined" component="label">
+                                    Choose Memo File (PDF/DOCX)
+                                    <input
+                                        type="file"
+                                        hidden
+                                        accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] || null;
+                                            setMemoFile(file);
+                                            setMemoError('');
+                                        }}
+                                    />
+                                </Button>
+                                <Typography sx={{ mt: 1, fontSize: '13px', color: '#64748b' }}>
+                                    {memoFile ? memoFile.name : 'No file selected'}
+                                </Typography>
+                                {memoError && (
+                                    <Typography sx={{ mt: 1, fontSize: '12px', color: '#d32f2f' }}>
+                                        {memoError}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={closeMemoSubmitDialog} disabled={memoUploading}>Cancel</Button>
+                            <Button
+                                onClick={submitMemoWithAttachment}
+                                variant="contained"
+                                disabled={memoUploading || !memoFile}
+                            >
+                                {memoUploading ? 'Submitting...' : 'Submit Memo'}
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </Container>
             </> : (
                 <Backdrop

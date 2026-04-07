@@ -56,3 +56,22 @@ export function patchPrelimApplication(prelimAppData:IPrelimApplicationData) {
     url: `/api/prelims/${prelimAppData.id}`
   });
 }
+
+export function postWorkflowAction(
+  applicationId: Number | undefined,
+  action: string,
+  payload: any
+) {
+  return api({
+    method: 'post',
+    data: payload,
+    url: `/api/application/${applicationId}/${action}`
+  });
+}
+
+export function fetchMakerUsers() {
+  return api({
+    method: 'get',
+    url: `/api/users/makers`
+  });
+}

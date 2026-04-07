@@ -9,6 +9,21 @@ function UserAdminRoute({ children }) {
     const token = localStorage.getItem('token')
     const navigate = useNavigate();
     const user = useAppSelector(selectUsers)
+    const hasUserAdminRoleInToken = () => {
+        try {
+            const currentToken = localStorage.getItem('token');
+            if (!currentToken) return false;
+            const payload = currentToken.split('.')[1];
+            if (!payload) return false;
+            const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+            const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), '=');
+            const decoded = JSON.parse(window.atob(padded));
+            const roles = Array.isArray(decoded?.rol) ? decoded.rol.map((r) => String(r).toUpperCase()) : [];
+            return roles.includes("USERADMIN");
+        } catch {
+            return false;
+        }
+    };
     
     useEffect(() => {
         console.log(localStorage.getItem('token'));
@@ -22,7 +37,7 @@ function UserAdminRoute({ children }) {
             })
        }
 
-       if(user.role !== "USERADMIN") {
+       if(user.role !== "USERADMIN" && !hasUserAdminRoleInToken()) {
         navigate({
             pathname: '/login',
             // state: { from: {pathname: '/home'} }

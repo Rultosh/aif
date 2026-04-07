@@ -3,7 +3,7 @@ import { RootState } from "../../app/store"
 import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
 import {IUser, IUserApprove} from "./IUser"
-import {fetchUsers, approveUser, whoAmI, patchUserOtpRequired, deleteUser} from './adminApi'
+import {fetchUsers, approveUser, whoAmI, patchUserOtpRequired, deleteUser, patchUserRoles} from './adminApi'
 import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 
 
@@ -104,6 +104,22 @@ export const deleteUserAsync = createAsyncThunk(
   }
 );
 
+export const updateUserRolesAsync = createAsyncThunk(
+  'users/updateRoles',
+  async (args: ActionWrapper<{ id: number; role: string }>, { rejectWithValue }) => {
+    try {
+      if (!args.argument) {
+        return rejectWithValue({ message: 'Missing role update data' });
+      }
+      const { id, role } = args.argument;
+      const response = await patchUserRoles(id, role);
+      return response.data as IUser;
+    } catch (reason) {
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -161,6 +177,13 @@ const usersSlice = createSlice({
     })
     .addCase(deleteUserAsync.fulfilled, (state, action: PayloadAction<number>) => {
       state.users = state.users.filter((row) => row.id !== action.payload);
+    })
+    .addCase(updateUserRolesAsync.fulfilled, (state, action: PayloadAction<IUser>) => {
+      const updated = action.payload;
+      state.users = state.users.map((row) =>
+        row.id === updated.id ? { ...row, ...updated } : row
+      );
+      state.response = "Roles updated successfully.";
     })
   }
 })

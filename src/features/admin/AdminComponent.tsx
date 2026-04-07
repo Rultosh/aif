@@ -16,6 +16,8 @@ import { Delete, Edit } from '@mui/icons-material'
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
 import dayjs from "dayjs";
+import { assignManagerRole } from "./adminApi";
+import AddOperationalUserModal from "./AddOperationalUserModal";
 
 const Admin = (props: any) => {
 
@@ -26,6 +28,7 @@ const Admin = (props: any) => {
     const [open, setOpen] = Rect.useState(false);
     const handleClose = () => setOpen(false);
     const [selectedRow , setSelectedRow] = useState({} as IUser);
+    const [openAddOperational, setOpenAddOperational] = useState(false);
     const navigate = useNavigate();
 
     function handleOpen(row:IUser)
@@ -74,7 +77,7 @@ const Admin = (props: any) => {
 
     };
 
-    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Email OTP", "Approve", "Delete"]
+    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Email OTP", "Approve", "Assign Manager", "Delete"]
     const handleDeleteUser = (row: IUser) => {
         if (row.id == null) {
             return;
@@ -105,6 +108,11 @@ const Admin = (props: any) => {
             {true ?
                 <Container maxWidth="xl" sx={{ pt: '120px' }}>
                     <Paper elevation={0} sx={{ backgroundColor: '#f6f6fb', borderRadius: '10px' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 2 }}>
+                            <Button variant="contained" onClick={() => setOpenAddOperational(true)}>
+                                Add Operational User
+                            </Button>
+                        </Box>
                         <TableContainer component={Paper} sx={{ maxHeight: 540 }}>
                             <Table sx={{ minWidth: 700, mb: 1 }} aria-label="customized table">
                                 <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
@@ -153,7 +161,26 @@ const Admin = (props: any) => {
                                                     </Tooltip>
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    {row.role == 'REGISTERED' ? <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} /> : <></>}
+                                                    <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    {row.role === 'CHECKER' ? (
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            onClick={async () => {
+                                                                if (row.id == null) return;
+                                                                try {
+                                                                    await assignManagerRole(Number(row.id));
+                                                                    dispatch(fetchUsersAsync(wrapArgument(actionUid, props.prelimApplicationId)));
+                                                                } catch (e: any) {
+                                                                    alert(e?.response?.data || e?.message || 'Failed to assign manager role');
+                                                                }
+                                                            }}
+                                                        >
+                                                            Promote
+                                                        </Button>
+                                                    ) : <></>}
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <Delete sx={{ cursor: 'pointer', color: '#d32f2f' }} onClick={() => handleDeleteUser(row)} />
@@ -166,6 +193,13 @@ const Admin = (props: any) => {
                             </Table>
                         </TableContainer>
                         {open ? <RoleComponent open={open} userDetails = {selectedRow} handleClose={handleClose}></RoleComponent> : <></>}
+                        <AddOperationalUserModal
+                            open={openAddOperational}
+                            onClose={() => setOpenAddOperational(false)}
+                            onCreated={() => {
+                                dispatch(fetchUsersAsync(wrapArgument(actionUid, props.prelimApplicationId)));
+                            }}
+                        />
                     </Paper>
                 </Container>                        
              : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}

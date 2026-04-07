@@ -5,6 +5,8 @@ export interface IPrelimApplicationData {
   status: String | undefined,
   /** Admin who forwarded for approval; cannot be the same user who approves. */
   reviewedByUserId: Number | undefined,
+  assignedCheckerUserId?: Number | undefined,
+  assignedMakerUserId?: Number | undefined,
   createdBy: Number | undefined,
   createdByName: String | undefined,
   parentId: Number | undefined,
@@ -132,6 +134,8 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   id: undefined,
   status: undefined,
   reviewedByUserId: undefined,
+  assignedCheckerUserId: undefined,
+  assignedMakerUserId: undefined,
   createdBy: undefined,
   createdByName: undefined,
   parentId: undefined,

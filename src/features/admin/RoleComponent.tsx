@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, FormControl, Grid, InputLabel, MenuItem, Modal, Select } from "@mui/material";
 import { useEffect, useState } from "react";
 import { IUser } from './IUser'
-import { approveUsersAsync, selectUsers } from './adminSlice'
+import { approveUsersAsync, selectUsers, updateUserRolesAsync } from './adminSlice'
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import uuid from "react-uuid";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
@@ -16,6 +16,10 @@ const RoleComponent = (props: any) => {
     const navigate = useNavigate()
     const { userDetails } = props
     const [data, setData] = useState(userDetails || {} as IUser)
+    const currentRole = String(userDetails?.role || "").toUpperCase();
+    const isRegistered = currentRole === "REGISTERED";
+    const roles = ['USER', 'USERADMIN', 'CHECKER', 'MAKER', 'MANAGER', 'CHECKER,MANAGER', 'CLOSED', 'ADMIN'];
+    const [selectedRole, setSelectedRole] = useState<string>(currentRole || roles[0]);
 
     const style = {
         position: 'absolute' as 'absolute',
@@ -30,7 +34,9 @@ const RoleComponent = (props: any) => {
     };
 
     const handleSelectChange = (e: any) => {
-        setData({ ...data, role: roles[e.target.value] })
+        const role = String(e.target.value);
+        setSelectedRole(role);
+        setData({ ...data, role })
     }
 
     const handleClose = () =>{
@@ -39,14 +45,22 @@ const RoleComponent = (props: any) => {
     }
 
     function handleSubmitForm() {
+        if (!selectedRole) return;
+        if (!isRegistered) {
+            if (!data.id) return;
+            dispatch(
+                updateUserRolesAsync(
+                    wrapArgument(actionUid, { id: Number(data.id), role: selectedRole })
+                )
+            );
+            return;
+        }
         dispatch(
             approveUsersAsync(
                 wrapArgument(actionUid, data)
             )
         )
     }
-
-    let roles = ['USER', 'ADMIN', 'CLOSED']
 
     return <Modal
         open={props.open}
@@ -64,19 +78,17 @@ const RoleComponent = (props: any) => {
                         <Grid container spacing={2} >
                             <Grid item xs={3}>
                                 <FormControl size="medium" fullWidth>
-
                                     <InputLabel id="demo-select-small">Assign Role</InputLabel>
                                     <Select
                                         labelId="demo-select-small"
                                         id="demo-select-small"
-                                        //value={scheme}
                                         label="Assign Role"
+                                        value={selectedRole}
                                         onChange={handleSelectChange}
                                     >
-
-                                        <MenuItem key={"USER"} value={0}>USER</MenuItem>
-                                        <MenuItem key={"ADMIN"} value={1}>ADMIN</MenuItem>
-                                        <MenuItem key={"CLOSED"} value={2}>CLOSED</MenuItem>
+                                        {roles.map((role) => (
+                                            <MenuItem key={role} value={role}>{role === "CHECKER,MANAGER" ? "CHECKER + MANAGER" : role}</MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
