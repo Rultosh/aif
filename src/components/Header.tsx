@@ -32,6 +32,7 @@ const Header = (props: any) => {
   const token = auth.token || localStorage.getItem('token');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const usersState = useAppSelector(selectUsers)
+  const activeRole = useAppSelector(state => state.auth.activeRole) || localStorage.getItem('activeRole') || usersState.role;
   const dispatch = useAppDispatch();
   const [actionUid] = useState(uuid());
   const navigate = useNavigate();
@@ -108,7 +109,7 @@ const Header = (props: any) => {
                         <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
                       </>
                     )}
-                    {usersState.role === 'USERADMIN' && (
+                    {activeRole === 'USERADMIN' && (
                       <>
                         <Link
                           to="/admin"
@@ -126,7 +127,7 @@ const Header = (props: any) => {
                       </>
                     )}
 
-                    {usersState.role === 'USER' && (
+                    {activeRole === 'USER' && (
                       <>
                         <Link
                           to="/Workflow"

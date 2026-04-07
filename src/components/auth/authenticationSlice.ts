@@ -20,6 +20,8 @@ export type MfaPendingState = {
 
 type InitialState = {
     token: String | undefined,
+    activeRole: string | undefined,
+    availableRoles: string[],
     response: string | undefined,
     status: IStatus,
     actionStatus: IStatus,
@@ -27,6 +29,8 @@ type InitialState = {
 }
 const initialState: InitialState = {
     token: undefined,
+    activeRole: undefined,
+    availableRoles: [],
     response: undefined,
     status: { fetchStatus: FetchStatus.IDLE },
     actionStatus: { fetchStatus: FetchStatus.IDLE },
@@ -59,6 +63,27 @@ export interface ILoginResponse {
 interface IMfaVerifyResponse {
     currentUser: string
     refreshToken?: string | null
+}
+
+function decodeRolesFromToken(token: string | undefined): string[] {
+  if (!token) return [];
+  try {
+    const payloadPart = token.split(".")[1];
+    if (!payloadPart) return [];
+    const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
+    const payload = JSON.parse(window.atob(padded));
+    const roles = payload?.rol;
+    if (Array.isArray(roles)) {
+      return roles.map((r) => String(r).toUpperCase());
+    }
+    if (typeof roles === "string") {
+      return roles.split(",").map((r: string) => r.trim().toUpperCase()).filter(Boolean);
+    }
+    return [];
+  } catch {
+    return [];
+  }
 }
 
 export const authenticateThunk = createAsyncThunk(
@@ -105,6 +130,10 @@ const authticationSlice = createSlice({
     setErrorMessage:  (state, action: PayloadAction<string>) => {
       state.response = action.payload
       state.status.fetchStatus = FetchStatus.FAILED
+    },
+    setActiveRole: (state, action: PayloadAction<string>) => {
+      state.activeRole = action.payload;
+      localStorage.setItem("activeRole", action.payload);
     }
   },
   extraReducers: builder => {
@@ -128,6 +157,14 @@ const authticationSlice = createSlice({
         }
         if (payload?.currentUser) {
           state.token = payload.currentUser;
+          state.availableRoles = decodeRolesFromToken(payload.currentUser);
+          if (state.availableRoles.length === 1) {
+            state.activeRole = state.availableRoles[0];
+            localStorage.setItem("activeRole", state.availableRoles[0]);
+          } else {
+            state.activeRole = undefined;
+            localStorage.removeItem("activeRole");
+          }
           state.mfaPending = undefined;
           console.log(JSON.stringify(state));
           state.response = undefined;
@@ -146,6 +183,14 @@ const authticationSlice = createSlice({
       const token = action.payload?.currentUser;
       if (token) {
         state.token = token;
+        state.availableRoles = decodeRolesFromToken(token);
+        if (state.availableRoles.length === 1) {
+          state.activeRole = state.availableRoles[0];
+          localStorage.setItem("activeRole", state.availableRoles[0]);
+        } else {
+          state.activeRole = undefined;
+          localStorage.removeItem("activeRole");
+        }
         state.mfaPending = undefined;
         state.response = undefined;
         localStorage.setItem('token', String(state.token));
@@ -172,7 +217,7 @@ const authticationSlice = createSlice({
 })
 
 export default authticationSlice.reducer
-export const { setErrorMessage, clearErrorMessage, clearMfaPending } = authticationSlice.actions
+export const { setErrorMessage, clearErrorMessage, clearMfaPending, setActiveRole } = authticationSlice.actions
 
 export const selectAuthenticatedUser = (state: RootState) => state.auth;
 export const selectMfaPending = (state: RootState) => state.auth.mfaPending;

@@ -68,17 +68,25 @@ const SignUp = () => {
     const captchaRef = React.createRef<ReCAPTCHA>();
 
     async function handleSubmitForm(data: any) {
-        const captchaResponse = await captchaRef.current?.executeAsync();
-        console.log("recaptcha", captchaResponse);
-        if (captchaResponse !== null && captchaResponse !== undefined) {
-            console.log(data)
-            setShowResponse(true)
-            dispatch(
-                signupUsersAsync(
-                    wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
-                )
-            )
+        let captchaResponse: string | null | undefined = "BLANK";
+        try {
+            captchaResponse = await captchaRef.current?.executeAsync();
+        } catch (e) {
+            captchaResponse = "BLANK";
         }
+        if (captchaResponse === null || captchaResponse === undefined) {
+            captchaResponse = "BLANK";
+        }
+
+        console.log("recaptcha", captchaResponse);
+        console.log(data)
+        setShowResponse(true)
+        dispatch(
+            signupUsersAsync(
+                wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
+            )
+        )
+        captchaRef.current?.reset();
     }
 
 

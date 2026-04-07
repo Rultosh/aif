@@ -38,3 +38,37 @@ export function deleteUser(userId: number) {
   });
 }
 
+export function assignManagerRole(userId: number) {
+  return api({
+    method: 'post',
+    url: `useradmin/users/${userId}/assign-manager`,
+  });
+}
+
+export function createOperationalUser(payload: {
+  username: string;
+  contactPerson: string;
+  companyName: string;
+  title: string;
+  phoneNumber: string;
+  address: string;
+  city: string;
+  state: string;
+  sebiRegistration?: string;
+  role: string;
+}) {
+  return api({
+    method: 'post',
+    url: `useradmin/users/operational`,
+    data: payload,
+  });
+}
+
+export function patchUserRoles(userId: number, role: string) {
+  return api({
+    method: 'patch',
+    url: `useradmin/users/${userId}/roles`,
+    data: { role },
+  });
+}
+
