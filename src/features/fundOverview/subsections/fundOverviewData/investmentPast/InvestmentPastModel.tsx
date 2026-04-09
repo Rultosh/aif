@@ -59,6 +59,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
 
   const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
   const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
+  const isEquityOriented = ['Equity Oriented AIF', 'Equity Oriented Fund'].includes(String(aifCategoryType));
 
   function handleSubmitForm() {
     console.log("Saving investment Past", investmentPastFormData)
@@ -222,7 +223,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     }).nullable(),
     currentStatus: Yup.string().required("Current Status is required").nullable(),
     instrumentType: Yup.string().required("Instrument Type is required").nullable(),
-    shareholdingInvestee: aifCategoryType === 'Equity Oriented AIF'
+    shareholdingInvestee: isEquityOriented
       ? Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Shareholding in investee company is required").test("max-value", "Value cannot exceed 100", (value) => {
         if (!value) return true;
         return parseFloat(String(value)) <= 100;
@@ -440,7 +441,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             />
           </Grid>
 
-          {aifCategoryType === 'Equity Oriented AIF' && (<Grid item xs={12} md={4}>
+          {isEquityOriented && (<Grid item xs={12} md={4}>
             <TextField
               required
               fullWidth
@@ -458,7 +459,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             />
           </Grid>
           )}
-          <Grid item xs={12} md={aifCategoryType === 'Equity Oriented AIF' ? 4 : 6}>
+          <Grid item xs={12} md={isEquityOriented ? 4 : 6}>
             <FormControl fullWidth variant="outlined" error={!!errors.currentStatus} sx={fieldSx}>
               <InputLabel id="currentStatus-label" sx={{
                 '&.Mui-focused': { color: '#FF671F' }
@@ -486,7 +487,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               {errors.currentStatus && <FormHelperText>{errors.currentStatus.message as string}</FormHelperText>}
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={aifCategoryType === 'Equity Oriented AIF' ? 4 : 6}>
+          <Grid item xs={12} md={isEquityOriented ? 4 : 6}>
             <TextField
               required
               fullWidth

@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Stack, Switch, TextField, Typography, Autocomplete, CircularProgress } from "@mui/material";
+import { Box, Button, Card, CardContent, Chip, Divider, FormControl, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Stack, TextField, Typography, Autocomplete, CircularProgress } from "@mui/material";
 import UploadIcon from '@mui/icons-material/Upload';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
@@ -19,6 +19,8 @@ import * as Yup from "yup";
 import FormHelperText from '@mui/material/FormHelperText';
 import dayjs, { Dayjs } from "dayjs";
 import { selectUsers } from '../../../admin/adminSlice';
+import { selectSelfRatings } from "../selfRating/selfRatingSlice";
+import { fetchSelfRatingAsync } from "../selfRating/selfRatingSlice";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -27,15 +29,17 @@ interface PrelimApplicationProps {
 }
 
 const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) => {
+    const { id } = useParams();
     const usersState = useAppSelector(selectUsers);
+    const selfRatingState = useAppSelector(selectSelfRatings);
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState<IPrelimApplicationData>(prelimApplicationState.prelimApplication || defaultIPrelimApplicationData);
     console.log('prelimApplicationState', prelimApplicationState)
     const [actionUid] = useState(uuid());
     const [prelimAppicationId, setPrelimApplicationId] = useState(props.prelimApplicationId);
-    const [firstClosingSwitch, setfirstClosingSwitch] = useState(false);
 
     const [fundManager] = useState(prelimApplicationState.prelimApplication?.fundManager);
+    const resolvedPrelimId = Number(prelimAppicationId || id);
 
     const MIN_DATE = dayjs("2020-01-01");
 
@@ -61,22 +65,35 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     ];
 
     useEffect(() => {
-        if (Number(prelimAppicationId)) {
-            dispatch(getPrelimApplicationData(
-                wrapArgument(actionUid, Number(prelimAppicationId))
-            ))
-        }
-    }, [])
+        if (!resolvedPrelimId) return;
+        dispatch(getPrelimApplicationData(
+            wrapArgument(actionUid, resolvedPrelimId)
+        ));
+        dispatch(fetchSelfRatingAsync(
+            wrapArgument(actionUid, resolvedPrelimId)
+        ));
+    }, [resolvedPrelimId, actionUid, dispatch])
 
     const [aifNameData, setAifNameData] = useState('');
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
             console.log('Syncing PrelimApplicationData...', prelimApplicationState.prelimApplication)
             let data = { ...prelimApplicationState.prelimApplication };
+            const initialAssessmentFundTypeRaw = selfRatingState?.selfRatings?.fundType;
+            const initialAssessmentFundType =
+                initialAssessmentFundTypeRaw === 'Equity Oriented Fund'
+                    ? 'Equity Oriented AIF'
+                    : initialAssessmentFundTypeRaw === 'Debt Oriented Fund'
+                        ? 'Debt Oriented AIF'
+                        : initialAssessmentFundTypeRaw;
             
             // Auto-populate from user state if field is empty
             if (!data.nameOfTheFund && usersState.me?.companyName) {
                 data.nameOfTheFund = usersState.me.companyName;
+            }
+            // Default AIF category type from Initial Assessment selection when empty.
+            if (!data.aifCategoryType && initialAssessmentFundType) {
+                data.aifCategoryType = initialAssessmentFundType as any;
             }
 
             // Convert date strings to Dayjs objects for the form
@@ -102,7 +119,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                 setPrelimApplicationFormData(prev => ({ ...prev, nameOfTheFund: usersState.me.companyName || '' }));
             }
         }
-    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me])
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me, selfRatingState?.selfRatings?.fundType])
 
     const setDateValue = (key: string, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
@@ -271,12 +288,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         setPrelimApplicationFormData(copiedValue);
     }
 
-    const handleToggle = () => {
-        const newValue = !prelimApplicationFormData.firstClosing;
+    const handleFirstClosingChange = (value: boolean) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
-        copiedValue.firstClosing = newValue;
+        copiedValue.firstClosing = value;
         setPrelimApplicationFormData(copiedValue);
-        setValue("firstClosing", newValue);
+        setValue("firstClosing", value);
     };
 
     const percentageFields = [
@@ -329,15 +345,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         color: '#FF671F',
         '&.Mui-checked': {
             color: '#FF671F',
-        },
-    };
-
-    const switchSx = {
-        '& .MuiSwitch-switchBase.Mui-checked': {
-            color: '#FF671F',
-            '& + .MuiSwitch-track': {
-                backgroundColor: '#FF671F',
-            },
         },
     };
 
@@ -796,33 +803,29 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                        <FormControl component="fieldset" fullWidth>
-                            <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>AIF Category Type</Typography>
-                            <Controller
-                                name="aifCategoryType"
-                                control={control}
-                                render={({ field }) => (
-                                    <RadioGroup
-                                        {...field}
-                                        row
-                                        value={prelimApplicationFormData.aifCategoryType || ''}
-                                        onChange={(e) => {
-                                            field.onChange(e);
-                                            handleChange({
-                                                preventDefault: () => { },
-                                                target: { name: 'aifCategoryType', value: e.target.value }
-                                            });
-                                        }}
-                                    >
-                                        <FormControlLabel value="Equity Oriented AIF" control={<Radio size="small" sx={controlSx} />} label="Equity Oriented AIF" />
-                                        <FormControlLabel value="Debt Oriented AIF" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented AIF" />
-                                    </RadioGroup>
-                                )}
-                            />
-                            {errors.aifCategoryType && (
-                                <FormHelperText error>{errors.aifCategoryType.message as string}</FormHelperText>
+                        <Controller
+                            name="aifCategoryType"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    fullWidth
+                                    label="AIF Category Type"
+                                    value={prelimApplicationFormData.aifCategoryType || ''}
+                                    error={!!errors.aifCategoryType}
+                                    helperText={errors.aifCategoryType?.message as string}
+                                    onChange={(e) => {
+                                        field.onChange(e);
+                                        handleChange({
+                                            preventDefault: () => { },
+                                            target: { name: 'aifCategoryType', value: e.target.value }
+                                        });
+                                    }}
+                                    variant="outlined"
+                                    sx={fieldSx}
+                                />
                             )}
-                        </FormControl>
+                        />
                     </Grid>
 
 
@@ -1361,11 +1364,24 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062' }}>
                                             First Closing Confirmed?
                                         </Typography>
-                                        <FormControlLabel
-                                            control={<Switch checked={!!prelimApplicationFormData.firstClosing} onChange={handleToggle} sx={switchSx} />}
-                                            label={prelimApplicationFormData.firstClosing ? "Yes" : "No"}
-                                            sx={{ mr: 0 }}
-                                        />
+                                        <FormControl component="fieldset">
+                                            <RadioGroup
+                                                row
+                                                value={String(!!prelimApplicationFormData.firstClosing)}
+                                                onChange={(e) => handleFirstClosingChange(e.target.value === 'true')}
+                                            >
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        <Radio value="true" size="small" sx={controlSx} />
+                                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>Yes</Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        <Radio value="false" size="small" sx={controlSx} />
+                                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>No</Typography>
+                                                    </Box>
+                                                </Box>
+                                            </RadioGroup>
+                                        </FormControl>
                                     </Box>
                                 </Grid>
 

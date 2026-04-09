@@ -45,6 +45,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
     const freeformRegx = /^[\s\S]*$/; // Allow all characters for multiline fields, or more permissive set
     const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
+    const isEquityOriented = ['Equity Oriented AIF', 'Equity Oriented Fund'].includes(String(aifCategoryType));
+    const isDebtOriented = ['Debt Oriented AIF', 'Debt Oriented Fund'].includes(String(aifCategoryType));
 
     const validationSchema = Yup.object().shape({
         isStrategyBasis: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
@@ -52,22 +54,22 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         isComparisonPast: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
         // isSignificantChange: Yup.string().required("This field is required").nullable(),
         //isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
-        isControlsRights: aifCategoryType === 'Equity Oriented AIF'
+        isControlsRights: isEquityOriented
             ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
             : Yup.string().nullable(),
-        isRightsProtections: aifCategoryType === 'Debt Oriented AIF'
+        isRightsProtections: isDebtOriented
             ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
             : Yup.string().nullable(),
         // isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
         // isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
-        isRolledOverInvestments: aifCategoryType === 'Equity Oriented AIF'
+        isRolledOverInvestments: isEquityOriented
             ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
             : Yup.string().nullable(),
         isGrossReturnObjective: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
-        isTargetInvestmentSize: aifCategoryType === 'Equity Oriented AIF'
+        isTargetInvestmentSize: isEquityOriented
             ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
             : Yup.string().nullable(),
-        isTargetInvestmentSizePerTransaction: aifCategoryType === 'Debt Oriented AIF'
+        isTargetInvestmentSizePerTransaction: isDebtOriented
             ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
             : Yup.string().nullable(),
         isTargetNumberInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
@@ -196,7 +198,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                         />
                     </Grid>
 
-                    {aifCategoryType === 'Equity Oriented AIF' && (
+                    {isEquityOriented && (
                         <Grid item xs={12} sx={qSx}>
                             <Typography variant="body1" sx={labelSx}>3. What controls and rights do you take / plan to take with minority shares? How do you ensure / propose to ensure your ability to exit when an opportunity comes? Will the fund typically be looking at gaining control positions? If yes, do you have the skills set to manage such investments? If yes, please give details.</Typography>
                             <TextField
@@ -213,7 +215,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                         </Grid>
                     )}
 
-                    {aifCategoryType === 'Debt Oriented AIF' && (
+                    {isDebtOriented && (
                         <Grid item xs={12} sx={qSx}>
                             <Typography variant="body1" sx={labelSx}>3. What rights and protections does the fund obtain in its investments, and how are these covenants enforced? How does the fund ensure timely repayment or exit?</Typography>
                             <TextField
@@ -230,7 +232,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                         </Grid>
                     )}
 
-                    {aifCategoryType === 'Equity Oriented AIF' && (
+                    {isEquityOriented && (
                         <Grid item xs={12} sx={qSx}>
                             <Typography variant="body1" sx={labelSx}>4. Have any investments been carried forward or rolled over from previous fund(s)? If yes, please provide the relevant details.</Typography>
                             <TextField
@@ -248,7 +250,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                     )}
 
                     <Grid item xs={12}>
-                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '5. Describe the following investment considerations:' : '4. Describe the following investment considerations:'}</Typography>
+                        <Typography variant="body1" sx={labelSx}>{isEquityOriented ? '5. Describe the following investment considerations:' : '4. Describe the following investment considerations:'}</Typography>
 
                         <Box sx={{ ml: 2 }}>
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) Gross return objective of the overall fund</Typography>
@@ -264,7 +266,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 inputProps={{ maxLength: 1000 }}
                             />
 
-                            {aifCategoryType === 'Equity Oriented AIF' && (
+                            {isEquityOriented && (
                                 <>
                                     <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Target investment size and percentage stake</Typography>
                                     <TextField
@@ -281,7 +283,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 </>
                             )}
 
-                            {aifCategoryType === 'Debt Oriented AIF' && (
+                            {isDebtOriented && (
                                 <>
                                     <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) What is the target investment size per transaction, and what proportion of each debt issuance does the fund typically subscribe to?</Typography>
                                     <TextField

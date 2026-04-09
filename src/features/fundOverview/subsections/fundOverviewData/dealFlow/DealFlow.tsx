@@ -37,6 +37,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     }, [prelimAppicationId, actionUid, dispatch]);
 
     const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
+    const isEquityOriented = ['Equity Oriented AIF', 'Equity Oriented Fund'].includes(String(aifCategoryType));
 
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
@@ -54,7 +55,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         dfMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
         dfExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfDirectorshipsPolicy: aifCategoryType === 'Equity Oriented AIF'
+        dfDirectorshipsPolicy: isEquityOriented
             ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)")
             : Yup.string().nullable(),
         dfConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
@@ -223,7 +224,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         />
                     </Grid>
 
-                    {aifCategoryType === 'Equity Oriented AIF' && (<Grid item xs={12} sx={qSx}>
+                    {isEquityOriented && (<Grid item xs={12} sx={qSx}>
                         <Typography variant="body1" sx={labelSx}>5. Do any Investment Manager (employees) hold directorships in investee companies? If yes, please provide details.</Typography>
                         <TextField
                             fullWidth
@@ -239,7 +240,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
                     )}
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '6' : '5'}. List the activities involved in monitoring and follow-up of investments? And How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same.</Typography>
+                        <Typography variant="body1" sx={labelSx}>{isEquityOriented ? '6' : '5'}. List the activities involved in monitoring and follow-up of investments? And How frequently do the investee companies furnish reports to the Investment Manager? Please give details of the same.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -254,7 +255,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '7' : '6'}. Are all contributors governed by same terms and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor (along with reasons).</Typography>
+                        <Typography variant="body1" sx={labelSx}>{isEquityOriented ? '7' : '6'}. Are all contributors governed by same terms and conditions or whether anyone or more has been offered special terms or terms different from that of others? If yes, please give details thereof and name of the contributor (along with reasons).</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -269,7 +270,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
-                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '8' : '7'}. Who approves investment and divestment decisions? Please give details of the process of evaluation of the deals and approvals/investments/exits thereafter.</Typography>
+                        <Typography variant="body1" sx={labelSx}>{isEquityOriented ? '8' : '7'}. Who approves investment and divestment decisions? Please give details of the process of evaluation of the deals and approvals/investments/exits thereafter.</Typography>
                         <TextField
                             fullWidth
                             multiline
@@ -284,7 +285,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Typography variant="body1" sx={labelSx}>{aifCategoryType === 'Equity Oriented AIF' ? '9' : '8'}. What is the reporting structure/procedure for the contributors.</Typography>
+                        <Typography variant="body1" sx={labelSx}>{isEquityOriented ? '9' : '8'}. What is the reporting structure/procedure for the contributors.</Typography>
 
                         <Box sx={{ ml: 2 }}>
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>a) What information about the portfolio companies is consolidated and reported to investors, and what is the frequency of such reporting?</Typography>

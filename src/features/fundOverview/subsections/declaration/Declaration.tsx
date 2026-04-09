@@ -294,6 +294,9 @@ const Declaration = (props: any) => {
                                                     <DocumentChip label="SEBI Registration Certificate" validationTitle="SEBI Registration Certificate" id={`sdSEBICertificate${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
+                                                    <DocumentChip label="AIF Grading Report" validationTitle="AIF Grading Report" id={`sdAifGradingReport${id}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
                                                     <DocumentChip label="Shareholding Pattern of Sponsor/IM"  id={`sdShareholdingPattern${id}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">

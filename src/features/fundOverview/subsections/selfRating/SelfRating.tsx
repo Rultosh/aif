@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress, Switch, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useState, useEffect } from "react"
 import { questionsForMoreThanOne } from './selfRatingQuestionsMoreThanOne'
 import { questionsForFirstTime } from './selfRatingQuestionsFirstTime'
@@ -462,54 +462,47 @@ export const SelfRating = (props: any) => {
                                     backgroundColor: 'rgba(54, 48, 98, 0.02)',
                                     border: '1px dashed rgba(54, 48, 98, 0.2)'
                                 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
-                                            First time IM/AMC?
-                                        </Typography>
-                                        <FormControlLabel
-                                            control={
-                                                <Switch
-                                                    checked={managerType === "First Time Fund Manager" || !managerType}
+                                    <Grid container spacing={2} alignItems="center">
+                                        <Grid item xs={12} md={6}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
+                                                    First time IM/AMC?
+                                                </Typography>
+                                                <RadioGroup
+                                                    row
+                                                    value={managerType === "Experienced Fund Manager" ? "no" : "yes"}
+                                                    name="managerType"
                                                     onChange={(e) => {
-                                                        const value = e.target.checked ? "First Time Fund Manager" : "Experienced Fund Manager";
+                                                        const value = e.target.value === "yes"
+                                                            ? "First Time Fund Manager"
+                                                            : "Experienced Fund Manager";
                                                         handleChangeFundManagerType({ target: { name: "managerType", value } });
                                                     }}
-                                                    color="primary"
-                                                    sx={{
-                                                        '& .MuiSwitch-switchBase': {
-                                                            color: '#FF671F',
-                                                        },
-                                                        '& .MuiSwitch-switchBase.Mui-checked': {
-                                                            color: '#FF671F',
-                                                        },
-                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                                            backgroundColor: '#FF671F',
-                                                        },
-                                                    }}
-                                                />
-                                            }
-                                            label={
-                                                <Typography variant="body2" sx={{ fontWeight: 600, color: managerType === "First Time Fund Manager" || !managerType ? '#000000' : '#666' }}>
-                                                    {managerType === "First Time Fund Manager" || !managerType ? "Yes" : "No"}
+                                                >
+                                                    <FormControlLabel value="yes" control={<Radio size="small" sx={controlSx} />} label="Yes" />
+                                                    <FormControlLabel value="no" control={<Radio size="small" sx={controlSx} />} label="No" />
+                                                </RadioGroup>
+                                            </Box>
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 2, flexWrap: 'wrap' }}>
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
+                                                    Type of Fund?
                                                 </Typography>
-                                            }
-                                        />
-                                    </Box><Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
-                                            Type of Fund?
-                                        </Typography>
-                                        <RadioGroup
-                                            row
-                                            value={selfRatingValue.fundType || "Equity Oriented Fund"}
-                                            name="fundType"
-                                            onChange={(e) => {
-                                                handleChangeFundManagerType(e);
-                                            }}
-                                        >
-                                            <FormControlLabel value="Equity Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Equity Oriented Fund" />
-                                            <FormControlLabel value="Debt Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented Fund" />
-                                        </RadioGroup>
-                                    </Box>
+                                                <RadioGroup
+                                                    row
+                                                    value={selfRatingValue.fundType || "Equity Oriented Fund"}
+                                                    name="fundType"
+                                                    onChange={(e) => {
+                                                        handleChangeFundManagerType(e);
+                                                    }}
+                                                >
+                                                    <FormControlLabel value="Equity Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Equity Oriented Fund" />
+                                                    <FormControlLabel value="Debt Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented Fund" />
+                                                </RadioGroup>
+                                            </Box>
+                                        </Grid>
+                                    </Grid>
                                 </Box>
                             </Grid>
                         </Grid>
