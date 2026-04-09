@@ -51,6 +51,13 @@ export const Preview = (props: any) => {
         (currentUserId == null || Number(reviewedById) === Number(currentUserId))
     const [showResponse, setShowResponse] = useState(false);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const role = usersState.role || '';
+    const isApplicantActionable =
+        role === 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE');
+    const isOperationalActionable =
+        ['ADMIN', 'USERADMIN'].includes(role) &&
+        (statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'TEMP_CLOSED');
+    const hasActionToPerform = isApplicantActionable || isOperationalActionable;
 
     const handleSuccessDialogClose = () => {
         setShowSuccessDialog(false);
@@ -257,13 +264,14 @@ export const Preview = (props: any) => {
                         </CardContent>
                     </Card>
 
-                    <Card sx={{
-                        mb: 4,
-                        borderRadius: '12px',
-                        backgroundColor: 'white',
-                        border: '1px solid rgba(54, 48, 98, 0.1)'
-                    }}>
-                        <CardContent sx={{ p: 3 }}>
+                    {hasActionToPerform && (
+                        <Card sx={{
+                            mb: 4,
+                            borderRadius: '12px',
+                            backgroundColor: 'white',
+                            border: '1px solid rgba(54, 48, 98, 0.1)'
+                        }}>
+                            <CardContent sx={{ p: 3 }}>
                             {usersState.role === 'USER' ? (
                                 <Box sx={{ mb: 4 }}>
                                     <Typography variant="h6" sx={{ fontWeight: 700, color: '#363062', mb: 2 }}>
@@ -336,27 +344,31 @@ export const Preview = (props: any) => {
                             ) : null}
 
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062', mb: 2 }}>
-                                    Any Comments/Feedback
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    id="previewComments"
-                                    label="Leave a comment"
-                                    variant="outlined"
-                                    multiline
-                                    rows={3}
-                                    {...register("previewComments")}
-                                    error={!!errors.previewComments}
-                                    helperText={errors.previewComments?.message as string}
-                                    onChange={handleChange}
-                                    placeholder="Provide any context or feedback before processing..."
-                                    sx={{
-                                        ...fieldSx, mb: 3
-                                    }}
-                                />
+                                {hasActionToPerform && (
+                                    <>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062', mb: 2 }}>
+                                            Any Comments/Feedback
+                                        </Typography>
+                                        <TextField
+                                            fullWidth
+                                            id="previewComments"
+                                            label="Leave a comment"
+                                            variant="outlined"
+                                            multiline
+                                            rows={3}
+                                            {...register("previewComments")}
+                                            error={!!errors.previewComments}
+                                            helperText={errors.previewComments?.message as string}
+                                            onChange={handleChange}
+                                            placeholder="Provide any context or feedback before processing..."
+                                            sx={{
+                                                ...fieldSx, mb: 3
+                                            }}
+                                        />
+                                    </>
+                                )}
 
-                                {usersState.role === 'ADMIN' && (
+                                {usersState.role === 'ADMIN' && hasActionToPerform && (
                                     <Box sx={{ mb: 3, p: 2, backgroundColor: 'rgba(213, 134, 247, 0.05)', borderRadius: '12px', border: '1px solid rgba(213, 134, 247, 0.2)' }}>
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                                             <DatePicker
@@ -442,8 +454,9 @@ export const Preview = (props: any) => {
                                     )}
                                 </Box>
                             </Box>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     <Button
                         disabled={(statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'APPROVED') || usersState.role == 'ADMIN'}

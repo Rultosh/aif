@@ -175,7 +175,7 @@ export const FundOverview = (props: any) => {
                 </Box>
                 <Box sx={{ flexGrow: 1 }}>
                     {/* Chevron Stepper */}
-                    {(!isRestricted && (usersState.role != undefined && !['USERADMIN', 'ADMIN'].includes(usersState.role || ''))) && (
+                    {(!isRestricted && usersState.role === 'USER') && (
                         <Box sx={{ width: '100%', display: 'flex', gap: 0.5 }}>
                             {filteredSteps.map((s, index, array) => {
                                 const isNew = id?.toString() === 'NEW';
