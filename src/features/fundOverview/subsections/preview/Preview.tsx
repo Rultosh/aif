@@ -36,7 +36,7 @@ export const Preview = (props: any) => {
     const dispatch = useAppDispatch()
     const statusPrelims = prelimApplicationState.prelimApplication.status
     //const [statusPrelims, setStatusPrelims] = useState<String | undefined>(undefined);
-    const [commentPreview, setCommentPreview] = useState<String | undefined>(" ");
+    const [commentPreview, setCommentPreview] = useState<String | undefined>("");
     const [actionUid] = useState(uuid());
     const usersState = useAppSelector(selectUsers)
     const reviewedById = prelimApplicationState.prelimApplication.reviewedByUserId
@@ -124,7 +124,7 @@ export const Preview = (props: any) => {
         }
     }
 
-    async function handleClickSave(ev: any) {
+    async function handleClickSave(ev: any, commentOverride?: string) {
 
         setActionDateError(undefined);
 
@@ -133,10 +133,11 @@ export const Preview = (props: any) => {
         // if (await checkAllDocsOk(id, "prelims")) {
         console.log("prelimId", Number(id), "intendedStatus", intendedStatus)
         try {
+            const remarkToSend = (commentOverride ?? String(commentPreview || '')).trim();
             await dispatch(
                 createApplicationAsync(
                     wrapArgument(
-                        actionUid, { id: Number(id), statusComments: commentPreview, status: intendedStatus }
+                        actionUid, { id: Number(id), statusComments: remarkToSend, status: intendedStatus }
                     )
                 )
             ).unwrap();
@@ -199,9 +200,10 @@ export const Preview = (props: any) => {
 
     const onSubmit = (data: any, e: any) => {
         console.log(data);
-        setCommentPreview(data);
+        const remark = String(data?.previewComments || "");
+        setCommentPreview(remark);
         // setInvestmentResponsibleAsLead({ ...teamMember, prelimApplicationId: Number(id) })
-        handleClickSave({ target: { id: 'submit' } });
+        handleClickSave({ target: { id: 'submit' } }, remark);
     };
 
     const handleClose = () => {
