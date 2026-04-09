@@ -16,7 +16,7 @@ import { Delete, Edit } from '@mui/icons-material'
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
 import dayjs from "dayjs";
-import { assignManagerRole } from "./adminApi";
+import { assignManagerRole, sendSetPasswordEmail } from "./adminApi";
 import AddOperationalUserModal from "./AddOperationalUserModal";
 
 const Admin = (props: any) => {
@@ -77,7 +77,7 @@ const Admin = (props: any) => {
 
     };
 
-    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Email OTP", "Approve", "Assign Manager", "Delete"]
+    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Email OTP", "Approve", "Assign Manager", "Set Password Email", "Delete"]
     const handleDeleteUser = (row: IUser) => {
         if (row.id == null) {
             return;
@@ -181,6 +181,23 @@ const Admin = (props: any) => {
                                                             Promote
                                                         </Button>
                                                     ) : <></>}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Button
+                                                        size="small"
+                                                        variant="outlined"
+                                                        onClick={async () => {
+                                                            if (row.id == null) return;
+                                                            try {
+                                                                await sendSetPasswordEmail(Number(row.id));
+                                                                alert(`Set password email sent to ${row.username}`);
+                                                            } catch (e: any) {
+                                                                alert(e?.response?.data || e?.message || 'Failed to send set password email');
+                                                            }
+                                                        }}
+                                                    >
+                                                        Send
+                                                    </Button>
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <Delete sx={{ cursor: 'pointer', color: '#d32f2f' }} onClick={() => handleDeleteUser(row)} />

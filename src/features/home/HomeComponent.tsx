@@ -72,6 +72,11 @@ export const Home = (pros: any) => {
     const [assignMakerRowId, setAssignMakerRowId] = useState<number | null>(null);
     const [selectedMakerUserId, setSelectedMakerUserId] = useState<string>('');
     const [assignMakerRemark, setAssignMakerRemark] = useState<string>('Assigned maker');
+    const [managerReassignOpen, setManagerReassignOpen] = useState(false);
+    const [managerReassignRowId, setManagerReassignRowId] = useState<number | null>(null);
+    const [managerSelectedMakerUserId, setManagerSelectedMakerUserId] = useState<string>('');
+    const [managerReassignRemark, setManagerReassignRemark] = useState<string>('Reassigned by manager');
+    const [managerReassignMakerOptions, setManagerReassignMakerOptions] = useState<IUser[]>([]);
     const [makerUsers, setMakerUsers] = useState<IUser[]>([]);
     const [memoSubmitOpen, setMemoSubmitOpen] = useState(false);
     const [memoSubmitRowId, setMemoSubmitRowId] = useState<number | null>(null);
@@ -143,9 +148,18 @@ export const Home = (pros: any) => {
         loadMakers();
     }, [activeRole]);
 
-    const openAssignMakerDialog = (rowId: number) => {
+    const openAssignMakerDialog = (row: IPrelimApplicationData) => {
+        const rowId = typeof row.id === 'number' ? row.id : Number(row.id);
+        const assignedMakerId = row.assignedMakerUserId != null ? String(row.assignedMakerUserId) : '';
+        const hasAssignedMakerInOptions = assignedMakerId
+            ? makerUsers.some((user) => String(user.id) === assignedMakerId)
+            : false;
         setAssignMakerRowId(rowId);
-        setSelectedMakerUserId(makerUsers[0]?.id ? String(makerUsers[0].id) : '');
+        setSelectedMakerUserId(
+            hasAssignedMakerInOptions
+                ? assignedMakerId
+                : (makerUsers[0]?.id ? String(makerUsers[0].id) : '')
+        );
         setAssignMakerRemark('Assigned maker');
         setAssignMakerOpen(true);
     };
@@ -153,6 +167,23 @@ export const Home = (pros: any) => {
     const closeAssignMakerDialog = () => {
         setAssignMakerOpen(false);
         setAssignMakerRowId(null);
+    };
+
+    const openManagerReassignDialog = (row: IPrelimApplicationData) => {
+        const assignedMakerId = row.assignedMakerUserId != null ? Number(row.assignedMakerUserId) : null;
+        const filteredMakers = makerUsers.filter((user) => Number(user.id) !== assignedMakerId);
+        setManagerReassignMakerOptions(filteredMakers);
+        const rowId = typeof row.id === 'number' ? row.id : Number(row.id);
+        setManagerReassignRowId(rowId);
+        setManagerSelectedMakerUserId(filteredMakers[0]?.id ? String(filteredMakers[0].id) : '');
+        setManagerReassignRemark('Reassigned by manager');
+        setManagerReassignOpen(true);
+    };
+
+    const closeManagerReassignDialog = () => {
+        setManagerReassignOpen(false);
+        setManagerReassignRowId(null);
+        setManagerReassignMakerOptions([]);
     };
 
     const submitAssignMaker = () => {
@@ -166,6 +197,20 @@ export const Home = (pros: any) => {
             })
         );
         closeAssignMakerDialog();
+    };
+
+    const submitManagerReassign = () => {
+        if (!managerReassignRowId || !managerSelectedMakerUserId) {
+            return;
+        }
+        callAndRefresh(
+            postWorkflowAction(managerReassignRowId, 'manager-reassign', {
+                makerUserId: Number(managerSelectedMakerUserId),
+                checkerUserId: null,
+                remark: managerReassignRemark || 'Reassigned by manager'
+            })
+        );
+        closeManagerReassignDialog();
     };
 
     const openMemoSubmitDialog = (rowId: number) => {
@@ -369,7 +414,7 @@ export const Home = (pros: any) => {
                         alert('Invalid application id.');
                         return;
                     }
-                    openAssignMakerDialog(row.id);
+                    openAssignMakerDialog(row);
                 }}>Assign Maker</Button>
             );
         }
@@ -423,6 +468,7 @@ export const Home = (pros: any) => {
             );
         }
         if (hasActiveRole('MANAGER')) {
+            const hasAssignedMaker = row.assignedMakerUserId != null;
             return (
                 <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button size="small" variant="outlined" onClick={() => {
@@ -432,17 +478,13 @@ export const Home = (pros: any) => {
                         }
                         downloadMemoForApplication(row.id);
                     }}>Download Memo</Button>
-                    {status !== 'SANCTIONED' && (
+                    {status !== 'SANCTIONED' && hasAssignedMaker && (
                         <Button size="small" variant="outlined" onClick={() => {
-                            const makerUserIdRaw = window.prompt('New maker user id (leave blank to keep)');
-                            const checkerUserIdRaw = window.prompt('New checker user id (leave blank to keep)');
-                            if (!makerUserIdRaw && !checkerUserIdRaw) return;
-                            const remark = window.prompt('Reassignment remark', 'Reassigned by manager') || 'Reassigned by manager';
-                            callAndRefresh(postWorkflowAction(row.id, 'manager-reassign', {
-                                makerUserId: makerUserIdRaw ? Number(makerUserIdRaw) : null,
-                                checkerUserId: checkerUserIdRaw ? Number(checkerUserIdRaw) : null,
-                                remark
-                            }));
+                            if (typeof row.id !== 'number') {
+                                alert('Invalid application id.');
+                                return;
+                            }
+                            openManagerReassignDialog(row);
                         }}>Reassign</Button>
                     )}
                 </Box>
@@ -653,7 +695,7 @@ export const Home = (pros: any) => {
                                     label="Maker User"
                                     onChange={(e) => setSelectedMakerUserId(e.target.value)}
                                 >
-                                    {makerUsers.map((user) => (
+                                    {managerReassignMakerOptions.map((user) => (
                                         <MenuItem key={user.id} value={String(user.id)}>
                                             {user.contactPerson || user.username} ({user.username})
                                         </MenuItem>
@@ -717,6 +759,39 @@ export const Home = (pros: any) => {
                                 disabled={memoUploading || !memoFile}
                             >
                                 {memoUploading ? 'Submitting...' : 'Submit Memo'}
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={managerReassignOpen} onClose={closeManagerReassignDialog} fullWidth maxWidth="sm">
+                        <DialogTitle>Reassign Maker</DialogTitle>
+                        <DialogContent>
+                            <FormControl fullWidth sx={{ mt: 1 }}>
+                                <InputLabel id="manager-reassign-maker-user-label">Maker User</InputLabel>
+                                <Select
+                                    labelId="manager-reassign-maker-user-label"
+                                    value={managerSelectedMakerUserId}
+                                    label="Maker User"
+                                    onChange={(e) => setManagerSelectedMakerUserId(e.target.value)}
+                                >
+                                    {makerUsers.map((user) => (
+                                        <MenuItem key={user.id} value={String(user.id)}>
+                                            {user.contactPerson || user.username} ({user.username})
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <TextField
+                                fullWidth
+                                sx={{ mt: 2 }}
+                                label="Remark"
+                                value={managerReassignRemark}
+                                onChange={(e) => setManagerReassignRemark(e.target.value)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={closeManagerReassignDialog}>Cancel</Button>
+                            <Button onClick={submitManagerReassign} variant="contained" disabled={!managerSelectedMakerUserId}>
+                                Reassign
                             </Button>
                         </DialogActions>
                     </Dialog>

@@ -45,6 +45,13 @@ export function assignManagerRole(userId: number) {
   });
 }
 
+export function sendSetPasswordEmail(userId: number) {
+  return api({
+    method: 'post',
+    url: `useradmin/users/${userId}/send-set-password`,
+  });
+}
+
 export function createOperationalUser(payload: {
   username: string;
   contactPerson: string;

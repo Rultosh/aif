@@ -94,21 +94,6 @@ const Header = (props: any) => {
               {token && <>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <>
-                    {props.sessionCountdown && (
-                      <>
-                        <Typography
-                          sx={{
-                            color: '#fff3cd',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            whiteSpace: 'nowrap'
-                          }}
-                        >
-                          Session: {props.sessionCountdown}
-                        </Typography>
-                        <Box sx={{ borderRight: '2px solid #82a0ff', height: 28, margin: '0 8px' }} />
-                      </>
-                    )}
                     {activeRole === 'USERADMIN' && (
                       <>
                         <Link
@@ -172,7 +157,6 @@ const Header = (props: any) => {
                         p: 0
                       }}
                       onClick={(e) => {
-                        console.log('avatar clicked', e.currentTarget);
                         setAnchorEl(e.currentTarget as HTMLElement);
                       }}
                     >
@@ -183,7 +167,6 @@ const Header = (props: any) => {
                         sx={{ width: 28, height: 28 }}
                       />
                     </IconButton>
-                    {console.log('anchorEl state', anchorEl)}
                     <Menu
                       id="user-menu"
                       anchorEl={anchorEl}
