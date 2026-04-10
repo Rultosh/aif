@@ -22,6 +22,7 @@ import dayjs from "dayjs";
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import DocumentChip from "../../../../components/DocumentChip";
+import FileUploadService from "../../../../components/FileUploadService";
 
 const Declaration = (props: any) => {
 
@@ -33,6 +34,7 @@ const Declaration = (props: any) => {
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
     const [agreed, setAgreed] = useState<boolean>(!!prelimApplicationState.prelimApplication.declarationAccepted);
     const [expanded, setExpanded] = useState<string | false>("1");
+    const [documentError, setDocumentError] = useState<string>('');
 
     const validationSchema = Yup.object().shape({
         sdDescription: Yup.string().label("Capital Raised Till Date").nullable(),
@@ -55,7 +57,61 @@ const Declaration = (props: any) => {
         setExpanded(isExpanded ? panel : false);
     };
 
-    const handleInternalSaveAndContinue = (nextPanel: string) => {
+    const hasUploadedFiles = async (bucketId: string): Promise<boolean> => {
+        try {
+            const res = await FileUploadService.list(bucketId);
+            const files = Array.isArray(res?.data)
+                ? res.data
+                : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
+            return files.length > 0;
+        } catch {
+            return false;
+        }
+    };
+
+    const validateRequiredDocuments = async (buckets: string[]): Promise<boolean> => {
+        const checks = await Promise.all(buckets.map((bucket) => hasUploadedFiles(`${bucket}${id}`)));
+        const allUploaded = checks.every(Boolean);
+        setDocumentError(allUploaded ? '' : 'Please upload all mandatory documents before proceeding.');
+        return allUploaded;
+    };
+
+    const handleInternalSaveAndContinue = async (currentPanel: string, nextPanel: string) => {
+        if (!Number(id)) {
+            setDocumentError('Please save the form to upload documents.');
+            return;
+        }
+
+        if (currentPanel === "1") {
+            const kycBuckets = ["kycBoardDirectors", "boardResolution"];
+            const ok = await validateRequiredDocuments(kycBuckets);
+            if (!ok) return;
+        }
+
+        if (currentPanel === "2") {
+            const supportingBuckets = [
+                "sdPvtPlacementMemorandum",
+                "sdLatestInvestorPresentation",
+                "sdImAgreement",
+                "sdTrustDeal",
+                "sdSEBICertificate",
+                // sdAifGradingReport is optional
+                "sdShareholdingPattern",
+                "sdPolicyOfCarry",
+                "sdContributionAgreement",
+                "sdInvestmentPolicy",
+                "sdInvestmentCommitteeNote",
+                "sdHrPolicy",
+                "sdOrganisationStructure",
+                "detailsOfInvestmentCommitteeMembers",
+                "detailsOfContributorToTheFund",
+                "pastInvestmentTrackRecord",
+            ];
+            const ok = await validateRequiredDocuments(supportingBuckets);
+            if (!ok) return;
+        }
+
+        setDocumentError('');
         setExpanded(nextPanel);
     };
 
@@ -65,6 +121,32 @@ const Declaration = (props: any) => {
         } else {
             await handleSubmit(async (data) => {
                 try {
+                    if (!Number(id)) {
+                        setDocumentError('Please save the form to upload documents.');
+                        return;
+                    }
+                    const allRequiredBuckets = [
+                        "kycBoardDirectors",
+                        "boardResolution",
+                        "sdPvtPlacementMemorandum",
+                        "sdLatestInvestorPresentation",
+                        "sdImAgreement",
+                        "sdTrustDeal",
+                        "sdSEBICertificate",
+                        // sdAifGradingReport is optional
+                        "sdShareholdingPattern",
+                        "sdPolicyOfCarry",
+                        "sdContributionAgreement",
+                        "sdInvestmentPolicy",
+                        "sdInvestmentCommitteeNote",
+                        "sdHrPolicy",
+                        "sdOrganisationStructure",
+                        "detailsOfInvestmentCommitteeMembers",
+                        "detailsOfContributorToTheFund",
+                        "pastInvestmentTrackRecord",
+                    ];
+                    const docsOk = await validateRequiredDocuments(allRequiredBuckets);
+                    if (!docsOk) return;
                     await handleClickSave(data);
                     markDeclarationStepComplete(String(prelimApplicationState.prelimApplication.id));
                     navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
@@ -243,7 +325,7 @@ const Declaration = (props: any) => {
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleInternalSaveAndContinue("2")}
+                                        onClick={() => handleInternalSaveAndContinue("1", "2")}
                                         sx={internalButtonSx}
                                     >
                                         Save & Continue
@@ -448,7 +530,7 @@ const Declaration = (props: any) => {
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleInternalSaveAndContinue("3")}
+                                        onClick={() => handleInternalSaveAndContinue("2", "3")}
                                         sx={internalButtonSx}
                                     >
                                         Save & Continue
@@ -567,6 +649,11 @@ const Declaration = (props: any) => {
                                 </Button>
                             </Box>
                         </Box>
+                        {documentError && (
+                            <Typography variant="caption" color="error" sx={{ mt: 1.5, display: 'block' }}>
+                                {documentError}
+                            </Typography>
+                        )}
                     </CardContent>
                 </Card>
             </div>

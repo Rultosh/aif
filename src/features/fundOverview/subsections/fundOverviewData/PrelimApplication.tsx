@@ -243,6 +243,21 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             }
         }
 
+        if (id === 'sdDescription') {
+            value = value.replace(/[^0-9.]/g, '');
+            const dotCount = (value.match(/\./g) || []).length;
+            if (dotCount > 1) {
+                const parts = value.split('.');
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            if (value.includes('.')) {
+                const parts = value.split('.');
+                if (parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].slice(0, 2);
+                }
+            }
+        }
+
         if (monthFields.includes(id)) {
             value = value.replace(/[^0-9.]/g, '');
         }
@@ -596,7 +611,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         carriedInterest: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Carried Interest must be a number").required("Carried Interest is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         // investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        sdDescription: Yup.string().required("Capital raised till date is required").nullable(),
+        sdDescription: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Capital raised till date must be a number").required("Capital raised till date is required").min(0, "Negative values not allowed"),
         sdTargetCorpusDomestic: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic must be a number").required("Domestic is required").min(0, "Negative values not allowed"),
         sdTargetCorpusOverseas: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Overseas must be a number").required("Overseas is required").min(0, "Negative values not allowed"),
         sdTotalTargetCorpus: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("Total Target Corpus is required").min(100, "Value less than Rs. 100 crores shall not be allowed"),
@@ -1286,6 +1301,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onBlur={handleBlur}
                                         variant="outlined"
                                         sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                                        inputProps={{ min: 0, step: 0.01, inputMode: 'decimal' }}
                                     />
                                 </Grid>
 

@@ -13,6 +13,7 @@ import DocumentChip from "../../../../../components/DocumentChip";
 import { useParams } from 'react-router-dom';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
+import FileUploadService from "../../../../../components/FileUploadService";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -27,6 +28,20 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     const [actionUid] = useState(uuid());
     const prelimAppicationId = props.prelimApplicationId;
     const dispatch = useAppDispatch();
+    const [documentError, setDocumentError] = useState('');
+
+    const hasRiskAssessmentDocument = async (): Promise<boolean> => {
+        try {
+            const bucketId = `sdRiskAssessmentAndMitigationPlan${id}`;
+            const res = await FileUploadService.list(bucketId);
+            const files = Array.isArray(res?.data)
+                ? res.data
+                : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
+            return files.length > 0;
+        } catch (e) {
+            return false;
+        }
+    };
 
     useEffect(() => {
         if (Number(prelimAppicationId)) {
@@ -89,20 +104,27 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-   const onSubmit = async (data: IPrelimApplicationData) => {
+   const onSubmit = async (data: IPrelimApplicationData): Promise<boolean> => {
+        const hasDocument = await hasRiskAssessmentDocument();
+        if (!hasDocument) {
+            setDocumentError("Risk Assessment and Mitigation Plan document is required.");
+            return false;
+        }
+        setDocumentError('');
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
         if (props.onSaveSuccess) {
             props.onSaveSuccess();
         }
+        return true;
     }; 
 
     useImperativeHandle(ref, () => ({
         submit: async () => {
             let isValid = false;
             await handleSubmit(
-                (data) => {
-                    onSubmit(data);
-                    isValid = true;
+                async (data) => {
+                    const submitOk = await onSubmit(data);
+                    isValid = submitOk;
                 },
                 () => {
                     isValid = false;
@@ -367,6 +389,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 </Typography>
                             )}
                         </Box>
+                        {documentError && (
+                            <Typography variant="caption" color="error" sx={{ display: 'block', mt: 1 }}>
+                                {documentError}
+                            </Typography>
+                        )}
                     </Grid>
 
 
