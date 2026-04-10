@@ -872,13 +872,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     value={prelimApplicationFormData.aifCategoryType || ''}
                                     error={!!errors.aifCategoryType}
                                     helperText={errors.aifCategoryType?.message as string}
-                                    onChange={(e) => {
-                                        field.onChange(e);
-                                        handleChange({
-                                            preventDefault: () => { },
-                                            target: { name: 'aifCategoryType', value: e.target.value }
-                                        });
-                                    }}
+                                    InputProps={{ readOnly: true }}
                                     variant="outlined"
                                     sx={fieldSx}
                                 />
@@ -981,7 +975,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onBlur={handleBlur}
                             variant="outlined"
                             sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                            inputProps={{ min: 0 }}
+                            inputProps={{ min: 0, step: 0.01, inputMode: 'decimal' }}
                         />
                     </Grid>
 
@@ -1078,7 +1072,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="otherExpenses"
-                            label="Operating expenses PA%"
+                            label="Operating expenses p.a. %"
                             value={prelimApplicationFormData.otherExpenses ?? ''}
                             {...register("otherExpenses")}
                             error={!!errors.otherExpenses}

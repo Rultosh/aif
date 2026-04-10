@@ -84,6 +84,7 @@ export const Home = (pros: any) => {
     const [memoFile, setMemoFile] = useState<File | null>(null);
     const [memoError, setMemoError] = useState<string>('');
     const [memoUploading, setMemoUploading] = useState<boolean>(false);
+    const [startApplicationConfirmOpen, setStartApplicationConfirmOpen] = useState(false);
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
     const totalEntries = prelimApplications.totalEntries || 0;
@@ -99,6 +100,18 @@ export const Home = (pros: any) => {
         dispatch(getPrelimApplicationList(wrapArgument(
             actionUid, updatedPageInfo
         )))
+    };
+
+    const proceedStartApplication = async () => {
+        try {
+            let application: IPrelimApplicationData = await dispatch(
+                createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
+            ).unwrap();
+            navigate(`/Preliminary/${application.id}/selfRating`)
+        } catch (error: any) {
+            console.error("Failed to start application:", error);
+            alert(error?.message || "An unexpected error occurred while starting the application.");
+        }
     };
 
     function openModel(row: any) {
@@ -525,17 +538,7 @@ export const Home = (pros: any) => {
                                     backgroundColor: 'rgba(255, 103, 30, 0.04)'
                                 }
                             }}
-                            onClick={async () => {
-                                try {
-                                    let application: IPrelimApplicationData = await dispatch(
-                                        createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
-                                    ).unwrap();
-                                    navigate(`/Preliminary/${application.id}/selfRating`)
-                                } catch (error: any) {
-                                    console.error("Failed to start application:", error);
-                                    alert(error?.message || "An unexpected error occurred while starting the application.");
-                                }
-                            }}
+                            onClick={() => setStartApplicationConfirmOpen(true)}
                         >
                             Start Application
                         </Button>}
@@ -792,6 +795,37 @@ export const Home = (pros: any) => {
                             <Button onClick={closeManagerReassignDialog}>Cancel</Button>
                             <Button onClick={submitManagerReassign} variant="contained" disabled={!managerSelectedMakerUserId}>
                                 Reassign
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={startApplicationConfirmOpen} onClose={() => setStartApplicationConfirmOpen(false)} fullWidth maxWidth="sm">
+                        <DialogTitle>Confirm Start Application</DialogTitle>
+                        <DialogContent>
+                            <Typography sx={{ mt: 1 }}>
+                                Kindly review the eligibility criteria provided on the website prior to initiating the application.
+                            </Typography>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setStartApplicationConfirmOpen(false)}>Cancel</Button>
+                            <Button
+                                variant="contained"
+                                onClick={async () => {
+                                    setStartApplicationConfirmOpen(false);
+                                    await proceedStartApplication();
+                                }}
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: '6px',
+                                    fontWeight: 700,
+                                    backgroundColor: '#FF671F',
+                                    '&:hover': {
+                                        border: '1px solid #FF671F',
+                                        color: '#FF671F',
+                                        backgroundColor: 'rgb(255 103 30 / 19%)'
+                                    }
+                                }}
+                            >
+                                Continue
                             </Button>
                         </DialogActions>
                     </Dialog>

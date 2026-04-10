@@ -137,32 +137,31 @@ export const Preview = (props: any) => {
 
         const intendedStatus = ev?.currentTarget?.id || ev?.target?.id;
 
-        // if (await checkAllDocsOk(id, "prelims")) {
-        console.log("prelimId", Number(id), "intendedStatus", intendedStatus)
-        try {
-            const remarkToSend = (commentOverride ?? String(commentPreview || '')).trim();
-            await dispatch(
-                createApplicationAsync(
-                    wrapArgument(
-                        actionUid, { id: Number(id), statusComments: remarkToSend, status: intendedStatus }
+        if (await checkAllDocsOk(id, "prelims")) {
+            console.log("prelimId", Number(id), "intendedStatus", intendedStatus)
+            try {
+                const remarkToSend = (commentOverride ?? String(commentPreview || '')).trim();
+                await dispatch(
+                    createApplicationAsync(
+                        wrapArgument(
+                            actionUid, { id: Number(id), statusComments: remarkToSend, status: intendedStatus }
+                        )
                     )
-                )
-            ).unwrap();
+                ).unwrap();
 
-            if (intendedStatus === 'submit') {
-                setShowSuccessDialog(true);
-            } else {
-                navigate('/home')
+                if (intendedStatus === 'submit') {
+                    setShowSuccessDialog(true);
+                } else {
+                    navigate('/home')
+                }
+            } catch (error) {
+                console.error("Save failure:", error);
+                alert("An unexpected error occurred while saving.");
             }
-        } catch (error) {
-            console.error("Save failure:", error);
-            alert("An unexpected error occurred while saving.");
         }
-        // }
-        // else {
-        //     setShowResponse(true);
-
-        // }
+        else {
+            setShowResponse(true);
+        }
     }
 
     async function handleClickSaveCloseAction(ev: any) {
