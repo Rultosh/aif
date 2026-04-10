@@ -23,6 +23,7 @@ const ChangePassword = (props:any) => {
     const [formData, setFormData] = useState(defaultIChangePassword);
     const state = useAppSelector(selectedforgotPassword)
     const [showResponse, setShowResponse] = useState(false);
+    const [passwordError, setPasswordError] = useState<string>('');
 
     useEffect(() => {
         if(props.checkUnAuth){
@@ -31,6 +32,15 @@ const ChangePassword = (props:any) => {
     })
 
     function handleSubmitForm() {
+        setPasswordError('');
+        if (!formData.password || !formData.matchingPassword) {
+            setPasswordError('Both password fields are required.');
+            return;
+        }
+        if (String(formData.password) !== String(formData.matchingPassword)) {
+            setPasswordError('Password and Confirm Password must be the same.');
+            return;
+        }
         setShowResponse(true)
         dispatch(
             changeUserPasswordAsync(
@@ -220,6 +230,13 @@ const ChangePassword = (props:any) => {
                                                     </Button>
                                                 </Box>
                                             </Grid  >
+                                            {passwordError && (
+                                                <Grid item xs={12}>
+                                                    <Typography variant="caption" color="error">
+                                                        {passwordError}
+                                                    </Typography>
+                                                </Grid>
+                                            )}
 
                                             <Grid item xs={12}>
                                                     <Box sx={{ mt: 2 }}>

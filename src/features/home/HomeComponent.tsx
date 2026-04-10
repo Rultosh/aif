@@ -628,47 +628,55 @@ export const Home = (pros: any) => {
                             gap: 4
                         }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Typography sx={{ fontSize: '14px', color: '#333' }}>Items per page:</Typography>
-                                <Select
-                                    value={pageInfoSelect.toString()}
-                                    onChange={handleChange as any}
-                                    size="small"
-                                    sx={{ height: '36px', fontSize: '14px', minWidth: '80px' }}
-                                >
-                                    <MenuItem value={5}>5</MenuItem>
-                                    <MenuItem value={10}>10</MenuItem>
-                                    <MenuItem value={20}>20</MenuItem>
-                                    <MenuItem value={50}>50</MenuItem>
-                                    <MenuItem value={100}>100</MenuItem>
-                                </Select>
+                                {totalEntries > 20 && (
+                                    <>
+                                        <Typography sx={{ fontSize: '14px', color: '#333' }}>Items per page:</Typography>
+                                        <Select
+                                            value={pageInfoSelect.toString()}
+                                            onChange={handleChange as any}
+                                            size="small"
+                                            sx={{ height: '36px', fontSize: '14px', minWidth: '80px' }}
+                                        >
+                                            <MenuItem value={5}>5</MenuItem>
+                                            <MenuItem value={10}>10</MenuItem>
+                                            <MenuItem value={20}>20</MenuItem>
+                                            <MenuItem value={50}>50</MenuItem>
+                                            <MenuItem value={100}>100</MenuItem>
+                                        </Select>
+                                    </>
+                                )}
                             </Box>
 
-                            <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
-                                Showing {prelimApplications.prelimApplications?.length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {prelimApplications.prelimApplications ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, totalEntries) : 0} of {totalEntries} entries
-                            </Typography>
+                            {totalEntries > 20 && (
+                                <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
+                                    Showing {prelimApplications.prelimApplications?.length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {prelimApplications.prelimApplications ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, totalEntries) : 0} of {totalEntries} entries
+                                </Typography>
+                            )}
 
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil(totalEntries / pageInfo.pageSize) || 1}
-                                    page={pageInfo.pageNumber + 1}
-                                    onChange={(event, value) => goToPage(value - 1)}
-                                    color="primary"
-                                    variant="outlined"
-                                    shape="rounded"
-                                    sx={{
-                                        '& .MuiPaginationItem-root': {
-                                            borderColor: '#e2e8f0',
-                                            color: '#333',
-                                            backgroundColor: '#fff',
-                                            '&.Mui-selected': {
-                                                borderColor: '#4466c1',
-                                                color: '#4466c1',
-                                                backgroundColor: 'transparent',
-                                                fontWeight: 600
-                                            },
-                                        }
-                                    }}
-                                />
+                                {Math.ceil(totalEntries / pageInfo.pageSize) > 1 && (
+                                    <Pagination
+                                        count={Math.ceil(totalEntries / pageInfo.pageSize)}
+                                        page={pageInfo.pageNumber + 1}
+                                        onChange={(event, value) => goToPage(value - 1)}
+                                        color="primary"
+                                        variant="outlined"
+                                        shape="rounded"
+                                        sx={{
+                                            '& .MuiPaginationItem-root': {
+                                                borderColor: '#e2e8f0',
+                                                color: '#333',
+                                                backgroundColor: '#fff',
+                                                '&.Mui-selected': {
+                                                    borderColor: '#4466c1',
+                                                    color: '#4466c1',
+                                                    backgroundColor: 'transparent',
+                                                    fontWeight: 600
+                                                },
+                                            }
+                                        }}
+                                    />
+                                )}
                             </Box>
                         </Box>
                     </Paper>

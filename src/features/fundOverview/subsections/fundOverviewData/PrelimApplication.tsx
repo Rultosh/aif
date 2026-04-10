@@ -70,6 +70,14 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         "Textiles"
     ];
 
+    const managerTypeValue = String(selfRatingState?.selfRatings?.managerType || '').trim().toLowerCase();
+    const firstTimeManagerType = managerTypeValue
+        ? managerTypeValue.includes("first time")
+        : String(prelimApplicationFormData.fundManager || '').trim().toLowerCase() === "first time fund manager";
+    const fundManagerOptions = firstTimeManagerType
+        ? ["First Time Fund Manager"]
+        : ["Two Funds Managed", "More Than Two Funds Managed"];
+
     useEffect(() => {
         if (!resolvedPrelimId) return;
         dispatch(getPrelimApplicationData(
@@ -79,6 +87,15 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             wrapArgument(actionUid, resolvedPrelimId)
         ));
     }, [resolvedPrelimId, actionUid, dispatch])
+
+    useEffect(() => {
+        const currentFundManager = String(prelimApplicationFormData.fundManager || '');
+        if (!fundManagerOptions.includes(currentFundManager)) {
+            const nextFundManager = firstTimeManagerType ? "First Time Fund Manager" : "Two Funds Managed";
+            setValue("fundManager", nextFundManager, { shouldValidate: false, shouldDirty: false });
+            setPrelimApplicationFormData(prev => ({ ...prev, fundManager: nextFundManager as any }));
+        }
+    }, [firstTimeManagerType, selfRatingState?.selfRatings?.managerType, prelimApplicationFormData.fundManager]);
 
     const [aifNameData, setAifNameData] = useState('');
     useEffect(() => {
@@ -100,6 +117,12 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             // Default AIF category type from Initial Assessment selection when empty.
             if (!data.aifCategoryType && initialAssessmentFundType) {
                 data.aifCategoryType = initialAssessmentFundType as any;
+            }
+            // Keep Fund Manager in sync with First time IM/AMC selection on refresh/load.
+            if (managerTypeValue.includes("first time")) {
+                data.fundManager = "First Time Fund Manager" as any;
+            } else if (!data.fundManager || String(data.fundManager).trim() === "First Time Fund Manager") {
+                data.fundManager = "Two Funds Managed" as any;
             }
 
             // Convert date strings to Dayjs objects for the form
@@ -125,7 +148,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                 setPrelimApplicationFormData(prev => ({ ...prev, nameOfTheFund: usersState.me.companyName || '' }));
             }
         }
-    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me, selfRatingState?.selfRatings?.fundType])
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me, selfRatingState?.selfRatings?.fundType, managerTypeValue])
 
     const setDateValue = (key: string, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
@@ -183,8 +206,19 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         const id = ev.target.id || ev.target.name;
 
         if (id === 'termOfFund') {
-            value = value.replace(/[^0-9]/g, '');
-            if (value !== '' && parseInt(value) > 200) {
+            value = value.replace(/[^0-9.]/g, '');
+            const dotCount = (value.match(/\./g) || []).length;
+            if (dotCount > 1) {
+                const parts = value.split('.');
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            if (value.includes('.')) {
+                const parts = value.split('.');
+                if (parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].slice(0, 2);
+                }
+            }
+            if (value !== '' && !Number.isNaN(parseFloat(value)) && parseFloat(value) > 200) {
                 value = '200';
             }
         }
@@ -602,7 +636,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
 
     const onSubmit = (data: IPrelimApplicationData) => {
         console.log(data);
-        savePrelimApplicationForm(data);
+        const payload: IPrelimApplicationData = {
+            ...data,
+            fundManager: firstTimeManagerType ? "First Time Fund Manager" : data.fundManager
+        };
+        savePrelimApplicationForm(payload);
     };
 
     // errors && console.log('errors', JSON.stringify(errors));
@@ -782,7 +820,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         {...field}
                                         labelId="fundManager-label"
                                         id="fundManager"
-                                        value={field.value || ""}
+                                        value={firstTimeManagerType ? "First Time Fund Manager" : (field.value || "")}
+                                        disabled={firstTimeManagerType}
                                         onChange={(e) => {
                                             field.onChange(e);
                                             handleChange({
@@ -791,9 +830,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             });
                                         }}
                                     >
-                                        <MenuItem value={"First Time Fund Manager"}>First Time Fund Manager</MenuItem>
-                                        <MenuItem value={"Two Funds Managed"}>Two Funds Managed</MenuItem>
-                                        <MenuItem value={"More Than Two Funds Managed"}>More Than Two Funds Managed</MenuItem>
+                                        {fundManagerOptions.map((option) => (
+                                            <MenuItem key={option} value={option}>{option}</MenuItem>
+                                        ))}
                                     </Select>
                                 )}
                             />

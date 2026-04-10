@@ -46,6 +46,7 @@ const ForgotPassword = () => {
     const [showResponse, setShowResponse] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState<string>('');
 
     useEffect(() => {
         if (token != undefined) {
@@ -54,6 +55,15 @@ const ForgotPassword = () => {
     }, [token])
 
     function handleSubmitForm() {
+        setPasswordError('');
+        if (!formData.password || !formData.matchingPassword) {
+            setPasswordError('Both password fields are required.');
+            return;
+        }
+        if (String(formData.password) !== String(formData.matchingPassword)) {
+            setPasswordError('Password and Confirm Password must be the same.');
+            return;
+        }
         setPasswordSet(true)
         setShowResponse(true)
         if (token) {
@@ -247,6 +257,13 @@ const ForgotPassword = () => {
                                             Set Password
                                         </Button>
                                     </Grid>
+                                    {passwordError && (
+                                        <Grid item xs={12}>
+                                            <Typography variant="caption" color="error">
+                                                {passwordError}
+                                            </Typography>
+                                        </Grid>
+                                    )}
                                 </Grid>
                             ) : (
                                 <Box sx={{ textAlign: 'center', py: 4 }}>
