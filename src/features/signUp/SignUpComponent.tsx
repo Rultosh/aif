@@ -192,6 +192,7 @@ const SignUp = () => {
             .nullable()
             .transform((curr, orig) => orig === '' ? null : curr)
             .typeError("Please enter a valid date")
+            .min(new Date(2020, 0, 1), "SEBI Registration Date must be on or after 01/01/2020")
             .max(new Date(), "SEBI Registration Date cannot be a future date")
             .required("SEBI Registration Date is required"),
         username: Yup
@@ -375,7 +376,9 @@ const SignUp = () => {
                                                 label="SEBI - Registration Date"
                                                 inputFormat='DD/MM/YYYY'
                                                 disableFuture
+                                                minDate={dayjs('2020-01-01')}
                                                 maxDate={dayjs()}
+                                                shouldDisableDate={(date) => dayjs(date).isBefore(dayjs('2020-01-01'), 'day')}
                                                 onChange={(newValue) => field.onChange(newValue)}
                                                 renderInput={(params) => (
                                                     <TextField

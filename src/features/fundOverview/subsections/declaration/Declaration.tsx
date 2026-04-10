@@ -11,6 +11,7 @@ import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import { defaultIPrelimApplicationData, IPrelimApplicationData } from "../fundOverviewData/IPrelimApplicationData";
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
+import { markDeclarationStepComplete } from "../../wizardProgress";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -65,6 +66,7 @@ const Declaration = (props: any) => {
             await handleSubmit(async (data) => {
                 try {
                     await handleClickSave(data);
+                    markDeclarationStepComplete(String(prelimApplicationState.prelimApplication.id));
                     navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
                 } catch (error: any) {
                     console.error("Save failure:", error);

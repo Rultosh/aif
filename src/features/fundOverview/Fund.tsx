@@ -6,7 +6,7 @@ import ContributorDetails from "./subsections/fundOverviewData/contributorDetail
 import InvestmentAssociate from "./subsections/fundOverviewData/investmentAssociate/InvestmentAssociate";
 import InvestmentPast from "./subsections/fundOverviewData/investmentPast/InvestmentPast";
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import PrelimApplicationData from "./subsections/fundOverviewData/PrelimApplication";
 import { clearPrelimApplication, selectPrelimApplication, updatePrelimApplicationAsync } from "./subsections/fundOverviewData/prelimApplicationDataSlice";
@@ -21,6 +21,11 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
+import {
+    markFundStepComplete,
+    readAccordionMaxPanel,
+    writeAccordionMaxPanel,
+} from "./wizardProgress";
 
 export const Fund = (props: any) => {
 
@@ -30,6 +35,11 @@ export const Fund = (props: any) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
+    const statusPrelims = prelimApplicationState.prelimApplication.status || '';
+    const skipAccordionLock = String(statusPrelims) === 'REVISE';
+    const effectivePrelimId = String(
+        prelimApplicationState.prelimApplication?.id || prelimApplicationId || id || ''
+    );
     const [hasInvestment, setHasInvestment] = useState(false);
     useEffect(() => {
         setHasInvestment(prelimApplicationState.prelimApplication.hasInvestment);
@@ -72,9 +82,33 @@ export const Fund = (props: any) => {
 
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState<string | false>("1");
+    const [maxUnlockedPanel, setMaxUnlockedPanel] = useState(1);
+    const accordionPrelimIdRef = useRef<string>('');
+
+    useEffect(() => {
+        if (skipAccordionLock) {
+            setMaxUnlockedPanel(7);
+            return;
+        }
+        if (!Number(effectivePrelimId)) {
+            if (accordionPrelimIdRef.current !== effectivePrelimId) {
+                accordionPrelimIdRef.current = effectivePrelimId;
+                setMaxUnlockedPanel(1);
+            }
+            return;
+        }
+        if (accordionPrelimIdRef.current !== effectivePrelimId) {
+            accordionPrelimIdRef.current = effectivePrelimId;
+            setMaxUnlockedPanel(readAccordionMaxPanel(effectivePrelimId, false));
+        }
+    }, [effectivePrelimId, skipAccordionLock]);
 
     const handleChange =
         (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+            const panelNum = parseInt(panel, 10);
+            if (!skipAccordionLock && isExpanded && panelNum > maxUnlockedPanel) {
+                return;
+            }
             setExpanded(isExpanded ? panel : false);
             if (isExpanded) {
                 setTimeout(() => {
@@ -115,6 +149,12 @@ export const Fund = (props: any) => {
 
         if (isSectionValid) {
             if (nextPanel) {
+                const nextNum = parseInt(nextPanel, 10);
+                setMaxUnlockedPanel((m) => {
+                    const next = Math.max(m, nextNum);
+                    writeAccordionMaxPanel(effectivePrelimId, next);
+                    return next;
+                });
                 setExpanded(nextPanel);
                 // Scroll to the next accordion header
                 setTimeout(() => {
@@ -124,7 +164,7 @@ export const Fund = (props: any) => {
                     }
                 }, 300);
             } else {
-                // If it's the last panel, go to next page
+                markFundStepComplete(effectivePrelimId);
                 navigate(`/preliminary/${prelimApplicationId}/declaration`);
             }
         }
@@ -152,7 +192,14 @@ export const Fund = (props: any) => {
         if (!allValid) {
             const firstInvalidIndex = validations.findIndex(res => res === false);
             if (firstInvalidIndex !== -1) {
-                setExpanded(panels[firstInvalidIndex]);
+                const panel = panels[firstInvalidIndex];
+                const pn = parseInt(panel, 10);
+                setMaxUnlockedPanel((m) => {
+                    const next = Math.max(m, pn);
+                    writeAccordionMaxPanel(effectivePrelimId, next);
+                    return next;
+                });
+                setExpanded(panel);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
@@ -169,6 +216,7 @@ export const Fund = (props: any) => {
                 const allValid = results.every(res => res === true);
 
                 if (allValid) {
+                    markFundStepComplete(effectivePrelimId);
                     navigate(`/preliminary/${prelimApplicationId}/declaration`)
                 } else {
                     console.log("allValid", allValid);
@@ -500,7 +548,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "4" ? '#000080' : '#444'
                                         }}>
-                                            Details of Investment Team Members (Other than KMP) – Maximum 5 Senior Members
+                                            Details of Investment Team Member (Other than KMP) – Maximum 5 Senior Members
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>

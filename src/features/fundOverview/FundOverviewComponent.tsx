@@ -26,6 +26,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import signupBg from '../../images/signup_ai.jpeg';
 import RestrictedPage from '../../components/RestrictedPage';
 import { FetchStatus, ResponseCode } from '../../lib/api-status/IStatus';
+import { wizardDeclarationCompleteKey, wizardFundCompleteKey } from './wizardProgress';
 
 export const FundOverview = (props: any) => {
     // let { shoppingList } = useContext(UserContext);
@@ -186,10 +187,36 @@ export const FundOverview = (props: any) => {
                                 const activeIndex = array.findIndex(item => currentPath.includes(item.path.toLowerCase()));
                                 const isCompleted = index < activeIndex;
                                 const isActive = index === activeIndex;
-                                const isPending = index > activeIndex;
 
-                                const isSelfRatingSubmitted = !!selfRatingState.selfRatings.id;
-                                const isDisabled = (isNew && isPending) || (isFailed && isPending) || (isSelfRatingSubmitted && s.path === 'selfrating');
+                                const selfRatingDone = !!selfRatingState.selfRatings?.id && !isFailed;
+                                const relaxWizardLock = String(statusPrelims) === 'REVISE';
+                                const prelimWizardId = String(prelimApplicationState.prelimApplication?.id || id || '');
+                                const pathLower = pathname.toLowerCase();
+                                const fundStepReached =
+                                    relaxWizardLock ||
+                                    pathLower.includes('/declaration') ||
+                                    pathLower.includes('/preview') ||
+                                    (prelimWizardId &&
+                                        Number(prelimWizardId) &&
+                                        sessionStorage.getItem(wizardFundCompleteKey(prelimWizardId)) === '1');
+                                const declarationStepReached =
+                                    relaxWizardLock ||
+                                    pathLower.includes('/preview') ||
+                                    (prelimWizardId &&
+                                        Number(prelimWizardId) &&
+                                        sessionStorage.getItem(wizardDeclarationCompleteKey(prelimWizardId)) === '1');
+
+                                const stepPathDisabled = (): boolean => {
+                                    if (relaxWizardLock) return false;
+                                    if (isFailed && s.path !== 'selfrating') return true;
+                                    if (isNew && s.path !== 'selfrating') return true;
+                                    if (s.path === 'selfrating') return false;
+                                    if (s.path === 'fund') return !selfRatingDone;
+                                    if (s.path === 'declaration') return !selfRatingDone || !fundStepReached;
+                                    if (s.path === 'preview') return !selfRatingDone || !fundStepReached || !declarationStepReached;
+                                    return false;
+                                };
+                                const isDisabled = stepPathDisabled();
 
                                 // Colors from reference
                                 const bgColor = isCompleted ? '#FF671F' : (isActive ? '#000080' : '#818181');

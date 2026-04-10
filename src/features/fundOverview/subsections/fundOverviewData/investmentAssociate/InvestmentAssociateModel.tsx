@@ -337,7 +337,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details of Investment Team Members (Other than KMP) – Maximum 5 Senior Members</Typography>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details of Investment Team Member (Other than KMP) – Maximum 5 Senior Members</Typography>
         <Box component="form">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'flex-end' }}>
