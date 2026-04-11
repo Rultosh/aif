@@ -21,11 +21,7 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
-import {
-    markFundStepComplete,
-    readAccordionMaxPanel,
-    writeAccordionMaxPanel,
-} from "./wizardProgress";
+import { markFundStepComplete } from "./wizardProgress";
 import { opaqueInfoToastAlertSx } from "../../lib/ui/opaqueInfoToastAlertSx";
 
 export const Fund = (props: any) => {
@@ -36,8 +32,6 @@ export const Fund = (props: any) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
-    const statusPrelims = prelimApplicationState.prelimApplication.status || '';
-    const skipAccordionLock = String(statusPrelims) === 'REVISE';
     const effectivePrelimId = String(
         prelimApplicationState.prelimApplication?.id || prelimApplicationId || id || ''
     );
@@ -83,8 +77,6 @@ export const Fund = (props: any) => {
 
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState<string | false>("1");
-    const [maxUnlockedPanel, setMaxUnlockedPanel] = useState(1);
-    const accordionPrelimIdRef = useRef<string>('');
     const [fundCompletenessToastOpen, setFundCompletenessToastOpen] = useState(false);
     /** Panel ids ("1"–"7") that failed the last full-fund validation; shown with a mild red tint. */
     const [fundPanelValidationErrors, setFundPanelValidationErrors] = useState<string[]>([]);
@@ -95,24 +87,6 @@ export const Fund = (props: any) => {
     const reportDealFlowSectionErrors = useCallback((hasErrors: boolean) => {
         setDealFlowSectionHasErrors(hasErrors);
     }, []);
-
-    useEffect(() => {
-        if (skipAccordionLock) {
-            setMaxUnlockedPanel(7);
-            return;
-        }
-        if (!Number(effectivePrelimId)) {
-            if (accordionPrelimIdRef.current !== effectivePrelimId) {
-                accordionPrelimIdRef.current = effectivePrelimId;
-                setMaxUnlockedPanel(1);
-            }
-            return;
-        }
-        if (accordionPrelimIdRef.current !== effectivePrelimId) {
-            accordionPrelimIdRef.current = effectivePrelimId;
-            setMaxUnlockedPanel(readAccordionMaxPanel(effectivePrelimId, false));
-        }
-    }, [effectivePrelimId, skipAccordionLock]);
 
     const prelimRef = useRef<any>(null);
     const strategyRef = useRef<any>(null);
@@ -172,15 +146,6 @@ export const Fund = (props: any) => {
         const failedIds = FUND_MANDATORY_PANEL_ORDER.filter((_, i) => validations[i] === false);
         setFundPanelValidationErrors(failedIds);
         setFundCompletenessToastOpen(true);
-        if (!skipAccordionLock) {
-            setMaxUnlockedPanel((m) => {
-                const next = Math.max(m, 7);
-                if (Number(effectivePrelimId)) {
-                    writeAccordionMaxPanel(effectivePrelimId, next);
-                }
-                return next;
-            });
-        }
     };
 
     const handleFundCompletenessToastClose = () => {
@@ -240,10 +205,6 @@ export const Fund = (props: any) => {
 
     const handleChange =
         (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            const panelNum = parseInt(panel, 10);
-            if (!skipAccordionLock && isExpanded && panelNum > maxUnlockedPanel) {
-                return;
-            }
             setExpanded(isExpanded ? panel : false);
 
             if (isExpanded && fundPanelValidationErrors.includes(panel)) {
@@ -280,12 +241,6 @@ export const Fund = (props: any) => {
         if (nextPanel) {
             setFundCompletenessToastOpen(false);
             setFundPanelValidationErrors([]);
-            const nextNum = parseInt(nextPanel, 10);
-            setMaxUnlockedPanel((m) => {
-                const next = Math.max(m, nextNum);
-                writeAccordionMaxPanel(effectivePrelimId, next);
-                return next;
-            });
             setExpanded(nextPanel);
             setTimeout(() => {
                 const nextAccordion = accordionRefs[nextPanel as keyof typeof accordionRefs]?.current;
