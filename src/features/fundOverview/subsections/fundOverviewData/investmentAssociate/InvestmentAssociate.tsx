@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
+import { useState, useEffect, forwardRef, useImperativeHandle, useCallback } from "react"
 import { fetchInvestmentTeamsAssociateLevelAsync, selectInvestmentAssociate, createInvestmentTeamsAssociateLevelAsync, deleteInvestmentTeamsAssociateLevelAsync } from './investmentAssociateSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
@@ -11,6 +11,19 @@ import { Delete, Edit } from '@mui/icons-material';
 import { InvestmentAssociateRow } from "./InvestmentAssociateRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { InvestmentAssociateModel } from "./InvestmentAssociateModel";
+import FileUploadService from "../../../../../components/FileUploadService";
+
+async function hasUploadedFiles(bucketId: string): Promise<boolean> {
+    try {
+        const res = await FileUploadService.list(bucketId);
+        const files = Array.isArray(res?.data)
+            ? res.data
+            : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
+        return files.length > 0;
+    } catch {
+        return false;
+    }
+}
 
 export type InvestmentAssociateHandle = {
     submit: () => Promise<boolean>;
@@ -40,8 +53,12 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
     const investmentAssociatesState = useAppSelector(selectInvestmentAssociate)
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
     const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
+    const handleOpen = () => {
+        setDocumentError('');
+        setOpen(true);
+    };
     const handleClose = () => setOpen(false);
+    const [documentError, setDocumentError] = useState('');
 
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsAssociateLevelAsync', props.prelimApplicationId);
@@ -61,21 +78,38 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
         ref,
         () => ({
             submit: async () => {
+                setDocumentError('');
                 if (
                     investmentAssociatesState.status.fetchStatus !== FetchStatus.IDLE ||
                     investmentAssociatesState.actionStatus.fetchStatus !== FetchStatus.IDLE
                 ) {
                     return false;
                 }
-                const n = investmentAssociatesState.investmentAssociates?.length ?? 0;
+                const associates = investmentAssociatesState.investmentAssociates ?? [];
+                const n = associates.length;
+                if (n < 1) {
+                    setDocumentError("Add at least one investment team member (other than KMP) before continuing (section 4).");
+                    return false;
+                }
                 if (n > 5) {
-                    window.alert("A maximum of 5 senior members (other than KMP) is allowed.");
+                    setDocumentError("A maximum of 5 senior members (other than KMP) is allowed.");
+                    return false;
+                }
+                const prelimId = props.prelimApplicationId != null ? String(props.prelimApplicationId) : "";
+                if (!prelimId) {
+                    setDocumentError("Please save the application before continuing.");
+                    return false;
+                }
+                const resumeBucket = `sdAssociateResumeCvExperience${prelimId}`;
+                const resumeOk = await hasUploadedFiles(resumeBucket);
+                if (!resumeOk) {
+                    setDocumentError("Please upload Resume/CV/Experience for Investment Team (other than KMP) before continuing (section 4).");
                     return false;
                 }
                 return true;
             },
         }),
-        [investmentAssociatesState]
+        [investmentAssociatesState, props.prelimApplicationId]
     );
 
     const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Experience in AIF Business", "Area Of Expertise", "Action"]
@@ -90,8 +124,15 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
     }
 
     return (
-        <Box >
+        <Box>
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
+                {documentError && (
+                    <Grid item xs={11.5}>
+                        <Typography variant="caption" color="error" sx={{ display: 'block' }}>
+                            {documentError}
+                        </Typography>
+                    </Grid>
+                )}
                 <Grid item xs={11.5}>
                     <TableContainer component={Paper} >
                         <Table sx={{ minWidth: 700, m: 0 }} aria-label="customized table">

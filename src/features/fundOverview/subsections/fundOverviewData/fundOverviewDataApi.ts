@@ -23,6 +23,14 @@ export function fetchFundOverviewAllList(pageInfo : IPageInfo | undefined) {
   });
 }
 
+/** Maker/checker: preliminary apps not yet in workflow (shell or CREATED/REVISE). */
+export function fetchPrelimDraftsList() {
+  return api({
+    method: 'get',
+    url: `/api/prelims/drafts`
+  });
+}
+
 export function postPrelimApplicationShell(prelimAppData:IPrelimApplicationData) {
   return api({
     method: 'post',

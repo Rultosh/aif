@@ -10,6 +10,8 @@ import ListFiles from "../../../components/ListFiles";
 interface UploadComponentProps {
     id: String
     signed?: boolean
+    /** When true, label shows that upload is mandatory before proceeding. */
+    required?: boolean
 }
 
 export const UploadComponents = (props: UploadComponentProps) => {
@@ -18,6 +20,8 @@ export const UploadComponents = (props: UploadComponentProps) => {
     const handleSuccess = () => {
         setRefreshId(uuid());
     }
+    const required = props.required === true;
+    const uploadLabel = required ? 'Upload file *' : 'Upload File';
 
     return (<>
         <Box>
@@ -26,7 +30,8 @@ export const UploadComponents = (props: UploadComponentProps) => {
 
                 <Chip
                     icon={<FileUploadIcon sx={{ color: 'inherit !important' }} />}
-                    label="Upload File"
+                    label={uploadLabel}
+                    title={required ? 'Mandatory upload' : undefined}
                     size="medium"
                     sx={{
                         backgroundColor: '#000080',

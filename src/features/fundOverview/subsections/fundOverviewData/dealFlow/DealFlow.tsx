@@ -386,7 +386,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Details of current pipeline of deals under consideration" id={`sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`} />
+                                        <DocumentChip label="Upload Document" validationTitle="Details of current pipeline of deals under consideration" id={`sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`} required />
                                     </span>
                                 </Box>
                             ) : (
@@ -427,7 +427,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Empanelled list of external Firms" id={`sdEmpanelledListOfExternalFirms${effectiveId}`} />
+                                        <DocumentChip label="Upload Document" validationTitle="Empanelled list of external Firms" id={`sdEmpanelledListOfExternalFirms${effectiveId}`} required />
                                     </span>
                                 </Box>
                             ) : (
