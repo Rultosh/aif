@@ -102,10 +102,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
         mode: "all",
+        shouldFocusError: false,
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-   const onSubmit = async (data: IPrelimApplicationData): Promise<boolean> => {
+    const persistStrategySection = async (data: IPrelimApplicationData, silent: boolean): Promise<boolean> => {
         const hasDocument = await hasRiskAssessmentDocument();
         if (!hasDocument) {
             setDocumentError("Risk Assessment and Mitigation Plan document is required.");
@@ -113,18 +114,20 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         }
         setDocumentError('');
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
-        if (props.onSaveSuccess) {
+        if (!silent && props.onSaveSuccess) {
             props.onSaveSuccess();
         }
         return true;
-    }; 
+    };
+
+    const onSubmit = async (data: IPrelimApplicationData) => persistStrategySection(data, false);
 
     useImperativeHandle(ref, () => ({
-        submit: async () => {
+        submit: async (opts?: { silent?: boolean }) => {
             let isValid = false;
             await handleSubmit(
                 async (data) => {
-                    const submitOk = await onSubmit(data);
+                    const submitOk = await persistStrategySection(data, Boolean(opts?.silent));
                     isValid = submitOk;
                 },
                 () => {

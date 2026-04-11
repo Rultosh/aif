@@ -1,5 +1,5 @@
-import { Box, Button, Grid, TextField, Typography, CircularProgress } from "@mui/material";
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { Alert, Box, Button, Grid, TextField, Typography, CircularProgress, Snackbar } from "@mui/material";
+import { useState, useEffect, forwardRef, useImperativeHandle, useRef } from "react";
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
 import { getPrelimApplicationData, PrelimApplicationState, selectPrelimApplication, updatePrelimApplicationAsync } from "../prelimApplicationDataSlice";
 import { IPrelimApplicationData } from "../IPrelimApplicationData";
@@ -14,11 +14,17 @@ import FileUploadService from "../../../../../components/FileUploadService";
 import { useParams } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
+import { opaqueInfoToastAlertSx } from "../../../../../lib/ui/opaqueInfoToastAlertSx";
+
+const MANDATORY_DOCUMENTS_UPLOAD_MESSAGE =
+    'Please upload all mandatory documents before proceeding.';
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
     setPrelimApplicationId: (id: String | undefined) => void;
     onSaveSuccess?: () => void;
+    /** When form or mandatory-document validation has issues, parent can tint the accordion shell. */
+    onSectionHasErrorsChange?: (hasErrors: boolean) => void;
 }
 
 const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
@@ -27,6 +33,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
     const [documentError, setDocumentError] = useState('');
+    const [mandatoryUploadToastOpen, setMandatoryUploadToastOpen] = useState(false);
     const prelimAppicationId = props.prelimApplicationId;
     const effectiveId = String(prelimAppicationId || prelimApplicationState.prelimApplication?.id || id || '');
     const dispatch = useAppDispatch();
@@ -79,8 +86,25 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
         mode: "all",
+        shouldFocusError: false,
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
+
+    const onSectionHasErrorsChangeRef = useRef(props.onSectionHasErrorsChange);
+    onSectionHasErrorsChangeRef.current = props.onSectionHasErrorsChange;
+
+    useEffect(() => {
+        const hasFormErrors = Object.keys(errors).length > 0;
+        const hasErrors = hasFormErrors || Boolean(documentError);
+        onSectionHasErrorsChangeRef.current?.(hasErrors);
+    }, [errors, documentError]);
+
+    useEffect(
+        () => () => {
+            onSectionHasErrorsChangeRef.current?.(false);
+        },
+        []
+    );
 
     const hasUploadedFiles = async (bucketId: string): Promise<boolean> => {
         try {
@@ -94,7 +118,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         }
     };
 
-    const onSubmit = async (data: IPrelimApplicationData): Promise<boolean> => {
+    const persistDealFlowSection = async (data: IPrelimApplicationData, silent: boolean): Promise<boolean> => {
         const requiredBuckets = [
             `sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`,
             `sdEmpanelledListOfExternalFirms${effectiveId}`,
@@ -102,23 +126,27 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         const checks = await Promise.all(requiredBuckets.map((bucket) => hasUploadedFiles(bucket)));
         const allUploaded = checks.every(Boolean);
         if (!allUploaded) {
-            setDocumentError("Please upload all mandatory documents before proceeding.");
+            setDocumentError(MANDATORY_DOCUMENTS_UPLOAD_MESSAGE);
+            setMandatoryUploadToastOpen(true);
             return false;
         }
         setDocumentError('');
+        setMandatoryUploadToastOpen(false);
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
-        if (props.onSaveSuccess) {
+        if (!silent && props.onSaveSuccess) {
             props.onSaveSuccess();
         }
         return true;
     };
 
+    const onSubmit = async (data: IPrelimApplicationData) => persistDealFlowSection(data, false);
+
     useImperativeHandle(ref, () => ({
-        submit: async () => {
+        submit: async (opts?: { silent?: boolean }) => {
             let isValid = false;
             await handleSubmit(
                 async (data) => {
-                    const ok = await onSubmit(data);
+                    const ok = await persistDealFlowSection(data, Boolean(opts?.silent));
                     isValid = ok;
                 },
                 () => {
@@ -448,13 +476,27 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 Save and Continue
                             </Button>
                         </Box>
-                        {documentError && (
-                            <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
-                                {documentError}
-                            </Typography>
-                        )}
                     </Grid>
                 </Grid>
+                <Snackbar
+                    open={mandatoryUploadToastOpen}
+                    autoHideDuration={12000}
+                    onClose={(_, reason) => {
+                        if (reason === 'clickaway') return;
+                        setMandatoryUploadToastOpen(false);
+                    }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    sx={{ zIndex: (theme) => theme.zIndex.modal + 12 }}
+                >
+                    <Alert
+                        onClose={() => setMandatoryUploadToastOpen(false)}
+                        severity="info"
+                        variant="standard"
+                        sx={opaqueInfoToastAlertSx}
+                    >
+                        {MANDATORY_DOCUMENTS_UPLOAD_MESSAGE}
+                    </Alert>
+                </Snackbar>
             </Box>
         );
     }

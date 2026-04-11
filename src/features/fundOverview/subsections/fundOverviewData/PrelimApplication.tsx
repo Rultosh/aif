@@ -180,17 +180,17 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     };
 
 
-    const savePrelimApplicationForm = async (data: IPrelimApplicationData) => {
+    const savePrelimApplicationForm = async (data: IPrelimApplicationData, silent?: boolean) => {
         // console.log("onSubmit called", data);
         if (data.id) {
             await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, data)));
-            if (props.onSaveSuccess) {
+            if (!silent && props.onSaveSuccess) {
                 props.onSaveSuccess();
             }
         } else {
             const resultAction = await dispatch(createPrelimApplicationAsync(wrapArgument(actionUid, data)));
             if (createPrelimApplicationAsync.fulfilled.match(resultAction)) {
-                if (props.onSaveSuccess) {
+                if (!silent && props.onSaveSuccess) {
                     props.onSaveSuccess();
                 }
             }
@@ -646,27 +646,29 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
         mode: "all",
+        shouldFocusError: false,
         defaultValues: prelimApplicationState.prelimApplication || {}
+    });
+
+    const buildPrelimPayload = (data: IPrelimApplicationData): IPrelimApplicationData => ({
+        ...data,
+        fundManager: firstTimeManagerType ? "First Time Fund Manager" : data.fundManager
     });
 
     const onSubmit = (data: IPrelimApplicationData) => {
         console.log(data);
-        const payload: IPrelimApplicationData = {
-            ...data,
-            fundManager: firstTimeManagerType ? "First Time Fund Manager" : data.fundManager
-        };
-        savePrelimApplicationForm(payload);
+        savePrelimApplicationForm(buildPrelimPayload(data), false);
     };
 
     // errors && console.log('errors', JSON.stringify(errors));
 
     useImperativeHandle(ref, () => ({
-        submit: async () => {
+        submit: async (opts?: { silent?: boolean }) => {
             let isValid = false;
             await handleSubmit(
                 (data) => {
                     console.log(data);
-                    onSubmit(data);
+                    savePrelimApplicationForm(buildPrelimPayload(data), Boolean(opts?.silent));
                     isValid = true;
                 },
                 () => {

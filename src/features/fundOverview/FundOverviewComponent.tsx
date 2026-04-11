@@ -119,13 +119,6 @@ export const FundOverview = (props: any) => {
         ? allSteps.filter(s => s.path === 'preview')
         : allSteps;
 
-    const prelimWizardIdForStepper = String(prelimApplicationState.prelimApplication?.id || id || '');
-    const hasRealPrelim = Boolean(
-        prelimWizardIdForStepper &&
-            Number(prelimWizardIdForStepper) &&
-            !Number.isNaN(Number(prelimWizardIdForStepper))
-    );
-
     const currentStep = filteredSteps.find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
 
     const userCannotAccessPreliminary =
@@ -186,12 +179,13 @@ export const FundOverview = (props: any) => {
                     {(!isRestricted && usersState.role === 'USER') && (
                         <Box sx={{ width: '100%', display: 'flex', gap: 0.5 }}>
                             {filteredSteps.map((s, index, array) => {
+                                const isNew = id?.toString() === 'NEW';
                                 const score = Number(selfRatingState.selfRatings.score || 0);
                                 const isFailed = score < 0.7;
 
                                 const currentPath = pathname.toLowerCase();
                                 const activeIndex = array.findIndex(item => currentPath.includes(item.path.toLowerCase()));
-                                const isCompleted = index < activeIndex;
+                                const isPastStep = index < activeIndex;
                                 const isActive = index === activeIndex;
 
                                 const selfRatingDone = !!selfRatingState.selfRatings?.id && !isFailed;
@@ -200,6 +194,7 @@ export const FundOverview = (props: any) => {
                                 const pathLower = pathname.toLowerCase();
                                 const fundStepReached =
                                     relaxWizardLock ||
+                                    pathLower.includes('/declaration') ||
                                     pathLower.includes('/preview') ||
                                     (prelimWizardId &&
                                         Number(prelimWizardId) &&
@@ -214,22 +209,40 @@ export const FundOverview = (props: any) => {
                                 const stepPathDisabled = (): boolean => {
                                     if (relaxWizardLock) return false;
                                     if (isFailed && s.path !== 'selfrating') return true;
+                                    if (isNew && s.path !== 'selfrating') return true;
                                     if (s.path === 'selfrating') return false;
-                                    if (!hasRealPrelim && s.path !== 'selfrating') return true;
-                                    if (s.path === 'fund' || s.path === 'declaration') return !selfRatingDone;
-                                    if (s.path === 'preview') {
-                                        return (
-                                            !selfRatingDone ||
-                                            !fundStepReached ||
-                                            !declarationStepReached
-                                        );
-                                    }
+                                    if (s.path === 'fund') return !selfRatingDone;
+                                    if (s.path === 'declaration') return !selfRatingDone || !fundStepReached;
+                                    if (s.path === 'preview') return !selfRatingDone || !fundStepReached || !declarationStepReached;
                                     return false;
                                 };
                                 const isDisabled = stepPathDisabled();
 
-                                // Colors from reference
-                                const bgColor = isCompleted ? '#FF671F' : (isActive ? '#000080' : '#818181');
+                                const isStepContentComplete = (stepPath: string): boolean => {
+                                    if (stepPath === 'selfrating') return selfRatingDone;
+                                    if (!prelimWizardId || !Number(prelimWizardId)) return false;
+                                    if (stepPath === 'fund') {
+                                        return sessionStorage.getItem(wizardFundCompleteKey(prelimWizardId)) === '1';
+                                    }
+                                    if (stepPath === 'declaration') {
+                                        return sessionStorage.getItem(wizardDeclarationCompleteKey(prelimWizardId)) === '1';
+                                    }
+                                    if (stepPath === 'preview') {
+                                        return false;
+                                    }
+                                    return false;
+                                };
+
+                                const pastAndComplete = isPastStep && isStepContentComplete(s.path);
+                                const pastAndIncomplete = isPastStep && !isStepContentComplete(s.path);
+                                /** Completed = orange + check; incomplete (even if left earlier in flow) = same blue as active, not orange. */
+                                const STEP_COMPLETE_BG = '#FF671F';
+                                const STEP_ACTIVE_BG = '#000080';
+                                const bgColor = pastAndComplete
+                                    ? STEP_COMPLETE_BG
+                                    : pastAndIncomplete || isActive
+                                        ? STEP_ACTIVE_BG
+                                        : '#818181';
 
                                 return (
                                     <Box
@@ -257,9 +270,9 @@ export const FundOverview = (props: any) => {
                                     >
                                         {/* Left Icon */}
                                         <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
-                                            {isCompleted ? (
+                                            {pastAndComplete ? (
                                                 <CheckCircleIcon sx={{ color: 'white', fontSize: 24 }} />
-                                            ) : isActive ? (
+                                            ) : isActive || pastAndIncomplete ? (
                                                 <Box sx={{
                                                     width: '24px',
                                                     height: '24px',

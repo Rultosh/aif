@@ -1,5 +1,5 @@
-import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
+import { Alert, Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Snackbar, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react"
 import { fetchInvestmentTeamsAssociateLevelAsync, selectInvestmentAssociate, createInvestmentTeamsAssociateLevelAsync, deleteInvestmentTeamsAssociateLevelAsync } from './investmentAssociateSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
@@ -11,9 +11,10 @@ import { Delete, Edit } from '@mui/icons-material';
 import { InvestmentAssociateRow } from "./InvestmentAssociateRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { InvestmentAssociateModel } from "./InvestmentAssociateModel";
+import { opaqueInfoToastAlertSx } from "../../../../../lib/ui/opaqueInfoToastAlertSx";
 
 export type InvestmentAssociateHandle = {
-    submit: () => Promise<boolean>;
+    submit: (opts?: { silent?: boolean }) => Promise<boolean>;
 };
 
 interface InvestmentAssociateProps {
@@ -42,6 +43,15 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [validationToastOpen, setValidationToastOpen] = useState(false);
+    const [validationToastMessage, setValidationToastMessage] = useState('');
+    const showValidationToast = useCallback((message: string) => {
+        setValidationToastMessage(message);
+        setValidationToastOpen(true);
+    }, []);
+    const handleValidationToastClose = () => {
+        setValidationToastOpen(false);
+    };
 
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsAssociateLevelAsync', props.prelimApplicationId);
@@ -60,22 +70,24 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
     useImperativeHandle(
         ref,
         () => ({
-            submit: async () => {
-                if (
-                    investmentAssociatesState.status.fetchStatus !== FetchStatus.IDLE ||
-                    investmentAssociatesState.actionStatus.fetchStatus !== FetchStatus.IDLE
-                ) {
+            submit: async (opts?: { silent?: boolean }) => {
+                const silent = opts?.silent === true;
+                const statusIdle = investmentAssociatesState.status.fetchStatus === FetchStatus.IDLE;
+                const actionIdle = investmentAssociatesState.actionStatus.fetchStatus === FetchStatus.IDLE;
+                if (!silent && (!statusIdle || !actionIdle)) {
                     return false;
                 }
                 const n = investmentAssociatesState.investmentAssociates?.length ?? 0;
                 if (n > 5) {
-                    window.alert("A maximum of 5 senior members (other than KMP) is allowed.");
+                    if (!silent) {
+                        showValidationToast('A maximum of 5 senior members (other than KMP) is allowed.');
+                    }
                     return false;
                 }
                 return true;
             },
         }),
-        [investmentAssociatesState]
+        [investmentAssociatesState, showValidationToast]
     );
 
     const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Experience in AIF Business", "Area Of Expertise", "Action"]
@@ -90,6 +102,7 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
     }
 
     return (
+        <>
         <Box >
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 <Grid item xs={11.5}>
@@ -133,6 +146,23 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
                 </Grid>
             </Grid>
         </Box>
+        <Snackbar
+            open={validationToastOpen}
+            autoHideDuration={9000}
+            onClose={handleValidationToastClose}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
+        >
+            <Alert
+                onClose={handleValidationToastClose}
+                severity="info"
+                variant="standard"
+                sx={opaqueInfoToastAlertSx}
+            >
+                {validationToastMessage}
+            </Alert>
+        </Snackbar>
+        </>
     );
 });
 

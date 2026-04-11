@@ -1,8 +1,8 @@
-import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Snackbar, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import UploadIcon from '@mui/icons-material/Upload';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import dayjs, { Dayjs } from 'dayjs';
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react"
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -18,9 +18,10 @@ import { Delete, Edit } from '@mui/icons-material';
 import { InvestmentPartnerRow } from "./InvestmentPartnerRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { InvestmentPartnerModel } from "./InvestmentPartnerModel";
+import { opaqueInfoToastAlertSx } from "../../../../../lib/ui/opaqueInfoToastAlertSx";
 
 export type InvestmentPartnerHandle = {
-    submit: () => Promise<boolean>;
+    submit: (opts?: { silent?: boolean }) => Promise<boolean>;
 };
 
 interface InvestmentPartnerProps {
@@ -49,6 +50,15 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [validationToastOpen, setValidationToastOpen] = useState(false);
+    const [validationToastMessage, setValidationToastMessage] = useState('');
+    const showValidationToast = useCallback((message: string) => {
+        setValidationToastMessage(message);
+        setValidationToastOpen(true);
+    }, []);
+    const handleValidationToastClose = () => {
+        setValidationToastOpen(false);
+    };
 
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsPartnerLevelAsync', props.prelimApplicationId);
@@ -67,22 +77,24 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
     useImperativeHandle(
         ref,
         () => ({
-            submit: async () => {
-                if (
-                    investmentPartnersState.status.fetchStatus !== FetchStatus.IDLE ||
-                    investmentPartnersState.actionStatus.fetchStatus !== FetchStatus.IDLE
-                ) {
+            submit: async (opts?: { silent?: boolean }) => {
+                const silent = opts?.silent === true;
+                const statusIdle = investmentPartnersState.status.fetchStatus === FetchStatus.IDLE;
+                const actionIdle = investmentPartnersState.actionStatus.fetchStatus === FetchStatus.IDLE;
+                if (!silent && (!statusIdle || !actionIdle)) {
                     return false;
                 }
                 const n = investmentPartnersState.investmentPartners?.length ?? 0;
                 if (n < 1) {
-                    window.alert("Add at least one investment team member at KMP level before continuing.");
+                    if (!silent) {
+                        showValidationToast('Add at least one investment team member at KMP level before continuing.');
+                    }
                     return false;
                 }
                 return true;
             },
         }),
-        [investmentPartnersState]
+        [investmentPartnersState, showValidationToast]
     );
 
     const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Experience in AIF Business", "Area Of Expertise", "Action"]
@@ -97,6 +109,7 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
     }
 
     return (
+        <>
         <Box >
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 <Grid item xs={12}>
@@ -140,6 +153,23 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
                 </Grid>
             </Grid>
         </Box>
+        <Snackbar
+            open={validationToastOpen}
+            autoHideDuration={9000}
+            onClose={handleValidationToastClose}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
+        >
+            <Alert
+                onClose={handleValidationToastClose}
+                severity="info"
+                variant="standard"
+                sx={opaqueInfoToastAlertSx}
+            >
+                {validationToastMessage}
+            </Alert>
+        </Snackbar>
+        </>
     );
 });
 

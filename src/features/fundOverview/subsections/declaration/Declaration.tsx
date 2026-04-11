@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, TextField, FormControlLabel, Divider, Checkbox, FormGroup, Switch, Dialog, DialogContent, Zoom } from "@mui/material";
+import { Alert, Backdrop, Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, TextField, FormControlLabel, Divider, Checkbox, FormGroup, Switch, Dialog, DialogContent, Zoom, CircularProgress, Snackbar } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
@@ -23,6 +23,12 @@ import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import DocumentChip from "../../../../components/DocumentChip";
 import FileUploadService from "../../../../components/FileUploadService";
+import { opaqueInfoToastAlertSx } from "../../../../lib/ui/opaqueInfoToastAlertSx";
+
+const MANDATORY_DOCUMENTS_UPLOAD_MESSAGE =
+    'Please upload all mandatory documents before proceeding.';
+
+const DECLARATION_ACCEPT_MESSAGE = 'Please accept the declaration to continue.';
 
 const Declaration = (props: any) => {
 
@@ -36,6 +42,14 @@ const Declaration = (props: any) => {
     const [agreed, setAgreed] = useState<boolean>(!!prelimApplicationState.prelimApplication.declarationAccepted);
     const [expanded, setExpanded] = useState<string | false>("1");
     const [documentError, setDocumentError] = useState<string>('');
+    /** Accordion panels "1"|"2" with document / prelim-id validation issues (mild red shell). */
+    const [declarationDocAccordionErrors, setDeclarationDocAccordionErrors] = useState<string[]>([]);
+    const [declarationDocsValidating, setDeclarationDocsValidating] = useState(false);
+    const [declarationValidateTitle, setDeclarationValidateTitle] = useState('Validating…');
+    /** Single mellow info toast for mandatory uploads or declaration checkbox reminder. */
+    const [declarationSoftToastMessage, setDeclarationSoftToastMessage] = useState<string | null>(null);
+    /** True after user tries “Save & Continue to Preview” without accepting; cleared when they accept. */
+    const [declarationContinueBlocked, setDeclarationContinueBlocked] = useState(false);
 
     const validationSchema = Yup.object().shape({
         sdDescription: Yup.string().label("Capital Raised Till Date").nullable(),
@@ -70,49 +84,88 @@ const Declaration = (props: any) => {
         }
     };
 
-    const validateRequiredDocuments = async (buckets: string[]): Promise<boolean> => {
+    const checkBucketsUploaded = async (buckets: string[]): Promise<boolean> => {
+        if (!Number(effectiveId)) return false;
         const checks = await Promise.all(buckets.map((bucket) => hasUploadedFiles(`${bucket}${effectiveId}`)));
-        const allUploaded = checks.every(Boolean);
-        setDocumentError(allUploaded ? '' : 'Please upload all mandatory documents before proceeding.');
-        return allUploaded;
+        return checks.every(Boolean);
     };
+
+    const validateRequiredDocuments = async (buckets: string[]): Promise<boolean> => {
+        const allUploaded = await checkBucketsUploaded(buckets);
+        if (!allUploaded) {
+            setDocumentError('');
+            setDeclarationSoftToastMessage(MANDATORY_DOCUMENTS_UPLOAD_MESSAGE);
+            return false;
+        }
+        setDocumentError('');
+        setDeclarationSoftToastMessage((prev) =>
+            prev === MANDATORY_DOCUMENTS_UPLOAD_MESSAGE ? null : prev
+        );
+        return true;
+    };
+
+    const kycDocumentBuckets = ["kycBoardDirectors", "boardResolution"];
+
+    const supportingDocumentBuckets = [
+        "sdPvtPlacementMemorandum",
+        "sdLatestInvestorPresentation",
+        "sdImAgreement",
+        "sdTrustDeal",
+        "sdSEBICertificate",
+        // sdAifGradingReport is optional
+        "sdShareholdingPattern",
+        "sdPolicyOfCarry",
+        "sdContributionAgreement",
+        "sdInvestmentPolicy",
+        "sdInvestmentCommitteeNote",
+        "sdHrPolicy",
+        "sdOrganisationStructure",
+        "detailsOfInvestmentCommitteeMembers",
+        "detailsOfContributorToTheFund",
+        "pastInvestmentTrackRecord",
+    ];
 
     const handleInternalSaveAndContinue = async (currentPanel: string, nextPanel: string) => {
         if (!Number(effectiveId)) {
             setDocumentError('Please save the form to upload documents.');
+            setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '1', '2'])));
             return;
         }
 
         if (currentPanel === "1") {
-            const kycBuckets = ["kycBoardDirectors", "boardResolution"];
-            const ok = await validateRequiredDocuments(kycBuckets);
-            if (!ok) return;
+            setDeclarationValidateTitle('Validating KYC…');
+            setDeclarationDocsValidating(true);
+            try {
+                const ok = await validateRequiredDocuments(kycDocumentBuckets);
+                if (!ok) {
+                    setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '1'])));
+                    return;
+                }
+                setDeclarationDocAccordionErrors((prev) => prev.filter((p) => p !== '1'));
+            } finally {
+                setDeclarationDocsValidating(false);
+            }
         }
 
         if (currentPanel === "2") {
-            const supportingBuckets = [
-                "sdPvtPlacementMemorandum",
-                "sdLatestInvestorPresentation",
-                "sdImAgreement",
-                "sdTrustDeal",
-                "sdSEBICertificate",
-                // sdAifGradingReport is optional
-                "sdShareholdingPattern",
-                "sdPolicyOfCarry",
-                "sdContributionAgreement",
-                "sdInvestmentPolicy",
-                "sdInvestmentCommitteeNote",
-                "sdHrPolicy",
-                "sdOrganisationStructure",
-                "detailsOfInvestmentCommitteeMembers",
-                "detailsOfContributorToTheFund",
-                "pastInvestmentTrackRecord",
-            ];
-            const ok = await validateRequiredDocuments(supportingBuckets);
-            if (!ok) return;
+            setDeclarationValidateTitle('Validating supporting documents…');
+            setDeclarationDocsValidating(true);
+            try {
+                const ok = await validateRequiredDocuments(supportingDocumentBuckets);
+                if (!ok) {
+                    setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '2'])));
+                    return;
+                }
+                setDeclarationDocAccordionErrors((prev) => prev.filter((p) => p !== '2'));
+            } finally {
+                setDeclarationDocsValidating(false);
+            }
         }
 
         setDocumentError('');
+        setDeclarationSoftToastMessage((prev) =>
+            prev === MANDATORY_DOCUMENTS_UPLOAD_MESSAGE ? null : prev
+        );
         setExpanded(nextPanel);
     };
 
@@ -124,33 +177,50 @@ const Declaration = (props: any) => {
                 try {
                     if (!Number(effectiveId)) {
                         setDocumentError('Please save the form to upload documents.');
+                        setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '1', '2'])));
                         return;
                     }
-                    const allRequiredBuckets = [
-                        "kycBoardDirectors",
-                        "boardResolution",
-                        "sdPvtPlacementMemorandum",
-                        "sdLatestInvestorPresentation",
-                        "sdImAgreement",
-                        "sdTrustDeal",
-                        "sdSEBICertificate",
-                        // sdAifGradingReport is optional
-                        "sdShareholdingPattern",
-                        "sdPolicyOfCarry",
-                        "sdContributionAgreement",
-                        "sdInvestmentPolicy",
-                        "sdInvestmentCommitteeNote",
-                        "sdHrPolicy",
-                        "sdOrganisationStructure",
-                        "detailsOfInvestmentCommitteeMembers",
-                        "detailsOfContributorToTheFund",
-                        "pastInvestmentTrackRecord",
-                    ];
-                    const docsOk = await validateRequiredDocuments(allRequiredBuckets);
-                    if (!docsOk) return;
-                    await handleClickSave(data);
-                    markDeclarationStepComplete(String(prelimApplicationState.prelimApplication.id));
-                    navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
+                    setDeclarationValidateTitle('Validating KYC and supporting documents…');
+                    setDeclarationDocsValidating(true);
+                    try {
+                        const kycOk = await checkBucketsUploaded(kycDocumentBuckets);
+                        const supportingOk = await checkBucketsUploaded(supportingDocumentBuckets);
+                        setDeclarationDocAccordionErrors((prev) => {
+                            let next = prev.filter((p) => p !== '1' && p !== '2');
+                            if (!kycOk) next = Array.from(new Set([...next, '1']));
+                            if (!supportingOk) next = Array.from(new Set([...next, '2']));
+                            return next;
+                        });
+                        if (!kycOk || !supportingOk) {
+                            setDocumentError('');
+                            setDeclarationContinueBlocked(false);
+                            setDeclarationSoftToastMessage(MANDATORY_DOCUMENTS_UPLOAD_MESSAGE);
+                            setExpanded(!kycOk ? '1' : '2');
+                            return;
+                        }
+                        setDocumentError('');
+                        setDeclarationSoftToastMessage((prev) =>
+                            prev === MANDATORY_DOCUMENTS_UPLOAD_MESSAGE ? null : prev
+                        );
+
+                        if (!agreed) {
+                            setDeclarationContinueBlocked(true);
+                            setDeclarationSoftToastMessage(DECLARATION_ACCEPT_MESSAGE);
+                            setExpanded('3');
+                            return;
+                        }
+                        setDeclarationContinueBlocked(false);
+                        setDeclarationSoftToastMessage((prev) =>
+                            prev === DECLARATION_ACCEPT_MESSAGE ? null : prev
+                        );
+
+                        await handleClickSave(data);
+                        setDeclarationDocAccordionErrors([]);
+                        markDeclarationStepComplete(String(prelimApplicationState.prelimApplication.id));
+                        navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
+                    } finally {
+                        setDeclarationDocsValidating(false);
+                    }
                 } catch (error: any) {
                     console.error("Save failure:", error);
                     alert(error?.message || "An unexpected error occurred while saving.");
@@ -181,6 +251,15 @@ const Declaration = (props: any) => {
         }
     }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
 
+    useEffect(() => {
+        if (agreed) {
+            setDeclarationContinueBlocked(false);
+            setDeclarationSoftToastMessage((prev) =>
+                prev === DECLARATION_ACCEPT_MESSAGE ? null : prev
+            );
+        }
+    }, [agreed]);
+
     function handleAgreementChange() {
         setAgreed(!agreed)
     }
@@ -201,17 +280,31 @@ const Declaration = (props: any) => {
         }
     }
 
-    const accordionSx = {
-        border: '1px solid rgba(0,0,0,0.08)',
-        borderRadius: '12px !important',
-        mb: 2,
-        overflow: 'hidden',
-        '&:before': { display: 'none' },
-        '&.Mui-expanded': {
-            boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-            borderColor: '#363062',
-            borderLeft: '6px solid #363062'
-        }
+    const declarationFormFieldErrors = Object.keys(errors).length > 0;
+
+    const declarationAccordionShellSx = (panelId: string) => {
+        const hasErr =
+            declarationDocAccordionErrors.includes(panelId) ||
+            (panelId === '3' && (declarationContinueBlocked || declarationFormFieldErrors));
+        return {
+            border: '1px solid rgba(0,0,0,0.08)',
+            borderRadius: '12px !important',
+            mb: 2,
+            overflow: 'hidden',
+            ...(hasErr
+                ? {
+                    backgroundColor: 'rgba(211, 47, 47, 0.055)',
+                    borderColor: 'rgba(211, 47, 47, 0.22)',
+                }
+                : {}),
+            '&:before': { display: 'none' },
+            '&.Mui-expanded': {
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                borderColor: '#363062',
+                borderLeft: '6px solid #363062',
+                ...(hasErr ? { backgroundColor: 'rgba(211, 47, 47, 0.045)' } : {}),
+            },
+        };
     };
 
     const accordionSummarySx = {
@@ -263,7 +356,7 @@ const Declaration = (props: any) => {
                         {/* Accordion 1: KYC */}
                         <Accordion
                             elevation={0}
-                            sx={accordionSx}
+                            sx={declarationAccordionShellSx('1')}
                             expanded={expanded === "1"}
                             onChange={handleAccordionChange("1")}
                         >
@@ -338,7 +431,7 @@ const Declaration = (props: any) => {
                         {/* Accordion 2: Supporting Documents */}
                         <Accordion
                             elevation={0}
-                            sx={accordionSx}
+                            sx={declarationAccordionShellSx('2')}
                             expanded={expanded === "2"}
                             onChange={handleAccordionChange("2")}
                         >
@@ -543,7 +636,7 @@ const Declaration = (props: any) => {
                         {/* Accordion 3: Declaration */}
                         <Accordion
                             elevation={0}
-                            sx={accordionSx}
+                            sx={declarationAccordionShellSx('3')}
                             expanded={expanded === "3"}
                             onChange={handleAccordionChange("3")}
                         >
@@ -629,7 +722,6 @@ const Declaration = (props: any) => {
                             <Box>
                                 <Button
                                     onClick={(e) => handleClick(e, "next")}
-                                    disabled={!agreed}
                                     endIcon={<ArrowRightIcon />}
                                     variant="contained"
                                     sx={{
@@ -657,6 +749,55 @@ const Declaration = (props: any) => {
                         )}
                     </CardContent>
                 </Card>
+
+                <Snackbar
+                    open={declarationSoftToastMessage !== null}
+                    autoHideDuration={declarationSoftToastMessage === DECLARATION_ACCEPT_MESSAGE ? 10000 : 12000}
+                    onClose={(_, reason) => {
+                        if (reason === 'clickaway') return;
+                        setDeclarationSoftToastMessage(null);
+                    }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    sx={{ zIndex: (theme) => theme.zIndex.modal + 12 }}
+                >
+                    <Alert
+                        onClose={() => setDeclarationSoftToastMessage(null)}
+                        severity="info"
+                        variant="standard"
+                        sx={opaqueInfoToastAlertSx}
+                    >
+                        {declarationSoftToastMessage}
+                    </Alert>
+                </Snackbar>
+
+                <Backdrop
+                    sx={{
+                        zIndex: (theme) => theme.zIndex.modal + 10,
+                        color: '#fff',
+                        flexDirection: 'column',
+                        gap: 2,
+                    }}
+                    open={declarationDocsValidating}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 2,
+                            textAlign: 'center',
+                            px: 3,
+                        }}
+                    >
+                        <CircularProgress color="inherit" size={48} thickness={4} />
+                        <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
+                            {declarationValidateTitle}
+                        </Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 420 }}>
+                            Please wait while we verify your uploads in the background.
+                        </Typography>
+                    </Box>
+                </Backdrop>
             </div>
         </LocalizationProvider>
     )

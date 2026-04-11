@@ -1,4 +1,4 @@
-import { Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, CircularProgress, Switch, FormControlLabel } from "@mui/material";
+import { Alert, Backdrop, Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, CircularProgress, Snackbar, Switch, FormControlLabel } from "@mui/material";
 import FundOverviewData from "./subsections/fundOverviewData/FundOverviewData";
 import InvestmentPartner from "./subsections/fundOverviewData/investmentPartner/InvestmentPartner";
 import InvestmentStrategy from "./subsections/fundOverviewData/investmentStrategy/InvestmentStrategy";
@@ -6,7 +6,7 @@ import ContributorDetails from "./subsections/fundOverviewData/contributorDetail
 import InvestmentAssociate from "./subsections/fundOverviewData/investmentAssociate/InvestmentAssociate";
 import InvestmentPast from "./subsections/fundOverviewData/investmentPast/InvestmentPast";
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import PrelimApplicationData from "./subsections/fundOverviewData/PrelimApplication";
 import { clearPrelimApplication, selectPrelimApplication, updatePrelimApplicationAsync } from "./subsections/fundOverviewData/prelimApplicationDataSlice";
@@ -21,7 +21,12 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
-import { markFundStepComplete } from "./wizardProgress";
+import {
+    markFundStepComplete,
+    readAccordionMaxPanel,
+    writeAccordionMaxPanel,
+} from "./wizardProgress";
+import { opaqueInfoToastAlertSx } from "../../lib/ui/opaqueInfoToastAlertSx";
 
 export const Fund = (props: any) => {
 
@@ -31,6 +36,8 @@ export const Fund = (props: any) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
+    const statusPrelims = prelimApplicationState.prelimApplication.status || '';
+    const skipAccordionLock = String(statusPrelims) === 'REVISE';
     const effectivePrelimId = String(
         prelimApplicationState.prelimApplication?.id || prelimApplicationId || id || ''
     );
@@ -76,20 +83,36 @@ export const Fund = (props: any) => {
 
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState<string | false>("1");
+    const [maxUnlockedPanel, setMaxUnlockedPanel] = useState(1);
+    const accordionPrelimIdRef = useRef<string>('');
+    const [fundCompletenessToastOpen, setFundCompletenessToastOpen] = useState(false);
+    /** Panel ids ("1"–"7") that failed the last full-fund validation; shown with a mild red tint. */
+    const [fundPanelValidationErrors, setFundPanelValidationErrors] = useState<string[]>([]);
+    /** Deal Flow/MIS: react-hook-form or document errors while editing (not only full-fund validation). */
+    const [dealFlowSectionHasErrors, setDealFlowSectionHasErrors] = useState(false);
+    const [fundValidatingAll, setFundValidatingAll] = useState(false);
 
-    const handleChange =
-        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            setExpanded(isExpanded ? panel : false);
-            if (isExpanded) {
-                setTimeout(() => {
-                    const nextAccordion = accordionRefs[panel as keyof typeof accordionRefs]?.current;
-                    if (nextAccordion) {
-                        nextAccordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 300);
+    const reportDealFlowSectionErrors = useCallback((hasErrors: boolean) => {
+        setDealFlowSectionHasErrors(hasErrors);
+    }, []);
+
+    useEffect(() => {
+        if (skipAccordionLock) {
+            setMaxUnlockedPanel(7);
+            return;
+        }
+        if (!Number(effectivePrelimId)) {
+            if (accordionPrelimIdRef.current !== effectivePrelimId) {
+                accordionPrelimIdRef.current = effectivePrelimId;
+                setMaxUnlockedPanel(1);
             }
-        };
-
+            return;
+        }
+        if (accordionPrelimIdRef.current !== effectivePrelimId) {
+            accordionPrelimIdRef.current = effectivePrelimId;
+            setMaxUnlockedPanel(readAccordionMaxPanel(effectivePrelimId, false));
+        }
+    }, [effectivePrelimId, skipAccordionLock]);
 
     const prelimRef = useRef<any>(null);
     const strategyRef = useRef<any>(null);
@@ -117,54 +140,169 @@ export const Fund = (props: any) => {
     /** Accordion panel ids matching validateAllFundSections order (all fund accordions 1–7). */
     const FUND_MANDATORY_PANEL_ORDER = ["1", "2", "3", "4", "5", "6", "7"];
 
-    const validateAllFundSections = async (): Promise<boolean[]> => {
-        const [r1, r2, r3, r4, r6, r7] = await Promise.all([
-            prelimRef.current?.submit?.() ?? Promise.resolve(true),
-            strategyRef.current?.submit?.() ?? Promise.resolve(true),
-            investmentPartnerRef.current?.submit?.() ?? Promise.resolve(true),
-            investmentAssociateRef.current?.submit?.() ?? Promise.resolve(true),
-            lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit?.() ?? Promise.resolve(true),
-            dealFlowRef.current?.submit?.() ?? Promise.resolve(true),
-        ]);
-        const r5 = hasInvestment
-            ? await (investmentPastRef.current?.submit?.() ?? Promise.resolve(false))
-            : true;
-        return [r1, r2, r3, r4, r5, r6, r7];
+    const FUND_COMPLETENESS_TOAST_TEXT =
+        'Please review all fund sections and fix any errors before continuing. Choose Stay to keep working here, or Continue to go to the declaration step anyway.';
+
+    const fundAccordionShellSx = (panelId: string) => {
+        const hasErr =
+            fundPanelValidationErrors.includes(panelId) ||
+            (panelId === "7" && dealFlowSectionHasErrors);
+        return {
+            border: '1px solid rgba(0,0,0,0.08)',
+            borderRadius: '12px !important',
+            mb: 2,
+            overflow: 'hidden',
+            ...(hasErr
+                ? {
+                    backgroundColor: 'rgba(211, 47, 47, 0.055)',
+                    borderColor: 'rgba(211, 47, 47, 0.22)',
+                }
+                : {}),
+            '&:before': { display: 'none' },
+            '&.Mui-expanded': {
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                borderColor: '#000080',
+                borderLeft: '6px solid #000080',
+                ...(hasErr ? { backgroundColor: 'rgba(211, 47, 47, 0.045)' } : {}),
+            },
+        };
     };
 
-    const expandFirstFailedMandatoryPanel = (validations: boolean[]) => {
-        const firstInvalidIndex = validations.findIndex((res) => res === false);
-        if (firstInvalidIndex === -1) return;
-        const panel = FUND_MANDATORY_PANEL_ORDER[firstInvalidIndex];
-        setExpanded(panel);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    const applyFundCompletenessFailure = (validations: boolean[]) => {
+        const failedIds = FUND_MANDATORY_PANEL_ORDER.filter((_, i) => validations[i] === false);
+        setFundPanelValidationErrors(failedIds);
+        setFundCompletenessToastOpen(true);
+        if (!skipAccordionLock) {
+            setMaxUnlockedPanel((m) => {
+                const next = Math.max(m, 7);
+                if (Number(effectivePrelimId)) {
+                    writeAccordionMaxPanel(effectivePrelimId, next);
+                }
+                return next;
+            });
+        }
     };
+
+    const handleFundCompletenessToastClose = () => {
+        setFundCompletenessToastOpen(false);
+    };
+
+    const stayReviewFundSections = () => {
+        setFundCompletenessToastOpen(false);
+    };
+
+    const continueToDeclarationDespiteFundErrors = () => {
+        setFundCompletenessToastOpen(false);
+        setFundPanelValidationErrors([]);
+        markFundStepComplete(effectivePrelimId);
+        navigate(`/preliminary/${prelimApplicationId}/declaration`);
+    };
+
+    /** When validating all sections at once, do not run per-section `onSaveSuccess` (avoids re-entering accordion flow in parallel). */
+    const SILENT_VALIDATE = { silent: true } as const;
+
+    const validateAllFundSections = async (): Promise<boolean[]> => {
+        setFundValidatingAll(true);
+        try {
+            const [r1, r2, r3, r4, r6, r7] = await Promise.all([
+                prelimRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
+                strategyRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
+                investmentPartnerRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
+                investmentAssociateRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
+                lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
+                dealFlowRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
+            ]);
+            const r5 = hasInvestment
+                ? await (investmentPastRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(false))
+                : true;
+            return [r1, r2, r3, r4, r5, r6, r7];
+        } finally {
+            setFundValidatingAll(false);
+        }
+    };
+
+    /** Panels whose Save & Continue is a raw button (no prior child submit); must run `submit()` here. */
+    const FUND_PANELS_WITH_BUTTON_ONLY_CONTINUE = new Set(["3", "4", "5"]);
+
+    const getFundPanelSubmitRef = (panelId: string) => {
+        const map: Record<string, React.MutableRefObject<any>> = {
+            "1": prelimRef,
+            "2": strategyRef,
+            "3": investmentPartnerRef,
+            "4": investmentAssociateRef,
+            "5": investmentPastRef,
+            "6": lpAdvisoryGovernanceInvestmentCommitteeRef,
+            "7": dealFlowRef,
+            "8": othersRef,
+        };
+        return map[panelId];
+    };
+
+    const handleChange =
+        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+            const panelNum = parseInt(panel, 10);
+            if (!skipAccordionLock && isExpanded && panelNum > maxUnlockedPanel) {
+                return;
+            }
+            setExpanded(isExpanded ? panel : false);
+
+            if (isExpanded && fundPanelValidationErrors.includes(panel)) {
+                const submitRef = getFundPanelSubmitRef(panel);
+                void (async () => {
+                    const ok = (await submitRef?.current?.submit?.(SILENT_VALIDATE)) ?? false;
+                    if (ok) {
+                        setFundPanelValidationErrors((prev) => prev.filter((id) => id !== panel));
+                    }
+                })();
+            }
+        };
 
     const handleAccordionSaveAndContinue = async (currentPanel: string, nextPanel: string | null, ref: any) => {
+        const resolvedRef =
+            ref && ref.current
+                ? ref
+                : FUND_PANELS_WITH_BUTTON_ONLY_CONTINUE.has(currentPanel)
+                    ? getFundPanelSubmitRef(currentPanel)
+                    : null;
+
         let isSectionValid = true;
-        if (ref && ref.current && ref.current.submit) {
-            isSectionValid = await ref.current.submit();
+        if (resolvedRef?.current?.submit) {
+            isSectionValid = await resolvedRef.current.submit();
         }
 
-        if (isSectionValid) {
-            if (nextPanel) {
-                setExpanded(nextPanel);
-                // Scroll to the next accordion header
-                setTimeout(() => {
-                    const nextAccordion = accordionRefs[nextPanel as keyof typeof accordionRefs]?.current;
-                    if (nextAccordion) {
-                        nextAccordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 300);
-            } else {
-                const validations = await validateAllFundSections();
-                if (!validations.every((res) => res === true)) {
-                    expandFirstFailedMandatoryPanel(validations);
-                    return;
+        if (!isSectionValid) {
+            setFundPanelValidationErrors((prev) =>
+                Array.from(new Set([...prev, currentPanel]))
+            );
+            return;
+        }
+
+        if (nextPanel) {
+            setFundCompletenessToastOpen(false);
+            setFundPanelValidationErrors([]);
+            const nextNum = parseInt(nextPanel, 10);
+            setMaxUnlockedPanel((m) => {
+                const next = Math.max(m, nextNum);
+                writeAccordionMaxPanel(effectivePrelimId, next);
+                return next;
+            });
+            setExpanded(nextPanel);
+            setTimeout(() => {
+                const nextAccordion = accordionRefs[nextPanel as keyof typeof accordionRefs]?.current;
+                if (nextAccordion) {
+                    nextAccordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
-                markFundStepComplete(effectivePrelimId);
-                navigate(`/preliminary/${prelimApplicationId}/declaration`);
+            }, 300);
+        } else {
+            const validations = await validateAllFundSections();
+            if (!validations.every((res) => res === true)) {
+                applyFundCompletenessFailure(validations);
+                return;
             }
+            setFundCompletenessToastOpen(false);
+            setFundPanelValidationErrors([]);
+            markFundStepComplete(effectivePrelimId);
+            navigate(`/preliminary/${prelimApplicationId}/declaration`);
         }
     };
 
@@ -187,7 +325,10 @@ export const Fund = (props: any) => {
             }
         });
         if (!validations.every((res) => res === true)) {
-            expandFirstFailedMandatoryPanel(validations);
+            applyFundCompletenessFailure(validations);
+        } else {
+            setFundCompletenessToastOpen(false);
+            setFundPanelValidationErrors([]);
         }
         return validations;
     };
@@ -306,18 +447,7 @@ export const Fund = (props: any) => {
                             <Accordion
                                 ref={accordionRefs["1"]}
                                 elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#000080',
-                                        borderLeft: '6px solid #000080'
-                                    }
-                                }}
+                                sx={fundAccordionShellSx("1")}
                                 expanded={expanded === "1"}
                                 onChange={handleChange("1")}
                             >
@@ -367,18 +497,7 @@ export const Fund = (props: any) => {
                             <Accordion
                                 ref={accordionRefs["2"]}
                                 elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#000080',
-                                        borderLeft: '6px solid #000080'
-                                    }
-                                }}
+                                sx={fundAccordionShellSx("2")}
                                 expanded={expanded === "2"}
                                 onChange={handleChange("2")}
                             >
@@ -428,18 +547,7 @@ export const Fund = (props: any) => {
                             <Accordion
                                 ref={accordionRefs["3"]}
                                 elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#000080',
-                                        borderLeft: '6px solid #000080'
-                                    }
-                                }}
+                                sx={fundAccordionShellSx("3")}
                                 expanded={expanded === "3"}
                                 onChange={handleChange("3")}
                             >
@@ -496,18 +604,7 @@ export const Fund = (props: any) => {
                             <Accordion
                                 ref={accordionRefs["4"]}
                                 elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#000080',
-                                        borderLeft: '6px solid #000080'
-                                    }
-                                }}
+                                sx={fundAccordionShellSx("4")}
                                 expanded={expanded === "4"}
                                 onChange={handleChange("4")}
                             >
@@ -564,18 +661,7 @@ export const Fund = (props: any) => {
                             <Accordion
                                 ref={accordionRefs["5"]}
                                 elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#000080',
-                                        borderLeft: '6px solid #000080'
-                                    }
-                                }}
+                                sx={fundAccordionShellSx("5")}
                                 expanded={expanded === "5"}
                                 onChange={handleChange("5")}
                             >
@@ -685,18 +771,7 @@ export const Fund = (props: any) => {
                             <Accordion
                                 ref={accordionRefs["6"]}
                                 elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#000080',
-                                        borderLeft: '6px solid #000080'
-                                    }
-                                }}
+                                sx={fundAccordionShellSx("6")}
                                 expanded={expanded === "6"}
                                 onChange={handleChange("6")}
                             >
@@ -746,18 +821,7 @@ export const Fund = (props: any) => {
                             <Accordion
                                 ref={accordionRefs["7"]}
                                 elevation={0}
-                                sx={{
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: '12px !important',
-                                    mb: 2,
-                                    overflow: 'hidden',
-                                    '&:before': { display: 'none' },
-                                    '&.Mui-expanded': {
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                                        borderColor: '#000080',
-                                        borderLeft: '6px solid #000080'
-                                    }
-                                }}
+                                sx={fundAccordionShellSx("7")}
                                 expanded={expanded === "7"}
                                 onChange={handleChange("7")}
                             >
@@ -798,6 +862,7 @@ export const Fund = (props: any) => {
                                             prelimApplicationId={String(prelimApplicationId)}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("7", null, null)}
+                                            onSectionHasErrorsChange={reportDealFlowSectionErrors}
                                         />
                                     </Box>
                                 </AccordionDetails>
@@ -987,6 +1052,62 @@ export const Fund = (props: any) => {
                     </Box>
                 </Button>
             </Box>
+
+            <Backdrop
+                sx={{
+                    zIndex: (theme) => theme.zIndex.modal + 10,
+                    color: '#fff',
+                    flexDirection: 'column',
+                    gap: 2,
+                }}
+                open={fundValidatingAll}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'center',
+                        px: 3,
+                    }}
+                >
+                    <CircularProgress color="inherit" size={48} thickness={4} />
+                    <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 360 }}>
+                        Validating fund sections…
+                    </Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 400 }}>
+                        Please wait while we check your information in the background.
+                    </Typography>
+                </Box>
+            </Backdrop>
+
+            <Snackbar
+                open={fundCompletenessToastOpen}
+                autoHideDuration={null}
+                onClose={handleFundCompletenessToastClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}
+            >
+                <Alert
+                    onClose={stayReviewFundSections}
+                    severity="info"
+                    variant="standard"
+                    sx={{ ...opaqueInfoToastAlertSx, maxWidth: 640 }}
+                    action={
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'flex-end', mt: 0.25 }}>
+                            <Button color="primary" size="small" variant="outlined" onClick={stayReviewFundSections}>
+                                Stay
+                            </Button>
+                            <Button color="primary" size="small" variant="contained" onClick={continueToDeclarationDespiteFundErrors}>
+                                Continue
+                            </Button>
+                        </Box>
+                    }
+                >
+                    {FUND_COMPLETENESS_TOAST_TEXT}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

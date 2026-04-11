@@ -1,5 +1,5 @@
-import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
+import { Alert, Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Snackbar, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react"
 import { fetchInvestmentPastAsync, selectInvestmentPast, createInvestmentPastAsync, deleteInvestmentPastAsync } from './investmentPastSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
@@ -11,9 +11,10 @@ import { Delete, Edit } from '@mui/icons-material';
 import { InvestmentPastRow } from "./InvestmentPastRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { InvestmentPastModel } from "./InvestmentPastModel";
+import { opaqueInfoToastAlertSx } from "../../../../../lib/ui/opaqueInfoToastAlertSx";
 
 export type InvestmentPastHandle = {
-    submit: () => Promise<boolean>;
+    submit: (opts?: { silent?: boolean }) => Promise<boolean>;
 };
 
 interface InvestmentPastProps {
@@ -44,6 +45,15 @@ const InvestmentPast = forwardRef<InvestmentPastHandle, InvestmentPastProps>(fun
     const [isModelOpen, setIsModelOpen] = useState(false);
     const handleOpen = () => setIsModelOpen(true);
     const handleClose = () => setIsModelOpen(false);
+    const [validationToastOpen, setValidationToastOpen] = useState(false);
+    const [validationToastMessage, setValidationToastMessage] = useState('');
+    const showValidationToast = useCallback((message: string) => {
+        setValidationToastMessage(message);
+        setValidationToastOpen(true);
+    }, []);
+    const handleValidationToastClose = () => {
+        setValidationToastOpen(false);
+    };
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsAssociateLevelAsync', props.prelimApplicationId);
         dispatch(fetchInvestmentPastAsync(
@@ -65,27 +75,29 @@ const InvestmentPast = forwardRef<InvestmentPastHandle, InvestmentPastProps>(fun
     useImperativeHandle(
         ref,
         () => ({
-            submit: async () => {
+            submit: async (opts?: { silent?: boolean }) => {
+                const silent = opts?.silent === true;
                 if (!hasInv) {
                     return true;
                 }
-                if (
-                    investmentPastsState.status.fetchStatus !== FetchStatus.IDLE ||
-                    investmentPastsState.actionStatus.fetchStatus !== FetchStatus.IDLE
-                ) {
+                const statusIdle = investmentPastsState.status.fetchStatus === FetchStatus.IDLE;
+                const actionIdle = investmentPastsState.actionStatus.fetchStatus === FetchStatus.IDLE;
+                if (!silent && (!statusIdle || !actionIdle)) {
                     return false;
                 }
                 const n = investmentPastsState.investmentPasts?.length ?? 0;
                 if (n < 1) {
-                    window.alert(
-                        "Add at least one past investment record before continuing (or set “Have any investments…” to No)."
-                    );
+                    if (!silent) {
+                        showValidationToast(
+                            'Add at least one past investment record before continuing (or set "Have any investments…" to No).'
+                        );
+                    }
                     return false;
                 }
                 return true;
             },
         }),
-        [hasInv, investmentPastsState]
+        [hasInv, investmentPastsState, showValidationToast]
     );
 
     const tableHeaders = [
@@ -106,6 +118,7 @@ const InvestmentPast = forwardRef<InvestmentPastHandle, InvestmentPastProps>(fun
     }
 
     return (
+        <>
         <Box >
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
                 <Grid item xs={11.5}>
@@ -151,6 +164,23 @@ const InvestmentPast = forwardRef<InvestmentPastHandle, InvestmentPastProps>(fun
                 </Grid>
             </Grid>
         </Box>
+        <Snackbar
+            open={validationToastOpen}
+            autoHideDuration={9000}
+            onClose={handleValidationToastClose}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
+        >
+            <Alert
+                onClose={handleValidationToastClose}
+                severity="info"
+                variant="standard"
+                sx={opaqueInfoToastAlertSx}
+            >
+                {validationToastMessage}
+            </Alert>
+        </Snackbar>
+        </>
     );
 });
 

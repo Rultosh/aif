@@ -58,22 +58,25 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
         mode: "all",
+        shouldFocusError: false,
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    const onSubmit = async (data: IPrelimApplicationData) => {
+    const persistLpAdvisorySection = async (data: IPrelimApplicationData, silent: boolean) => {
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
-        if (props.onSaveSuccess) {
+        if (!silent && props.onSaveSuccess) {
             props.onSaveSuccess();
         }
     };
 
+    const onSubmit = async (data: IPrelimApplicationData) => persistLpAdvisorySection(data, false);
+
     useImperativeHandle(ref, () => ({
-        submit: async () => {
+        submit: async (opts?: { silent?: boolean }) => {
             let isValid = false;
             await handleSubmit(
                 (data) => {
-                    onSubmit(data);
+                    void persistLpAdvisorySection(data, Boolean(opts?.silent));
                     isValid = true;
                 },
                 () => {
