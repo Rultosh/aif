@@ -17,7 +17,6 @@ import { state, city } from "./stateAndCity";
 import signupBg from '../../images/signup_ai.jpeg';
 
 import { getError } from "../../lib/api-status/errorHandler"
-import ReCAPTCHA from "react-google-recaptcha";
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -65,28 +64,15 @@ const SignUp = () => {
     const [showResponse, setShowResponse] = useState(false);
     const [formDataEmail, setFormDataEmail] = useState(false);
     const [registedWithSebi, setRegisteredWithSebi] = useState("no");
-    const captchaRef = React.createRef<ReCAPTCHA>();
 
     async function handleSubmitForm(data: any) {
-        let captchaResponse: string | null | undefined = "BLANK";
-        try {
-            captchaResponse = await captchaRef.current?.executeAsync();
-        } catch (e) {
-            captchaResponse = "BLANK";
-        }
-        if (captchaResponse === null || captchaResponse === undefined) {
-            captchaResponse = "BLANK";
-        }
-
-        console.log("recaptcha", captchaResponse);
         console.log(data)
         setShowResponse(true)
         dispatch(
             signupUsersAsync(
-                wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
+                wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse: "BLANK" })
             )
         )
-        captchaRef.current?.reset();
     }
 
 
@@ -295,11 +281,6 @@ const SignUp = () => {
                 }
             }} />
 
-            <ReCAPTCHA
-                ref={captchaRef}
-                size={'invisible'}
-                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
-            />
             <Container maxWidth="lg" sx={{ pt: '100px', pb: '60px', position: 'relative', zIndex: 1 }}>
 
                 <Paper

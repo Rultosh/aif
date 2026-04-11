@@ -26,7 +26,6 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 // Image imports removed as they have been replaced by video
 
-import ReCAPTCHA from "react-google-recaptcha";
 import { env } from 'yargs';
 import ReactDOM from 'react-dom';
 import { FetchStatus } from '../../lib/api-status/IStatus';
@@ -74,8 +73,6 @@ const Landing = () => {
     const [selectedRole, setSelectedRole] = useState<string>('');
     const usersState = useAppSelector(selectUsers)
     // console.log(usersState)
-
-    const captchaRef = React.createRef<ReCAPTCHA>();
 
     useEffect(() => {
         const token = state.token != null ? String(state.token) : localStorage.getItem('token');
@@ -176,38 +173,14 @@ const Landing = () => {
     };
 
     async function isUserValid(formData: any) {
-        var captchaResponse: string | undefined | null;
-
-        if (captchaRef && captchaRef.current) {
-            var captchaTimeout = setTimeout(() => {
-                dispatch(setErrorMessage("Captcha not available. Please refresh the screen and try again."));
-            }, 1000)
-            captchaResponse = await captchaRef.current.executeAsync();
-            clearTimeout(captchaTimeout);
-            console.log("Captcha: " + captchaResponse);
-        }
-
-        if (captchaResponse === null || captchaResponse === undefined) {
-            captchaResponse = "BLANK";
-        }
-
-        console.log(captchaResponse);
-
         dispatch(authenticateThunk(wrapArgument(
-            actionId, { ...formData, captchaResponse }
+            actionId, { ...formData, captchaResponse: "BLANK" }
         )));
-
-        captchaRef.current?.reset();
 
     }
 
     return (
         <>
-            <ReCAPTCHA
-                ref={captchaRef}
-                size={'invisible'}
-                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
-            />
             <Box sx={{ pt: '3%', height: '100vh', display: 'flex', overflow: 'hidden' }}>
                 {/* Left Section - Video Background on White */}
                 <Box sx={{
@@ -319,7 +292,6 @@ const Landing = () => {
                                     onClick={() => {
                                         setOtpValue('');
                                         dispatch(clearMfaPending());
-                                        captchaRef.current?.reset();
                                     }}
                                 >
                                     Back to login

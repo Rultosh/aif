@@ -28,6 +28,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const [actionUid] = useState(uuid());
     const [documentError, setDocumentError] = useState('');
     const prelimAppicationId = props.prelimApplicationId;
+    const effectiveId = String(prelimAppicationId || prelimApplicationState.prelimApplication?.id || id || '');
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -95,8 +96,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
 
     const onSubmit = async (data: IPrelimApplicationData): Promise<boolean> => {
         const requiredBuckets = [
-            `sdDetailsOfCurrentPipelineOfDealsUnderConsideration${id}`,
-            `sdEmpanelledListOfExternalFirms${id}`,
+            `sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`,
+            `sdEmpanelledListOfExternalFirms${effectiveId}`,
         ];
         const checks = await Promise.all(requiredBuckets.map((bucket) => hasUploadedFiles(bucket)));
         const allUploaded = checks.every(Boolean);
@@ -366,7 +367,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             borderRadius: '16px',
                             backgroundColor: '#fafafa'
                         }}>
-                            {Number(id) ? (
+                            {Number(effectiveId) ? (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
@@ -385,7 +386,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Details of current pipeline of deals under consideration" id={`sdDetailsOfCurrentPipelineOfDealsUnderConsideration${id}`} />
+                                        <DocumentChip label="Upload Document" validationTitle="Details of current pipeline of deals under consideration" id={`sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`} />
                                     </span>
                                 </Box>
                             ) : (
@@ -407,7 +408,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             borderRadius: '16px',
                             backgroundColor: '#fafafa'
                         }}>
-                            {Number(id) ? (
+                            {Number(effectiveId) ? (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
@@ -426,7 +427,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Empanelled list of external Firms" id={`sdEmpanelledListOfExternalFirms${id}`} />
+                                        <DocumentChip label="Upload Document" validationTitle="Empanelled list of external Firms" id={`sdEmpanelledListOfExternalFirms${effectiveId}`} />
                                     </span>
                                 </Box>
                             ) : (

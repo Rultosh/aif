@@ -27,12 +27,13 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
     const prelimAppicationId = props.prelimApplicationId;
+    const effectiveId = String(prelimAppicationId || prelimApplicationState.prelimApplication?.id || id || '');
     const dispatch = useAppDispatch();
     const [documentError, setDocumentError] = useState('');
 
     const hasRiskAssessmentDocument = async (): Promise<boolean> => {
         try {
-            const bucketId = `sdRiskAssessmentAndMitigationPlan${id}`;
+            const bucketId = `sdRiskAssessmentAndMitigationPlan${effectiveId}`;
             const res = await FileUploadService.list(bucketId);
             const files = Array.isArray(res?.data)
                 ? res.data
@@ -361,7 +362,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             borderRadius: '16px',
                             backgroundColor: '#fafafa'
                         }}>
-                            {Number(id) ? (
+                            {Number(effectiveId) ? (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
@@ -380,7 +381,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Risk Assessment and Mitigation Plan" id={`sdRiskAssessmentAndMitigationPlan${id}`} />
+                                        <DocumentChip label="Upload Document" validationTitle="Risk Assessment and Mitigation Plan" id={`sdRiskAssessmentAndMitigationPlan${effectiveId}`} />
                                     </span>
                                 </Box>
                             ) : (
