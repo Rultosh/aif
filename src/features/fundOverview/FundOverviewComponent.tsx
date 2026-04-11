@@ -119,6 +119,13 @@ export const FundOverview = (props: any) => {
         ? allSteps.filter(s => s.path === 'preview')
         : allSteps;
 
+    const prelimWizardIdForStepper = String(prelimApplicationState.prelimApplication?.id || id || '');
+    const hasRealPrelim = Boolean(
+        prelimWizardIdForStepper &&
+            Number(prelimWizardIdForStepper) &&
+            !Number.isNaN(Number(prelimWizardIdForStepper))
+    );
+
     const currentStep = filteredSteps.find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
 
     const userCannotAccessPreliminary =
@@ -179,7 +186,6 @@ export const FundOverview = (props: any) => {
                     {(!isRestricted && usersState.role === 'USER') && (
                         <Box sx={{ width: '100%', display: 'flex', gap: 0.5 }}>
                             {filteredSteps.map((s, index, array) => {
-                                const isNew = id?.toString() === 'NEW';
                                 const score = Number(selfRatingState.selfRatings.score || 0);
                                 const isFailed = score < 0.7;
 
@@ -194,7 +200,6 @@ export const FundOverview = (props: any) => {
                                 const pathLower = pathname.toLowerCase();
                                 const fundStepReached =
                                     relaxWizardLock ||
-                                    pathLower.includes('/declaration') ||
                                     pathLower.includes('/preview') ||
                                     (prelimWizardId &&
                                         Number(prelimWizardId) &&
@@ -209,11 +214,16 @@ export const FundOverview = (props: any) => {
                                 const stepPathDisabled = (): boolean => {
                                     if (relaxWizardLock) return false;
                                     if (isFailed && s.path !== 'selfrating') return true;
-                                    if (isNew && s.path !== 'selfrating') return true;
                                     if (s.path === 'selfrating') return false;
-                                    if (s.path === 'fund') return !selfRatingDone;
-                                    if (s.path === 'declaration') return !selfRatingDone || !fundStepReached;
-                                    if (s.path === 'preview') return !selfRatingDone || !fundStepReached || !declarationStepReached;
+                                    if (!hasRealPrelim && s.path !== 'selfrating') return true;
+                                    if (s.path === 'fund' || s.path === 'declaration') return !selfRatingDone;
+                                    if (s.path === 'preview') {
+                                        return (
+                                            !selfRatingDone ||
+                                            !fundStepReached ||
+                                            !declarationStepReached
+                                        );
+                                    }
                                     return false;
                                 };
                                 const isDisabled = stepPathDisabled();
