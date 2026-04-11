@@ -10,7 +10,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
-import FileUploadService from "../../../../../components/FileUploadService";
 import * as Yup from "yup";
 
 interface PrelimApplicationProps {
@@ -25,19 +24,6 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
     const [actionUid] = useState(uuid());
     const prelimAppicationId = props.prelimApplicationId;
     const dispatch = useAppDispatch();
-    const [documentError, setDocumentError] = useState('');
-
-    const hasUploadedFiles = async (bucketId: string): Promise<boolean> => {
-        try {
-            const res = await FileUploadService.list(bucketId);
-            const files = Array.isArray(res?.data)
-                ? res.data
-                : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
-            return files.length > 0;
-        } catch {
-            return false;
-        }
-    };
 
     useEffect(() => {
         if (Number(prelimAppicationId)) {
@@ -75,35 +61,20 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    const onSubmit = async (data: IPrelimApplicationData): Promise<boolean> => {
-        const pid = String(prelimAppicationId ?? '');
-        if (!Number(pid)) {
-            setDocumentError('Please save the form to upload documents.');
-            return false;
-        }
-        const buckets = [
-            `investmentOrganisationStructure${pid}`,
-            `investmentPolicyDirectorship${pid}`,
-        ];
-        const checks = await Promise.all(buckets.map((bucket) => hasUploadedFiles(bucket)));
-        if (!checks.every(Boolean)) {
-            setDocumentError('Please upload both mandatory documents (organisation structure and directorships policy) before proceeding.');
-            return false;
-        }
-        setDocumentError('');
+    const onSubmit = async (data: IPrelimApplicationData) => {
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
         if (props.onSaveSuccess) {
             props.onSaveSuccess();
         }
-        return true;
     };
 
     useImperativeHandle(ref, () => ({
         submit: async () => {
             let isValid = false;
             await handleSubmit(
-                async (data) => {
-                    isValid = await onSubmit(data);
+                (data) => {
+                    onSubmit(data);
+                    isValid = true;
                 },
                 () => {
                     isValid = false;
@@ -181,10 +152,10 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 {Number(prelimAppicationId) ? (
                                     <Grid container spacing={2}>
                                         <Grid item xs="auto">
-                                            <DocumentChip label="Organisation structure/chart of the Investment Manager" id={`investmentOrganisationStructure${prelimAppicationId}`} required />
+                                            <DocumentChip label="Organisation structure/chart of the Investment Manager" id={`investmentOrganisationStructure${prelimAppicationId}`} />
                                         </Grid>
                                         <Grid item xs="auto">
-                                            <DocumentChip label="Policy for Directorships held by Investment Managers" id={`investmentPolicyDirectorship${prelimAppicationId}`} required />
+                                            <DocumentChip label="Policy for Directorships held by Investment Managers" id={`investmentPolicyDirectorship${prelimAppicationId}`} />
                                         </Grid>
                                     </Grid>
                                 ) : (
@@ -193,11 +164,6 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                     </Typography>
                                 )}
                             </Box>
-                            {documentError && (
-                                <Typography variant="caption" color="error" sx={{ display: 'block', mt: 1 }}>
-                                    {documentError}
-                                </Typography>
-                            )}
                         </Box>
                     </Grid>
 

@@ -354,7 +354,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details of Investment Team (At KMP Level)</Typography>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#000080' }}>Details Of Investment Team (At KMP Level)</Typography>
         <Box component="form">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} sx={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -845,7 +845,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         Download Template
                       </Button>
                       <span style={{ marginTop: '10px' }}>
-                        <DocumentChip label="Upload Document" validationTitle="Details of investments undertaken by the Partner in the past 10 years" id={`docDetailsOfInvestmentsUndertakenByThePartnerInThePast10Years${investmentPartnerFormData.id}`} required />
+                        <DocumentChip label="Upload Document" validationTitle="Details of investments undertaken by the Partner in the past 10 years" id={`docDetailsOfInvestmentsUndertakenByThePartnerInThePast10Years${investmentPartnerFormData.id}`} />
                       </span>
                     </Box>
                   ) : (
@@ -862,7 +862,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   <Grid item xs={12} md={6}>
                     <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
                       <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Experience</Typography>
-                      <UploadComponents id={`sdPartnerResume${props.prelimApplicationId || uuid()}`} signed={false} required />
+                      <UploadComponents id={`sdPartnerResume${props.prelimApplicationId || uuid()}`} signed={false} />
                     </Box>
                   </Grid>
                 </Grid>

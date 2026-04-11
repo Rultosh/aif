@@ -1,5 +1,5 @@
 import '../../index.css';
-import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab } from '@mui/material';
+import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NavigationBar from '../../components/NavigationBar'
@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { wrapArgument } from '../../lib/api-status/actionWrapper';
-import { createPrelimApplicationAsync, createShellPrelimApplicationAsync, getPrelimApplicationList, getPrelimApplicationAllList, getPrelimApplicationDraftsList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
+import { createPrelimApplicationAsync, createShellPrelimApplicationAsync, getPrelimApplicationList, getPrelimApplicationAllList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
 import logo from '../../images/logo.png';
 import logoNps from '../../images/logo_nps.png';
 import uuid from "react-uuid";
@@ -87,10 +87,9 @@ export const Home = (pros: any) => {
     const [startApplicationConfirmOpen, setStartApplicationConfirmOpen] = useState(false);
     const [searchEmail, setSearchEmail] = useState<string>('');
     const [searchAifName, setSearchAifName] = useState<string>('');
-    /** 0 = workflow queue, 1 = drafts (maker/checker only). */
-    const [homeListTab, setHomeListTab] = useState(0);
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
+    const totalEntries = prelimApplications.totalEntries || 0;
     const hasActiveRole = (...roles: string[]) =>
         roles.some((role) =>
             activeRole.split(',').map((r) => r.trim().toUpperCase()).includes(role.toUpperCase())
@@ -100,24 +99,17 @@ export const Home = (pros: any) => {
         let updatedPageInfo = { ...pageInfo, pageSize: parseInt(event.target.value), pageNumber: 0 }
         setPageInfoSelect(parseInt(event.target.value));
         setPageInfo(updatedPageInfo)
-        const isDraftTab = (hasActiveRole('MAKER') || hasActiveRole('CHECKER')) && homeListTab === 1;
-        if (!isDraftTab) {
-            dispatch(getPrelimApplicationList(wrapArgument(
-                actionUid, updatedPageInfo
-            )))
-        }
+        dispatch(getPrelimApplicationList(wrapArgument(
+            actionUid, updatedPageInfo
+        )))
     };
 
-    const baseApplicationsForTable = (hasActiveRole('MAKER') || hasActiveRole('CHECKER')) && homeListTab === 1
-        ? (prelimApplications.prelimDraftApplications || [])
-        : (prelimApplications.prelimApplications || []);
-
     const getFilteredApplications = () => {
-        return baseApplicationsForTable.filter((app) => {
+        return prelimApplications.prelimApplications?.filter((app) => {
             const emailMatch = (app.createdByName || '').toLowerCase().includes(searchEmail.toLowerCase());
             const aifNameMatch = (app.nameOfTheFund || '').toLowerCase().includes(searchAifName.toLowerCase());
             return emailMatch && aifNameMatch;
-        });
+        }) || [];
     };
 
     const handleSearchEmailChange = (e: any) => {
@@ -168,15 +160,7 @@ export const Home = (pros: any) => {
         dispatch(getPrelimApplicationList(wrapArgument(
             actionUid, pageInfo
         )))
-        if (hasActiveRole('MAKER') || hasActiveRole('CHECKER')) {
-            dispatch(getPrelimApplicationDraftsList(wrapArgument(actionUid, pageInfo)))
-        }
-    }, [prelimApplications.prelimApplication, activeRole])
-
-    useEffect(() => {
-        if (!(hasActiveRole('MAKER') || hasActiveRole('CHECKER')) || homeListTab !== 1) return;
-        dispatch(getPrelimApplicationDraftsList(wrapArgument(actionUid, pageInfo)))
-    }, [homeListTab])
+    }, [prelimApplications.prelimApplication])
 
     useEffect(() => {
         console.log("checking homeunauth", CheckAuth.isUnauthorized)
@@ -362,12 +346,9 @@ export const Home = (pros: any) => {
         let updatedPageInfo = { ...pageInfo, pageNumber: pageNo }
         setPageInfo(updatedPageInfo)
         setPageInfoSelect(pageInfo.pageSize);
-        const isDraftTab = (hasActiveRole('MAKER') || hasActiveRole('CHECKER')) && homeListTab === 1;
-        if (!isDraftTab) {
-            dispatch(getPrelimApplicationList(wrapArgument(
-                actionUid, updatedPageInfo
-            )))
-        }
+        dispatch(getPrelimApplicationList(wrapArgument(
+            actionUid, updatedPageInfo
+        )))
     }
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
@@ -376,14 +357,6 @@ export const Home = (pros: any) => {
             return true
         if ((row.status === 'CREATED' || row.status === 'REVISE') && role == 'USER')
             return true
-        if (hasActiveRole('MAKER') || hasActiveRole('CHECKER')) {
-            if (homeListTab === 1) {
-                const norm = String(row.status ?? '').trim().toUpperCase();
-                if (norm === 'CREATED' || norm === 'REVISE' || norm === '') {
-                    return true;
-                }
-            }
-        }
         if ((row.status === 'MAKER_ASSIGNED' || row.status === 'REVERTED_TO_MAKER' || row.status === 'MEMO_SUBMITTED' || row.status === 'SANCTIONED') && (role == 'CHECKER' || role == 'MAKER' || role == 'MANAGER'))
             return true
         return false
@@ -391,19 +364,16 @@ export const Home = (pros: any) => {
 
     const getStatusChip = (row: IPrelimApplicationData) => {
         const status = row.status;
-        const statusNorm = String(status ?? '').trim().toUpperCase();
         let color: "success" | "error" | "warning" | "info" | "default" | "primary" | "secondary" = "default";
-        let label = String(getStatusDescription(row));
+        let label = String(getStatusDescription(row.stage, status));
 
         if (status === 'APPROVED' || label === 'Approved') {
             color = "success";
         } else if (status === 'REJECTED' || status === 'CLOSED') {
             color = "error";
-        } else if (row.selfRatingBelowMinimum === true) {
-            color = "error";
         } else if (status === 'SUBMITTED' || status === 'REVIEWED' || status === 'REVISE') {
             color = "warning";
-        } else if (statusNorm === 'CREATED' || statusNorm === '') {
+        } else if (status === 'CREATED') {
             color = "primary";
         } else if (status === 'TEMP_CLOSED') {
             color = "default";
@@ -421,24 +391,17 @@ export const Home = (pros: any) => {
         return path;
     }
 
-    const getStatusDescription = (row: IPrelimApplicationData) => {
-        const stage = row.stage;
-        const status = row.status;
-        const statusNorm = String(status ?? '').trim().toUpperCase();
+    const getStatusDescription = (stage: String | undefined, status: String | undefined) => {
+
+        const stageDescription = stage === "PRELIM" ? "Preliminary application" : "Detailed application";
 
         if (stage !== "PRELIM") {
             if (status === "REVIEWED") return "Pending final approval";
             return "Approved";
         }
 
-        switch (statusNorm) {
+        switch (status) {
             case "CREATED":
-                if (row.selfRatingBelowMinimum === true) {
-                    return "Self-rating below minimum";
-                }
-                if (row.hasSelfRatingRecord === false) {
-                    return "Pending with applicant (self-rating / fund)";
-                }
                 return "Pending submission";
             case "SUBMITTED":
                 return "Pending review";
@@ -462,8 +425,6 @@ export const Home = (pros: any) => {
                 return "Reverted to maker";
             case "SANCTIONED":
                 return "Sanctioned";
-            case "":
-                return "Pending with applicant (self-rating / fund)";
             default:
                 return "Invalid Status";
         }
@@ -475,9 +436,6 @@ export const Home = (pros: any) => {
             await promise;
             dispatch(getPrelimApplicationList(wrapArgument(actionUid, pageInfo)));
             dispatch(getPrelimApplicationAllList(wrapArgument(actionUid, pageInfo)));
-            if (hasActiveRole('MAKER') || hasActiveRole('CHECKER')) {
-                dispatch(getPrelimApplicationDraftsList(wrapArgument(actionUid, pageInfo)));
-            }
         } catch (e: any) {
             alert(e?.response?.data?.message || e?.message || 'Action failed');
         }
@@ -608,23 +566,6 @@ export const Home = (pros: any) => {
                             Start Application
                         </Button>}
                     </Box>
-                    {(hasActiveRole('MAKER') || hasActiveRole('CHECKER')) && (
-                        <Box sx={{ mb: 2 }}>
-                            <Tabs
-                                value={homeListTab}
-                                onChange={(_, next) => setHomeListTab(next)}
-                                sx={{
-                                    minHeight: 42,
-                                    '& .MuiTab-root': { textTransform: 'none', fontWeight: 600, minHeight: 42 },
-                                    borderBottom: 1,
-                                    borderColor: 'divider',
-                                }}
-                            >
-                                <Tab label="Workflow" />
-                                <Tab label="Not submitted" />
-                            </Tabs>
-                        </Box>
-                    )}
                     {activeRole !== "USER" && (
                     <Paper elevation={0} sx={{
                         backgroundColor: '#ffffff',
@@ -759,19 +700,7 @@ export const Home = (pros: any) => {
                                                     </Box>
                                                 </TableCell>
                                             </TableRow>
-                                        }) : (
-                                            <TableRow>
-                                                <TableCell colSpan={11} align="center" sx={{ py: 3 }}>
-                                                    {activeRole === 'USER'
-                                                        ? 'No applications found.'
-                                                        : (hasActiveRole('MAKER') || hasActiveRole('CHECKER')) && homeListTab === 1
-                                                            ? (searchEmail.trim() || searchAifName.trim()
-                                                                ? 'No applications found matching your search criteria.'
-                                                                : 'No not-yet-submitted applications found.')
-                                                            : 'No applications found matching your search criteria'}
-                                                </TableCell>
-                                            </TableRow>
-                                        )
+                                        }) : <TableRow><TableCell colSpan={11} align="center" sx={{ py: 3 }}>No applications found matching your search criteria</TableCell></TableRow>
                                     }
                                 </TableBody>
                             </Table>
@@ -786,7 +715,7 @@ export const Home = (pros: any) => {
                             flexWrap: 'wrap'
                         }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                {getFilteredApplications().length > 20 && (
+                                {(totalEntries > 20 || getFilteredApplications().length > 0) && (
                                     <>
                                         <Typography sx={{ fontSize: '14px', color: '#333' }}>Items per page:</Typography>
                                         <Select
@@ -805,7 +734,7 @@ export const Home = (pros: any) => {
                                 )}
                             </Box>
 
-                            {getFilteredApplications().length > 20 && (
+                            {(totalEntries > 20 || getFilteredApplications().length > 0) && (
                                 <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
                                     Showing {getFilteredApplications().length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {getFilteredApplications().length > 0 ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, getFilteredApplications().length) : 0} of {getFilteredApplications().length} results
                                 </Typography>
@@ -966,37 +895,10 @@ export const Home = (pros: any) => {
                     </Dialog>
                     <Dialog open={startApplicationConfirmOpen} onClose={() => setStartApplicationConfirmOpen(false)} fullWidth maxWidth="sm">
                         <DialogTitle>Confirm Start Application</DialogTitle>
-                        <DialogContent sx={{ overflow: 'visible' }}>
-                            <Typography sx={{ mt: 1, color: '#333' }}>
+                        <DialogContent>
+                            <Typography sx={{ mt: 1 }}>
                                 Kindly review the eligibility criteria provided on the website prior to initiating the application.
                             </Typography>
-                            <Box sx={{ mt: 2 }}>
-                                <Button
-                                    component="a"
-                                    href={
-                                        typeof window !== 'undefined'
-                                            ? `${window.location.href.split('#')[0]}#/eligibilityQuestioner`
-                                            : '#/eligibilityQuestioner'
-                                    }
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    variant="outlined"
-                                    onClick={() => setStartApplicationConfirmOpen(false)}
-                                    sx={{
-                                        textTransform: 'none',
-                                        fontWeight: 700,
-                                        color: '#1942b6',
-                                        borderColor: '#1942b6',
-                                        '&:hover': {
-                                            borderColor: '#1942b6',
-                                            color: '#1942b6',
-                                            backgroundColor: 'rgba(25, 66, 182, 0.08)',
-                                        },
-                                    }}
-                                >
-                                    Go to eligibility questionnaire
-                                </Button>
-                            </Box>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => setStartApplicationConfirmOpen(false)}>Cancel</Button>

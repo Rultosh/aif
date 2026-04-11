@@ -381,7 +381,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Risk Assessment and Mitigation Plan" id={`sdRiskAssessmentAndMitigationPlan${effectiveId}`} required />
+                                        <DocumentChip label="Upload Document" validationTitle="Risk Assessment and Mitigation Plan" id={`sdRiskAssessmentAndMitigationPlan${effectiveId}`} />
                                     </span>
                                 </Box>
                             ) : (

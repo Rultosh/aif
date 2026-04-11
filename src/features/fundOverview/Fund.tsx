@@ -79,27 +79,15 @@ export const Fund = (props: any) => {
 
     const handleChange =
         (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            if (!isExpanded) {
-                setExpanded(false);
-                return;
-            }
-            void (async () => {
-                if (panel === "4" && investmentPartnerRef.current?.submit) {
-                    const ok = await investmentPartnerRef.current.submit();
-                    if (!ok) return;
-                }
-                if (panel === "5" && investmentAssociateRef.current?.submit) {
-                    const ok = await investmentAssociateRef.current.submit();
-                    if (!ok) return;
-                }
-                setExpanded(panel);
+            setExpanded(isExpanded ? panel : false);
+            if (isExpanded) {
                 setTimeout(() => {
                     const nextAccordion = accordionRefs[panel as keyof typeof accordionRefs]?.current;
                     if (nextAccordion) {
                         nextAccordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 }, 300);
-            })();
+            }
         };
 
 
@@ -129,38 +117,19 @@ export const Fund = (props: any) => {
     /** Accordion panel ids matching validateAllFundSections order (all fund accordions 1–7). */
     const FUND_MANDATORY_PANEL_ORDER = ["1", "2", "3", "4", "5", "6", "7"];
 
-    /**
-     * Validates fund accordions 1→7 in order. Runs one section at a time so only the first
-     * failing section surfaces validation/errors; parallel validation opened every invalid section at once.
-     */
     const validateAllFundSections = async (): Promise<boolean[]> => {
-        const validators: Array<() => Promise<boolean>> = [
-            () => prelimRef.current?.submit?.() ?? Promise.resolve(true),
-            () => strategyRef.current?.submit?.() ?? Promise.resolve(true),
-            () => investmentPartnerRef.current?.submit?.() ?? Promise.resolve(true),
-            () => investmentAssociateRef.current?.submit?.() ?? Promise.resolve(true),
-            () =>
-                hasInvestment
-                    ? investmentPastRef.current?.submit?.() ?? Promise.resolve(false)
-                    : Promise.resolve(true),
-            () => lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit?.() ?? Promise.resolve(true),
-            () => dealFlowRef.current?.submit?.() ?? Promise.resolve(true),
-        ];
-        const results: boolean[] = [];
-        for (const run of validators) {
-            const ok = await run();
-            results.push(ok);
-            if (!ok) {
-                while (results.length < FUND_MANDATORY_PANEL_ORDER.length) {
-                    results.push(true);
-                }
-                break;
-            }
-        }
-        while (results.length < FUND_MANDATORY_PANEL_ORDER.length) {
-            results.push(true);
-        }
-        return results;
+        const [r1, r2, r3, r4, r6, r7] = await Promise.all([
+            prelimRef.current?.submit?.() ?? Promise.resolve(true),
+            strategyRef.current?.submit?.() ?? Promise.resolve(true),
+            investmentPartnerRef.current?.submit?.() ?? Promise.resolve(true),
+            investmentAssociateRef.current?.submit?.() ?? Promise.resolve(true),
+            lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit?.() ?? Promise.resolve(true),
+            dealFlowRef.current?.submit?.() ?? Promise.resolve(true),
+        ]);
+        const r5 = hasInvestment
+            ? await (investmentPastRef.current?.submit?.() ?? Promise.resolve(false))
+            : true;
+        return [r1, r2, r3, r4, r5, r6, r7];
     };
 
     const expandFirstFailedMandatoryPanel = (validations: boolean[]) => {
@@ -168,12 +137,7 @@ export const Fund = (props: any) => {
         if (firstInvalidIndex === -1) return;
         const panel = FUND_MANDATORY_PANEL_ORDER[firstInvalidIndex];
         setExpanded(panel);
-        setTimeout(() => {
-            const el = accordionRefs[panel as keyof typeof accordionRefs]?.current;
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 300);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleAccordionSaveAndContinue = async (currentPanel: string, nextPanel: string | null, ref: any) => {
@@ -505,7 +469,7 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "3" ? '#000080' : '#444'
                                         }}>
-                                            Details of Investment Team (At KMP Level)
+                                            Details Of Investment Team (At KMP Level)
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
@@ -518,7 +482,7 @@ export const Fund = (props: any) => {
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
-                                                onClick={() => handleAccordionSaveAndContinue("3", "4", investmentPartnerRef)}
+                                                onClick={() => handleAccordionSaveAndContinue("3", "4", null)}
                                                 sx={internalButtonSx}
                                             >
                                                 Save & Continue
@@ -586,7 +550,7 @@ export const Fund = (props: any) => {
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
-                                                onClick={() => handleAccordionSaveAndContinue("4", "5", investmentAssociateRef)}
+                                                onClick={() => handleAccordionSaveAndContinue("4", "5", null)}
                                                 sx={internalButtonSx}
                                             >
                                                 Save & Continue
