@@ -3,6 +3,10 @@ import { Dayjs } from "dayjs";
 export interface IPrelimApplicationData {
   id: Number | undefined,
   status: String | undefined,
+  /** Maker/checker drafts list: whether a self-rating exists for this prelim. */
+  hasSelfRatingRecord?: boolean,
+  /** Maker/checker drafts list: true when applicant self-rating average is below the minimum. */
+  selfRatingBelowMinimum?: boolean,
   /** Admin who forwarded for approval; cannot be the same user who approves. */
   reviewedByUserId: Number | undefined,
   assignedCheckerUserId?: Number | undefined,

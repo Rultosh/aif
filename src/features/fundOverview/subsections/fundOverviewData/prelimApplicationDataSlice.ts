@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ActionWrapper } from '../../../../lib/api-status/actionWrapper'
-import { fetchFundOverviewData, fetchFundOverviewList, fetchFundOverviewAllList, patchPrelimApplication, postPrelimApplication, postApplication, postPrelimApplicationShell } from './fundOverviewDataApi'
+import { fetchFundOverviewData, fetchFundOverviewList, fetchFundOverviewAllList, fetchPrelimDraftsList, patchPrelimApplication, postPrelimApplication, postApplication, postPrelimApplicationShell } from './fundOverviewDataApi'
 import { getError } from '../../../../lib/api-status/errorHandler'
 import { defaultIPrelimApplicationData, IPrelimApplicationData, IApplicationData } from './IPrelimApplicationData'
 import { FetchStatus, IStatus, ResponseCode } from '../../../../lib/api-status/IStatus'
@@ -8,6 +8,8 @@ import { RootState } from '../../../../app/store'
 
 export interface PrelimApplicationState {
   prelimApplications: IPrelimApplicationData[],
+  /** Maker/checker: drafts not yet submitted into workflow (from GET /prelims/drafts). */
+  prelimDraftApplications: IPrelimApplicationData[],
   prelimApplication: IPrelimApplicationData,
   status: IStatus,
   allStatus: IStatus,
@@ -21,6 +23,7 @@ export interface IPageInfo {
 
 const initialState: PrelimApplicationState = {
   prelimApplications: [],
+  prelimDraftApplications: [],
   prelimApplication: defaultIPrelimApplicationData,
   status: {},
   allStatus: {},
@@ -65,6 +68,19 @@ export const getPrelimApplicationAllList = createAsyncThunk(
         const response = await fetchFundOverviewAllList(args.argument);
         return response.data;
       }
+    } catch (reason) {
+      console.log(reason)
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
+
+export const getPrelimApplicationDraftsList = createAsyncThunk(
+  'prelimApplicationDrafts/read',
+  async (_args: ActionWrapper<IPageInfo | undefined>, { rejectWithValue }) => {
+    try {
+      const response = await fetchPrelimDraftsList();
+      return response.data;
     } catch (reason) {
       console.log(reason)
       return rejectWithValue(getError(reason));
@@ -237,6 +253,15 @@ const prelimApplicationDataSlice = createSlice({
       })
       .addCase(getPrelimApplicationAllList.fulfilled, (state, action: PayloadAction<IPrelimApplicationData[]>) => {
         state.totalEntries = action.payload?.length || 0;
+      })
+      .addCase(
+        getPrelimApplicationDraftsList.fulfilled,
+        (state, action: PayloadAction<IPrelimApplicationData[]>) => {
+          state.prelimDraftApplications = action.payload || [];
+        }
+      )
+      .addCase(getPrelimApplicationDraftsList.rejected, state => {
+        state.prelimDraftApplications = [];
       })
       .addCase(createApplicationAsync.pending, state => {
         state.status.fetchStatus = FetchStatus.DOING;
