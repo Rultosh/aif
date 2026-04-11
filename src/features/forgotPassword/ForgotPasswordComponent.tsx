@@ -1,17 +1,12 @@
-import { Container, Grid, Card, CardContent, Box, Button, Typography, TextField, IconButton, Link, Divider, InputAdornment } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Typography, TextField, Link, Divider, InputAdornment, CircularProgress } from "@mui/material";
 import IconButtonIcon from '@mui/material/IconButton';
-import logo from '../../images/logo.png';
-import ffsLogo from '../../images/ffs_final_logo.png';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import CloseIcon from '@mui/icons-material/Close';
-import loginIconImg from '../../images/aif_login_icon.png'
+import { useAppDispatch } from '../../app/hooks'
 import uuid from "react-uuid";
 import { useEffect, useState } from "react";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
-import { setUserPasswordAsync, selectedforgotPassword, changeUserPasswordAsync } from './forgotPasswordSlice'
+import { setUserPasswordAsync, changeUserPasswordAsync } from './forgotPasswordSlice'
 import { defaultIForgotPassword } from './IForgotPassword'
-import { ModalComponent } from '../../components/ModalComponent'
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import signupBg from '../../images/signup_ai.jpeg';
 import viewIcon from '../../images/view.svg';
@@ -41,12 +36,11 @@ const ForgotPassword = () => {
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const [formData, setFormData] = useState(defaultIForgotPassword);
-    const state = useAppSelector(selectedforgotPassword)
-    const [passwordSet, setPasswordSet] = useState(false);
-    const [showResponse, setShowResponse] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [passwordError, setPasswordError] = useState<string>('');
+    const [serverError, setServerError] = useState<string>('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (token != undefined) {
@@ -54,8 +48,9 @@ const ForgotPassword = () => {
         }
     }, [token])
 
-    function handleSubmitForm() {
+    async function handleSubmitForm() {
         setPasswordError('');
+        setServerError('');
         if (!formData.password || !formData.matchingPassword) {
             setPasswordError('Both password fields are required.');
             return;
@@ -64,24 +59,33 @@ const ForgotPassword = () => {
             setPasswordError('Password and Confirm Password must be the same.');
             return;
         }
-        setPasswordSet(true)
-        setShowResponse(true)
-        if (token) {
-            dispatch(
-                setUserPasswordAsync(
-                    wrapArgument(actionUid, formData)
-                )
-            )
-        } else {
-            dispatch(
-                changeUserPasswordAsync(
-                    wrapArgument(actionUid,
-                        {
+        setIsSubmitting(true);
+        try {
+            if (token) {
+                await dispatch(
+                    setUserPasswordAsync(wrapArgument(actionUid, formData))
+                ).unwrap();
+            } else {
+                await dispatch(
+                    changeUserPasswordAsync(
+                        wrapArgument(actionUid, {
                             ...defaultIChangePassword,
-                            passwordWithSaltAndIv: formData.passwordWithSaltAndIv
+                            passwordWithSaltAndIv: formData.passwordWithSaltAndIv,
                         })
-                )
-            )
+                    )
+                ).unwrap();
+            }
+            navigate('/login');
+        } catch (err: any) {
+            const msg =
+                typeof err?.message === 'string'
+                    ? err.message
+                    : typeof err === 'string'
+                      ? err
+                      : 'Could not update password. Please try again.';
+            setServerError(msg);
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -91,10 +95,6 @@ const ForgotPassword = () => {
         let key = ev.target.id ? ev.target.id : ev.target.name;
         copiedValue[key as keyof typeof formData] = ev.target.value;
         setFormData(copiedValue);
-    };
-
-    const handleClose = () => {
-        setShowResponse(false)
     };
 
     return (
@@ -175,8 +175,7 @@ const ForgotPassword = () => {
                                 Please create a strong password for your account.
                             </Typography>
 
-                            {!passwordSet ? (
-                                <Grid container spacing={3}>
+                            <Grid container spacing={3}>
                                     <Grid item xs={12}>
                                         <TextField
                                             required
@@ -237,11 +236,20 @@ const ForgotPassword = () => {
                                         />
                                     </Grid>
 
+                                    {serverError && (
+                                        <Grid item xs={12}>
+                                            <Typography variant="body2" color="error">
+                                                {serverError}
+                                            </Typography>
+                                        </Grid>
+                                    )}
+
                                     <Grid item xs={12}>
                                         <Button
                                             fullWidth
                                             variant="contained"
-                                            onClick={handleSubmitForm}
+                                            disabled={isSubmitting}
+                                            onClick={() => void handleSubmitForm()}
                                             sx={{
                                                 py: 1.5,
                                                 backgroundColor: '#FF671F',
@@ -254,7 +262,11 @@ const ForgotPassword = () => {
                                                 mt: 1
                                             }}
                                         >
-                                            Set Password
+                                            {isSubmitting ? (
+                                                <CircularProgress size={22} sx={{ color: 'white' }} />
+                                            ) : (
+                                                'Set Password'
+                                            )}
                                         </Button>
                                     </Grid>
                                     {passwordError && (
@@ -265,25 +277,6 @@ const ForgotPassword = () => {
                                         </Grid>
                                     )}
                                 </Grid>
-                            ) : (
-                                <Box sx={{ textAlign: 'center', py: 4 }}>
-                                    <Typography sx={{ color: '#000', fontWeight: 500 }}>
-                                        Processing your request...
-                                    </Typography>
-                                </Box>
-                            )}
-
-                            <Box sx={{ mt: 2 }}>
-                                <ModalComponent
-                                    open={showResponse}
-                                    close={handleClose}
-                                    aria-labelledby="modal-modal-title"
-                                    aria-describedby="modal-modal-description"
-                                    className="special_modal"
-                                    msg={state.response}
-                                    status={state.status.fetchStatus}
-                                />
-                            </Box>
 
                             <Divider sx={{ my: 4 }} />
 

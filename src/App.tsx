@@ -4,7 +4,7 @@ import EligibilityQuestioner from './features/eligibilityQuesioner/EligibilityQu
 import EligibilityResults from './features/eligibilityResults/EligibilityResultsComponent'
 import { useState, useEffect, createContext, useContext } from "react"
 import { Route, Routes } from "react-router"
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Landing from './features/landing/LandingComponent'
 import SignUp from './features/signUp/SignUpComponent'
 import ResetPassword from './features/resetPassword/ResetPasswordComponent'
@@ -49,6 +49,20 @@ import BackgroundPattern from './components/BackgroundPattern';
 import { refreshAccessToken } from './app/api';
 // import useCookie, { getCookie } from 'react-use-cookie';
 
+const PUBLIC_AUTH_FLOW_PATHS = new Set([
+  '/setPassword',
+  '/resetPassword',
+  '/signUp',
+  '/eligibilityQuestioner',
+  '/eligibilityResults',
+]);
+
+/** Routes where an expired JWT must not trigger immediate redirect to login (e.g. email reset links). */
+function isPublicAuthFlowPath(pathname: string): boolean {
+  const p = pathname.replace(/\/+$/, '') || '/';
+  return PUBLIC_AUTH_FLOW_PATHS.has(p);
+}
+
 // let initialState = {
 //   shoppingList : 'test'
 // }
@@ -80,6 +94,8 @@ function App() {
     }
   });
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [showExpiryDialog, setShowExpiryDialog] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [sessionEndsAt, setSessionEndsAt] = useState<number | null>(null);
@@ -184,6 +200,10 @@ function App() {
       return;
     }
 
+    if (isPublicAuthFlowPath(location.pathname)) {
+      return;
+    }
+
     const now = Date.now();
     const warningDelay = Math.max(sessionEndsAt - now - 60000, 0);
     const logoutDelay = Math.max(sessionEndsAt - now, 0);
@@ -200,7 +220,7 @@ function App() {
       window.clearTimeout(warningTimer);
       window.clearTimeout(logoutTimer);
     };
-  }, [sessionEndsAt]);
+  }, [sessionEndsAt, location.pathname]);
 
   useEffect(() => {
     if (!sessionEndsAt) {

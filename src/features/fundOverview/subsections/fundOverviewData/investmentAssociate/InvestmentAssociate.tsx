@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useState, useEffect } from "react"
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
 import { fetchInvestmentTeamsAssociateLevelAsync, selectInvestmentAssociate, createInvestmentTeamsAssociateLevelAsync, deleteInvestmentTeamsAssociateLevelAsync } from './investmentAssociateSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
@@ -11,6 +11,10 @@ import { Delete, Edit } from '@mui/icons-material';
 import { InvestmentAssociateRow } from "./InvestmentAssociateRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { InvestmentAssociateModel } from "./InvestmentAssociateModel";
+
+export type InvestmentAssociateHandle = {
+    submit: () => Promise<boolean>;
+};
 
 interface InvestmentAssociateProps {
     prelimApplicationId: Number | undefined
@@ -29,7 +33,7 @@ const style = {
 };
 
 
-export const InvestmentAssociate = (props: InvestmentAssociateProps) => {
+const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAssociateProps>(function InvestmentAssociate(props, ref) {
 
     const dispatch = useAppDispatch()
     const [actionUid] = useState(uuid())
@@ -52,6 +56,27 @@ export const InvestmentAssociate = (props: InvestmentAssociateProps) => {
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            submit: async () => {
+                if (
+                    investmentAssociatesState.status.fetchStatus !== FetchStatus.IDLE ||
+                    investmentAssociatesState.actionStatus.fetchStatus !== FetchStatus.IDLE
+                ) {
+                    return false;
+                }
+                const n = investmentAssociatesState.investmentAssociates?.length ?? 0;
+                if (n > 5) {
+                    window.alert("A maximum of 5 senior members (other than KMP) is allowed.");
+                    return false;
+                }
+                return true;
+            },
+        }),
+        [investmentAssociatesState]
+    );
 
     const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Experience in AIF Business", "Area Of Expertise", "Action"]
 
@@ -109,8 +134,6 @@ export const InvestmentAssociate = (props: InvestmentAssociateProps) => {
             </Grid>
         </Box>
     );
-}
-
-
+});
 
 export default InvestmentAssociate;

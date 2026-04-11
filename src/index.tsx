@@ -5,7 +5,28 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import store from './app/store'
-import { BrowserRouter, HashRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
+
+/**
+ * Emails historically linked to /setpassword?token=... (no hash). With HashRouter the real route is
+ * in the fragment (#/setPassword). Without this, the app loads with an empty hash and shows "/" (login).
+ */
+function redirectLegacySetPasswordUrlToHash(): void {
+  const { pathname, search, hash, origin } = window.location;
+  if (/#\/setPassword/i.test(hash)) {
+    return;
+  }
+  if (/^\/setpassword\/?$/i.test(pathname)) {
+    window.location.replace(`${origin}/#/setPassword${search}`);
+    return;
+  }
+  const nested = pathname.match(/^(.*)\/setpassword\/?$/i);
+  if (nested) {
+    window.location.replace(`${origin}${nested[1]}/#/setPassword${search}`);
+  }
+}
+
+redirectLegacySetPasswordUrlToHash();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
