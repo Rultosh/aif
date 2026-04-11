@@ -17,7 +17,6 @@ import { state, city } from "./stateAndCity";
 import signupBg from '../../images/signup_ai.jpeg';
 
 import { getError } from "../../lib/api-status/errorHandler"
-import ReCAPTCHA from "react-google-recaptcha";
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -65,28 +64,15 @@ const SignUp = () => {
     const [showResponse, setShowResponse] = useState(false);
     const [formDataEmail, setFormDataEmail] = useState(false);
     const [registedWithSebi, setRegisteredWithSebi] = useState("no");
-    const captchaRef = React.createRef<ReCAPTCHA>();
 
     async function handleSubmitForm(data: any) {
-        let captchaResponse: string | null | undefined = "BLANK";
-        try {
-            captchaResponse = await captchaRef.current?.executeAsync();
-        } catch (e) {
-            captchaResponse = "BLANK";
-        }
-        if (captchaResponse === null || captchaResponse === undefined) {
-            captchaResponse = "BLANK";
-        }
-
-        console.log("recaptcha", captchaResponse);
         console.log(data)
         setShowResponse(true)
         dispatch(
             signupUsersAsync(
-                wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse })
+                wrapArgument(actionUid, { ...data, registeredOn: new Date(), captchaResponse: "BLANK" })
             )
         )
-        captchaRef.current?.reset();
     }
 
 
@@ -192,6 +178,7 @@ const SignUp = () => {
             .nullable()
             .transform((curr, orig) => orig === '' ? null : curr)
             .typeError("Please enter a valid date")
+            .min(new Date(2020, 0, 1), "SEBI Registration Date must be on or after 01/01/2020")
             .max(new Date(), "SEBI Registration Date cannot be a future date")
             .required("SEBI Registration Date is required"),
         username: Yup
@@ -294,11 +281,6 @@ const SignUp = () => {
                 }
             }} />
 
-            <ReCAPTCHA
-                ref={captchaRef}
-                size={'invisible'}
-                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
-            />
             <Container maxWidth="lg" sx={{ pt: '100px', pb: '60px', position: 'relative', zIndex: 1 }}>
 
                 <Paper
@@ -375,7 +357,9 @@ const SignUp = () => {
                                                 label="SEBI - Registration Date"
                                                 inputFormat='DD/MM/YYYY'
                                                 disableFuture
+                                                minDate={dayjs('2020-01-01')}
                                                 maxDate={dayjs()}
+                                                shouldDisableDate={(date) => dayjs(date).isBefore(dayjs('2020-01-01'), 'day')}
                                                 onChange={(newValue) => field.onChange(newValue)}
                                                 renderInput={(params) => (
                                                     <TextField

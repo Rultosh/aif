@@ -6,7 +6,7 @@ import ContributorDetails from "./subsections/fundOverviewData/contributorDetail
 import InvestmentAssociate from "./subsections/fundOverviewData/investmentAssociate/InvestmentAssociate";
 import InvestmentPast from "./subsections/fundOverviewData/investmentPast/InvestmentPast";
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import PrelimApplicationData from "./subsections/fundOverviewData/PrelimApplication";
 import { clearPrelimApplication, selectPrelimApplication, updatePrelimApplicationAsync } from "./subsections/fundOverviewData/prelimApplicationDataSlice";
@@ -21,6 +21,7 @@ import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
+import { markFundStepComplete } from "./wizardProgress";
 
 export const Fund = (props: any) => {
 
@@ -30,6 +31,9 @@ export const Fund = (props: any) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
+    const effectivePrelimId = String(
+        prelimApplicationState.prelimApplication?.id || prelimApplicationId || id || ''
+    );
     const [hasInvestment, setHasInvestment] = useState(false);
     useEffect(() => {
         setHasInvestment(prelimApplicationState.prelimApplication.hasInvestment);
@@ -89,6 +93,9 @@ export const Fund = (props: any) => {
 
     const prelimRef = useRef<any>(null);
     const strategyRef = useRef<any>(null);
+    const investmentPartnerRef = useRef<any>(null);
+    const investmentAssociateRef = useRef<any>(null);
+    const investmentPastRef = useRef<any>(null);
     const dealFlowRef = useRef<any>(null);
     const lpAdvisoryGovernanceInvestmentCommitteeRef = useRef<any>(null);
     const othersRef = useRef<any>(null);
@@ -105,6 +112,32 @@ export const Fund = (props: any) => {
         "8": useRef<HTMLDivElement>(null),
         "9": useRef<HTMLDivElement>(null),
         "10": useRef<HTMLDivElement>(null),
+    };
+
+    /** Accordion panel ids matching validateAllFundSections order (all fund accordions 1–7). */
+    const FUND_MANDATORY_PANEL_ORDER = ["1", "2", "3", "4", "5", "6", "7"];
+
+    const validateAllFundSections = async (): Promise<boolean[]> => {
+        const [r1, r2, r3, r4, r6, r7] = await Promise.all([
+            prelimRef.current?.submit?.() ?? Promise.resolve(true),
+            strategyRef.current?.submit?.() ?? Promise.resolve(true),
+            investmentPartnerRef.current?.submit?.() ?? Promise.resolve(true),
+            investmentAssociateRef.current?.submit?.() ?? Promise.resolve(true),
+            lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit?.() ?? Promise.resolve(true),
+            dealFlowRef.current?.submit?.() ?? Promise.resolve(true),
+        ]);
+        const r5 = hasInvestment
+            ? await (investmentPastRef.current?.submit?.() ?? Promise.resolve(false))
+            : true;
+        return [r1, r2, r3, r4, r5, r6, r7];
+    };
+
+    const expandFirstFailedMandatoryPanel = (validations: boolean[]) => {
+        const firstInvalidIndex = validations.findIndex((res) => res === false);
+        if (firstInvalidIndex === -1) return;
+        const panel = FUND_MANDATORY_PANEL_ORDER[firstInvalidIndex];
+        setExpanded(panel);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleAccordionSaveAndContinue = async (currentPanel: string, nextPanel: string | null, ref: any) => {
@@ -124,37 +157,37 @@ export const Fund = (props: any) => {
                     }
                 }, 300);
             } else {
-                // If it's the last panel, go to next page
+                const validations = await validateAllFundSections();
+                if (!validations.every((res) => res === true)) {
+                    expandFirstFailedMandatoryPanel(validations);
+                    return;
+                }
+                markFundStepComplete(effectivePrelimId);
                 navigate(`/preliminary/${prelimApplicationId}/declaration`);
             }
         }
     };
 
     const handleClickSave = async () => {
-        // Validate required sections: Fund Overview (panel 1), LP Advisory (panel 7), Deal Flow/MIS (panel 8), Others (panel 9)
-        const validations = await Promise.all([
-            prelimRef.current?.submit?.() ?? Promise.resolve(true),
-            lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit?.() ?? Promise.resolve(true),
-            dealFlowRef.current?.submit?.() ?? Promise.resolve(true),
-            othersRef.current?.submit?.() ?? Promise.resolve(true),
-        ]);
-
-        const sectionNames = ["Fund Overview", "LP Advisory Governance and Investment Committee", "Deal Flow/MIS", "Others"];
-        const panels = ["1", "7", "8", "9"];
-
+        const validations = await validateAllFundSections();
+        const sectionNames = [
+            "Fund Overview",
+            "Investment Strategy",
+            "Investment Team (KMP)",
+            "Investment Team (other than KMP)",
+            "Past investments",
+            "LP Advisory / Governance / IC",
+            "Deal Flow/MIS",
+        ];
         validations.forEach((isValid, index) => {
             if (isValid === false) {
-                console.log(`Validation failed in section: ${sectionNames[index]} (Panel ${panels[index]})`);
+                console.log(
+                    `Validation failed in section: ${sectionNames[index]} (Panel ${FUND_MANDATORY_PANEL_ORDER[index]})`
+                );
             }
         });
-
-        const allValid = validations.every(res => res === true);
-        if (!allValid) {
-            const firstInvalidIndex = validations.findIndex(res => res === false);
-            if (firstInvalidIndex !== -1) {
-                setExpanded(panels[firstInvalidIndex]);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+        if (!validations.every((res) => res === true)) {
+            expandFirstFailedMandatoryPanel(validations);
         }
         return validations;
     };
@@ -169,6 +202,7 @@ export const Fund = (props: any) => {
                 const allValid = results.every(res => res === true);
 
                 if (allValid) {
+                    markFundStepComplete(effectivePrelimId);
                     navigate(`/preliminary/${prelimApplicationId}/declaration`)
                 } else {
                     console.log("allValid", allValid);
@@ -441,7 +475,10 @@ export const Fund = (props: any) => {
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <InvestmentPartner prelimApplicationId={Number(prelimApplicationId)} />
+                                        <InvestmentPartner
+                                            ref={investmentPartnerRef}
+                                            prelimApplicationId={Number(prelimApplicationId)}
+                                        />
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
@@ -500,13 +537,16 @@ export const Fund = (props: any) => {
                                             fontWeight: 700,
                                             color: expanded === "4" ? '#000080' : '#444'
                                         }}>
-                                            Details of Investment Team Members (Other than KMP) – Maximum 5 Senior Members
+                                            Details of Investment Team Member (Other than KMP) – Maximum 5 Senior Members
                                         </Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
                                     <Box sx={{ pt: 2 }}>
-                                        <InvestmentAssociate prelimApplicationId={Number(prelimApplicationId)} />
+                                        <InvestmentAssociate
+                                            ref={investmentAssociateRef}
+                                            prelimApplicationId={Number(prelimApplicationId)}
+                                        />
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
                                                 variant="contained"
@@ -606,7 +646,11 @@ export const Fund = (props: any) => {
                                     <Box sx={{ pt: 2 }}>
                                         {hasInvestment ? (
                                             <>
-                                                <InvestmentPast prelimApplicationId={Number(prelimApplicationId)} />
+                                                <InvestmentPast
+                                                    ref={investmentPastRef}
+                                                    prelimApplicationId={Number(prelimApplicationId)}
+                                                    hasInvestment={hasInvestment}
+                                                />
                                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                                     <Button
                                                         variant="contained"

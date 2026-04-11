@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import DownloadIcon from '@mui/icons-material/Download';
+import FileUploadService from "../../../../../components/FileUploadService";
 import { useParams } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
@@ -25,7 +26,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
+    const [documentError, setDocumentError] = useState('');
     const prelimAppicationId = props.prelimApplicationId;
+    const effectiveId = String(prelimAppicationId || prelimApplicationState.prelimApplication?.id || id || '');
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -79,20 +82,44 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
-    const onSubmit = async (data: IPrelimApplicationData) => {
+    const hasUploadedFiles = async (bucketId: string): Promise<boolean> => {
+        try {
+            const res = await FileUploadService.list(bucketId);
+            const files = Array.isArray(res?.data)
+                ? res.data
+                : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
+            return files.length > 0;
+        } catch {
+            return false;
+        }
+    };
+
+    const onSubmit = async (data: IPrelimApplicationData): Promise<boolean> => {
+        const requiredBuckets = [
+            `sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`,
+            `sdEmpanelledListOfExternalFirms${effectiveId}`,
+        ];
+        const checks = await Promise.all(requiredBuckets.map((bucket) => hasUploadedFiles(bucket)));
+        const allUploaded = checks.every(Boolean);
+        if (!allUploaded) {
+            setDocumentError("Please upload all mandatory documents before proceeding.");
+            return false;
+        }
+        setDocumentError('');
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
         if (props.onSaveSuccess) {
             props.onSaveSuccess();
         }
+        return true;
     };
 
     useImperativeHandle(ref, () => ({
         submit: async () => {
             let isValid = false;
             await handleSubmit(
-                (data) => {
-                    onSubmit(data);
-                    isValid = true;
+                async (data) => {
+                    const ok = await onSubmit(data);
+                    isValid = ok;
                 },
                 () => {
                     isValid = false;
@@ -340,7 +367,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             borderRadius: '16px',
                             backgroundColor: '#fafafa'
                         }}>
-                            {Number(id) ? (
+                            {Number(effectiveId) ? (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
@@ -359,7 +386,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Details of current pipeline of deals under consideration" id={`sdDetailsOfCurrentPipelineOfDealsUnderConsideration${id}`} />
+                                        <DocumentChip label="Upload Document" validationTitle="Details of current pipeline of deals under consideration" id={`sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`} />
                                     </span>
                                 </Box>
                             ) : (
@@ -381,7 +408,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             borderRadius: '16px',
                             backgroundColor: '#fafafa'
                         }}>
-                            {Number(id) ? (
+                            {Number(effectiveId) ? (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
@@ -400,7 +427,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Empanelled list of external Firms" id={`sdEmpanelledListOfExternalFirms${id}`} />
+                                        <DocumentChip label="Upload Document" validationTitle="Empanelled list of external Firms" id={`sdEmpanelledListOfExternalFirms${effectiveId}`} />
                                     </span>
                                 </Box>
                             ) : (
@@ -421,6 +448,11 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 Save and Continue
                             </Button>
                         </Box>
+                        {documentError && (
+                            <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
+                                {documentError}
+                            </Typography>
+                        )}
                     </Grid>
                 </Grid>
             </Box>

@@ -74,7 +74,7 @@ export const SelfRating = (props: any) => {
 
     useEffect(() => {
         if (props.checkUnAuth) {
-            navigate('/login')
+            navigate('/home', { replace: true });
         }
 
         // if(getCookie('selfRating') == '1'){
@@ -97,6 +97,10 @@ export const SelfRating = (props: any) => {
                     Number(id))
             )
         )
+            .unwrap()
+            .catch(() => {
+                navigate('/home', { replace: true });
+            });
     }, [selfRatingState.actionStatus.fetchStatus === FetchStatus.IDLE])
 
     useEffect(() => {
@@ -404,12 +408,11 @@ export const SelfRating = (props: any) => {
         }
     };
 
-    const handleHomeClick= async(e:any) =>{
-         localStorage.removeItem('token');
-         localStorage.removeItem('refreshToken');
-         navigate('/login');
-         window.location.reload();
-    }
+    /** After a below-threshold score, return to the app home while staying signed in so the user can start a new application. */
+    const handleHomeClick = () => {
+        setShowResultModal(false);
+        navigate('/home', { replace: true });
+    };
 
     return (
         <div className="formAnimation">
@@ -696,9 +699,13 @@ export const SelfRating = (props: any) => {
             {/* Assessment Result Modal */}
             <Dialog
                 open={showResultModal}
-                onClose={(e) => {
+                onClose={() => {
                     setShowResultModal(false);
-                    handleNextClick(e);
+                    if (modalType === 'success') {
+                        handleNextClick({ preventDefault: () => {} } as any);
+                    } else {
+                        navigate('/home', { replace: true });
+                    }
                 }}
                 PaperProps={{
                     sx: {
@@ -760,9 +767,8 @@ export const SelfRating = (props: any) => {
                         //     OK
                         // </Button>                        
                         <Button
-                            onClick={(e) => {
-                                setShowResultModal(false);
-                                handleHomeClick(e);
+                            onClick={() => {
+                                handleHomeClick();
                             }}
                             variant="contained"
                             sx={{

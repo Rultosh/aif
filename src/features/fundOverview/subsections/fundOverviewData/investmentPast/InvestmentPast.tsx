@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useState, useEffect } from "react"
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react"
 import { fetchInvestmentPastAsync, selectInvestmentPast, createInvestmentPastAsync, deleteInvestmentPastAsync } from './investmentPastSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
@@ -12,8 +12,14 @@ import { InvestmentPastRow } from "./InvestmentPastRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { InvestmentPastModel } from "./InvestmentPastModel";
 
+export type InvestmentPastHandle = {
+    submit: () => Promise<boolean>;
+};
+
 interface InvestmentPastProps {
-    prelimApplicationId: Number | undefined
+    prelimApplicationId: Number | undefined;
+    /** When false, submit() is a no-op success (table not shown). */
+    hasInvestment?: boolean;
 }
 
 const style = {
@@ -29,7 +35,7 @@ const style = {
 };
 
 
-export const InvestmentPast = (props: InvestmentPastProps) => {
+const InvestmentPast = forwardRef<InvestmentPastHandle, InvestmentPastProps>(function InvestmentPast(props, ref) {
 
     const dispatch = useAppDispatch()
     const [actionUid] = useState(uuid())
@@ -38,14 +44,6 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
     const [isModelOpen, setIsModelOpen] = useState(false);
     const handleOpen = () => setIsModelOpen(true);
     const handleClose = () => setIsModelOpen(false);
-    const [hasInvestment, setHasInvestment] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (investmentPastsState.investmentPasts && investmentPastsState.investmentPasts.length > 0) {
-            setHasInvestment(true);
-        }
-    }, [investmentPastsState.investmentPasts])
-
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsAssociateLevelAsync', props.prelimApplicationId);
         dispatch(fetchInvestmentPastAsync(
@@ -61,6 +59,34 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
         ))
         setIsModelOpen(false)
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
+
+    const hasInv = props.hasInvestment !== false;
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            submit: async () => {
+                if (!hasInv) {
+                    return true;
+                }
+                if (
+                    investmentPastsState.status.fetchStatus !== FetchStatus.IDLE ||
+                    investmentPastsState.actionStatus.fetchStatus !== FetchStatus.IDLE
+                ) {
+                    return false;
+                }
+                const n = investmentPastsState.investmentPasts?.length ?? 0;
+                if (n < 1) {
+                    window.alert(
+                        "Add at least one past investment record before continuing (or set “Have any investments…” to No)."
+                    );
+                    return false;
+                }
+                return true;
+            },
+        }),
+        [hasInv, investmentPastsState]
+    );
 
     const tableHeaders = [
         "Name Of Company",
@@ -126,8 +152,6 @@ export const InvestmentPast = (props: InvestmentPastProps) => {
             </Grid>
         </Box>
     );
-}
-
-
+});
 
 export default InvestmentPast;

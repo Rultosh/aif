@@ -28,6 +28,12 @@ interface PrelimApplicationProps {
     onSaveSuccess?: () => void;
 }
 
+/** Use for controlled numeric fields and “amount in words” helper text — `value || ''` treats 0 as empty and clears the input after blur. */
+function hasNumericFormValue(v: unknown): boolean {
+    if (v === '' || v === undefined || v === null) return false;
+    return !Number.isNaN(Number(v));
+}
+
 const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) => {
     const { id } = useParams();
     const usersState = useAppSelector(selectUsers);
@@ -64,6 +70,14 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         "Textiles"
     ];
 
+    const managerTypeValue = String(selfRatingState?.selfRatings?.managerType || '').trim().toLowerCase();
+    const firstTimeManagerType = managerTypeValue
+        ? managerTypeValue.includes("first time")
+        : String(prelimApplicationFormData.fundManager || '').trim().toLowerCase() === "first time fund manager";
+    const fundManagerOptions = firstTimeManagerType
+        ? ["First Time Fund Manager"]
+        : ["Two Funds Managed", "More Than Two Funds Managed"];
+
     useEffect(() => {
         if (!resolvedPrelimId) return;
         dispatch(getPrelimApplicationData(
@@ -73,6 +87,15 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             wrapArgument(actionUid, resolvedPrelimId)
         ));
     }, [resolvedPrelimId, actionUid, dispatch])
+
+    useEffect(() => {
+        const currentFundManager = String(prelimApplicationFormData.fundManager || '');
+        if (!fundManagerOptions.includes(currentFundManager)) {
+            const nextFundManager = firstTimeManagerType ? "First Time Fund Manager" : "Two Funds Managed";
+            setValue("fundManager", nextFundManager, { shouldValidate: false, shouldDirty: false });
+            setPrelimApplicationFormData(prev => ({ ...prev, fundManager: nextFundManager as any }));
+        }
+    }, [firstTimeManagerType, selfRatingState?.selfRatings?.managerType, prelimApplicationFormData.fundManager]);
 
     const [aifNameData, setAifNameData] = useState('');
     useEffect(() => {
@@ -94,6 +117,12 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             // Default AIF category type from Initial Assessment selection when empty.
             if (!data.aifCategoryType && initialAssessmentFundType) {
                 data.aifCategoryType = initialAssessmentFundType as any;
+            }
+            // Keep Fund Manager in sync with First time IM/AMC selection on refresh/load.
+            if (managerTypeValue.includes("first time")) {
+                data.fundManager = "First Time Fund Manager" as any;
+            } else if (!data.fundManager || String(data.fundManager).trim() === "First Time Fund Manager") {
+                data.fundManager = "Two Funds Managed" as any;
             }
 
             // Convert date strings to Dayjs objects for the form
@@ -119,7 +148,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                 setPrelimApplicationFormData(prev => ({ ...prev, nameOfTheFund: usersState.me.companyName || '' }));
             }
         }
-    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me, selfRatingState?.selfRatings?.fundType])
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me, selfRatingState?.selfRatings?.fundType, managerTypeValue])
 
     const setDateValue = (key: string, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
@@ -177,9 +206,55 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         const id = ev.target.id || ev.target.name;
 
         if (id === 'termOfFund') {
-            value = value.replace(/[^0-9]/g, '');
-            if (value !== '' && parseInt(value) > 200) {
+            value = value.replace(/[^0-9.]/g, '');
+            const dotCount = (value.match(/\./g) || []).length;
+            if (dotCount > 1) {
+                const parts = value.split('.');
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            if (value.includes('.')) {
+                const parts = value.split('.');
+                if (parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].slice(0, 2);
+                }
+            }
+            if (value !== '' && !Number.isNaN(parseFloat(value)) && parseFloat(value) > 200) {
                 value = '200';
+            }
+        }
+
+        if (id === 'commitmentPeriod') {
+            value = value.replace(/[^0-9.]/g, '');
+            const dotCount = (value.match(/\./g) || []).length;
+            if (dotCount > 1) {
+                const parts = value.split('.');
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            if (value.includes('.')) {
+                const parts = value.split('.');
+                if (parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].slice(0, 2);
+                }
+            }
+            if (value !== '' && !Number.isNaN(parseFloat(value))) {
+                const n = parseFloat(value);
+                if (n > 10) value = '10';
+                if (n < 0) value = '0';
+            }
+        }
+
+        if (id === 'sdDescription') {
+            value = value.replace(/[^0-9.]/g, '');
+            const dotCount = (value.match(/\./g) || []).length;
+            if (dotCount > 1) {
+                const parts = value.split('.');
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            if (value.includes('.')) {
+                const parts = value.split('.');
+                if (parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].slice(0, 2);
+                }
             }
         }
 
@@ -235,17 +310,17 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         setValue((ev.target.id || ev.target.name) as any, value);
 
         if (id === 'sdTargetCorpusDomestic' || id === 'sdTargetCorpusOverseas') {
-            const domestic = id === 'sdTargetCorpusDomestic' ? value : (copiedValue.sdTargetCorpusDomestic || 0);
-            const overseas = id === 'sdTargetCorpusOverseas' ? value : (copiedValue.sdTargetCorpusOverseas || 0);
-            const total = (parseFloat(domestic as string) || 0) + (parseFloat(overseas as string) || 0);
+            const domestic = id === 'sdTargetCorpusDomestic' ? value : (copiedValue.sdTargetCorpusDomestic ?? '');
+            const overseas = id === 'sdTargetCorpusOverseas' ? value : (copiedValue.sdTargetCorpusOverseas ?? '');
+            const total = (parseFloat(String(domestic)) || 0) + (parseFloat(String(overseas)) || 0);
             copiedValue.sdTotalTargetCorpus = total;
             setValue('sdTotalTargetCorpus', total as any);
         }
 
         if (id === 'sdGreenShoeTargetCorpusDomestic' || id === 'sdGreenShoeTargetCorpusOverseas') {
-            const domestic = id === 'sdGreenShoeTargetCorpusDomestic' ? value : (copiedValue.sdGreenShoeTargetCorpusDomestic || 0);
-            const overseas = id === 'sdGreenShoeTargetCorpusOverseas' ? value : (copiedValue.sdGreenShoeTargetCorpusOverseas || 0);
-            const total = (parseFloat(domestic as string) || 0) + (parseFloat(overseas as string) || 0);
+            const domestic = id === 'sdGreenShoeTargetCorpusDomestic' ? value : (copiedValue.sdGreenShoeTargetCorpusDomestic ?? '');
+            const overseas = id === 'sdGreenShoeTargetCorpusOverseas' ? value : (copiedValue.sdGreenShoeTargetCorpusOverseas ?? '');
+            const total = (parseFloat(String(domestic)) || 0) + (parseFloat(String(overseas)) || 0);
             copiedValue.sdGreenShoeTotalTargetCorpus = total;
             setValue('sdGreenShoeTotalTargetCorpus', total as any);
         }
@@ -301,7 +376,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     ];
 
     const monthFields = [
-        'termOfFund', 'commitmentPeriod'
+        'termOfFund',
     ];
 
     const numericFields = [
@@ -356,6 +431,20 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             return; // No formatting for months
         }
 
+        if (id === 'commitmentPeriod' && value !== '') {
+            const numValue = parseFloat(value);
+            if (!Number.isNaN(numValue)) {
+                const clamped = Math.min(10, Math.max(0, numValue));
+                const formattedValue = clamped.toFixed(2);
+                setValue(id as any, formattedValue);
+                setPrelimApplicationFormData((prev) => ({
+                    ...prev,
+                    [id]: Number(formattedValue),
+                }));
+            }
+            return;
+        }
+
         if (numericFields.includes(id) && value !== '') {
             const numValue = parseFloat(value);
             if (!isNaN(numValue)) {
@@ -364,9 +453,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
 
                 const updateTotals = (valId: string, totalId: string, domesticId: string, overseasId: string) => {
                     const values = getValues();
-                    const domestic = valId === domesticId ? formattedValue : (values[domesticId as keyof IPrelimApplicationData] || 0);
-                    const overseas = valId === overseasId ? formattedValue : (values[overseasId as keyof IPrelimApplicationData] || 0);
-                    const total = (parseFloat(domestic as string) || 0) + (parseFloat(overseas as string) || 0);
+                    const domesticRaw = valId === domesticId ? formattedValue : values[domesticId as keyof IPrelimApplicationData];
+                    const overseasRaw = valId === overseasId ? formattedValue : values[overseasId as keyof IPrelimApplicationData];
+                    const domestic = domesticRaw === '' || domesticRaw === undefined || domesticRaw === null ? 0 : domesticRaw;
+                    const overseas = overseasRaw === '' || overseasRaw === undefined || overseasRaw === null ? 0 : overseasRaw;
+                    const total = (parseFloat(String(domestic)) || 0) + (parseFloat(String(overseas)) || 0);
                     const formattedTotal = total.toFixed(2);
                     setValue(totalId as any, formattedTotal as any);
                     setPrelimApplicationFormData(prev => ({
@@ -481,6 +572,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             .nullable()
             .transform((curr, orig) => orig === '' ? null : curr)
             .typeError("Please enter a valid date")
+            .min(new Date(2020, 0, 1), "Date cannot be before 01/01/2020")
             .max(new Date(), "Date cannot be a future date")
             .required("This value is required"),
         dealSector: Yup.string().required("Deal Sector is required").nullable(),
@@ -499,13 +591,27 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             return parseFloat(value) <= 10000;
         }).nullable(),
         termOfFund: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Term of Fund must be a number").required("Term of Fund is required").min(0, "Negative values not allowed").max(200, "Term of Fund cannot exceed 200"),
-        commitmentPeriod: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Commitment Period must be a number").required("Commitment Period is required").min(0, "Negative values not allowed"),
+        commitmentPeriod: Yup.number()
+            .transform((val) => (isNaN(val) ? undefined : val))
+            .typeError("Commitment Period must be a number")
+            .required("Commitment Period is required")
+            .min(0, "Negative values not allowed")
+            .max(10, "Commitment Period cannot exceed 10 years")
+            .test(
+                'max-two-decimals',
+                'Maximum 2 decimal places allowed',
+                (val) => {
+                    if (val === undefined || val === null) return true;
+                    const rounded = Math.round(val * 100) / 100;
+                    return Math.abs(val - rounded) < 1e-9;
+                }
+            ),
         preferredReturn: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Preferred Return must be a number").required("Preferred Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         managementFees: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Management Fees must be a number").required("Management Fees is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         carriedInterest: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Carried Interest must be a number").required("Carried Interest is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         // investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        sdDescription: Yup.string().required("Capital raised till date is required").nullable(),
+        sdDescription: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Capital raised till date must be a number").required("Capital raised till date is required").min(0, "Negative values not allowed"),
         sdTargetCorpusDomestic: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic must be a number").required("Domestic is required").min(0, "Negative values not allowed"),
         sdTargetCorpusOverseas: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Overseas must be a number").required("Overseas is required").min(0, "Negative values not allowed"),
         sdTotalTargetCorpus: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("Total Target Corpus is required").min(100, "Value less than Rs. 100 crores shall not be allowed"),
@@ -518,6 +624,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             .nullable()
             .transform((curr, orig) => orig === '' ? null : curr)
             .typeError("Please enter a valid date")
+            .min(new Date(2020, 0, 1), "Date cannot be before 01/01/2020")
             .required("This value is required"),
         // sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
         aifCategoryType: Yup.string().required("AIF Category Type is required").nullable(),
@@ -544,7 +651,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
 
     const onSubmit = (data: IPrelimApplicationData) => {
         console.log(data);
-        savePrelimApplicationForm(data);
+        const payload: IPrelimApplicationData = {
+            ...data,
+            fundManager: firstTimeManagerType ? "First Time Fund Manager" : data.fundManager
+        };
+        savePrelimApplicationForm(payload);
     };
 
     // errors && console.log('errors', JSON.stringify(errors));
@@ -724,7 +835,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         {...field}
                                         labelId="fundManager-label"
                                         id="fundManager"
-                                        value={field.value || ""}
+                                        value={firstTimeManagerType ? "First Time Fund Manager" : (field.value || "")}
+                                        disabled={firstTimeManagerType}
                                         onChange={(e) => {
                                             field.onChange(e);
                                             handleChange({
@@ -733,9 +845,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             });
                                         }}
                                     >
-                                        <MenuItem value={"First Time Fund Manager"}>First Time Fund Manager</MenuItem>
-                                        <MenuItem value={"Two Funds Managed"}>Two Funds Managed</MenuItem>
-                                        <MenuItem value={"More Than Two Funds Managed"}>More Than Two Funds Managed</MenuItem>
+                                        {fundManagerOptions.map((option) => (
+                                            <MenuItem key={option} value={option}>{option}</MenuItem>
+                                        ))}
                                     </Select>
                                 )}
                             />
@@ -814,13 +926,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     value={prelimApplicationFormData.aifCategoryType || ''}
                                     error={!!errors.aifCategoryType}
                                     helperText={errors.aifCategoryType?.message as string}
-                                    onChange={(e) => {
-                                        field.onChange(e);
-                                        handleChange({
-                                            preventDefault: () => { },
-                                            target: { name: 'aifCategoryType', value: e.target.value }
-                                        });
-                                    }}
+                                    InputProps={{ readOnly: true }}
                                     variant="outlined"
                                     sx={fieldSx}
                                 />
@@ -865,6 +971,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         inputFormat="DD/MM/YYYY"
                                         disableFuture
                                         minDate={MIN_DATE}
+                                        shouldDisableDate={(d) => dayjs(d).isBefore(MIN_DATE, 'day')}
                                         value={field.value || null}
                                         onChange={(newValue: Dayjs | null) => {
                                             field.onChange(newValue);
@@ -891,13 +998,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             id="contributionSought"
                             label="Contribution Sought (₹ Crore)"
-                            value={prelimApplicationFormData.contributionSought || ''}
+                            value={prelimApplicationFormData.contributionSought ?? ''}
                             {...register("contributionSought")}
                             error={!!errors.contributionSought}
                             helperText={
                                 errors.contributionSought
                                     ? (errors.contributionSought.message as string)
-                                    : (prelimApplicationFormData?.contributionSought
+                                    : (hasNumericFormValue(prelimApplicationFormData?.contributionSought)
                                         ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.contributionSought)) * 10000000)
                                         : '')
                             }
@@ -917,12 +1024,12 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             {...register("termOfFund")}
                             error={!!errors.termOfFund}
                             helperText={errors.termOfFund?.message as string}
-                            value={prelimApplicationFormData.termOfFund || ''}
+                            value={prelimApplicationFormData.termOfFund ?? ''}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             variant="outlined"
                             sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                            inputProps={{ min: 0 }}
+                            inputProps={{ min: 0, step: 0.01, inputMode: 'decimal' }}
                         />
                     </Grid>
 
@@ -933,7 +1040,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="commitmentPeriod"
                             label="Commitment Period (Years)"
-                            value={prelimApplicationFormData.commitmentPeriod || ''}
+                            value={prelimApplicationFormData.commitmentPeriod ?? ''}
                             {...register("commitmentPeriod")}
                             error={!!errors.commitmentPeriod}
                             helperText={errors.commitmentPeriod?.message as string}
@@ -941,6 +1048,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onBlur={handleBlur}
                             variant="outlined"
                             sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                            inputProps={{ min: 0, max: 10, step: 0.01 }}
                         />
                     </Grid>
 
@@ -951,7 +1059,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="preferredReturn"
                             label="Preferred Return/Hurdle Rate p.a. (%)"
-                            value={prelimApplicationFormData.preferredReturn || ''}
+                            value={prelimApplicationFormData.preferredReturn ?? ''}
                             {...register("preferredReturn")}
                             error={!!errors.preferredReturn}
                             helperText={errors.preferredReturn?.message as string}
@@ -968,7 +1076,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="targetReturnIRR"
                             label="Target Gross Return of the Fund (IRR in %)"
-                            value={prelimApplicationFormData.targetReturnIRR || ''}
+                            value={prelimApplicationFormData.targetReturnIRR ?? ''}
                             {...register("targetReturnIRR")}
                             error={!!errors.targetReturnIRR}
                             helperText={errors.targetReturnIRR?.message as string}
@@ -985,7 +1093,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="managementFees"
                             label="Management Fee p.a. (%)"
-                            value={prelimApplicationFormData.managementFees || ''}
+                            value={prelimApplicationFormData.managementFees ?? ''}
                             {...register("managementFees")}
                             error={!!errors.managementFees}
                             helperText={errors.managementFees?.message as string}
@@ -1002,7 +1110,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="fundSetupCost"
                             label="Fund Set Up Cost (%)"
-                            value={prelimApplicationFormData.fundSetupCost || ''}
+                            value={prelimApplicationFormData.fundSetupCost ?? ''}
                             {...register("fundSetupCost")}
                             error={!!errors.fundSetupCost}
                             helperText={errors.fundSetupCost?.message as string}
@@ -1018,8 +1126,8 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             fullWidth
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="otherExpenses"
-                            label="Operating Expenses (%)"
-                            value={prelimApplicationFormData.otherExpenses || ''}
+                            label="Operating expenses p.a. %"
+                            value={prelimApplicationFormData.otherExpenses ?? ''}
                             {...register("otherExpenses")}
                             error={!!errors.otherExpenses}
                             helperText={errors.otherExpenses?.message as string}
@@ -1036,7 +1144,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             id="carriedInterest"
                             label="Carried Interest (%)"
-                            value={prelimApplicationFormData.carriedInterest || ''}
+                            value={prelimApplicationFormData.carriedInterest ?? ''}
                             {...register("carriedInterest")}
                             error={!!errors.carriedInterest}
                             helperText={errors.carriedInterest?.message as string}
@@ -1179,13 +1287,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                         id="sdDescription"
                                         label="Capital Raised Till Date (₹ Crore)"
-                                        value={prelimApplicationFormData.sdDescription || ''}
+                                        value={prelimApplicationFormData.sdDescription ?? ''}
                                         {...register("sdDescription")}
                                         error={!!errors.sdDescription}
                                         helperText={
                                             errors.sdDescription
                                                 ? (errors.sdDescription.message as string)
-                                                : (prelimApplicationFormData?.sdDescription
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdDescription)
                                                     ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdDescription)) * 10000000)
                                                     : '')
                                         }
@@ -1193,6 +1301,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         onBlur={handleBlur}
                                         variant="outlined"
                                         sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                                        inputProps={{ min: 0, step: 0.01, inputMode: 'decimal' }}
                                     />
                                 </Grid>
 
@@ -1209,13 +1318,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                         id="sdTargetCorpusDomestic"
                                         label="Domestic (₹ Crore)"
-                                        value={prelimApplicationFormData.sdTargetCorpusDomestic || ''}
+                                        value={prelimApplicationFormData.sdTargetCorpusDomestic ?? ''}
                                         {...register("sdTargetCorpusDomestic")}
                                         error={!!errors.sdTargetCorpusDomestic}
                                         helperText={
                                             errors.sdTargetCorpusDomestic
                                                 ? (errors.sdTargetCorpusDomestic.message as string)
-                                                : (prelimApplicationFormData?.sdTargetCorpusDomestic
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdTargetCorpusDomestic)
                                                     ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdTargetCorpusDomestic)) * 10000000)
                                                     : '')
                                         }
@@ -1232,13 +1341,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                         id="sdTargetCorpusOverseas"
                                         label="Overseas (₹ Crore)"
-                                        value={prelimApplicationFormData.sdTargetCorpusOverseas || ''}
+                                        value={prelimApplicationFormData.sdTargetCorpusOverseas ?? ''}
                                         {...register("sdTargetCorpusOverseas")}
                                         error={!!errors.sdTargetCorpusOverseas}
                                         helperText={
                                             errors.sdTargetCorpusOverseas
                                                 ? (errors.sdTargetCorpusOverseas.message as string)
-                                                : (prelimApplicationFormData?.sdTargetCorpusOverseas
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdTargetCorpusOverseas)
                                                     ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdTargetCorpusOverseas)) * 10000000)
                                                     : '')
                                         }
@@ -1255,13 +1364,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                         id="sdTotalTargetCorpus"
                                         label="Total Target Corpus (₹ Crore)"
-                                        value={prelimApplicationFormData.sdTotalTargetCorpus || ''}
+                                        value={prelimApplicationFormData.sdTotalTargetCorpus ?? ''}
                                         {...register("sdTotalTargetCorpus")}
                                         error={!!errors.sdTotalTargetCorpus}
                                         helperText={
                                             errors.sdTotalTargetCorpus
                                                 ? (errors.sdTotalTargetCorpus.message as string)
-                                                : (prelimApplicationFormData?.sdTotalTargetCorpus
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdTotalTargetCorpus)
                                                     ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdTotalTargetCorpus)) * 10000000)
                                                     : '')
                                         }
@@ -1286,13 +1395,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                         id="sdGreenShoeTargetCorpusDomestic"
                                         label="Domestic (Green Shoe) (₹ Crore)"
-                                        value={prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic || ''}
+                                        value={prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic ?? ''}
                                         {...register("sdGreenShoeTargetCorpusDomestic")}
                                         error={!!errors.sdGreenShoeTargetCorpusDomestic}
                                         helperText={
                                             errors.sdGreenShoeTargetCorpusDomestic
                                                 ? (errors.sdGreenShoeTargetCorpusDomestic.message as string)
-                                                : (prelimApplicationFormData?.sdGreenShoeTargetCorpusDomestic
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdGreenShoeTargetCorpusDomestic)
                                                     ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic)) * 10000000)
                                                     : '')
                                         }
@@ -1309,13 +1418,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                         id="sdGreenShoeTargetCorpusOverseas"
                                         label="Overseas (Green Shoe) (₹ Crore)"
-                                        value={prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas || ''}
+                                        value={prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas ?? ''}
                                         {...register("sdGreenShoeTargetCorpusOverseas")}
                                         error={!!errors.sdGreenShoeTargetCorpusOverseas}
                                         helperText={
                                             errors.sdGreenShoeTargetCorpusOverseas
                                                 ? (errors.sdGreenShoeTargetCorpusOverseas.message as string)
-                                                : (prelimApplicationFormData?.sdGreenShoeTargetCorpusOverseas
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdGreenShoeTargetCorpusOverseas)
                                                     ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas)) * 10000000)
                                                     : '')
                                         }
@@ -1332,13 +1441,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                         id="sdGreenShoeTotalTargetCorpus"
                                         label="Total (Green Shoe) (₹ Crore)"
-                                        value={prelimApplicationFormData.sdGreenShoeTotalTargetCorpus || ''}
+                                        value={prelimApplicationFormData.sdGreenShoeTotalTargetCorpus ?? ''}
                                         {...register("sdGreenShoeTotalTargetCorpus")}
                                         error={!!errors.sdGreenShoeTotalTargetCorpus}
                                         helperText={
                                             errors.sdGreenShoeTotalTargetCorpus
                                                 ? (errors.sdGreenShoeTotalTargetCorpus.message as string)
-                                                : (prelimApplicationFormData?.sdGreenShoeTotalTargetCorpus
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdGreenShoeTotalTargetCorpus)
                                                     ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdGreenShoeTotalTargetCorpus)) * 10000000)
                                                     : '')
                                         }
@@ -1353,15 +1462,18 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                 <Grid item xs={12}>
                                     <Box sx={{
                                         display: 'flex',
+                                        flexDirection: 'row',
+                                        flexWrap: 'wrap',
                                         alignItems: 'center',
-                                        justifyContent: 'space-between',
+                                        justifyContent: 'flex-start',
+                                        gap: { xs: 1, sm: 2 },
                                         p: 2,
                                         borderRadius: '12px',
                                         backgroundColor: 'rgba(54, 48, 98, 0.02)',
                                         border: '1px dashed rgba(54, 48, 98, 0.2)',
                                         mt: 2
                                     }}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062' }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062', flexShrink: 0 }}>
                                             First Closing Confirmed?
                                         </Typography>
                                         <FormControl component="fieldset">
@@ -1392,14 +1504,37 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                         id="sdFirstClosingDomesticAmount"
                                         label={prelimApplicationFormData.firstClosing ? "Domestic Amount (₹ Crore)" : "Expected Domestic Amount (₹ Crore)"}
-                                        value={prelimApplicationFormData.sdFirstClosingDomesticAmount || ''}
+                                        value={prelimApplicationFormData.sdFirstClosingDomesticAmount ?? ''}
                                         {...register("sdFirstClosingDomesticAmount")}
                                         error={!!errors.sdFirstClosingDomesticAmount}
                                         helperText={
                                             errors.sdFirstClosingDomesticAmount
                                                 ? (errors.sdFirstClosingDomesticAmount.message as string)
-                                                : (prelimApplicationFormData?.sdFirstClosingDomesticAmount
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdFirstClosingDomesticAmount)
                                                     ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdFirstClosingDomesticAmount)) * 10000000)
+                                                    : '')
+                                        }
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        variant="outlined"
+                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        id="sdFirstClosingOverseasAmount"
+                                        label={prelimApplicationFormData.firstClosing ? "Overseas Amount (₹ Crore)" : "Expected Overseas Amount (₹ Crore)"}
+                                        value={prelimApplicationFormData.sdFirstClosingOverseasAmount ?? ''}
+                                        {...register("sdFirstClosingOverseasAmount")}
+                                        error={!!errors.sdFirstClosingOverseasAmount}
+                                        helperText={
+                                            errors.sdFirstClosingOverseasAmount
+                                                ? (errors.sdFirstClosingOverseasAmount.message as string)
+                                                : (hasNumericFormValue(prelimApplicationFormData?.sdFirstClosingOverseasAmount)
+                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdFirstClosingOverseasAmount)) * 10000000)
                                                     : '')
                                         }
                                         onChange={handleChange}
@@ -1413,10 +1548,20 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         <Controller
                                             name="sdFirstClosingDomesticAmountDate"
                                             control={control}
+                                            rules={{
+                                                validate: (value: Dayjs | null) => {
+                                                    if (!value) return true;
+                                                    return value.isBefore(MIN_DATE)
+                                                        ? "Date cannot be before 01/01/2020"
+                                                        : true;
+                                                }
+                                            }}
                                             render={({ fieldState: { invalid, error } }) => (
                                                 <DesktopDatePicker
                                                     inputFormat="DD/MM/YYYY"
                                                     label={prelimApplicationFormData.firstClosing ? "Closing Date" : "Expected Closing Date"}
+                                                    minDate={MIN_DATE}
+                                                    shouldDisableDate={(d) => dayjs(d).isBefore(MIN_DATE, 'day')}
                                                     value={prelimApplicationFormData.sdFirstClosingDomesticAmountDate || null}
                                                     onChange={(newValue: any) => {
                                                         setValue('sdFirstClosingDomesticAmountDate', newValue);
@@ -1436,29 +1581,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                             )}
                                         />
                                     </LocalizationProvider>
-                                </Grid>
-                                <Grid item xs={12} md={4}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
-                                        id="sdFirstClosingOverseasAmount"
-                                        label={prelimApplicationFormData.firstClosing ? "Overseas Amount (₹ Crore)" : "Expected Overseas Amount (₹ Crore)"}
-                                        value={prelimApplicationFormData.sdFirstClosingOverseasAmount || ''}
-                                        {...register("sdFirstClosingOverseasAmount")}
-                                        error={!!errors.sdFirstClosingOverseasAmount}
-                                        helperText={
-                                            errors.sdFirstClosingOverseasAmount
-                                                ? (errors.sdFirstClosingOverseasAmount.message as string)
-                                                : (prelimApplicationFormData?.sdFirstClosingOverseasAmount
-                                                    ? numberToWordsIndian(parseFloat(String(prelimApplicationFormData.sdFirstClosingOverseasAmount)) * 10000000)
-                                                    : '')
-                                        }
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        variant="outlined"
-                                        sx={{ ...numericSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                                    />
                                 </Grid>
                                 {/* <Grid item xs={12} md={4}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>

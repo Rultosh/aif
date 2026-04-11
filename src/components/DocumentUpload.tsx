@@ -34,7 +34,7 @@ export default function DocumentChip(props: DocumentChipProps) {
       if (props.validationTitle) {
         const fileNameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
         if (fileNameWithoutExtension.toLowerCase() !== props.validationTitle.toLowerCase()) {
-          setError("Upload the file correctly. The document file name should be '" + props.validationTitle + "'");
+          setError("The document file name should be '" + props.validationTitle + "'");
           return;
         }
       }

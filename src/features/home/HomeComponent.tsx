@@ -84,6 +84,9 @@ export const Home = (pros: any) => {
     const [memoFile, setMemoFile] = useState<File | null>(null);
     const [memoError, setMemoError] = useState<string>('');
     const [memoUploading, setMemoUploading] = useState<boolean>(false);
+    const [startApplicationConfirmOpen, setStartApplicationConfirmOpen] = useState(false);
+    const [searchEmail, setSearchEmail] = useState<string>('');
+    const [searchAifName, setSearchAifName] = useState<string>('');
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
     const totalEntries = prelimApplications.totalEntries || 0;
@@ -99,6 +102,39 @@ export const Home = (pros: any) => {
         dispatch(getPrelimApplicationList(wrapArgument(
             actionUid, updatedPageInfo
         )))
+    };
+
+    const getFilteredApplications = () => {
+        return prelimApplications.prelimApplications?.filter((app) => {
+            const emailMatch = (app.createdByName || '').toLowerCase().includes(searchEmail.toLowerCase());
+            const aifNameMatch = (app.nameOfTheFund || '').toLowerCase().includes(searchAifName.toLowerCase());
+            return emailMatch && aifNameMatch;
+        }) || [];
+    };
+
+    const handleSearchEmailChange = (e: any) => {
+        setSearchEmail(e.target.value);
+    };
+
+    const handleSearchAifNameChange = (e: any) => {
+        setSearchAifName(e.target.value);
+    };
+
+    const handleClearSearch = () => {
+        setSearchEmail('');
+        setSearchAifName('');
+    };
+
+    const proceedStartApplication = async () => {
+        try {
+            let application: IPrelimApplicationData = await dispatch(
+                createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
+            ).unwrap();
+            navigate(`/Preliminary/${application.id}/selfRating`)
+        } catch (error: any) {
+            console.error("Failed to start application:", error);
+            alert(error?.message || "An unexpected error occurred while starting the application.");
+        }
     };
 
     function openModel(row: any) {
@@ -525,21 +561,74 @@ export const Home = (pros: any) => {
                                     backgroundColor: 'rgba(255, 103, 30, 0.04)'
                                 }
                             }}
-                            onClick={async () => {
-                                try {
-                                    let application: IPrelimApplicationData = await dispatch(
-                                        createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
-                                    ).unwrap();
-                                    navigate(`/Preliminary/${application.id}/selfRating`)
-                                } catch (error: any) {
-                                    console.error("Failed to start application:", error);
-                                    alert(error?.message || "An unexpected error occurred while starting the application.");
-                                }
-                            }}
+                            onClick={() => setStartApplicationConfirmOpen(true)}
                         >
                             Start Application
                         </Button>}
                     </Box>
+                    {activeRole !== "USER" && (
+                    <Paper elevation={0} sx={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                        border: '1px solid #edf2f7',
+                        mb: 2
+                    }}>
+                        <Box sx={{ p: '20px 24px', borderBottom: '1px solid #edf2f7', backgroundColor: '#f8fafc' }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#333333', mb: 2 }}>Search Applications</Typography>
+                            <Grid container spacing={2} alignItems="flex-end">
+                                <Grid item xs={12} sm={6} md={4}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Search by Email ID"
+                                        placeholder="Enter email or name"
+                                        value={searchEmail}
+                                        onChange={handleSearchEmailChange}
+                                        variant="outlined"
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                backgroundColor: '#ffffff',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={4}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        label="Search by AIF Name"
+                                        placeholder="Enter fund name"
+                                        value={searchAifName}
+                                        onChange={handleSearchAifNameChange}
+                                        variant="outlined"
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                backgroundColor: '#ffffff',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={4}>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={handleClearSearch}
+                                        sx={{
+                                            color: '#666',
+                                            borderColor: '#ddd',
+                                            '&:hover': {
+                                                borderColor: '#999'
+                                            }
+                                        }}
+                                    >
+                                        Clear Search
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Paper>
+                    )}
                     <Paper elevation={0} sx={{
                         backgroundColor: '#ffffff',
                         borderRadius: '8px',
@@ -556,7 +645,7 @@ export const Home = (pros: any) => {
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        prelimApplications.prelimApplications ? prelimApplications.prelimApplications.map((row, index) => {
+                                        getFilteredApplications().length > 0 ? getFilteredApplications().map((row, index) => {
                                             return <TableRow
                                                 key={row.id != null ? `prelim-${row.id}` : `prelim-row-${index}`}
                                                 sx={{
@@ -611,7 +700,7 @@ export const Home = (pros: any) => {
                                                     </Box>
                                                 </TableCell>
                                             </TableRow>
-                                        }) : <TableRow><TableCell colSpan={11} align="center">No data available</TableCell></TableRow>
+                                        }) : <TableRow><TableCell colSpan={11} align="center" sx={{ py: 3 }}>No applications found matching your search criteria</TableCell></TableRow>
                                     }
                                 </TableBody>
                             </Table>
@@ -622,50 +711,59 @@ export const Home = (pros: any) => {
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             p: '25px 24px',
-                            gap: 4
+                            gap: 4,
+                            flexWrap: 'wrap'
                         }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Typography sx={{ fontSize: '14px', color: '#333' }}>Items per page:</Typography>
-                                <Select
-                                    value={pageInfoSelect.toString()}
-                                    onChange={handleChange as any}
-                                    size="small"
-                                    sx={{ height: '36px', fontSize: '14px', minWidth: '80px' }}
-                                >
-                                    <MenuItem value={5}>5</MenuItem>
-                                    <MenuItem value={10}>10</MenuItem>
-                                    <MenuItem value={20}>20</MenuItem>
-                                    <MenuItem value={50}>50</MenuItem>
-                                    <MenuItem value={100}>100</MenuItem>
-                                </Select>
+                                {(totalEntries > 20 || getFilteredApplications().length > 0) && (
+                                    <>
+                                        <Typography sx={{ fontSize: '14px', color: '#333' }}>Items per page:</Typography>
+                                        <Select
+                                            value={pageInfoSelect.toString()}
+                                            onChange={handleChange as any}
+                                            size="small"
+                                            sx={{ height: '36px', fontSize: '14px', minWidth: '80px' }}
+                                        >
+                                            <MenuItem value={5}>5</MenuItem>
+                                            <MenuItem value={10}>10</MenuItem>
+                                            <MenuItem value={20}>20</MenuItem>
+                                            <MenuItem value={50}>50</MenuItem>
+                                            <MenuItem value={100}>100</MenuItem>
+                                        </Select>
+                                    </>
+                                )}
                             </Box>
 
-                            <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
-                                Showing {prelimApplications.prelimApplications?.length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {prelimApplications.prelimApplications ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, totalEntries) : 0} of {totalEntries} entries
-                            </Typography>
+                            {(totalEntries > 20 || getFilteredApplications().length > 0) && (
+                                <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
+                                    Showing {getFilteredApplications().length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {getFilteredApplications().length > 0 ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, getFilteredApplications().length) : 0} of {getFilteredApplications().length} results
+                                </Typography>
+                            )}
 
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil(totalEntries / pageInfo.pageSize) || 1}
-                                    page={pageInfo.pageNumber + 1}
-                                    onChange={(event, value) => goToPage(value - 1)}
-                                    color="primary"
-                                    variant="outlined"
-                                    shape="rounded"
-                                    sx={{
-                                        '& .MuiPaginationItem-root': {
-                                            borderColor: '#e2e8f0',
-                                            color: '#333',
-                                            backgroundColor: '#fff',
-                                            '&.Mui-selected': {
-                                                borderColor: '#4466c1',
-                                                color: '#4466c1',
-                                                backgroundColor: 'transparent',
-                                                fontWeight: 600
-                                            },
-                                        }
-                                    }}
-                                />
+                                {Math.ceil(getFilteredApplications().length / pageInfo.pageSize) > 1 && (
+                                    <Pagination
+                                        count={Math.ceil(getFilteredApplications().length / pageInfo.pageSize)}
+                                        page={pageInfo.pageNumber + 1}
+                                        onChange={(event, value) => goToPage(value - 1)}
+                                        color="primary"
+                                        variant="outlined"
+                                        shape="rounded"
+                                        sx={{
+                                            '& .MuiPaginationItem-root': {
+                                                borderColor: '#e2e8f0',
+                                                color: '#333',
+                                                backgroundColor: '#fff',
+                                                '&.Mui-selected': {
+                                                    borderColor: '#4466c1',
+                                                    color: '#4466c1',
+                                                    backgroundColor: 'transparent',
+                                                    fontWeight: 600
+                                                },
+                                            }
+                                        }}
+                                    />
+                                )}
                             </Box>
                         </Box>
                     </Paper>
@@ -792,6 +890,37 @@ export const Home = (pros: any) => {
                             <Button onClick={closeManagerReassignDialog}>Cancel</Button>
                             <Button onClick={submitManagerReassign} variant="contained" disabled={!managerSelectedMakerUserId}>
                                 Reassign
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={startApplicationConfirmOpen} onClose={() => setStartApplicationConfirmOpen(false)} fullWidth maxWidth="sm">
+                        <DialogTitle>Confirm Start Application</DialogTitle>
+                        <DialogContent>
+                            <Typography sx={{ mt: 1 }}>
+                                Kindly review the eligibility criteria provided on the website prior to initiating the application.
+                            </Typography>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setStartApplicationConfirmOpen(false)}>Cancel</Button>
+                            <Button
+                                variant="contained"
+                                onClick={async () => {
+                                    setStartApplicationConfirmOpen(false);
+                                    await proceedStartApplication();
+                                }}
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: '6px',
+                                    fontWeight: 700,
+                                    backgroundColor: '#FF671F',
+                                    '&:hover': {
+                                        border: '1px solid #FF671F',
+                                        color: '#FF671F',
+                                        backgroundColor: 'rgb(255 103 30 / 19%)'
+                                    }
+                                }}
+                            >
+                                Continue
                             </Button>
                         </DialogActions>
                     </Dialog>

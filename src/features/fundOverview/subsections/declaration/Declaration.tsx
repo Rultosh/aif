@@ -11,6 +11,7 @@ import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import { defaultIPrelimApplicationData, IPrelimApplicationData } from "../fundOverviewData/IPrelimApplicationData";
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
+import { markDeclarationStepComplete } from "../../wizardProgress";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -21,6 +22,7 @@ import dayjs from "dayjs";
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import DocumentChip from "../../../../components/DocumentChip";
+import FileUploadService from "../../../../components/FileUploadService";
 
 const Declaration = (props: any) => {
 
@@ -30,8 +32,10 @@ const Declaration = (props: any) => {
     const [actionUid] = useState(uuid());
 
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
+    const effectiveId = String(prelimApplicationState.prelimApplication?.id || id || '');
     const [agreed, setAgreed] = useState<boolean>(!!prelimApplicationState.prelimApplication.declarationAccepted);
     const [expanded, setExpanded] = useState<string | false>("1");
+    const [documentError, setDocumentError] = useState<string>('');
 
     const validationSchema = Yup.object().shape({
         sdDescription: Yup.string().label("Capital Raised Till Date").nullable(),
@@ -54,7 +58,61 @@ const Declaration = (props: any) => {
         setExpanded(isExpanded ? panel : false);
     };
 
-    const handleInternalSaveAndContinue = (nextPanel: string) => {
+    const hasUploadedFiles = async (bucketId: string): Promise<boolean> => {
+        try {
+            const res = await FileUploadService.list(bucketId);
+            const files = Array.isArray(res?.data)
+                ? res.data
+                : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
+            return files.length > 0;
+        } catch {
+            return false;
+        }
+    };
+
+    const validateRequiredDocuments = async (buckets: string[]): Promise<boolean> => {
+        const checks = await Promise.all(buckets.map((bucket) => hasUploadedFiles(`${bucket}${effectiveId}`)));
+        const allUploaded = checks.every(Boolean);
+        setDocumentError(allUploaded ? '' : 'Please upload all mandatory documents before proceeding.');
+        return allUploaded;
+    };
+
+    const handleInternalSaveAndContinue = async (currentPanel: string, nextPanel: string) => {
+        if (!Number(effectiveId)) {
+            setDocumentError('Please save the form to upload documents.');
+            return;
+        }
+
+        if (currentPanel === "1") {
+            const kycBuckets = ["kycBoardDirectors", "boardResolution"];
+            const ok = await validateRequiredDocuments(kycBuckets);
+            if (!ok) return;
+        }
+
+        if (currentPanel === "2") {
+            const supportingBuckets = [
+                "sdPvtPlacementMemorandum",
+                "sdLatestInvestorPresentation",
+                "sdImAgreement",
+                "sdTrustDeal",
+                "sdSEBICertificate",
+                // sdAifGradingReport is optional
+                "sdShareholdingPattern",
+                "sdPolicyOfCarry",
+                "sdContributionAgreement",
+                "sdInvestmentPolicy",
+                "sdInvestmentCommitteeNote",
+                "sdHrPolicy",
+                "sdOrganisationStructure",
+                "detailsOfInvestmentCommitteeMembers",
+                "detailsOfContributorToTheFund",
+                "pastInvestmentTrackRecord",
+            ];
+            const ok = await validateRequiredDocuments(supportingBuckets);
+            if (!ok) return;
+        }
+
+        setDocumentError('');
         setExpanded(nextPanel);
     };
 
@@ -64,7 +122,34 @@ const Declaration = (props: any) => {
         } else {
             await handleSubmit(async (data) => {
                 try {
+                    if (!Number(effectiveId)) {
+                        setDocumentError('Please save the form to upload documents.');
+                        return;
+                    }
+                    const allRequiredBuckets = [
+                        "kycBoardDirectors",
+                        "boardResolution",
+                        "sdPvtPlacementMemorandum",
+                        "sdLatestInvestorPresentation",
+                        "sdImAgreement",
+                        "sdTrustDeal",
+                        "sdSEBICertificate",
+                        // sdAifGradingReport is optional
+                        "sdShareholdingPattern",
+                        "sdPolicyOfCarry",
+                        "sdContributionAgreement",
+                        "sdInvestmentPolicy",
+                        "sdInvestmentCommitteeNote",
+                        "sdHrPolicy",
+                        "sdOrganisationStructure",
+                        "detailsOfInvestmentCommitteeMembers",
+                        "detailsOfContributorToTheFund",
+                        "pastInvestmentTrackRecord",
+                    ];
+                    const docsOk = await validateRequiredDocuments(allRequiredBuckets);
+                    if (!docsOk) return;
                     await handleClickSave(data);
+                    markDeclarationStepComplete(String(prelimApplicationState.prelimApplication.id));
                     navigate(`/preliminary/${prelimApplicationState.prelimApplication.id}/preview`)
                 } catch (error: any) {
                     console.error("Save failure:", error);
@@ -232,7 +317,7 @@ const Declaration = (props: any) => {
                                                     {item.templateLabel}
                                                 </Button>}
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" validationTitle={item.validationTitle} id={`${item.id}${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle={item.validationTitle} id={`${item.id}${effectiveId}`} />
                                                 </span>
                                             </Box>
                                         </Box>
@@ -241,7 +326,7 @@ const Declaration = (props: any) => {
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleInternalSaveAndContinue("2")}
+                                        onClick={() => handleInternalSaveAndContinue("1", "2")}
                                         sx={internalButtonSx}
                                     >
                                         Save & Continue
@@ -276,46 +361,46 @@ const Declaration = (props: any) => {
                                         borderRadius: '16px',
                                         backgroundColor: '#fafafa'
                                     }}>
-                                        {Number(id) ? (
+                                        {Number(effectiveId) ? (
                                             <Grid container spacing={2}>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Private Placement Memorandum" validationTitle="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${id}`} />
+                                                    <DocumentChip label="Private Placement Memorandum" validationTitle="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Latest Investor Presentation" validationTitle="Latest Investor Presentation" id={`sdLatestInvestorPresentation${id}`} />
+                                                    <DocumentChip label="Latest Investor Presentation" validationTitle="Latest Investor Presentation" id={`sdLatestInvestorPresentation${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="IM Agreement" validationTitle="IM Agreement" id={`sdImAgreement${id}`} />
+                                                    <DocumentChip label="IM Agreement" validationTitle="IM Agreement" id={`sdImAgreement${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Trust Deed" validationTitle="Trust Deed" id={`sdTrustDeal${id}`} />
+                                                    <DocumentChip label="Trust Deed" validationTitle="Trust Deed" id={`sdTrustDeal${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="SEBI Registration Certificate" validationTitle="SEBI Registration Certificate" id={`sdSEBICertificate${id}`} />
+                                                    <DocumentChip label="SEBI Registration Certificate" validationTitle="SEBI Registration Certificate" id={`sdSEBICertificate${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="AIF Grading Report" validationTitle="AIF Grading Report" id={`sdAifGradingReport${id}`} />
+                                                    <DocumentChip label="AIF Grading Report" validationTitle="AIF Grading Report" id={`sdAifGradingReport${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Shareholding Pattern of Sponsor/IM"  id={`sdShareholdingPattern${id}`} />
+                                                    <DocumentChip label="Shareholding Pattern of Sponsor/IM"  id={`sdShareholdingPattern${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Policy of Carry" validationTitle="Policy of Carry" id={`sdPolicyOfCarry${id}`} />
+                                                    <DocumentChip label="Policy of Carry" validationTitle="Policy of Carry" id={`sdPolicyOfCarry${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Draft Contribution Agreement" validationTitle="Draft Contribution Agreement" id={`sdContributionAgreement${id}`} />
+                                                    <DocumentChip label="Draft Contribution Agreement" validationTitle="Draft Contribution Agreement" id={`sdContributionAgreement${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Investment and Other Policies" validationTitle="Investment and Other Policies" id={`sdInvestmentPolicy${id}`} />
+                                                    <DocumentChip label="Investment and Other Policies" validationTitle="Investment and Other Policies" id={`sdInvestmentPolicy${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Sample Investment Committee Note" validationTitle="Sample Investment Committee Note" id={`sdInvestmentCommitteeNote${id}`} />
+                                                    <DocumentChip label="Sample Investment Committee Note" validationTitle="Sample Investment Committee Note" id={`sdInvestmentCommitteeNote${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="HR Policy" validationTitle="HR Policy" id={`sdHrPolicy${id}`} />
+                                                    <DocumentChip label="HR Policy" validationTitle="HR Policy" id={`sdHrPolicy${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip label="Organisation Structure" validationTitle="Organisation Structure" id={`sdOrganisationStructure${id}`} />
+                                                    <DocumentChip label="Organisation Structure" validationTitle="Organisation Structure" id={`sdOrganisationStructure${effectiveId}`} />
                                                 </Grid>
                                             </Grid>
                                         ) : (
@@ -335,7 +420,7 @@ const Declaration = (props: any) => {
                                         borderRadius: '16px',
                                         backgroundColor: '#fafafa'
                                     }}>
-                                        {Number(id) ? (
+                                        {Number(effectiveId) ? (
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
@@ -354,7 +439,7 @@ const Declaration = (props: any) => {
                                                     Download Template
                                                 </Button>
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" validationTitle="Details of Investment Committee Members" id={`detailsOfInvestmentCommitteeMembers${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle="Details of Investment Committee Members" id={`detailsOfInvestmentCommitteeMembers${effectiveId}`} />
                                                 </span>
                                             </Box>
                                         ) : (
@@ -374,7 +459,7 @@ const Declaration = (props: any) => {
                                         borderRadius: '16px',
                                         backgroundColor: '#fafafa'
                                     }}>
-                                        {Number(id) ? (
+                                        {Number(effectiveId) ? (
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
@@ -393,7 +478,7 @@ const Declaration = (props: any) => {
                                                     Download Template
                                                 </Button>
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" validationTitle="Details of contributors of Current Fund" id={`detailsOfContributorToTheFund${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle="Details of contributors of Current Fund" id={`detailsOfContributorToTheFund${effectiveId}`} />
                                                 </span>
                                             </Box>
                                         ) : (
@@ -413,7 +498,7 @@ const Declaration = (props: any) => {
                                         borderRadius: '16px',
                                         backgroundColor: '#fafafa'
                                     }}>
-                                        {Number(id) ? (
+                                        {Number(effectiveId) ? (
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
@@ -432,7 +517,7 @@ const Declaration = (props: any) => {
                                                     Download Template
                                                 </Button>
                                                 <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" validationTitle="Past Investment Track Record Of IM or AMC" id={`pastInvestmentTrackRecord${id}`} />
+                                                    <DocumentChip label="Upload Document" validationTitle="Past Investment Track Record Of IM or AMC" id={`pastInvestmentTrackRecord${effectiveId}`} />
                                                 </span>
                                             </Box>
                                         ) : (
@@ -446,7 +531,7 @@ const Declaration = (props: any) => {
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleInternalSaveAndContinue("3")}
+                                        onClick={() => handleInternalSaveAndContinue("2", "3")}
                                         sx={internalButtonSx}
                                     >
                                         Save & Continue
@@ -565,6 +650,11 @@ const Declaration = (props: any) => {
                                 </Button>
                             </Box>
                         </Box>
+                        {documentError && (
+                            <Typography variant="caption" color="error" sx={{ mt: 1.5, display: 'block' }}>
+                                {documentError}
+                            </Typography>
+                        )}
                     </CardContent>
                 </Card>
             </div>
