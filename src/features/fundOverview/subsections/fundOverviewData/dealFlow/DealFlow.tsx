@@ -1,4 +1,4 @@
-import { Alert, Backdrop, Box, Button, Grid, TextField, Typography, CircularProgress, Snackbar } from "@mui/material";
+import { Backdrop, Box, Button, Grid, TextField, Typography, CircularProgress } from "@mui/material";
 import { useState, useEffect, forwardRef, useImperativeHandle, useRef } from "react";
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
 import { getPrelimApplicationData, PrelimApplicationState, selectPrelimApplication, updatePrelimApplicationAsync } from "../prelimApplicationDataSlice";
@@ -15,13 +15,6 @@ import FileUploadService from "../../../../../components/FileUploadService";
 import { useParams } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
-import { opaqueInfoToastAlertSx } from "../../../../../lib/ui/opaqueInfoToastAlertSx";
-
-const DEAL_FLOW_MANDATORY_UPLOADS_MESSAGE =
-    'Upload the two mandatory files in this section (Deal Flow/MIS): current pipeline of deals under consideration, and empanelled list of external firms.';
-
-const ASSOCIATE_RESUME_DEALFLOW_MESSAGE =
-    'Section 4 — one or more non-KMP team members are missing the mandatory Resume/CV upload. Open the highlighted row(s), add the file, and save.';
 
 export type DealFlowSubmitResult = true | { ok: false; highlightPanel: '3' | '4' | '7' };
 
@@ -32,11 +25,10 @@ interface PrelimApplicationProps {
     /** When form or mandatory-document validation has issues, parent can tint the accordion shell. */
     onSectionHasErrorsChange?: (hasErrors: boolean) => void;
     /**
-     * Deal Flow "Save and Continue" runs KMP / non-KMP mandatory checks before `onSaveSuccess`.
-     * If those fail, we return early and never call `onSaveSuccess` — parent must still run full-fund
-     * validation + Stay/Continue (same as sticky save). Invoked only for section 3/4 gate failures.
+     * Any Deal Flow save path that does not reach `onSaveSuccess` (missing uploads, RHF errors,
+     * KMP/associate gates, etc.): parent runs full-fund validation and opens Stay/Continue.
      */
-    onCrossSectionGateIncomplete?: () => void;
+    onDealFlowSaveIncomplete?: () => void;
 }
 
 const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
@@ -44,10 +36,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
-    const [documentError, setDocumentError] = useState('');
     /** Drives parent accordion tint for section 7 only when the problem is inside Deal Flow (not cross-section gates). */
     const [documentGateFailureScope, setDocumentGateFailureScope] = useState<'dealFlow' | 'kmp' | 'associate' | null>(null);
-    const [mandatoryUploadToastOpen, setMandatoryUploadToastOpen] = useState(false);
     /** Shown during file-server bucket checks, KMP document API check, and save (non-silent submit only). */
     const [documentChecksBusy, setDocumentChecksBusy] = useState(false);
     const prelimAppicationId = props.prelimApplicationId;
@@ -109,6 +99,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const onSectionHasErrorsChangeRef = useRef(props.onSectionHasErrorsChange);
     onSectionHasErrorsChangeRef.current = props.onSectionHasErrorsChange;
 
+    const onDealFlowSaveIncompleteRef = useRef(props.onDealFlowSaveIncomplete);
+    onDealFlowSaveIncompleteRef.current = props.onDealFlowSaveIncomplete;
+
     useEffect(() => {
         const hasFormErrors = Object.keys(errors).length > 0;
         const hasInSectionMandatoryDocIssue = documentGateFailureScope === 'dealFlow';
@@ -152,16 +145,11 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
             if (!allUploaded) {
                 setDocumentGateFailureScope('dealFlow');
                 if (!silent) {
-                    setDocumentError(DEAL_FLOW_MANDATORY_UPLOADS_MESSAGE);
-                    setMandatoryUploadToastOpen(true);
-                } else {
-                    setDocumentError('');
+                    onDealFlowSaveIncompleteRef.current?.();
                 }
                 return { ok: false, highlightPanel: '7' };
             }
-            setDocumentError('');
             setDocumentGateFailureScope(null);
-            setMandatoryUploadToastOpen(false);
             if (!silent) {
                 try {
                     const kmpRes = await fetchKmpMandatoryDocumentsStatus(Number(effectiveId));
@@ -172,18 +160,12 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                     const resume = asNumList(d?.missingResumeKmpIds);
                     if (past.length > 0 || resume.length > 0) {
                         setDocumentGateFailureScope('kmp');
-                        setDocumentError('');
-                        setMandatoryUploadToastOpen(false);
-                        props.onCrossSectionGateIncomplete?.();
+                        onDealFlowSaveIncompleteRef.current?.();
                         return { ok: false, highlightPanel: '3' };
                     }
                 } catch {
                     setDocumentGateFailureScope('kmp');
-                    setDocumentError(
-                        'Unable to verify KMP mandatory uploads. Please check your connection and try again.'
-                    );
-                    setMandatoryUploadToastOpen(true);
-                    props.onCrossSectionGateIncomplete?.();
+                    onDealFlowSaveIncompleteRef.current?.();
                     return { ok: false, highlightPanel: '3' };
                 }
                 try {
@@ -193,23 +175,16 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         : [];
                     if (assocMissing.length > 0) {
                         setDocumentGateFailureScope('associate');
-                        setDocumentError(ASSOCIATE_RESUME_DEALFLOW_MESSAGE);
-                        setMandatoryUploadToastOpen(true);
-                        props.onCrossSectionGateIncomplete?.();
+                        onDealFlowSaveIncompleteRef.current?.();
                         return { ok: false, highlightPanel: '4' };
                     }
                 } catch {
                     setDocumentGateFailureScope('associate');
-                    setDocumentError(
-                        'Unable to verify non-KMP team uploads. Please check your connection and try again.'
-                    );
-                    setMandatoryUploadToastOpen(true);
-                    props.onCrossSectionGateIncomplete?.();
+                    onDealFlowSaveIncompleteRef.current?.();
                     return { ok: false, highlightPanel: '4' };
                 }
             }
             await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
-            setDocumentError('');
             setDocumentGateFailureScope(null);
             if (!silent && props.onSaveSuccess) {
                 props.onSaveSuccess();
@@ -224,15 +199,23 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
 
     const onSubmit = async (data: IPrelimApplicationData) => persistDealFlowSection(data, false);
 
+    const onSubmitInvalid = () => {
+        onDealFlowSaveIncompleteRef.current?.();
+    };
+
     useImperativeHandle(ref, () => ({
         submit: async (opts?: { silent?: boolean }): Promise<DealFlowSubmitResult> => {
+            const silent = Boolean(opts?.silent);
             let result: DealFlowSubmitResult = true;
             await handleSubmit(
                 async (data) => {
-                    result = await persistDealFlowSection(data, Boolean(opts?.silent));
+                    result = await persistDealFlowSection(data, silent);
                 },
                 () => {
                     result = { ok: false, highlightPanel: '7' };
+                    if (!silent) {
+                        onDealFlowSaveIncompleteRef.current?.();
+                    }
                 }
             )();
             return result;
@@ -299,7 +282,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
 
     if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE || prelimApplicationState.prelimApplication?.id) {
         return (
-            <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 0 }}>
+            <Box component="form" onSubmit={handleSubmit(onSubmit, onSubmitInvalid)} sx={{ p: 0 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sx={qSx}>
                         <Typography variant="body1" sx={labelSx}>1. Total number of business plans / deals evaluated since Fund inception and Conversion ratio for transactions sourced to those completed.</Typography>
@@ -594,25 +577,6 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         </Typography>
                     </Box>
                 </Backdrop>
-                <Snackbar
-                    open={mandatoryUploadToastOpen}
-                    autoHideDuration={12000}
-                    onClose={(_, reason) => {
-                        if (reason === 'clickaway') return;
-                        setMandatoryUploadToastOpen(false);
-                    }}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                    sx={{ zIndex: (theme) => theme.zIndex.modal + 12 }}
-                >
-                    <Alert
-                        onClose={() => setMandatoryUploadToastOpen(false)}
-                        severity="info"
-                        variant="standard"
-                        sx={opaqueInfoToastAlertSx}
-                    >
-                        {documentError || DEAL_FLOW_MANDATORY_UPLOADS_MESSAGE}
-                    </Alert>
-                </Snackbar>
             </Box>
         );
     }

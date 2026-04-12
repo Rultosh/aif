@@ -35,19 +35,27 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     const [riskAssessmentDocMissing, setRiskAssessmentDocMissing] = useState(false);
     const onSectionHasErrorsChangeRef = useRef(props.onSectionHasErrorsChange);
     onSectionHasErrorsChangeRef.current = props.onSectionHasErrorsChange;
+    /** After `reset()` from prelim refresh, RHF/yup can briefly report errors and falsely flag section 2 for other panels’ activity. */
+    const skipStrategyErrorReportRef = useRef(false);
 
-    const riskBucketHasFiles = useCallback(async (): Promise<boolean> => {
+    /** `true` / `false` = list succeeded; `null` = still failing after retries — caller treats as “unknown”, not “missing”. */
+    const riskBucketHasFiles = useCallback(async (): Promise<boolean | null> => {
         if (!Number(effectiveId)) return false;
-        try {
-            const bucketId = `sdRiskAssessmentAndMitigationPlan${effectiveId}`;
-            const res = await FileUploadService.list(bucketId);
-            const files = Array.isArray(res?.data)
-                ? res.data
-                : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
-            return files.length > 0;
-        } catch {
-            return false;
+        const bucketId = `sdRiskAssessmentAndMitigationPlan${effectiveId}`;
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                const res = await FileUploadService.list(bucketId);
+                const files = Array.isArray(res?.data)
+                    ? res.data
+                    : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
+                return files.length > 0;
+            } catch {
+                if (attempt < 2) {
+                    await new Promise((r) => setTimeout(r, 70));
+                }
+            }
         }
+        return null;
     }, [effectiveId]);
 
     const refreshRiskAssessmentDocMissing = useCallback(async () => {
@@ -56,6 +64,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
             return;
         }
         const ok = await riskBucketHasFiles();
+        if (ok === null) return;
         setRiskAssessmentDocMissing(!ok);
     }, [effectiveId, riskBucketHasFiles]);
 
@@ -69,7 +78,11 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
             const isInitialLoad = !prelimApplicationFormData?.id;
             setPrelimApplicationFormData(prelimApplicationState.prelimApplication);
+            skipStrategyErrorReportRef.current = true;
             reset(prelimApplicationState.prelimApplication, { keepDirtyValues: !isInitialLoad });
+            window.setTimeout(() => {
+                skipStrategyErrorReportRef.current = false;
+            }, 80);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
     const freeformRegx = /^[\s\S]*$/; // Allow all characters for multiline fields, or more permissive set
@@ -127,14 +140,17 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                 return;
             }
             const ok = await riskBucketHasFiles();
-            if (!cancelled) setRiskAssessmentDocMissing(!ok);
+            if (!cancelled && ok !== null) {
+                setRiskAssessmentDocMissing(!ok);
+            }
         })();
         return () => {
             cancelled = true;
         };
-    }, [effectiveId, riskBucketHasFiles, prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
+    }, [effectiveId, riskBucketHasFiles, prelimApplicationState.prelimApplication?.id]);
 
     useEffect(() => {
+        if (skipStrategyErrorReportRef.current) return;
         const hasFormErrors = Object.keys(errors).length > 0;
         onSectionHasErrorsChangeRef.current?.(hasFormErrors || riskAssessmentDocMissing);
     }, [errors, riskAssessmentDocMissing]);
@@ -148,6 +164,16 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
 
     const persistStrategySection = async (data: IPrelimApplicationData, silent: boolean): Promise<boolean> => {
         const hasDocument = await riskBucketHasFiles();
+        if (hasDocument === null) {
+            if (!silent) {
+                setDocumentError('Unable to verify the risk assessment document. Check your connection and try again.');
+                return false;
+            }
+            /** Silent full-fund run: do not fail section 2 (or dispatch) on file-server hiccups while other sections validate. */
+            setDocumentError('');
+            setRiskAssessmentDocMissing(false);
+            return true;
+        }
         if (!hasDocument) {
             setRiskAssessmentDocMissing(true);
             if (!silent) {
@@ -174,10 +200,14 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
             /** Full-fund silent run: fail fast on missing risk doc without relying only on RHF `onValid` ordering. */
             if (silent) {
                 const hasFile = await riskBucketHasFiles();
-                if (!hasFile) {
+                if (hasFile === false) {
                     setRiskAssessmentDocMissing(true);
                     setDocumentError('');
                     return false;
+                }
+                if (hasFile === null) {
+                    setDocumentError('');
+                    /** Let `persistStrategySection` / RHF decide; avoid failing the whole fund on transient list errors. */
                 }
             }
             let isValid = false;

@@ -68,6 +68,9 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
     const onSectionHasErrorsChangeRef = useRef(props.onSectionHasErrorsChange);
     onSectionHasErrorsChangeRef.current = props.onSectionHasErrorsChange;
 
+    const investmentPartnersStateRef = useRef(investmentPartnersState);
+    investmentPartnersStateRef.current = investmentPartnersState;
+
     const loadKmpDocGaps = useCallback(async (): Promise<
         { missingPastTenYearsKmpIds: number[]; missingResumeKmpIds: number[] } | null
     > => {
@@ -158,13 +161,31 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
         () => ({
             submit: async (opts?: { silent?: boolean }) => {
                 const silent = opts?.silent === true;
-                const statusIdle = investmentPartnersState.status.fetchStatus === FetchStatus.IDLE;
-                const actionIdle = investmentPartnersState.actionStatus.fetchStatus === FetchStatus.IDLE;
-                /** Full-fund silent validation must not pass while team or gap data may still be loading. */
-                if (!statusIdle || !actionIdle) {
-                    return false;
+                if (silent) {
+                    /** Section 2 (or others) can dispatch and briefly move this slice off IDLE; silent `submit` must not fail KMP while only a later panel is wrong. */
+                    let kmpSliceIdle = false;
+                    for (let i = 0; i < 50; i++) {
+                        const s = investmentPartnersStateRef.current;
+                        if (
+                            s.status.fetchStatus === FetchStatus.IDLE &&
+                            s.actionStatus.fetchStatus === FetchStatus.IDLE
+                        ) {
+                            kmpSliceIdle = true;
+                            break;
+                        }
+                        await new Promise((r) => setTimeout(r, 50));
+                    }
+                    if (!kmpSliceIdle) {
+                        return true;
+                    }
+                } else {
+                    const statusIdle = investmentPartnersState.status.fetchStatus === FetchStatus.IDLE;
+                    const actionIdle = investmentPartnersState.actionStatus.fetchStatus === FetchStatus.IDLE;
+                    if (!statusIdle || !actionIdle) {
+                        return false;
+                    }
                 }
-                const n = investmentPartnersState.investmentPartners?.length ?? 0;
+                const n = investmentPartnersStateRef.current.investmentPartners?.length ?? 0;
                 if (n < 1) {
                     if (!silent) {
                         showValidationToast('Add at least one investment team member at KMP level before continuing.');
@@ -182,8 +203,18 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
                     setKmpDocValidationBusy(true);
                 }
                 try {
-                    const gaps = await loadKmpDocGaps();
+                    let gaps = await loadKmpDocGaps();
+                    if (gaps === null && silent) {
+                        for (let r = 0; r < 2 && gaps === null; r++) {
+                            await new Promise((res) => setTimeout(res, 70));
+                            gaps = await loadKmpDocGaps();
+                        }
+                    }
                     if (gaps === null) {
+                        if (silent) {
+                            /** Do not mark section 3 failed on transient KMP status API errors during full-fund validation. */
+                            return true;
+                        }
                         return false;
                     }
                     const { missingPastTenYearsKmpIds: past, missingResumeKmpIds: resume } = gaps;

@@ -119,40 +119,23 @@ export const Fund = (props: any) => {
     const [investmentStrategySectionHasErrors, setInvestmentStrategySectionHasErrors] = useState(false);
     const [fundValidatingAll, setFundValidatingAll] = useState(false);
 
-    /** Ref mirrors for accordion error flags — updated synchronously so post-`await` validation sees latest child state. */
-    const investmentStrategySectionHasErrorsRef = useRef(false);
-    const investmentPartnerSectionHasErrorsRef = useRef(false);
-    const investmentAssociateSectionHasErrorsRef = useRef(false);
-    const pastInvestmentSectionHasErrorsRef = useRef(false);
-    const dealFlowSectionHasErrorsRef = useRef(false);
-    const fundPanelValidationErrorsRef = useRef<string[]>([]);
-
-    useEffect(() => {
-        fundPanelValidationErrorsRef.current = fundPanelValidationErrors;
-    }, [fundPanelValidationErrors]);
-
     const reportDealFlowSectionErrors = useCallback((hasErrors: boolean) => {
-        dealFlowSectionHasErrorsRef.current = hasErrors;
         setDealFlowSectionHasErrors(hasErrors);
     }, []);
 
     const reportInvestmentPartnerSectionErrors = useCallback((hasErrors: boolean) => {
-        investmentPartnerSectionHasErrorsRef.current = hasErrors;
         setInvestmentPartnerSectionHasErrors(hasErrors);
     }, []);
 
     const reportInvestmentAssociateSectionErrors = useCallback((hasErrors: boolean) => {
-        investmentAssociateSectionHasErrorsRef.current = hasErrors;
         setInvestmentAssociateSectionHasErrors(hasErrors);
     }, []);
 
     const reportPastInvestmentSectionErrors = useCallback((hasErrors: boolean) => {
-        pastInvestmentSectionHasErrorsRef.current = hasErrors;
         setPastInvestmentSectionHasErrors(hasErrors);
     }, []);
 
     const reportInvestmentStrategySectionErrors = useCallback((hasErrors: boolean) => {
-        investmentStrategySectionHasErrorsRef.current = hasErrors;
         setInvestmentStrategySectionHasErrors(hasErrors);
     }, []);
 
@@ -185,32 +168,26 @@ export const Fund = (props: any) => {
     const isFundSectionSubmitOk = (v: unknown) =>
         v === true || (typeof v === 'object' && v !== null && (v as { ok?: boolean }).ok === true);
 
-    /** If children already report document/form issues, treat that panel as failed even when silent `submit()` races or misses. */
-    const mergeLiveAccordionErrorsIntoValidations = (v: boolean[]): boolean[] => {
-        const out = [...v];
-        if (investmentStrategySectionHasErrorsRef.current) out[1] = false;
-        if (investmentPartnerSectionHasErrorsRef.current) out[2] = false;
-        if (investmentAssociateSectionHasErrorsRef.current) out[3] = false;
-        if (hasInvestment && pastInvestmentSectionHasErrorsRef.current) out[4] = false;
-        if (dealFlowSectionHasErrorsRef.current) out[6] = false;
-        for (const panelId of fundPanelValidationErrorsRef.current) {
-            const idx = FUND_MANDATORY_PANEL_ORDER.indexOf(panelId);
-            if (idx >= 0) out[idx] = false;
-        }
-        return out;
-    };
+    /**
+     * Full-fund result is driven only by each section’s `submit({ silent: true })` outcome.
+     * Do not OR in live accordion refs here — they update in effects and can stay “stale true” while
+     * `submit()` already passed, which incorrectly tinted section 2 when failures were only in 3 or 7.
+     */
+    const mergeLiveAccordionErrorsIntoValidations = (v: boolean[]): boolean[] => [...v];
 
     const FUND_COMPLETENESS_TOAST_TEXT =
         'Some fund sections still have errors or missing mandatory documents. Review each section from the top (red highlights show where to fix). Choose Stay to keep working here, or Continue to go to the declaration step anyway.';
 
     const fundAccordionShellSx = (panelId: string) => {
-        const hasErr =
-            fundPanelValidationErrors.includes(panelId) ||
-            (panelId === "2" && investmentStrategySectionHasErrors) ||
-            (panelId === "3" && investmentPartnerSectionHasErrors) ||
-            (panelId === "4" && investmentAssociateSectionHasErrors) ||
-            (panelId === "5" && pastInvestmentSectionHasErrors) ||
-            (panelId === "7" && dealFlowSectionHasErrors);
+        /** Prefer the last full-fund failure list so stale per-section flags (effects not yet cleared) do not re-tint the wrong accordion — e.g. only panel 7 in `fundPanelValidationErrors` while partner state still says “has errors”. */
+        const liveErr =
+            fundPanelValidationErrors.length === 0 &&
+            ((panelId === "2" && investmentStrategySectionHasErrors) ||
+                (panelId === "3" && investmentPartnerSectionHasErrors) ||
+                (panelId === "4" && investmentAssociateSectionHasErrors) ||
+                (panelId === "5" && pastInvestmentSectionHasErrors) ||
+                (panelId === "7" && dealFlowSectionHasErrors));
+        const hasErr = fundPanelValidationErrors.includes(panelId) || liveErr;
         return {
             border: '1px solid rgba(0,0,0,0.08)',
             borderRadius: '12px !important',
@@ -960,7 +937,7 @@ export const Fund = (props: any) => {
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("7", null, null)}
                                             onSectionHasErrorsChange={reportDealFlowSectionErrors}
-                                            onCrossSectionGateIncomplete={() => {
+                                            onDealFlowSaveIncomplete={() => {
                                                 void (async () => {
                                                     const validations = await runMergedFullFundValidation();
                                                     if (!validations.every((res) => res === true)) {
