@@ -793,7 +793,7 @@ export const Home = (pros: any) => {
                                     label="Maker User"
                                     onChange={(e) => setSelectedMakerUserId(e.target.value)}
                                 >
-                                    {managerReassignMakerOptions.map((user) => (
+                                    {makerUsers.map((user) => (
                                         <MenuItem key={user.id} value={String(user.id)}>
                                             {user.contactPerson || user.username} ({user.username})
                                         </MenuItem>
@@ -871,7 +871,7 @@ export const Home = (pros: any) => {
                                     label="Maker User"
                                     onChange={(e) => setManagerSelectedMakerUserId(e.target.value)}
                                 >
-                                    {makerUsers.map((user) => (
+                                    {managerReassignMakerOptions.map((user) => (
                                         <MenuItem key={user.id} value={String(user.id)}>
                                             {user.contactPerson || user.username} ({user.username})
                                         </MenuItem>
