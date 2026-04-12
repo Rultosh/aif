@@ -128,6 +128,10 @@ export interface IPrelimApplicationData {
   lpacTotalNumberAndVotingMembersDetails: String | undefined,
   lpacDecisionMakingProcess: String | undefined,
   lpacIndependentMembersDetails: String | undefined,
+  /** GET /prelims/initial-assessment-in-progress: average total score ÷ 17 (first-time) or ÷ 10 (experienced). */
+  initialSelfRatingScore?: string | undefined,
+  /** Fund name from registration: `vcf_users.company_name` (API-enriched on prelim list/get). */
+  registrationAifName?: string | undefined,
 }
 
 export const defaultIPrelimApplicationData: IPrelimApplicationData = {
@@ -258,6 +262,8 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   lpacTotalNumberAndVotingMembersDetails: undefined,
   lpacDecisionMakingProcess: undefined,
   lpacIndependentMembersDetails: undefined,
+  initialSelfRatingScore: undefined,
+  registrationAifName: undefined,
 }
 
 export interface IApplicationData {

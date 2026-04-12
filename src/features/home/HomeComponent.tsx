@@ -1,5 +1,5 @@
 import '../../index.css';
-import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab, CircularProgress } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NavigationBar from '../../components/NavigationBar'
@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { wrapArgument } from '../../lib/api-status/actionWrapper';
-import { createPrelimApplicationAsync, createShellPrelimApplicationAsync, getPrelimApplicationList, getPrelimApplicationAllList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
+import { createPrelimApplicationAsync, createPrelimStarterAsync, getPrelimApplicationList, getPrelimApplicationAllList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
 import logo from '../../images/logo.png';
 import logoNps from '../../images/logo_nps.png';
 import uuid from "react-uuid";
@@ -43,8 +43,9 @@ import { ReactComponent as HistoryCustomIcon } from '../../images/history.svg';
 import { ReactComponent as SettingCustomIcon } from '../../images/setting.svg';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { fetchMakerUsers, postWorkflowAction } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
+import { fetchMakerUsers, postWorkflowAction, fetchPrelimsInitialAssessmentOnly } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
 import FileUploadService from '../../components/FileUploadService';
+import { shouldShowListPaginationFooter } from '../../lib/listPaginationVisibility';
 
 export const Home = (pros: any) => {
 
@@ -87,6 +88,10 @@ export const Home = (pros: any) => {
     const [startApplicationConfirmOpen, setStartApplicationConfirmOpen] = useState(false);
     const [searchEmail, setSearchEmail] = useState<string>('');
     const [searchAifName, setSearchAifName] = useState<string>('');
+    /** 0 = main workflow list, 1 = prelims with no linked self-rating yet (initial assessment only). */
+    const [homeWorkflowTab, setHomeWorkflowTab] = useState(0);
+    const [initialAssessmentList, setInitialAssessmentList] = useState<IPrelimApplicationData[]>([]);
+    const [initialAssessmentLoading, setInitialAssessmentLoading] = useState(false);
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
     const totalEntries = prelimApplications.totalEntries || 0;
@@ -104,13 +109,21 @@ export const Home = (pros: any) => {
         )))
     };
 
+    const showInitialAssessmentTab = hasActiveRole('CHECKER') || hasActiveRole('MANAGER');
+
     const getFilteredApplications = () => {
-        return prelimApplications.prelimApplications?.filter((app) => {
+        const source =
+            homeWorkflowTab === 0
+                ? prelimApplications.prelimApplications
+                : initialAssessmentList;
+        return source?.filter((app) => {
             const emailMatch = (app.createdByName || '').toLowerCase().includes(searchEmail.toLowerCase());
-            const aifNameMatch = (app.nameOfTheFund || '').toLowerCase().includes(searchAifName.toLowerCase());
+            const aifHaystack = `${app.registrationAifName || ''} ${app.nameOfTheFund || ''}`.toLowerCase();
+            const aifNameMatch = aifHaystack.includes(searchAifName.toLowerCase());
             return emailMatch && aifNameMatch;
         }) || [];
     };
+
 
     const handleSearchEmailChange = (e: any) => {
         setSearchEmail(e.target.value);
@@ -128,7 +141,7 @@ export const Home = (pros: any) => {
     const proceedStartApplication = async () => {
         try {
             let application: IPrelimApplicationData = await dispatch(
-                createShellPrelimApplicationAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
+                createPrelimStarterAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
             ).unwrap();
             navigate(`/Preliminary/${application.id}/selfRating`)
         } catch (error: any) {
@@ -183,6 +196,41 @@ export const Home = (pros: any) => {
         };
         loadMakers();
     }, [activeRole]);
+
+    useEffect(() => {
+        if (!showInitialAssessmentTab || homeWorkflowTab !== 1) {
+            return;
+        }
+        let cancelled = false;
+        const run = async () => {
+            setInitialAssessmentLoading(true);
+            try {
+                const response = await fetchPrelimsInitialAssessmentOnly();
+                if (!cancelled) {
+                    setInitialAssessmentList(response.data || []);
+                }
+            } catch (e: any) {
+                if (!cancelled) {
+                    setInitialAssessmentList([]);
+                    alert(e?.response?.data?.message || e?.message || 'Failed to load initial-assessment list.');
+                }
+            } finally {
+                if (!cancelled) {
+                    setInitialAssessmentLoading(false);
+                }
+            }
+        };
+        void run();
+        return () => {
+            cancelled = true;
+        };
+    }, [showInitialAssessmentTab, homeWorkflowTab]);
+
+    useEffect(() => {
+        if (!showInitialAssessmentTab) {
+            setHomeWorkflowTab(0);
+        }
+    }, [showInitialAssessmentTab, activeRole]);
 
     const openAssignMakerDialog = (row: IPrelimApplicationData) => {
         const rowId = typeof row.id === 'number' ? row.id : Number(row.id);
@@ -309,18 +357,32 @@ export const Home = (pros: any) => {
         }
     };
 
-    const tableHeaders = [
+    const tableHeadersWorkflow = [
         "Fund Name",
         "Contact Person",
         "Status",
         "Start Date",
-        // "Detailed Date",
         "Target Corpus",
         "Contribution",
         "Download",
         "Query",
         "History",
-        "Progress"]
+        "Progress",
+    ];
+    const tableHeadersInitialAssessment = [
+        "Fund Name",
+        "Contact Person",
+        "Status",
+        "Application created",
+        "Target Corpus",
+        "Contribution",
+        "Avg score",
+        "Query",
+        "History",
+        "Progress",
+    ];
+    const tableHeaders = homeWorkflowTab === 1 ? tableHeadersInitialAssessment : tableHeadersWorkflow;
+    const tableColumnCount = tableHeaders.length;
 
     let headerComponent = []
 
@@ -398,6 +460,11 @@ export const Home = (pros: any) => {
         if (stage !== "PRELIM") {
             if (status === "REVIEWED") return "Pending final approval";
             return "Approved";
+        }
+
+        const statusNorm = status == null || String(status).trim() === '' ? '' : String(status).trim().toUpperCase();
+        if (statusNorm === '') {
+            return "Initial assessment";
         }
 
         switch (status) {
@@ -529,6 +596,11 @@ export const Home = (pros: any) => {
         return <Typography variant="caption" sx={{ color: '#64748b' }}>-</Typography>;
     };
 
+    const showListPaginationFooter = shouldShowListPaginationFooter({
+        filteredRowCount: getFilteredApplications().length,
+        logicalTotalCount: homeWorkflowTab === 0 ? totalEntries : initialAssessmentList.length,
+    });
+
     return (
         <div className="homeComp">
             <NavigationBar></NavigationBar>
@@ -566,6 +638,23 @@ export const Home = (pros: any) => {
                             Start Application
                         </Button>}
                     </Box>
+                    {showInitialAssessmentTab && (
+                        <Box sx={{ mb: 2 }}>
+                            <Tabs
+                                value={homeWorkflowTab}
+                                onChange={(_, v) => setHomeWorkflowTab(v)}
+                                sx={{ minHeight: 42, '& .MuiTab-root': { textTransform: 'none', fontWeight: 600 } }}
+                            >
+                                <Tab label="Workflow applications" />
+                                <Tab label="Initial assessment only" />
+                            </Tabs>
+                            {homeWorkflowTab === 1 && (
+                                <Typography variant="body2" sx={{ color: '#64748b', mt: 1, maxWidth: 900 }}>
+                                    In-progress preliminary applications that do not yet have a linked self-rating record (applicant has not moved past initial assessment to fund information for this application).
+                                </Typography>
+                            )}
+                        </Box>
+                    )}
                     {activeRole !== "USER" && (
                     <Paper elevation={0} sx={{
                         backgroundColor: '#ffffff',
@@ -645,7 +734,33 @@ export const Home = (pros: any) => {
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        getFilteredApplications().length > 0 ? getFilteredApplications().map((row, index) => {
+                                        homeWorkflowTab === 1 && initialAssessmentLoading ? (
+                                            <TableRow>
+                                                <TableCell colSpan={tableColumnCount} align="center" sx={{ py: 5 }}>
+                                                    <CircularProgress size={32} />
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : getFilteredApplications().length > 0 ? getFilteredApplications().map((row, index) => {
+                                            const isInitialTab = homeWorkflowTab === 1;
+                                            const scoreRaw = row.initialSelfRatingScore;
+                                            const scoreDisplay =
+                                                scoreRaw != null && String(scoreRaw).trim() !== ''
+                                                    ? String(scoreRaw).trim()
+                                                    : '';
+                                            const targetCorpusDisplay = (() => {
+                                                const v = row.sdTotalTargetCorpus as unknown;
+                                                if (v == null) return '';
+                                                const s = String(v).trim();
+                                                if (s === '' || s.toLowerCase() === 'null' || s === 'undefined') {
+                                                    return '';
+                                                }
+                                                return s;
+                                            })();
+                                            // Fund name: API `registrationAifName` = vcf_users.company_name, then nameOfTheFund.
+                                            const fundDisplayName = (String(row.registrationAifName || '').trim()
+                                                || String(row.nameOfTheFund || '').trim()
+                                                || String(row.createdByName || '').trim()
+                                                || '—');
                                             return <TableRow
                                                 key={row.id != null ? `prelim-${row.id}` : `prelim-row-${index}`}
                                                 sx={{
@@ -657,33 +772,56 @@ export const Home = (pros: any) => {
                                                     <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
                                                         {isGoodToShowApplication(row) ?
                                                             <a href={`#/preliminary/${row.id}/${activeRole === "USER" ? 'selfrating' : 'preview'}`}
-                                                                style={{ color: '#3f4bee', fontWeight: 600 }}>{row.nameOfTheFund}</a> :
+                                                                style={{ color: '#3f4bee', fontWeight: 600 }}>{fundDisplayName}</a> :
                                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                                                                {row.nameOfTheFund}
+                                                                {fundDisplayName}
                                                             </Typography>}
                                                     </TableCell> : <TableCell align="left" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
-                                                        {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.nameOfTheFund}</Typography>}
+                                                        {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{fundDisplayName}</Typography>}
                                                     </TableCell>}
-                                                <TableCell align="left" sx={{ color: '#64748b' }}>{row.createdByName}</TableCell>
-                                                <TableCell align="left" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
-                                                <TableCell align="left" sx={{ color: '#64748b', width: '20%' }}>{row.applicationSubmissionDate ? Moment(String(row.applicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell>
-                                                {/* <TableCell align="left" sx={{ color: '#64748b' }}>{row.detailedApplicationSubmissionDate ? Moment(String(row.detailedApplicationSubmissionDate)).format("DD MMM YYYY") : '-'}</TableCell> */}
-                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.sdTotalTargetCorpus)}</TableCell>
-                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
-                                                <TableCell align="left">
-                                                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                                                        <Tooltip title="Download Preview">
-                                                            <IconButton size="small" sx={{ color: '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
-                                                                <FileDownloadIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip title="Download ZIP">
-                                                            <IconButton size="small" sx={{ color: '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
-                                                                <FileDownloadIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </Box>
+                                                <TableCell align="left" sx={{ color: '#64748b' }}>
+                                                    {isInitialTab ? (
+                                                        <Link
+                                                            href={`#/preliminary/${row.id}/preview`}
+                                                            underline="hover"
+                                                            sx={{ fontWeight: 600, fontSize: '14px', color: '#3f4bee' }}
+                                                        >
+                                                            {row.createdByName || 'View preview'}
+                                                        </Link>
+                                                    ) : (
+                                                        row.createdByName
+                                                    )}
                                                 </TableCell>
+                                                <TableCell align="left" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
+                                                <TableCell align="left" sx={{ color: '#64748b', width: '20%' }}>
+                                                    {isInitialTab
+                                                        ? (row.createdOn
+                                                            ? Moment(String(row.createdOn)).format('DD MMM YYYY')
+                                                            : '-')
+                                                        : (row.applicationSubmissionDate
+                                                            ? Moment(String(row.applicationSubmissionDate)).format('DD MMM YYYY')
+                                                            : '-')}
+                                                </TableCell>
+                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{targetCorpusDisplay}</TableCell>
+                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
+                                                {!isInitialTab ? (
+                                                    <TableCell align="left">
+                                                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                                                            <Tooltip title="Download Preview">
+                                                                <IconButton size="small" sx={{ color: '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
+                                                                    <FileDownloadIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                            <Tooltip title="Download ZIP">
+                                                                <IconButton size="small" sx={{ color: '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
+                                                                    <FileDownloadIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </Box>
+                                                    </TableCell>
+                                                ) : (
+                                                    <TableCell align="left" sx={{ fontWeight: 600, color: '#1e293b' }}>{scoreDisplay}</TableCell>
+                                                )}
                                                 <TableCell align="left">
                                                     <IconButton size="small" sx={{ p: '2px', color: '#476bbc', '&:hover': { backgroundColor: '#f0f4ff' } }} onClick={() => openModel(row)}>
                                                         <EmailListIcon style={{ width: '22px', height: '22px', fill: 'currentColor' }} />
@@ -700,12 +838,13 @@ export const Home = (pros: any) => {
                                                     </Box>
                                                 </TableCell>
                                             </TableRow>
-                                        }) : <TableRow><TableCell colSpan={11} align="center" sx={{ py: 3 }}>No applications found matching your search criteria</TableCell></TableRow>
+                                        }) : <TableRow><TableCell colSpan={tableColumnCount} align="center" sx={{ py: 3 }}>No applications found matching your search criteria</TableCell></TableRow>
                                     }
                                 </TableBody>
                             </Table>
                         </TableContainer>
 
+                        {showListPaginationFooter && (
                         <Box sx={{
                             display: 'flex',
                             justifyContent: 'space-between',
@@ -715,30 +854,24 @@ export const Home = (pros: any) => {
                             flexWrap: 'wrap'
                         }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                {(totalEntries > 20 || getFilteredApplications().length > 0) && (
-                                    <>
-                                        <Typography sx={{ fontSize: '14px', color: '#333' }}>Items per page:</Typography>
-                                        <Select
-                                            value={pageInfoSelect.toString()}
-                                            onChange={handleChange as any}
-                                            size="small"
-                                            sx={{ height: '36px', fontSize: '14px', minWidth: '80px' }}
-                                        >
-                                            <MenuItem value={5}>5</MenuItem>
-                                            <MenuItem value={10}>10</MenuItem>
-                                            <MenuItem value={20}>20</MenuItem>
-                                            <MenuItem value={50}>50</MenuItem>
-                                            <MenuItem value={100}>100</MenuItem>
-                                        </Select>
-                                    </>
-                                )}
+                                <Typography sx={{ fontSize: '14px', color: '#333' }}>Items per page:</Typography>
+                                <Select
+                                    value={pageInfoSelect.toString()}
+                                    onChange={handleChange as any}
+                                    size="small"
+                                    sx={{ height: '36px', fontSize: '14px', minWidth: '80px' }}
+                                >
+                                    <MenuItem value={5}>5</MenuItem>
+                                    <MenuItem value={10}>10</MenuItem>
+                                    <MenuItem value={20}>20</MenuItem>
+                                    <MenuItem value={50}>50</MenuItem>
+                                    <MenuItem value={100}>100</MenuItem>
+                                </Select>
                             </Box>
 
-                            {(totalEntries > 20 || getFilteredApplications().length > 0) && (
-                                <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
-                                    Showing {getFilteredApplications().length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {getFilteredApplications().length > 0 ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, getFilteredApplications().length) : 0} of {getFilteredApplications().length} results
-                                </Typography>
-                            )}
+                            <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
+                                Showing {getFilteredApplications().length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {getFilteredApplications().length > 0 ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, getFilteredApplications().length) : 0} of {getFilteredApplications().length} results
+                            </Typography>
 
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 {Math.ceil(getFilteredApplications().length / pageInfo.pageSize) > 1 && (
@@ -766,6 +899,7 @@ export const Home = (pros: any) => {
                                 )}
                             </Box>
                         </Box>
+                        )}
                     </Paper>
                     {openQueryModal ? <QueryResolutionModal
                         isActive={openQueryModal}

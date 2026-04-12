@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ActionWrapper } from '../../../../lib/api-status/actionWrapper'
-import { fetchFundOverviewData, fetchFundOverviewList, fetchFundOverviewAllList, patchPrelimApplication, postPrelimApplication, postApplication, postPrelimApplicationShell } from './fundOverviewDataApi'
+import { fetchFundOverviewData, fetchFundOverviewList, fetchFundOverviewAllList, patchPrelimApplication, postPrelimApplication, postApplication, postNewPreliminaryStarter } from './fundOverviewDataApi'
 import { getError } from '../../../../lib/api-status/errorHandler'
 import { defaultIPrelimApplicationData, IPrelimApplicationData, IApplicationData } from './IPrelimApplicationData'
 import { FetchStatus, IStatus, ResponseCode } from '../../../../lib/api-status/IStatus'
@@ -104,13 +104,13 @@ export const createPrelimApplicationAsync = createAsyncThunk(
   }
 );
 
-export const createShellPrelimApplicationAsync = createAsyncThunk(
-  'prelimApplicationdataShell/create',
+export const createPrelimStarterAsync = createAsyncThunk(
+  'prelimApplicationStarter/create',
   async (args: ActionWrapper<IPrelimApplicationData>, { rejectWithValue }) => {
     try {
       if (args.argument) {
-        const response = await postPrelimApplicationShell(args.argument);
-        console.log('prelimApplicationdataShell/create', args.argument);
+        const response = await postNewPreliminaryStarter(args.argument);
+        console.log('prelimApplicationStarter/create', args.argument);
         return response.data;
       }
     } catch (reason) {
@@ -178,18 +178,18 @@ const prelimApplicationDataSlice = createSlice({
         }
       })
 
-      .addCase(createShellPrelimApplicationAsync.pending, state => {
+      .addCase(createPrelimStarterAsync.pending, state => {
         state.status.fetchStatus = FetchStatus.DOING;
       })
       .addCase(
-        createShellPrelimApplicationAsync.fulfilled,
+        createPrelimStarterAsync.fulfilled,
         (state, action: PayloadAction<IPrelimApplicationData>) => {
           console.log(action.payload)
           state.prelimApplication = action.payload
           state.status.fetchStatus = FetchStatus.IDLE;
         }
       )
-      .addCase(createShellPrelimApplicationAsync.rejected, (state, action) => {
+      .addCase(createPrelimStarterAsync.rejected, (state, action) => {
         state.status.fetchStatus = FetchStatus.FAILED;
         state.status.message = (action.payload as IStatus)?.message;
       })

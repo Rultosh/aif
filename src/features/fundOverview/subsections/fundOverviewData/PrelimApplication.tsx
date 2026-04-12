@@ -302,9 +302,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
 
         if (ev.target.id) {
-            copiedValue[ev.target.id as keyof IPrelimApplicationData] = value
+            (copiedValue as unknown as Record<string, unknown>)[ev.target.id] = value;
         } else {
-            copiedValue[ev.target.name as keyof IPrelimApplicationData] = value
+            (copiedValue as unknown as Record<string, unknown>)[ev.target.name] = value;
         }
 
         setValue((ev.target.id || ev.target.name) as any, value);
