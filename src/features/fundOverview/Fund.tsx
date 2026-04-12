@@ -960,6 +960,14 @@ export const Fund = (props: any) => {
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("7", null, null)}
                                             onSectionHasErrorsChange={reportDealFlowSectionErrors}
+                                            onCrossSectionGateIncomplete={() => {
+                                                void (async () => {
+                                                    const validations = await runMergedFullFundValidation();
+                                                    if (!validations.every((res) => res === true)) {
+                                                        applyFundCompletenessFailure(validations);
+                                                    }
+                                                })();
+                                            }}
                                         />
                                     </Box>
                                 </AccordionDetails>

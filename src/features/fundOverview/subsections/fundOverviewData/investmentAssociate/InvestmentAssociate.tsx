@@ -119,8 +119,15 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
         const statusIdle = investmentAssociatesState.status.fetchStatus === FetchStatus.IDLE;
         const actionIdle = investmentAssociatesState.actionStatus.fetchStatus === FetchStatus.IDLE;
         const n = investmentAssociatesState.investmentAssociates?.length ?? 0;
-        const docIssue = statusIdle && actionIdle && missingResumeRowIds.length > 0;
         const tooManyRows = n > 5;
+        /** Same as KMP section: avoid reporting `false` during fetch so merge step after section 2 validation does not clear doc-gap errors. Still surface row-count violations from current state. */
+        if (!statusIdle || !actionIdle) {
+            if (tooManyRows) {
+                onSectionHasErrorsChangeRef.current?.(true);
+            }
+            return;
+        }
+        const docIssue = missingResumeRowIds.length > 0;
         onSectionHasErrorsChangeRef.current?.(docIssue || tooManyRows);
     }, [
         missingResumeRowIds,

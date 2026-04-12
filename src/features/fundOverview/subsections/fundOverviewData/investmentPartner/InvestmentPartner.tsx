@@ -131,11 +131,12 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
         const statusIdle = investmentPartnersState.status.fetchStatus === FetchStatus.IDLE;
         const actionIdle = investmentPartnersState.actionStatus.fetchStatus === FetchStatus.IDLE;
         const n = investmentPartnersState.investmentPartners?.length ?? 0;
-        const docIssue =
-            statusIdle &&
-            actionIdle &&
-            (missingPastTenYearsKmpIds.length > 0 || missingResumeKmpIds.length > 0);
-        const tooFewKmp = statusIdle && actionIdle && n < 1;
+        /** While team list or actions are loading, do not report `false` — parent full-fund validation uses this ref and would drop real KMP/doc errors after section 2 submit triggers a brief non-IDLE fetch. */
+        if (!statusIdle || !actionIdle) {
+            return;
+        }
+        const docIssue = missingPastTenYearsKmpIds.length > 0 || missingResumeKmpIds.length > 0;
+        const tooFewKmp = n < 1;
         onSectionHasErrorsChangeRef.current?.(docIssue || tooFewKmp);
     }, [
         missingPastTenYearsKmpIds,

@@ -31,6 +31,12 @@ interface PrelimApplicationProps {
     onSaveSuccess?: () => void;
     /** When form or mandatory-document validation has issues, parent can tint the accordion shell. */
     onSectionHasErrorsChange?: (hasErrors: boolean) => void;
+    /**
+     * Deal Flow "Save and Continue" runs KMP / non-KMP mandatory checks before `onSaveSuccess`.
+     * If those fail, we return early and never call `onSaveSuccess` — parent must still run full-fund
+     * validation + Stay/Continue (same as sticky save). Invoked only for section 3/4 gate failures.
+     */
+    onCrossSectionGateIncomplete?: () => void;
 }
 
 const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
@@ -168,6 +174,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         setDocumentGateFailureScope('kmp');
                         setDocumentError('');
                         setMandatoryUploadToastOpen(false);
+                        props.onCrossSectionGateIncomplete?.();
                         return { ok: false, highlightPanel: '3' };
                     }
                 } catch {
@@ -176,6 +183,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         'Unable to verify KMP mandatory uploads. Please check your connection and try again.'
                     );
                     setMandatoryUploadToastOpen(true);
+                    props.onCrossSectionGateIncomplete?.();
                     return { ok: false, highlightPanel: '3' };
                 }
                 try {
@@ -187,6 +195,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         setDocumentGateFailureScope('associate');
                         setDocumentError(ASSOCIATE_RESUME_DEALFLOW_MESSAGE);
                         setMandatoryUploadToastOpen(true);
+                        props.onCrossSectionGateIncomplete?.();
                         return { ok: false, highlightPanel: '4' };
                     }
                 } catch {
@@ -195,6 +204,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         'Unable to verify non-KMP team uploads. Please check your connection and try again.'
                     );
                     setMandatoryUploadToastOpen(true);
+                    props.onCrossSectionGateIncomplete?.();
                     return { ok: false, highlightPanel: '4' };
                 }
             }
