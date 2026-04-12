@@ -113,21 +113,19 @@ export const Preview = (props: any) => {
         //setStatusPrelims(prelimApplicationState.prelimApplication.status)
     }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
 
-    async function checkAllDocsOk(id: any, applicationName: any) {
+    async function checkAllDocsOk(prelimId: string | undefined, applicationName: string) {
         if (usersState.role === 'ADMIN') {
-            return true
+            return true;
+        }
+        if (!prelimId || !Number(prelimId)) {
+            return false;
         }
         try {
-            const res = await isAllDocsAvailable(id, applicationName)
-            if (res.status === 200) {
-                return true
-            }
-            else {
-                return false
-            }
+            const res = await isAllDocsAvailable(String(prelimId), applicationName);
+            return res.status >= 200 && res.status < 300;
         } catch (reason) {
             console.log(reason);
-            return false
+            return false;
         }
     }
 
