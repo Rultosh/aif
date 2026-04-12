@@ -666,9 +666,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         submit: async (opts?: { silent?: boolean }) => {
             let isValid = false;
             await handleSubmit(
-                (data) => {
+                async (data) => {
                     console.log(data);
-                    savePrelimApplicationForm(buildPrelimPayload(data), Boolean(opts?.silent));
+                    await savePrelimApplicationForm(buildPrelimPayload(data), Boolean(opts?.silent));
                     isValid = true;
                 },
                 () => {

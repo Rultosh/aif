@@ -1,5 +1,5 @@
-import { Alert, Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Snackbar, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react"
+import { Alert, Backdrop, Box, Button, Card, CardContent, CardHeader, Chip, CircularProgress, FormControlLabel, Grid, Modal, Paper, Snackbar, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle, useRef } from "react"
 import { fetchInvestmentTeamsAssociateLevelAsync, selectInvestmentAssociate, createInvestmentTeamsAssociateLevelAsync, deleteInvestmentTeamsAssociateLevelAsync } from './investmentAssociateSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
@@ -12,6 +12,7 @@ import { InvestmentAssociateRow } from "./InvestmentAssociateRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { InvestmentAssociateModel } from "./InvestmentAssociateModel";
 import { opaqueInfoToastAlertSx } from "../../../../../lib/ui/opaqueInfoToastAlertSx";
+import { fetchAssociateMandatoryDocumentsStatus } from "../fundOverviewDataApi";
 
 export type InvestmentAssociateHandle = {
     submit: (opts?: { silent?: boolean }) => Promise<boolean>;
@@ -19,6 +20,8 @@ export type InvestmentAssociateHandle = {
 
 interface InvestmentAssociateProps {
     prelimApplicationId: Number | undefined
+    /** Tint fund accordion section 4 when rows are invalid (missing docs or too many rows). */
+    onSectionHasErrorsChange?: (hasErrors: boolean) => void
 }
 
 const style = {
@@ -42,9 +45,10 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
     const [validationToastOpen, setValidationToastOpen] = useState(false);
     const [validationToastMessage, setValidationToastMessage] = useState('');
+    const [missingResumeRowIds, setMissingResumeRowIds] = useState<number[]>([]);
+    const [associateDocCheckBusy, setAssociateDocCheckBusy] = useState(false);
     const showValidationToast = useCallback((message: string) => {
         setValidationToastMessage(message);
         setValidationToastOpen(true);
@@ -52,6 +56,34 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
     const handleValidationToastClose = () => {
         setValidationToastOpen(false);
     };
+
+    const onSectionHasErrorsChangeRef = useRef(props.onSectionHasErrorsChange);
+    onSectionHasErrorsChangeRef.current = props.onSectionHasErrorsChange;
+
+    const loadMissingResumeIds = useCallback(async (): Promise<number[]> => {
+        const pid = props.prelimApplicationId;
+        if (pid == null || Number(pid) <= 0) {
+            setMissingResumeRowIds([]);
+            return [];
+        }
+        try {
+            const res = await fetchAssociateMandatoryDocumentsStatus(pid);
+            const raw = (res as { data?: { missingResumeAssociateIds?: unknown } })?.data?.missingResumeAssociateIds;
+            const ids = Array.isArray(raw)
+                ? raw.map((x) => Number(x)).filter((n) => !Number.isNaN(n))
+                : [];
+            setMissingResumeRowIds(ids);
+            return ids;
+        } catch {
+            setMissingResumeRowIds([]);
+            return [];
+        }
+    }, [props.prelimApplicationId]);
+
+    const handleCloseAddModal = useCallback(() => {
+        setOpen(false);
+        void loadMissingResumeIds();
+    }, [loadMissingResumeIds]);
 
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsAssociateLevelAsync', props.prelimApplicationId);
@@ -66,6 +98,43 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
+
+    useEffect(() => {
+        if (
+            props.prelimApplicationId &&
+            investmentAssociatesState.status.fetchStatus === FetchStatus.IDLE &&
+            investmentAssociatesState.actionStatus.fetchStatus === FetchStatus.IDLE
+        ) {
+            void loadMissingResumeIds();
+        }
+    }, [
+        props.prelimApplicationId,
+        investmentAssociatesState.investmentAssociates,
+        investmentAssociatesState.status.fetchStatus,
+        investmentAssociatesState.actionStatus.fetchStatus,
+        loadMissingResumeIds,
+    ]);
+
+    useEffect(() => {
+        const statusIdle = investmentAssociatesState.status.fetchStatus === FetchStatus.IDLE;
+        const actionIdle = investmentAssociatesState.actionStatus.fetchStatus === FetchStatus.IDLE;
+        const n = investmentAssociatesState.investmentAssociates?.length ?? 0;
+        const docIssue = statusIdle && actionIdle && missingResumeRowIds.length > 0;
+        const tooManyRows = n > 5;
+        onSectionHasErrorsChangeRef.current?.(docIssue || tooManyRows);
+    }, [
+        missingResumeRowIds,
+        investmentAssociatesState.investmentAssociates?.length,
+        investmentAssociatesState.status.fetchStatus,
+        investmentAssociatesState.actionStatus.fetchStatus,
+    ]);
+
+    useEffect(
+        () => () => {
+            onSectionHasErrorsChangeRef.current?.(false);
+        },
+        []
+    );
 
     useImperativeHandle(
         ref,
@@ -84,10 +153,28 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
                     }
                     return false;
                 }
+                if (!silent) {
+                    setAssociateDocCheckBusy(true);
+                }
+                try {
+                    const missing = await loadMissingResumeIds();
+                    if (missing.length > 0) {
+                        if (!silent) {
+                            showValidationToast(
+                                'Resume/CV is required for each non-KMP team member. Rows with a red indicator are missing the upload — click Edit on each to add the file.'
+                            );
+                        }
+                        return false;
+                    }
+                } finally {
+                    if (!silent) {
+                        setAssociateDocCheckBusy(false);
+                    }
+                }
                 return true;
             },
         }),
-        [investmentAssociatesState, showValidationToast]
+        [investmentAssociatesState, showValidationToast, loadMissingResumeIds]
     );
 
     const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Experience in AIF Business", "Area Of Expertise", "Action"]
@@ -116,8 +203,15 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
                             {investmentAssociatesState.status.fetchStatus == FetchStatus.IDLE && investmentAssociatesState.actionStatus.fetchStatus == FetchStatus.IDLE ?
                                 <TableBody>
                                     {investmentAssociatesState.investmentAssociates && investmentAssociatesState.investmentAssociates.length > 0 ?
-                                        investmentAssociatesState.investmentAssociates.map((row: IInvestmentAssociate) => (
-                                            <InvestmentAssociateRow row={row} />
+                                        investmentAssociatesState.investmentAssociates.map((row: IInvestmentAssociate, index: number) => (
+                                            <InvestmentAssociateRow
+                                                key={row.id != null ? String(Number(row.id)) : `associate-${index}`}
+                                                row={row}
+                                                rowDocInvalid={missingResumeRowIds.includes(Number(row.id))}
+                                                onRowModalClosed={() => {
+                                                    void loadMissingResumeIds();
+                                                }}
+                                            />
                                         )) : <TableRow><TableCell colSpan={7}>No Rows To Display</TableCell></TableRow>
                                     }
                                 </TableBody> : <TableBody>
@@ -141,11 +235,39 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
                         key='add-investment-partner'
                         investmentAssociateFormData={defaultInvestmentAssociate}
                         open={open}
-                        handleClose={handleClose}
+                        handleClose={handleCloseAddModal}
                         prelimApplicationId={props.prelimApplicationId} />
                 </Grid>
             </Grid>
         </Box>
+        <Backdrop
+            open={associateDocCheckBusy}
+            sx={{
+                zIndex: (theme) => theme.zIndex.modal + 8,
+                color: '#fff',
+                flexDirection: 'column',
+                gap: 2,
+            }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 2,
+                    textAlign: 'center',
+                    px: 3,
+                }}
+            >
+                <CircularProgress color="inherit" size={48} thickness={4} aria-label="Verifying document uploads" />
+                <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
+                    Verifying mandatory documents…
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 440 }}>
+                    Checking resume/CV uploads for each non-KMP team member.
+                </Typography>
+            </Box>
+        </Backdrop>
         <Snackbar
             open={validationToastOpen}
             autoHideDuration={9000}

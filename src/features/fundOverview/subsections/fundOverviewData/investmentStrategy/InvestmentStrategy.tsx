@@ -1,5 +1,5 @@
 import { Box, Button, Divider, FormControl, FormControlLabel, Grid, Radio, RadioGroup, TextField, Typography, FormHelperText, CircularProgress } from "@mui/material";
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle, useCallback, useRef } from "react";
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
 import { getPrelimApplicationData, PrelimApplicationState, selectPrelimApplication, updatePrelimApplicationAsync } from "../prelimApplicationDataSlice";
 import { IPrelimApplicationData } from "../IPrelimApplicationData";
@@ -19,6 +19,8 @@ interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
     setPrelimApplicationId: (id: String | undefined) => void;
     onSaveSuccess?: () => void;
+    /** Tint fund accordion section 2 when mandatory risk document is missing or form has errors. */
+    onSectionHasErrorsChange?: (hasErrors: boolean) => void;
 }
 
 const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
@@ -30,8 +32,12 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
     const effectiveId = String(prelimAppicationId || prelimApplicationState.prelimApplication?.id || id || '');
     const dispatch = useAppDispatch();
     const [documentError, setDocumentError] = useState('');
+    const [riskAssessmentDocMissing, setRiskAssessmentDocMissing] = useState(false);
+    const onSectionHasErrorsChangeRef = useRef(props.onSectionHasErrorsChange);
+    onSectionHasErrorsChangeRef.current = props.onSectionHasErrorsChange;
 
-    const hasRiskAssessmentDocument = async (): Promise<boolean> => {
+    const riskBucketHasFiles = useCallback(async (): Promise<boolean> => {
+        if (!Number(effectiveId)) return false;
         try {
             const bucketId = `sdRiskAssessmentAndMitigationPlan${effectiveId}`;
             const res = await FileUploadService.list(bucketId);
@@ -39,18 +45,25 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                 ? res.data
                 : (Array.isArray((res as any)?.data?.files) ? (res as any).data.files : []);
             return files.length > 0;
-        } catch (e) {
+        } catch {
             return false;
         }
-    };
+    }, [effectiveId]);
+
+    const refreshRiskAssessmentDocMissing = useCallback(async () => {
+        if (!Number(effectiveId)) {
+            setRiskAssessmentDocMissing(false);
+            return;
+        }
+        const ok = await riskBucketHasFiles();
+        setRiskAssessmentDocMissing(!ok);
+    }, [effectiveId, riskBucketHasFiles]);
 
     useEffect(() => {
-        if (Number(prelimAppicationId)) {
-            dispatch(getPrelimApplicationData(
-                wrapArgument(actionUid, Number(prelimAppicationId))
-            ));
+        if (Number(effectiveId)) {
+            dispatch(getPrelimApplicationData(wrapArgument(actionUid, Number(effectiveId))));
         }
-    }, [prelimAppicationId, actionUid, dispatch]);
+    }, [effectiveId, actionUid, dispatch]);
 
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
@@ -106,13 +119,46 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
+    useEffect(() => {
+        let cancelled = false;
+        void (async () => {
+            if (!Number(effectiveId)) {
+                if (!cancelled) setRiskAssessmentDocMissing(false);
+                return;
+            }
+            const ok = await riskBucketHasFiles();
+            if (!cancelled) setRiskAssessmentDocMissing(!ok);
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [effectiveId, riskBucketHasFiles, prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
+
+    useEffect(() => {
+        const hasFormErrors = Object.keys(errors).length > 0;
+        onSectionHasErrorsChangeRef.current?.(hasFormErrors || riskAssessmentDocMissing);
+    }, [errors, riskAssessmentDocMissing]);
+
+    useEffect(
+        () => () => {
+            onSectionHasErrorsChangeRef.current?.(false);
+        },
+        []
+    );
+
     const persistStrategySection = async (data: IPrelimApplicationData, silent: boolean): Promise<boolean> => {
-        const hasDocument = await hasRiskAssessmentDocument();
+        const hasDocument = await riskBucketHasFiles();
         if (!hasDocument) {
-            setDocumentError("Risk Assessment and Mitigation Plan document is required.");
+            setRiskAssessmentDocMissing(true);
+            if (!silent) {
+                setDocumentError("Risk Assessment and Mitigation Plan document is required.");
+            } else {
+                setDocumentError('');
+            }
             return false;
         }
         setDocumentError('');
+        setRiskAssessmentDocMissing(false);
         await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
         if (!silent && props.onSaveSuccess) {
             props.onSaveSuccess();
@@ -124,10 +170,20 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
 
     useImperativeHandle(ref, () => ({
         submit: async (opts?: { silent?: boolean }) => {
+            const silent = Boolean(opts?.silent);
+            /** Full-fund silent run: fail fast on missing risk doc without relying only on RHF `onValid` ordering. */
+            if (silent) {
+                const hasFile = await riskBucketHasFiles();
+                if (!hasFile) {
+                    setRiskAssessmentDocMissing(true);
+                    setDocumentError('');
+                    return false;
+                }
+            }
             let isValid = false;
             await handleSubmit(
                 async (data) => {
-                    const submitOk = await persistStrategySection(data, Boolean(opts?.silent));
+                    const submitOk = await persistStrategySection(data, silent);
                     isValid = submitOk;
                 },
                 () => {
@@ -363,7 +419,13 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             p: 3,
                             border: '1px solid rgba(0,0,0,0.08)',
                             borderRadius: '16px',
-                            backgroundColor: '#fafafa'
+                            backgroundColor: '#fafafa',
+                            ...(riskAssessmentDocMissing && Number(effectiveId)
+                                ? {
+                                    backgroundColor: 'rgba(211, 47, 47, 0.06)',
+                                    borderColor: 'rgba(211, 47, 47, 0.28)',
+                                }
+                                : {}),
                         }}>
                             {Number(effectiveId) ? (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
@@ -384,7 +446,14 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                         Download Template
                                     </Button>
                                     <span style={{ marginTop: '10px' }}>
-                                        <DocumentChip label="Upload Document" validationTitle="Risk Assessment and Mitigation Plan" id={`sdRiskAssessmentAndMitigationPlan${effectiveId}`} />
+                                        <DocumentChip
+                                            label="Upload Document"
+                                            validationTitle="Risk Assessment and Mitigation Plan"
+                                            id={`sdRiskAssessmentAndMitigationPlan${effectiveId}`}
+                                            onAfterUpload={() => {
+                                                void refreshRiskAssessmentDocMissing();
+                                            }}
+                                        />
                                     </span>
                                 </Box>
                             ) : (

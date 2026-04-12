@@ -1,8 +1,8 @@
-import { Alert, Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Snackbar, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Alert, Backdrop, Box, Button, Card, CardContent, CardHeader, Chip, CircularProgress, FormControlLabel, Grid, Modal, Paper, Snackbar, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import UploadIcon from '@mui/icons-material/Upload';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import dayjs, { Dayjs } from 'dayjs';
-import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react"
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle, useRef } from "react"
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -19,6 +19,7 @@ import { InvestmentPartnerRow } from "./InvestmentPartnerRow";
 import { selectPrelimApplication } from "../prelimApplicationDataSlice";
 import { InvestmentPartnerModel } from "./InvestmentPartnerModel";
 import { opaqueInfoToastAlertSx } from "../../../../../lib/ui/opaqueInfoToastAlertSx";
+import { fetchKmpMandatoryDocumentsStatus } from "../fundOverviewDataApi";
 
 export type InvestmentPartnerHandle = {
     submit: (opts?: { silent?: boolean }) => Promise<boolean>;
@@ -26,6 +27,8 @@ export type InvestmentPartnerHandle = {
 
 interface InvestmentPartnerProps {
     prelimApplicationId: Number | undefined
+    /** Tint fund accordion section 3 when KMP rows or mandatory documents are incomplete. */
+    onSectionHasErrorsChange?: (hasErrors: boolean) => void
 }
 
 const style = {
@@ -49,9 +52,11 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
     const [validationToastOpen, setValidationToastOpen] = useState(false);
     const [validationToastMessage, setValidationToastMessage] = useState('');
+    const [kmpDocValidationBusy, setKmpDocValidationBusy] = useState(false);
+    const [missingPastTenYearsKmpIds, setMissingPastTenYearsKmpIds] = useState<number[]>([]);
+    const [missingResumeKmpIds, setMissingResumeKmpIds] = useState<number[]>([]);
     const showValidationToast = useCallback((message: string) => {
         setValidationToastMessage(message);
         setValidationToastOpen(true);
@@ -59,6 +64,38 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
     const handleValidationToastClose = () => {
         setValidationToastOpen(false);
     };
+
+    const onSectionHasErrorsChangeRef = useRef(props.onSectionHasErrorsChange);
+    onSectionHasErrorsChangeRef.current = props.onSectionHasErrorsChange;
+
+    const loadKmpDocGaps = useCallback(async (): Promise<
+        { missingPastTenYearsKmpIds: number[]; missingResumeKmpIds: number[] } | null
+    > => {
+        const pid = props.prelimApplicationId;
+        if (pid == null || Number(pid) <= 0) {
+            setMissingPastTenYearsKmpIds([]);
+            setMissingResumeKmpIds([]);
+            return { missingPastTenYearsKmpIds: [] as number[], missingResumeKmpIds: [] as number[] };
+        }
+        try {
+            const res = await fetchKmpMandatoryDocumentsStatus(pid);
+            const d = (res as { data?: Record<string, unknown> })?.data;
+            const asNumList = (v: unknown) =>
+                Array.isArray(v) ? v.map((x) => Number(x)).filter((n) => !Number.isNaN(n)) : [];
+            const past = asNumList(d?.missingPastTenYearsKmpIds);
+            const resume = asNumList(d?.missingResumeKmpIds);
+            setMissingPastTenYearsKmpIds(past);
+            setMissingResumeKmpIds(resume);
+            return { missingPastTenYearsKmpIds: past, missingResumeKmpIds: resume };
+        } catch {
+            return null;
+        }
+    }, [props.prelimApplicationId]);
+
+    const handleCloseAddModal = useCallback(() => {
+        setOpen(false);
+        void loadKmpDocGaps();
+    }, [loadKmpDocGaps]);
 
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsPartnerLevelAsync', props.prelimApplicationId);
@@ -74,6 +111,47 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
         ))
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
+    useEffect(() => {
+        if (
+            props.prelimApplicationId &&
+            investmentPartnersState.status.fetchStatus === FetchStatus.IDLE &&
+            investmentPartnersState.actionStatus.fetchStatus === FetchStatus.IDLE
+        ) {
+            void loadKmpDocGaps();
+        }
+    }, [
+        props.prelimApplicationId,
+        investmentPartnersState.investmentPartners,
+        investmentPartnersState.status.fetchStatus,
+        investmentPartnersState.actionStatus.fetchStatus,
+        loadKmpDocGaps,
+    ]);
+
+    useEffect(() => {
+        const statusIdle = investmentPartnersState.status.fetchStatus === FetchStatus.IDLE;
+        const actionIdle = investmentPartnersState.actionStatus.fetchStatus === FetchStatus.IDLE;
+        const n = investmentPartnersState.investmentPartners?.length ?? 0;
+        const docIssue =
+            statusIdle &&
+            actionIdle &&
+            (missingPastTenYearsKmpIds.length > 0 || missingResumeKmpIds.length > 0);
+        const tooFewKmp = statusIdle && actionIdle && n < 1;
+        onSectionHasErrorsChangeRef.current?.(docIssue || tooFewKmp);
+    }, [
+        missingPastTenYearsKmpIds,
+        missingResumeKmpIds,
+        investmentPartnersState.investmentPartners?.length,
+        investmentPartnersState.status.fetchStatus,
+        investmentPartnersState.actionStatus.fetchStatus,
+    ]);
+
+    useEffect(
+        () => () => {
+            onSectionHasErrorsChangeRef.current?.(false);
+        },
+        []
+    );
+
     useImperativeHandle(
         ref,
         () => ({
@@ -81,7 +159,8 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
                 const silent = opts?.silent === true;
                 const statusIdle = investmentPartnersState.status.fetchStatus === FetchStatus.IDLE;
                 const actionIdle = investmentPartnersState.actionStatus.fetchStatus === FetchStatus.IDLE;
-                if (!silent && (!statusIdle || !actionIdle)) {
+                /** Full-fund silent validation must not pass while team or gap data may still be loading. */
+                if (!statusIdle || !actionIdle) {
                     return false;
                 }
                 const n = investmentPartnersState.investmentPartners?.length ?? 0;
@@ -91,10 +170,39 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
                     }
                     return false;
                 }
+                const prelimId = props.prelimApplicationId;
+                if (prelimId == null || Number(prelimId) <= 0) {
+                    if (!silent) {
+                        showValidationToast('Preliminary application is not loaded; try again in a moment.');
+                    }
+                    return false;
+                }
+                if (!silent) {
+                    setKmpDocValidationBusy(true);
+                }
+                try {
+                    const gaps = await loadKmpDocGaps();
+                    if (gaps === null) {
+                        return false;
+                    }
+                    const { missingPastTenYearsKmpIds: past, missingResumeKmpIds: resume } = gaps;
+                    if (past.length > 0 || resume.length > 0) {
+                        if (!silent) {
+                            showValidationToast(
+                                'Mandatory documents are incomplete for one or more KMP rows (see red indicators). Click Edit on each row to upload the past 10 years file and resume/CV.'
+                            );
+                        }
+                        return false;
+                    }
+                } finally {
+                    if (!silent) {
+                        setKmpDocValidationBusy(false);
+                    }
+                }
                 return true;
             },
         }),
-        [investmentPartnersState, showValidationToast]
+        [investmentPartnersState, showValidationToast, props.prelimApplicationId, loadKmpDocGaps]
     );
 
     const tableHeaders = ["Name", "Designation", "Age", "Qualification", "Experience in AIF Business", "Area Of Expertise", "Action"]
@@ -123,8 +231,16 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
                             {investmentPartnersState.status.fetchStatus == FetchStatus.IDLE && investmentPartnersState.actionStatus.fetchStatus == FetchStatus.IDLE ?
                                 <TableBody>
                                     {investmentPartnersState.investmentPartners && investmentPartnersState.investmentPartners.length > 0 ?
-                                        investmentPartnersState.investmentPartners.map((row: IInvestmentPartner) => (
-                                            <InvestmentPartnerRow row={row} />
+                                        investmentPartnersState.investmentPartners.map((row: IInvestmentPartner, index: number) => (
+                                            <InvestmentPartnerRow
+                                                key={row.id !== undefined ? Number(row.id) : `kmp-${index}`}
+                                                row={row}
+                                                missingPastTenYearsDoc={missingPastTenYearsKmpIds.includes(Number(row.id))}
+                                                missingResumeDoc={missingResumeKmpIds.includes(Number(row.id))}
+                                                onRowModalClosed={() => {
+                                                    void loadKmpDocGaps();
+                                                }}
+                                            />
                                         )) : <TableRow><TableCell colSpan={7}>No Rows To Display</TableCell></TableRow>
                                     }
                                 </TableBody> : <TableBody>
@@ -148,11 +264,39 @@ const InvestmentPartner = forwardRef<InvestmentPartnerHandle, InvestmentPartnerP
                         key='add-investment-partner'
                         investmentPartnerFormData={defaultInvestmentPartner}
                         open={open}
-                        handleClose={handleClose}
+                        handleClose={handleCloseAddModal}
                         prelimApplicationId={props.prelimApplicationId} />
                 </Grid>
             </Grid>
         </Box>
+        <Backdrop
+            open={kmpDocValidationBusy}
+            sx={{
+                zIndex: (theme) => theme.zIndex.modal + 8,
+                color: '#fff',
+                flexDirection: 'column',
+                gap: 2,
+            }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 2,
+                    textAlign: 'center',
+                    px: 3,
+                }}
+            >
+                <CircularProgress color="inherit" size={48} thickness={4} aria-label="Verifying KMP documents" />
+                <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
+                    Verifying mandatory documents…
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 440 }}>
+                    Checking KMP uploads for each team member. This may take a few seconds.
+                </Typography>
+            </Box>
+        </Backdrop>
         <Snackbar
             open={validationToastOpen}
             autoHideDuration={9000}

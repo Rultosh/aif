@@ -18,7 +18,6 @@ import { getAllInvestmentResponsibleAsNonLeadsAsnyc, selectInvestmentResponsible
 import { IInvestmentResponsibleAsNonLead, defaultIIInvestmentResponsibleAsNonLead } from "../../profile-new/investmentResponsibleAsNonLead/IInvestmentResponsibleAsNonLead";
 import Moment from 'moment';
 import DocumentChip from "../../../../../components/DocumentChip";
-import { useParams } from 'react-router-dom';
 import DownloadIcon from '@mui/icons-material/Download';
 
 
@@ -30,8 +29,6 @@ interface InvestmentPartnerModelProps {
 }
 
 export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
-  const { id } = useParams();
-
   const [actionUid] = useState(uuid())
   const [investmentPartnerFormData, setInvestmentPartnerFormData] = useState(defaultInvestmentPartner)
 
@@ -826,7 +823,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   borderRadius: '16px',
                   backgroundColor: '#fafafa'
                 }}>
-                  {Number(id) ? (
+                  {investmentPartnerFormData.id ? (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                       <Button
                         variant="outlined"
@@ -862,7 +859,13 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                   <Grid item xs={12} md={6}>
                     <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
                       <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Experience</Typography>
-                      <UploadComponents id={`sdPartnerResume${props.prelimApplicationId || uuid()}`} signed={false} />
+                      {investmentPartnerFormData.id ? (
+                        <UploadComponents id={`sdPartnerResume${investmentPartnerFormData.id}`} signed={false} />
+                      ) : (
+                        <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
+                          Please save the form to upload documents.
+                        </Typography>
+                      )}
                     </Box>
                   </Grid>
                 </Grid>

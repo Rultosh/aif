@@ -1,4 +1,4 @@
-import { Alert, Backdrop, Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, CircularProgress, Snackbar, Switch, FormControlLabel } from "@mui/material";
+import { Alert, Backdrop, Card, Divider, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Button, CircularProgress, Switch, FormControlLabel, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import FundOverviewData from "./subsections/fundOverviewData/FundOverviewData";
 import InvestmentPartner from "./subsections/fundOverviewData/investmentPartner/InvestmentPartner";
 import InvestmentStrategy from "./subsections/fundOverviewData/investmentStrategy/InvestmentStrategy";
@@ -32,13 +32,35 @@ export const Fund = (props: any) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const prelimApplicationState = useAppSelector(selectPrelimApplication)
-    const effectivePrelimId = String(
-        prelimApplicationState.prelimApplication?.id || prelimApplicationId || id || ''
-    );
+    /** First positive numeric id among Redux, local state, and route (avoids literal "undefined" from String(undefined) blocking the URL id). */
+    const pickPositivePrelimIdString = (): string => {
+        const sources: unknown[] = [
+            prelimApplicationState.prelimApplication?.id,
+            prelimApplicationId,
+            id,
+        ];
+        for (const s of sources) {
+            if (s === undefined || s === null) continue;
+            const str = String(s).trim();
+            if (!str || str === 'undefined' || str === 'null') continue;
+            const n = Number(str);
+            if (!Number.isNaN(n) && n > 0) return str;
+        }
+        return '';
+    };
+    const effectivePrelimId = pickPositivePrelimIdString();
+    /** Sections 2–7 mount and validate only once we have a numeric prelim id (Redux, URL, or local state). */
+    const hasNumericFundPrelimId = effectivePrelimId.length > 0 && !Number.isNaN(Number(effectivePrelimId));
     const [hasInvestment, setHasInvestment] = useState(false);
     useEffect(() => {
         setHasInvestment(prelimApplicationState.prelimApplication.hasInvestment);
     }, [prelimApplicationState.prelimApplication.hasInvestment]);
+
+    useEffect(() => {
+        if (!hasInvestment) {
+            setPastInvestmentSectionHasErrors(false);
+        }
+    }, [hasInvestment]);
 
     const handleApplicationIdCreation = (value: String | undefined) => {
         if (value) setPrelimApplicationId(String(value));
@@ -58,9 +80,14 @@ export const Fund = (props: any) => {
     // })
 
     useEffect(() => {
-        console.log('use effect fund', prelimApplicationState.prelimApplication.id)
-        setPrelimApplicationId(String(prelimApplicationState.prelimApplication.id))
-    }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
+        const pid = prelimApplicationState.prelimApplication?.id;
+        if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && pid != null) {
+            const n = Number(pid);
+            if (!Number.isNaN(n) && n > 0) {
+                setPrelimApplicationId(String(pid));
+            }
+        }
+    }, [prelimApplicationState.status.fetchStatus, prelimApplicationState.prelimApplication?.id])
 
     useEffect(() => {
         setPrelimApplicationId(id);
@@ -82,10 +109,51 @@ export const Fund = (props: any) => {
     const [fundPanelValidationErrors, setFundPanelValidationErrors] = useState<string[]>([]);
     /** Deal Flow/MIS: react-hook-form or document errors while editing (not only full-fund validation). */
     const [dealFlowSectionHasErrors, setDealFlowSectionHasErrors] = useState(false);
+    /** Section 3: KMP team — too few rows or mandatory document gaps. */
+    const [investmentPartnerSectionHasErrors, setInvestmentPartnerSectionHasErrors] = useState(false);
+    /** Section 4: non-KMP team — missing mandatory uploads or more than 5 rows. */
+    const [investmentAssociateSectionHasErrors, setInvestmentAssociateSectionHasErrors] = useState(false);
+    /** Section 5: past investments when "Yes" — no rows yet. */
+    const [pastInvestmentSectionHasErrors, setPastInvestmentSectionHasErrors] = useState(false);
+    /** Section 2: strategy form errors or missing Risk Assessment upload (file server). */
+    const [investmentStrategySectionHasErrors, setInvestmentStrategySectionHasErrors] = useState(false);
     const [fundValidatingAll, setFundValidatingAll] = useState(false);
 
+    /** Ref mirrors for accordion error flags — updated synchronously so post-`await` validation sees latest child state. */
+    const investmentStrategySectionHasErrorsRef = useRef(false);
+    const investmentPartnerSectionHasErrorsRef = useRef(false);
+    const investmentAssociateSectionHasErrorsRef = useRef(false);
+    const pastInvestmentSectionHasErrorsRef = useRef(false);
+    const dealFlowSectionHasErrorsRef = useRef(false);
+    const fundPanelValidationErrorsRef = useRef<string[]>([]);
+
+    useEffect(() => {
+        fundPanelValidationErrorsRef.current = fundPanelValidationErrors;
+    }, [fundPanelValidationErrors]);
+
     const reportDealFlowSectionErrors = useCallback((hasErrors: boolean) => {
+        dealFlowSectionHasErrorsRef.current = hasErrors;
         setDealFlowSectionHasErrors(hasErrors);
+    }, []);
+
+    const reportInvestmentPartnerSectionErrors = useCallback((hasErrors: boolean) => {
+        investmentPartnerSectionHasErrorsRef.current = hasErrors;
+        setInvestmentPartnerSectionHasErrors(hasErrors);
+    }, []);
+
+    const reportInvestmentAssociateSectionErrors = useCallback((hasErrors: boolean) => {
+        investmentAssociateSectionHasErrorsRef.current = hasErrors;
+        setInvestmentAssociateSectionHasErrors(hasErrors);
+    }, []);
+
+    const reportPastInvestmentSectionErrors = useCallback((hasErrors: boolean) => {
+        pastInvestmentSectionHasErrorsRef.current = hasErrors;
+        setPastInvestmentSectionHasErrors(hasErrors);
+    }, []);
+
+    const reportInvestmentStrategySectionErrors = useCallback((hasErrors: boolean) => {
+        investmentStrategySectionHasErrorsRef.current = hasErrors;
+        setInvestmentStrategySectionHasErrors(hasErrors);
     }, []);
 
     const prelimRef = useRef<any>(null);
@@ -114,12 +182,34 @@ export const Fund = (props: any) => {
     /** Accordion panel ids matching validateAllFundSections order (all fund accordions 1–7). */
     const FUND_MANDATORY_PANEL_ORDER = ["1", "2", "3", "4", "5", "6", "7"];
 
+    const isFundSectionSubmitOk = (v: unknown) =>
+        v === true || (typeof v === 'object' && v !== null && (v as { ok?: boolean }).ok === true);
+
+    /** If children already report document/form issues, treat that panel as failed even when silent `submit()` races or misses. */
+    const mergeLiveAccordionErrorsIntoValidations = (v: boolean[]): boolean[] => {
+        const out = [...v];
+        if (investmentStrategySectionHasErrorsRef.current) out[1] = false;
+        if (investmentPartnerSectionHasErrorsRef.current) out[2] = false;
+        if (investmentAssociateSectionHasErrorsRef.current) out[3] = false;
+        if (hasInvestment && pastInvestmentSectionHasErrorsRef.current) out[4] = false;
+        if (dealFlowSectionHasErrorsRef.current) out[6] = false;
+        for (const panelId of fundPanelValidationErrorsRef.current) {
+            const idx = FUND_MANDATORY_PANEL_ORDER.indexOf(panelId);
+            if (idx >= 0) out[idx] = false;
+        }
+        return out;
+    };
+
     const FUND_COMPLETENESS_TOAST_TEXT =
-        'Please review all fund sections and fix any errors before continuing. Choose Stay to keep working here, or Continue to go to the declaration step anyway.';
+        'Some fund sections still have errors or missing mandatory documents. Review each section from the top (red highlights show where to fix). Choose Stay to keep working here, or Continue to go to the declaration step anyway.';
 
     const fundAccordionShellSx = (panelId: string) => {
         const hasErr =
             fundPanelValidationErrors.includes(panelId) ||
+            (panelId === "2" && investmentStrategySectionHasErrors) ||
+            (panelId === "3" && investmentPartnerSectionHasErrors) ||
+            (panelId === "4" && investmentAssociateSectionHasErrors) ||
+            (panelId === "5" && pastInvestmentSectionHasErrors) ||
             (panelId === "7" && dealFlowSectionHasErrors);
         return {
             border: '1px solid rgba(0,0,0,0.08)',
@@ -146,10 +236,16 @@ export const Fund = (props: any) => {
         const failedIds = FUND_MANDATORY_PANEL_ORDER.filter((_, i) => validations[i] === false);
         setFundPanelValidationErrors(failedIds);
         setFundCompletenessToastOpen(true);
-    };
-
-    const handleFundCompletenessToastClose = () => {
-        setFundCompletenessToastOpen(false);
+        const firstFailed = failedIds[0];
+        if (firstFailed) {
+            setExpanded(firstFailed);
+            setTimeout(() => {
+                accordionRefs[firstFailed as keyof typeof accordionRefs]?.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }, 150);
+        }
     };
 
     const stayReviewFundSections = () => {
@@ -166,23 +262,51 @@ export const Fund = (props: any) => {
     /** When validating all sections at once, do not run per-section `onSaveSuccess` (avoids re-entering accordion flow in parallel). */
     const SILENT_VALIDATE = { silent: true } as const;
 
+    /** Validates panels 1→7 in order (top to bottom). Each section runs form + document checks for that section only. */
     const validateAllFundSections = async (): Promise<boolean[]> => {
         setFundValidatingAll(true);
+        const safeDetailSectionSubmit = async (ref: { current: any }): Promise<boolean> => {
+            if (!hasNumericFundPrelimId) return true;
+            const submitFn = ref.current?.submit as ((o?: { silent?: boolean }) => Promise<unknown>) | undefined;
+            if (typeof submitFn !== 'function') return false;
+            try {
+                return isFundSectionSubmitOk(await submitFn(SILENT_VALIDATE));
+            } catch {
+                return false;
+            }
+        };
         try {
-            const [r1, r2, r3, r4, r6, r7] = await Promise.all([
-                prelimRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
-                strategyRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
-                investmentPartnerRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
-                investmentAssociateRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
-                lpAdvisoryGovernanceInvestmentCommitteeRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
-                dealFlowRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true),
-            ]);
-            const r5 = hasInvestment
-                ? await (investmentPastRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(false))
-                : true;
+            let r1 = true;
+            try {
+                r1 = isFundSectionSubmitOk(
+                    await (prelimRef.current?.submit?.(SILENT_VALIDATE) ?? Promise.resolve(true))
+                );
+            } catch {
+                r1 = false;
+            }
+            const r2 = await safeDetailSectionSubmit(strategyRef);
+            const r3 = await safeDetailSectionSubmit(investmentPartnerRef);
+            const r4 = await safeDetailSectionSubmit(investmentAssociateRef);
+            const r5 = hasInvestment ? await safeDetailSectionSubmit(investmentPastRef) : true;
+            const r6 = await safeDetailSectionSubmit(lpAdvisoryGovernanceInvestmentCommitteeRef);
+            const r7 = await safeDetailSectionSubmit(dealFlowRef);
             return [r1, r2, r3, r4, r5, r6, r7];
         } finally {
             setFundValidatingAll(false);
+        }
+    };
+
+    /** Runs sequential validation, then re-merges after a microtask so child refs/state from effects are current. */
+    const runMergedFullFundValidation = async (): Promise<boolean[]> => {
+        try {
+            const raw = await validateAllFundSections();
+            await new Promise<void>((resolve) => {
+                queueMicrotask(() => resolve());
+            });
+            return mergeLiveAccordionErrorsIntoValidations(raw);
+        } catch (e) {
+            console.error('validateAllFundSections failed', e);
+            return FUND_MANDATORY_PANEL_ORDER.map(() => false);
         }
     };
 
@@ -210,8 +334,8 @@ export const Fund = (props: any) => {
             if (isExpanded && fundPanelValidationErrors.includes(panel)) {
                 const submitRef = getFundPanelSubmitRef(panel);
                 void (async () => {
-                    const ok = (await submitRef?.current?.submit?.(SILENT_VALIDATE)) ?? false;
-                    if (ok) {
+                    const raw = await submitRef?.current?.submit?.(SILENT_VALIDATE);
+                    if (isFundSectionSubmitOk(raw ?? false)) {
                         setFundPanelValidationErrors((prev) => prev.filter((id) => id !== panel));
                     }
                 })();
@@ -227,14 +351,28 @@ export const Fund = (props: any) => {
                     : null;
 
         let isSectionValid = true;
+        let submitResult: unknown = true;
         if (resolvedRef?.current?.submit) {
-            isSectionValid = await resolvedRef.current.submit();
+            submitResult = await resolvedRef.current.submit();
+            isSectionValid = isFundSectionSubmitOk(submitResult);
         }
 
         if (!isSectionValid) {
-            setFundPanelValidationErrors((prev) =>
-                Array.from(new Set([...prev, currentPanel]))
-            );
+            const highlightPanel =
+                typeof submitResult === 'object' &&
+                submitResult !== null &&
+                'highlightPanel' in submitResult &&
+                typeof (submitResult as { highlightPanel?: string }).highlightPanel === 'string'
+                    ? (submitResult as { highlightPanel: string }).highlightPanel
+                    : currentPanel;
+            setFundPanelValidationErrors((prev) => Array.from(new Set([...prev, highlightPanel])));
+            if (currentPanel === '7' && (highlightPanel === '3' || highlightPanel === '4')) {
+                setExpanded(highlightPanel);
+                setTimeout(() => {
+                    const refKey = highlightPanel as '3' | '4';
+                    accordionRefs[refKey]?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
             return;
         }
 
@@ -249,7 +387,7 @@ export const Fund = (props: any) => {
                 }
             }, 300);
         } else {
-            const validations = await validateAllFundSections();
+            const validations = await runMergedFullFundValidation();
             if (!validations.every((res) => res === true)) {
                 applyFundCompletenessFailure(validations);
                 return;
@@ -262,7 +400,7 @@ export const Fund = (props: any) => {
     };
 
     const handleClickSave = async () => {
-        const validations = await validateAllFundSections();
+        const validations = await runMergedFullFundValidation();
         const sectionNames = [
             "Fund Overview",
             "Investment Strategy",
@@ -338,7 +476,7 @@ export const Fund = (props: any) => {
     const [actionUid] = useState(uuid());
     const updateHasInvestment = async (hasInvestment: boolean) => {
         setHasInvestment(hasInvestment)
-        if (Number(prelimApplicationId)) {
+        if (hasNumericFundPrelimId) {
             await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationState.prelimApplication, hasInvestment })));
         }
     };
@@ -448,7 +586,7 @@ export const Fund = (props: any) => {
                                 </AccordionDetails>
                             </Accordion>
                         </Grid>
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                        {hasNumericFundPrelimId ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["2"]}
                                 elevation={0}
@@ -490,15 +628,16 @@ export const Fund = (props: any) => {
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentStrategy
                                             ref={strategyRef}
-                                            prelimApplicationId={prelimApplicationId}
+                                            prelimApplicationId={effectivePrelimId}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("2", "3", null)}
+                                            onSectionHasErrorsChange={reportInvestmentStrategySectionErrors}
                                         />
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                        {hasNumericFundPrelimId ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["3"]}
                                 elevation={0}
@@ -540,7 +679,8 @@ export const Fund = (props: any) => {
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentPartner
                                             ref={investmentPartnerRef}
-                                            prelimApplicationId={Number(prelimApplicationId)}
+                                            prelimApplicationId={Number(effectivePrelimId)}
+                                            onSectionHasErrorsChange={reportInvestmentPartnerSectionErrors}
                                         />
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
@@ -555,7 +695,7 @@ export const Fund = (props: any) => {
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                        {hasNumericFundPrelimId ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["4"]}
                                 elevation={0}
@@ -597,7 +737,8 @@ export const Fund = (props: any) => {
                                     <Box sx={{ pt: 2 }}>
                                         <InvestmentAssociate
                                             ref={investmentAssociateRef}
-                                            prelimApplicationId={Number(prelimApplicationId)}
+                                            prelimApplicationId={Number(effectivePrelimId)}
+                                            onSectionHasErrorsChange={reportInvestmentAssociateSectionErrors}
                                         />
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                             <Button
@@ -612,7 +753,7 @@ export const Fund = (props: any) => {
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                        {hasNumericFundPrelimId ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["5"]}
                                 elevation={0}
@@ -689,8 +830,9 @@ export const Fund = (props: any) => {
                                             <>
                                                 <InvestmentPast
                                                     ref={investmentPastRef}
-                                                    prelimApplicationId={Number(prelimApplicationId)}
+                                                    prelimApplicationId={Number(effectivePrelimId)}
                                                     hasInvestment={hasInvestment}
+                                                    onSectionHasErrorsChange={reportPastInvestmentSectionErrors}
                                                 />
                                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                                                     <Button
@@ -722,7 +864,7 @@ export const Fund = (props: any) => {
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                        {hasNumericFundPrelimId ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["6"]}
                                 elevation={0}
@@ -764,7 +906,7 @@ export const Fund = (props: any) => {
                                     <Box sx={{ pt: 2 }}>
                                         <LpAdvisoryGovernanceInvestmentCommittee
                                             ref={lpAdvisoryGovernanceInvestmentCommitteeRef}
-                                            prelimApplicationId={String(prelimApplicationId)}
+                                            prelimApplicationId={effectivePrelimId}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("6", "7", null)}
                                         />
@@ -772,7 +914,7 @@ export const Fund = (props: any) => {
                                 </AccordionDetails>
                             </Accordion>
                         </Grid> : <></>}
-                        {Number(prelimApplicationId) ? <Grid item xs={12}>
+                        {hasNumericFundPrelimId ? <Grid item xs={12}>
                             <Accordion
                                 ref={accordionRefs["7"]}
                                 elevation={0}
@@ -814,7 +956,7 @@ export const Fund = (props: any) => {
                                     <Box sx={{ pt: 2 }}>
                                         <DealFlow
                                             ref={dealFlowRef}
-                                            prelimApplicationId={String(prelimApplicationId)}
+                                            prelimApplicationId={effectivePrelimId}
                                             setPrelimApplicationId={handleApplicationIdCreation}
                                             onSaveSuccess={() => handleAccordionSaveAndContinue("7", null, null)}
                                             onSectionHasErrorsChange={reportDealFlowSectionErrors}
@@ -1032,37 +1174,49 @@ export const Fund = (props: any) => {
                         Validating fund sections…
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 400 }}>
-                        Please wait while we check your information in the background.
+                        Please wait while we validate your entries and mandatory document uploads in the background.
                     </Typography>
                 </Box>
             </Backdrop>
 
-            <Snackbar
+            {/* Dialog portals to body; sx z-index lifts the whole Modal above sticky save. Avoid raising only Backdrop z-index — it stacks above Paper and blocks clicks. */}
+            <Dialog
                 open={fundCompletenessToastOpen}
-                autoHideDuration={null}
-                onClose={handleFundCompletenessToastClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}
-            >
-                <Alert
-                    onClose={stayReviewFundSections}
-                    severity="info"
-                    variant="standard"
-                    sx={{ ...opaqueInfoToastAlertSx, maxWidth: 640 }}
-                    action={
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'flex-end', mt: 0.25 }}>
-                            <Button color="primary" size="small" variant="outlined" onClick={stayReviewFundSections}>
-                                Stay
-                            </Button>
-                            <Button color="primary" size="small" variant="contained" onClick={continueToDeclarationDespiteFundErrors}>
-                                Continue
-                            </Button>
-                        </Box>
+                onClose={(_, reason) => {
+                    if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
+                        stayReviewFundSections();
                     }
-                >
-                    {FUND_COMPLETENESS_TOAST_TEXT}
-                </Alert>
-            </Snackbar>
+                }}
+                maxWidth="sm"
+                fullWidth
+                disableScrollLock={false}
+                sx={{ zIndex: 10001 }}
+                PaperProps={{
+                    sx: {
+                        ...opaqueInfoToastAlertSx,
+                        borderRadius: '12px',
+                        maxWidth: 640,
+                        m: 2,
+                        position: 'relative',
+                        zIndex: 1,
+                    },
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 700, color: '#4e342e', pb: 1 }}>Fund sections need attention</DialogTitle>
+                <DialogContent sx={{ pt: 0 }}>
+                    <Typography variant="body1" sx={{ color: '#4e342e', lineHeight: 1.5, fontWeight: 500 }}>
+                        {FUND_COMPLETENESS_TOAST_TEXT}
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2, pt: 0, gap: 1, flexWrap: 'wrap' }}>
+                    <Button color="primary" variant="outlined" onClick={stayReviewFundSections}>
+                        Stay
+                    </Button>
+                    <Button color="primary" variant="contained" onClick={continueToDeclarationDespiteFundErrors}>
+                        Continue
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }

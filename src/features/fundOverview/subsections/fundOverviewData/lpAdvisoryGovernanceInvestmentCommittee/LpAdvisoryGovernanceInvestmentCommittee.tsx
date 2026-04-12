@@ -75,8 +75,8 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
         submit: async (opts?: { silent?: boolean }) => {
             let isValid = false;
             await handleSubmit(
-                (data) => {
-                    void persistLpAdvisorySection(data, Boolean(opts?.silent));
+                async (data) => {
+                    await persistLpAdvisorySection(data, Boolean(opts?.silent));
                     isValid = true;
                 },
                 () => {

@@ -9,6 +9,22 @@ export function fetchFundOverviewData(prelimAppId:Number) {
   });
 }
 
+/** KMP rows missing past-10-years doc and/or resume (ids per category). */
+export function fetchKmpMandatoryDocumentsStatus(prelimAppId: Number) {
+  return api({
+    method: 'get',
+    url: `/api/prelims/${prelimAppId}/kmpMandatoryDocumentsStatus`,
+  });
+}
+
+/** Non-KMP associate rows missing mandatory resume/CV on the file server (ids only). */
+export function fetchAssociateMandatoryDocumentsStatus(prelimAppId: Number) {
+  return api({
+    method: 'get',
+    url: `/api/prelims/${prelimAppId}/associateMandatoryDocumentsStatus`,
+  });
+}
+
 export function fetchFundOverviewList(pageInfo : IPageInfo | undefined) {
   return api({
     method: 'get',

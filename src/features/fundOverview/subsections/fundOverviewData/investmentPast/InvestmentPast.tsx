@@ -1,5 +1,5 @@
 import { Alert, Box, Button, Card, CardContent, CardHeader, Chip, FormControlLabel, Grid, Modal, Paper, Snackbar, Stack, styled, Switch, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react"
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle, useRef } from "react"
 import { fetchInvestmentPastAsync, selectInvestmentPast, createInvestmentPastAsync, deleteInvestmentPastAsync } from './investmentPastSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import React, * as Rect from 'react'
@@ -21,6 +21,8 @@ interface InvestmentPastProps {
     prelimApplicationId: Number | undefined;
     /** When false, submit() is a no-op success (table not shown). */
     hasInvestment?: boolean;
+    /** Tint fund accordion section 5 when "Yes" but no past investment rows. */
+    onSectionHasErrorsChange?: (hasErrors: boolean) => void;
 }
 
 const style = {
@@ -54,6 +56,10 @@ const InvestmentPast = forwardRef<InvestmentPastHandle, InvestmentPastProps>(fun
     const handleValidationToastClose = () => {
         setValidationToastOpen(false);
     };
+
+    const onSectionHasErrorsChangeRef = useRef(props.onSectionHasErrorsChange);
+    onSectionHasErrorsChangeRef.current = props.onSectionHasErrorsChange;
+
     useEffect(() => {
         console.log('calling fetchInvestmentTeamsAssociateLevelAsync', props.prelimApplicationId);
         dispatch(fetchInvestmentPastAsync(
@@ -71,6 +77,30 @@ const InvestmentPast = forwardRef<InvestmentPastHandle, InvestmentPastProps>(fun
     }, [prelimApplicationState.status.fetchStatus == FetchStatus.IDLE])
 
     const hasInv = props.hasInvestment !== false;
+
+    useEffect(() => {
+        if (!hasInv) {
+            onSectionHasErrorsChangeRef.current?.(false);
+            return;
+        }
+        const statusIdle = investmentPastsState.status.fetchStatus === FetchStatus.IDLE;
+        const actionIdle = investmentPastsState.actionStatus.fetchStatus === FetchStatus.IDLE;
+        const n = investmentPastsState.investmentPasts?.length ?? 0;
+        const hasErrors = statusIdle && actionIdle && n < 1;
+        onSectionHasErrorsChangeRef.current?.(hasErrors);
+    }, [
+        hasInv,
+        investmentPastsState.investmentPasts?.length,
+        investmentPastsState.status.fetchStatus,
+        investmentPastsState.actionStatus.fetchStatus,
+    ]);
+
+    useEffect(
+        () => () => {
+            onSectionHasErrorsChangeRef.current?.(false);
+        },
+        []
+    );
 
     useImperativeHandle(
         ref,

@@ -1,7 +1,8 @@
-import { Alert, Box, Button, Grid, TextField, Typography, CircularProgress, Snackbar } from "@mui/material";
+import { Alert, Backdrop, Box, Button, Grid, TextField, Typography, CircularProgress, Snackbar } from "@mui/material";
 import { useState, useEffect, forwardRef, useImperativeHandle, useRef } from "react";
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks';
 import { getPrelimApplicationData, PrelimApplicationState, selectPrelimApplication, updatePrelimApplicationAsync } from "../prelimApplicationDataSlice";
+import { fetchAssociateMandatoryDocumentsStatus, fetchKmpMandatoryDocumentsStatus } from "../fundOverviewDataApi";
 import { IPrelimApplicationData } from "../IPrelimApplicationData";
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
 import uuid from "react-uuid";
@@ -16,8 +17,13 @@ import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
 import { opaqueInfoToastAlertSx } from "../../../../../lib/ui/opaqueInfoToastAlertSx";
 
-const MANDATORY_DOCUMENTS_UPLOAD_MESSAGE =
-    'Please upload all mandatory documents before proceeding.';
+const DEAL_FLOW_MANDATORY_UPLOADS_MESSAGE =
+    'Upload the two mandatory files in this section (Deal Flow/MIS): current pipeline of deals under consideration, and empanelled list of external firms.';
+
+const ASSOCIATE_RESUME_DEALFLOW_MESSAGE =
+    'Section 4 — one or more non-KMP team members are missing the mandatory Resume/CV upload. Open the highlighted row(s), add the file, and save.';
+
+export type DealFlowSubmitResult = true | { ok: false; highlightPanel: '3' | '4' | '7' };
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -33,7 +39,11 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState(prelimApplicationState.prelimApplication);
     const [actionUid] = useState(uuid());
     const [documentError, setDocumentError] = useState('');
+    /** Drives parent accordion tint for section 7 only when the problem is inside Deal Flow (not cross-section gates). */
+    const [documentGateFailureScope, setDocumentGateFailureScope] = useState<'dealFlow' | 'kmp' | 'associate' | null>(null);
     const [mandatoryUploadToastOpen, setMandatoryUploadToastOpen] = useState(false);
+    /** Shown during file-server bucket checks, KMP document API check, and save (non-silent submit only). */
+    const [documentChecksBusy, setDocumentChecksBusy] = useState(false);
     const prelimAppicationId = props.prelimApplicationId;
     const effectiveId = String(prelimAppicationId || prelimApplicationState.prelimApplication?.id || id || '');
     const dispatch = useAppDispatch();
@@ -95,9 +105,9 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
 
     useEffect(() => {
         const hasFormErrors = Object.keys(errors).length > 0;
-        const hasErrors = hasFormErrors || Boolean(documentError);
-        onSectionHasErrorsChangeRef.current?.(hasErrors);
-    }, [errors, documentError]);
+        const hasInSectionMandatoryDocIssue = documentGateFailureScope === 'dealFlow';
+        onSectionHasErrorsChangeRef.current?.(hasFormErrors || hasInSectionMandatoryDocIssue);
+    }, [errors, documentGateFailureScope]);
 
     useEffect(
         () => () => {
@@ -118,42 +128,104 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         }
     };
 
-    const persistDealFlowSection = async (data: IPrelimApplicationData, silent: boolean): Promise<boolean> => {
-        const requiredBuckets = [
-            `sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`,
-            `sdEmpanelledListOfExternalFirms${effectiveId}`,
-        ];
-        const checks = await Promise.all(requiredBuckets.map((bucket) => hasUploadedFiles(bucket)));
-        const allUploaded = checks.every(Boolean);
-        if (!allUploaded) {
-            setDocumentError(MANDATORY_DOCUMENTS_UPLOAD_MESSAGE);
-            setMandatoryUploadToastOpen(true);
-            return false;
+    const persistDealFlowSection = async (
+        data: IPrelimApplicationData,
+        silent: boolean
+    ): Promise<DealFlowSubmitResult> => {
+        const showBusyOverlay = !silent;
+        if (showBusyOverlay) {
+            setDocumentChecksBusy(true);
         }
-        setDocumentError('');
-        setMandatoryUploadToastOpen(false);
-        await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
-        if (!silent && props.onSaveSuccess) {
-            props.onSaveSuccess();
+        try {
+            const requiredBuckets = [
+                `sdDetailsOfCurrentPipelineOfDealsUnderConsideration${effectiveId}`,
+                `sdEmpanelledListOfExternalFirms${effectiveId}`,
+            ];
+            const checks = await Promise.all(requiredBuckets.map((bucket) => hasUploadedFiles(bucket)));
+            const allUploaded = checks.every(Boolean);
+            if (!allUploaded) {
+                setDocumentGateFailureScope('dealFlow');
+                if (!silent) {
+                    setDocumentError(DEAL_FLOW_MANDATORY_UPLOADS_MESSAGE);
+                    setMandatoryUploadToastOpen(true);
+                } else {
+                    setDocumentError('');
+                }
+                return { ok: false, highlightPanel: '7' };
+            }
+            setDocumentError('');
+            setDocumentGateFailureScope(null);
+            setMandatoryUploadToastOpen(false);
+            if (!silent) {
+                try {
+                    const kmpRes = await fetchKmpMandatoryDocumentsStatus(Number(effectiveId));
+                    const d = (kmpRes as { data?: Record<string, unknown> })?.data;
+                    const asNumList = (v: unknown) =>
+                        Array.isArray(v) ? v.map((x) => Number(x)).filter((n) => !Number.isNaN(n)) : [];
+                    const past = asNumList(d?.missingPastTenYearsKmpIds);
+                    const resume = asNumList(d?.missingResumeKmpIds);
+                    if (past.length > 0 || resume.length > 0) {
+                        setDocumentGateFailureScope('kmp');
+                        setDocumentError('');
+                        setMandatoryUploadToastOpen(false);
+                        return { ok: false, highlightPanel: '3' };
+                    }
+                } catch {
+                    setDocumentGateFailureScope('kmp');
+                    setDocumentError(
+                        'Unable to verify KMP mandatory uploads. Please check your connection and try again.'
+                    );
+                    setMandatoryUploadToastOpen(true);
+                    return { ok: false, highlightPanel: '3' };
+                }
+                try {
+                    const assocRes = await fetchAssociateMandatoryDocumentsStatus(Number(effectiveId));
+                    const assocMissing: number[] = Array.isArray((assocRes as any)?.data?.missingResumeAssociateIds)
+                        ? (assocRes as any).data.missingResumeAssociateIds
+                        : [];
+                    if (assocMissing.length > 0) {
+                        setDocumentGateFailureScope('associate');
+                        setDocumentError(ASSOCIATE_RESUME_DEALFLOW_MESSAGE);
+                        setMandatoryUploadToastOpen(true);
+                        return { ok: false, highlightPanel: '4' };
+                    }
+                } catch {
+                    setDocumentGateFailureScope('associate');
+                    setDocumentError(
+                        'Unable to verify non-KMP team uploads. Please check your connection and try again.'
+                    );
+                    setMandatoryUploadToastOpen(true);
+                    return { ok: false, highlightPanel: '4' };
+                }
+            }
+            await dispatch(updatePrelimApplicationAsync(wrapArgument(actionUid, { ...prelimApplicationFormData, ...data })));
+            setDocumentError('');
+            setDocumentGateFailureScope(null);
+            if (!silent && props.onSaveSuccess) {
+                props.onSaveSuccess();
+            }
+            return true;
+        } finally {
+            if (showBusyOverlay) {
+                setDocumentChecksBusy(false);
+            }
         }
-        return true;
     };
 
     const onSubmit = async (data: IPrelimApplicationData) => persistDealFlowSection(data, false);
 
     useImperativeHandle(ref, () => ({
-        submit: async (opts?: { silent?: boolean }) => {
-            let isValid = false;
+        submit: async (opts?: { silent?: boolean }): Promise<DealFlowSubmitResult> => {
+            let result: DealFlowSubmitResult = true;
             await handleSubmit(
                 async (data) => {
-                    const ok = await persistDealFlowSection(data, Boolean(opts?.silent));
-                    isValid = ok;
+                    result = await persistDealFlowSection(data, Boolean(opts?.silent));
                 },
                 () => {
-                    isValid = false;
+                    result = { ok: false, highlightPanel: '7' };
                 }
             )();
-            return isValid;
+            return result;
         }
     }));
 
@@ -472,12 +544,46 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 type="submit"
                                 variant="contained"
                                 sx={internalButtonSx}
+                                disabled={documentChecksBusy}
+                                startIcon={
+                                    documentChecksBusy ? (
+                                        <CircularProgress size={18} color="inherit" aria-hidden />
+                                    ) : undefined
+                                }
                             >
                                 Save and Continue
                             </Button>
                         </Box>
                     </Grid>
                 </Grid>
+                <Backdrop
+                    open={documentChecksBusy}
+                    sx={{
+                        zIndex: (theme) => theme.zIndex.modal + 8,
+                        color: '#fff',
+                        flexDirection: 'column',
+                        gap: 2,
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 2,
+                            textAlign: 'center',
+                            px: 3,
+                        }}
+                    >
+                        <CircularProgress color="inherit" size={48} thickness={4} aria-label="Verifying documents" />
+                        <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
+                            Verifying mandatory documents…
+                        </Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 440 }}>
+                            Checking uploaded files and KMP requirements. This may take a few seconds.
+                        </Typography>
+                    </Box>
+                </Backdrop>
                 <Snackbar
                     open={mandatoryUploadToastOpen}
                     autoHideDuration={12000}
@@ -494,7 +600,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         variant="standard"
                         sx={opaqueInfoToastAlertSx}
                     >
-                        {MANDATORY_DOCUMENTS_UPLOAD_MESSAGE}
+                        {documentError || DEAL_FLOW_MANDATORY_UPLOADS_MESSAGE}
                     </Alert>
                 </Snackbar>
             </Box>

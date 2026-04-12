@@ -12,6 +12,8 @@ interface DocumentChipProps {
   label: String
   signed?: boolean | undefined
   validationTitle?: string
+  /** Called after a successful upload so parents can re-check bucket state. */
+  onAfterUpload?: () => void
 }
 
 export default function DocumentChip(props: DocumentChipProps) {
@@ -21,6 +23,7 @@ export default function DocumentChip(props: DocumentChipProps) {
 
   const onUploadSuccess = () => {
     setRefreshId(uuid())
+    props.onAfterUpload?.()
   }
 
   return (<DocumentUpload id={props.id} onSuccess={onUploadSuccess} signed={props.signed} validationTitle={props.validationTitle}>
