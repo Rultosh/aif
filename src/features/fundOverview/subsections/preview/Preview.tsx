@@ -52,6 +52,15 @@ export const Preview = (props: any) => {
     const [showResponse, setShowResponse] = useState(false);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
     const role = usersState.role || '';
+    const roleParts = role
+        .split(',')
+        .map((r) => r.trim().toUpperCase())
+        .filter(Boolean);
+    const isOperationalWorkflowUser = roleParts.some((r) =>
+        ['MAKER', 'CHECKER', 'MANAGER', 'ADMIN', 'USERADMIN'].includes(r)
+    );
+    /** Preview: only fund applicants should return to declaration; not maker/checker/manager/admin. */
+    const showBackToDeclaration = roleParts.includes('USER') && !isOperationalWorkflowUser;
     const isApplicantActionable =
         role === 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE');
     const isOperationalActionable =
@@ -455,21 +464,27 @@ export const Preview = (props: any) => {
                         </Card>
                     )}
 
-                    <Button
-                        disabled={(statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'APPROVED') || usersState.role == 'ADMIN'}
-                        onClick={(e) => handleClick(e, "previous")}
-                        startIcon={<ArrowLeftIcon />}
-                        variant="outlined"
-                        sx={{
-                            textTransform: 'none',
-                            borderRadius: '8px',
-                            fontWeight: 600,
-                            color: '#363062',
-                            borderColor: '#363062'
-                        }}
-                    >
-                        Back to Declaration
-                    </Button>
+                    {showBackToDeclaration && (
+                        <Button
+                            disabled={
+                                statusPrelims == 'SUBMITTED' ||
+                                statusPrelims == 'REVIEWED' ||
+                                statusPrelims == 'APPROVED'
+                            }
+                            onClick={(e) => handleClick(e, "previous")}
+                            startIcon={<ArrowLeftIcon />}
+                            variant="outlined"
+                            sx={{
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                color: '#363062',
+                                borderColor: '#363062'
+                            }}
+                        >
+                            Back to Declaration
+                        </Button>
+                    )}
 
                     {showResponse && (
                         <ModalComponent
