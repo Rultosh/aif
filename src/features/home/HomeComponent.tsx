@@ -373,6 +373,7 @@ export const Home = (pros: any) => {
         "Fund Name",
         "Contact Person",
         "Status",
+        "Self-rating for this application",
         "Application created",
         "Target Corpus",
         "Contribution",
@@ -650,7 +651,7 @@ export const Home = (pros: any) => {
                             </Tabs>
                             {homeWorkflowTab === 1 && (
                                 <Typography variant="body2" sx={{ color: '#64748b', mt: 1, maxWidth: 900 }}>
-                                    In-progress preliminary applications that do not yet have a linked self-rating record (applicant has not moved past initial assessment to fund information for this application).
+                                    Draft preliminary applications (prelim stage). Each row is a separate application; older applications stay listed after the applicant completes initial assessment on another. Use &quot;Self-rating for this application&quot; to see whether IA is saved against that application id.
                                 </Typography>
                             )}
                         </Box>
@@ -793,6 +794,15 @@ export const Home = (pros: any) => {
                                                     )}
                                                 </TableCell>
                                                 <TableCell align="left" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
+                                                {isInitialTab && (
+                                                    <TableCell align="left" sx={{ minWidth: '140px' }}>
+                                                        {row.initialAssessmentLinked === true ? (
+                                                            <Chip label="Linked" color="success" size="small" sx={{ fontSize: '0.7rem', fontWeight: 600 }} />
+                                                        ) : (
+                                                            <Chip label="Not linked" color="warning" variant="outlined" size="small" sx={{ fontSize: '0.7rem', fontWeight: 600 }} />
+                                                        )}
+                                                    </TableCell>
+                                                )}
                                                 <TableCell align="left" sx={{ color: '#64748b', width: '20%' }}>
                                                     {isInitialTab
                                                         ? (row.createdOn
@@ -1033,6 +1043,25 @@ export const Home = (pros: any) => {
                             <Typography sx={{ mt: 1 }}>
                                 Kindly review the eligibility criteria provided on the website prior to initiating the application.
                             </Typography>
+                            <Link
+                                href={
+                                    process.env.REACT_APP_ELIGIBILITY_CRITERIA_URL?.trim() ||
+                                    `${window.location.origin}${window.location.pathname}${window.location.search}#/eligibilityQuestioner`
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => setStartApplicationConfirmOpen(false)}
+                                sx={{
+                                    mt: 1.5,
+                                    display: 'inline-block',
+                                    fontWeight: 600,
+                                    color: '#FF671F',
+                                    textDecoration: 'none',
+                                    '&:hover': { textDecoration: 'underline' },
+                                }}
+                            >
+                                View eligibility criteria
+                            </Link>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => setStartApplicationConfirmOpen(false)}>Cancel</Button>
