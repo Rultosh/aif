@@ -593,7 +593,7 @@ export const Preview = (props: any) => {
                                         </FormControl>
                                     )}
 
-                                    {(usersState.role === 'MANAGER' && statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER') && (
+                                    {(hasRole('MANAGER') && statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER') && (
                                         <FormControl sx={{ minWidth: 260 }}>
                                             <InputLabel id="pf-user-label">Select PF User</InputLabel>
                                             <Select
@@ -754,7 +754,7 @@ export const Preview = (props: any) => {
                                         </Button>
                                     )}
 
-                                    {(usersState.role === 'MANAGER' && (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
+                                    {(hasRole('MANAGER') && (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                             <Button color='primary' id='manager-forward-pf' onClick={async () => {
                                                 const remark = String(commentPreview || '').trim();
@@ -796,7 +796,7 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(usersState.role === 'MANAGER'
+                                    {(hasRole('MANAGER')
                                         && statusPrelims === 'APPROVED_BY_PF'
                                         && Number(prelimApplicationState.prelimApplication.assignedManagerUserId || 0) === Number(usersState.me?.id || 0)) && (
                                         <Button color='success' id='sanction' onClick={async () => {
