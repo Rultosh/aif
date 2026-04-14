@@ -643,7 +643,7 @@ export const Home = (pros: any) => {
 
     const workflowActionsForRow = (row: IPrelimApplicationData) => {
         const status = String(row.status || '').toUpperCase();
-        if (hasActiveRole('CHECKER') && status === 'SUBMITTED') {
+        if (hasActiveRole('CHECKER') && (status === 'SUBMITTED' || status === 'REVERTED_TO_MANAGER')) {
             return (
                 <Button size="small" variant="outlined" onClick={() => {
                     if (typeof row.id !== 'number') {
