@@ -390,7 +390,6 @@ export const Home = (pros: any) => {
         "Fund Name",
         "Contact Person",
         "Status",
-        "Self-rating for this application",
         "Application created",
         "Target Corpus",
         "Contribution",
@@ -594,11 +593,6 @@ export const Home = (pros: any) => {
                                 <Tab label="Workflow applications" />
                                 <Tab label="Initial assessment only" />
                             </Tabs>
-                            {homeWorkflowTab === 1 && (
-                                <Typography variant="body2" sx={{ color: '#64748b', mt: 1, maxWidth: 900 }}>
-                                    Draft preliminary applications (prelim stage). Each row is a separate application; older applications stay listed after the applicant completes initial assessment on another. Use &quot;Self-rating for this application&quot; to see whether IA is saved against that application id.
-                                </Typography>
-                            )}
                         </Box>
                     )}
                     {activeRole !== "USER" && (
@@ -739,15 +733,6 @@ export const Home = (pros: any) => {
                                                     )}
                                                 </TableCell>
                                                 <TableCell align="left" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
-                                                {isInitialTab && (
-                                                    <TableCell align="left" sx={{ minWidth: '140px' }}>
-                                                        {row.initialAssessmentLinked === true ? (
-                                                            <Chip label="Linked" color="success" size="small" sx={{ fontSize: '0.7rem', fontWeight: 600 }} />
-                                                        ) : (
-                                                            <Chip label="Not linked" color="warning" variant="outlined" size="small" sx={{ fontSize: '0.7rem', fontWeight: 600 }} />
-                                                        )}
-                                                    </TableCell>
-                                                )}
                                                 <TableCell align="left" sx={{ color: '#64748b', width: '20%' }}>
                                                     {isInitialTab
                                                         ? (row.createdOn

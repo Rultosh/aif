@@ -2,6 +2,7 @@ import { Modal, Box, TableContainer, Table, TableHead, TableRow, TableBody, Tabl
 import { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import uuid from "react-uuid";
+import dayjs from "dayjs";
 import { IHistory } from "./IHistory";
 import { fetchHistoryAsync, selecthistory } from './historySlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
@@ -74,7 +75,9 @@ export const HistoryModal = (props: any) => {
                                 <TableRow key={`${row.id}`}>
                                     {/* <TableCell align="center">{row.stage}</TableCell> */}
                                     <TableCell align="center">{row.status}</TableCell>
-                                    <TableCell align="center">{row.createdOn}</TableCell>
+                                    <TableCell align="center">
+                                        {row.createdOn ? dayjs(row.createdOn).format("DD MMM YYYY") : "-"}
+                                    </TableCell>
                                     <TableCell align="center">{row.remarks || '-'}</TableCell>
                                     <TableCell align="center">
                                         {row.attachmentBucket && row.attachmentName ? (

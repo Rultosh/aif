@@ -48,7 +48,7 @@ export const InvestmentPartnerRow = (props: InvestmentPartnerRowPros) => {
     tooltipParts.push('Past 10 years investments document is mandatory.');
   }
   if (props.missingResumeDoc) {
-    tooltipParts.push('Resume/CV/Experience upload is required.');
+    tooltipParts.push('Resume/CV/Experience upload is mandatory.');
   }
   const tooltipTitle =
     tooltipParts.length > 0

@@ -76,7 +76,7 @@ export const InvestmentAssociateRow = (props: InvestmentAssociateRowPros) => {
 
   if (props.rowDocInvalid) {
     return (
-      <Tooltip title="Resume/CV upload is required for this team member. Click Edit to add the document." placement="top-start">
+      <Tooltip title="Resume/CV upload is mandatory for this team member. Click Edit to add the document." placement="top-start">
         {row}
       </Tooltip>
     );

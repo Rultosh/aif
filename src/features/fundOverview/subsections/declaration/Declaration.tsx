@@ -90,21 +90,42 @@ const Declaration = (props: any) => {
         return checks.every(Boolean);
     };
 
-    const validateRequiredDocuments = async (buckets: string[]): Promise<boolean> => {
-        const allUploaded = await checkBucketsUploaded(buckets);
-        if (!allUploaded) {
+    const validateRequiredDocuments = async (
+        buckets: string[],
+        bucketLabels?: Record<string, string>
+    ): Promise<boolean> => {
+        if (!Number(effectiveId)) return false;
+        const checks = await Promise.all(
+            buckets.map(async (bucket) => ({
+                bucket,
+                uploaded: await hasUploadedFiles(`${bucket}${effectiveId}`)
+            }))
+        );
+        const missingBuckets = checks.filter((c) => !c.uploaded).map((c) => c.bucket);
+        if (missingBuckets.length > 0) {
             setDocumentError('');
-            setDeclarationSoftToastMessage(MANDATORY_DOCUMENTS_UPLOAD_MESSAGE);
+            const missingText = missingBuckets
+                .map((bucket) => bucketLabels?.[bucket] || bucket)
+                .join(', ');
+            setDeclarationSoftToastMessage(
+                missingBuckets.length === 1
+                    ? `Please upload mandatory document: ${missingText}.`
+                    : `Please upload all mandatory documents: ${missingText}.`
+            );
             return false;
         }
         setDocumentError('');
         setDeclarationSoftToastMessage((prev) =>
-            prev === MANDATORY_DOCUMENTS_UPLOAD_MESSAGE ? null : prev
+            prev && prev.startsWith("Please upload") ? null : prev
         );
         return true;
     };
 
     const kycDocumentBuckets = ["kycBoardDirectors", "boardResolution"];
+    const kycDocumentLabels: Record<string, string> = {
+        kycBoardDirectors: "Annexure I - Details/KYC documents",
+        boardResolution: "Annexure II - KYC form"
+    };
 
     const supportingDocumentBuckets = [
         "sdPvtPlacementMemorandum",
@@ -136,7 +157,7 @@ const Declaration = (props: any) => {
             // setDeclarationValidateTitle('Validating KYC…');
             setDeclarationDocsValidating(true);
             try {
-                const ok = await validateRequiredDocuments(kycDocumentBuckets);
+                const ok = await validateRequiredDocuments(kycDocumentBuckets, kycDocumentLabels);
                 if (!ok) {
                     setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '1'])));
                     return;
