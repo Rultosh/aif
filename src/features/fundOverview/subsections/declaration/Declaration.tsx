@@ -204,7 +204,7 @@ const Declaration = (props: any) => {
                     // setDeclarationValidateTitle('Validating KYC and supporting documents…');
                     setDeclarationDocsValidating(true);
                     try {
-                        const kycOk = await checkBucketsUploaded(kycDocumentBuckets);
+                        const kycOk = await validateRequiredDocuments(kycDocumentBuckets, kycDocumentLabels);
                         const supportingOk = await checkBucketsUploaded(supportingDocumentBuckets);
                         setDeclarationDocAccordionErrors((prev) => {
                             let next = prev.filter((p) => p !== '1' && p !== '2');
