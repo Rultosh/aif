@@ -39,11 +39,18 @@ export function fetchFundOverviewAllList(pageInfo : IPageInfo | undefined) {
   });
 }
 
-export function postPrelimApplicationShell(prelimAppData:IPrelimApplicationData) {
+/** Draft prelims with no linked self-rating yet (still in initial assessment, before fund step). */
+export function fetchPrelimsInitialAssessmentOnly() {
+  return api({
+    method: 'get',
+    url: `/api/prelims/initial-assessment-in-progress`,
+  });
+}
+
+/** Creates a new preliminary application (empty starter); legacy API path unchanged. */
+export function postNewPreliminaryStarter(_prelimAppData: IPrelimApplicationData) {
   return api({
     method: 'post',
-    // data: prelimAppData,
-    // url: `/api/prelims`
     url: `/api/prelims/createShell`
   });
 }
