@@ -108,6 +108,7 @@ export const Preview = (props: any) => {
     const [selectedCheckerUserId, setSelectedCheckerUserId] = useState<string>('');
     const [selectedManagerUserId, setSelectedManagerUserId] = useState<string>('');
     const [selectedPfUserId, setSelectedPfUserId] = useState<string>('');
+    const [sanctionedAmountInr, setSanctionedAmountInr] = useState<string>('');
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -362,6 +363,24 @@ export const Preview = (props: any) => {
                         </CardContent>
                     </Card>
 
+                    {String(prelimApplicationState.prelimApplication.sanctionedAmountInr || '').trim() !== '' && (
+                        <Card sx={{
+                            mb: 4,
+                            borderRadius: '12px',
+                            backgroundColor: 'white',
+                            border: '1px solid rgba(54, 48, 98, 0.1)'
+                        }}>
+                            <CardContent sx={{ p: 3 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#363062', mb: 1 }}>
+                                    PF Sanction Details
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 600 }}>
+                                    Sanctioned Amount (INR): {String(prelimApplicationState.prelimApplication.sanctionedAmountInr)}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    )}
+
                     {hasActionToPerform && (
                         <Card sx={{
                             mb: 4,
@@ -561,6 +580,19 @@ export const Preview = (props: any) => {
                                         </FormControl>
                                     )}
 
+                                    {(usersState.role === 'PENSION_FUND' && statusPrelims === 'MANAGER_FORWARDED_TO_PF' && Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0)) && (
+                                        <TextField
+                                            sx={{ minWidth: 260 }}
+                                            label="Sanctioned Amount (INR)"
+                                            value={sanctionedAmountInr}
+                                            onChange={(e) => setSanctionedAmountInr(e.target.value)}
+                                            placeholder="Enter amount in Rupees"
+                                            type="number"
+                                            inputProps={{ min: 1, step: "0.01" }}
+                                            required
+                                        />
+                                    )}
+
                                     {(usersState.role == 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE')) && (
                                         <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', px: 4, fontWeight: 700, backgroundColor: '#4caf50' }}>
                                             Submit Application
@@ -709,6 +741,27 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
+                                    {(usersState.role === 'MANAGER'
+                                        && statusPrelims === 'APPROVED_BY_PF'
+                                        && Number(prelimApplicationState.prelimApplication.assignedManagerUserId || 0) === Number(usersState.me?.id || 0)) && (
+                                        <Button color='success' id='sanction' onClick={async () => {
+                                            const remark = String(commentPreview || '').trim();
+                                            if (!hasEvidence(remark)) {
+                                                alert("Please provide either a comment or upload a document.");
+                                                return;
+                                            }
+                                            const attachment = await uploadActionFile(Number(id), 'sanction');
+                                            await postWorkflowAction(Number(id), 'sanction', {
+                                                remark,
+                                                attachmentBucket: attachment.attachmentBucket,
+                                                attachmentName: attachment.attachmentName,
+                                            });
+                                            navigate('/home');
+                                        }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                            Mark as Sanctioned
+                                        </Button>
+                                    )}
+
                                     {(usersState.role === 'PENSION_FUND' && statusPrelims === 'MANAGER_FORWARDED_TO_PF' && Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0)) && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                             <Button color='success' id='pf-approve' onClick={async () => {
@@ -717,9 +770,15 @@ export const Preview = (props: any) => {
                                                     alert("Please provide either a comment or upload a document.");
                                                     return;
                                                 }
+                                                const normalizedAmount = String(sanctionedAmountInr || '').trim();
+                                                if (!normalizedAmount || Number(normalizedAmount) <= 0) {
+                                                    alert("Please enter sanctioned amount in Rupees.");
+                                                    return;
+                                                }
                                                 const attachment = await uploadActionFile(Number(id), 'pf-approve');
                                                 await postWorkflowAction(Number(id), 'pf-approve', {
                                                     remark,
+                                                    sanctionedAmountInr: normalizedAmount,
                                                     attachmentBucket: attachment.attachmentBucket,
                                                     attachmentName: attachment.attachmentName,
                                                 });
