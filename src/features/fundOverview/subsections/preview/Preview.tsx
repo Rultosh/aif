@@ -25,7 +25,7 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import FileUploadService from "../../../../components/FileUploadService";
 import { postWorkflowAction } from "../fundOverviewData/fundOverviewDataApi";
-import { fetchCheckerUsers, fetchManagerUsers, fetchPensionFundUsers } from "../fundOverviewData/fundOverviewDataApi";
+import { fetchCheckerUsers, fetchManagerUsers, fetchPensionFundUsers, fetchMakerUsers } from "../fundOverviewData/fundOverviewDataApi";
 
 export const Preview = (props: any) => {
 
@@ -59,6 +59,7 @@ export const Preview = (props: any) => {
         .split(',')
         .map((r) => r.trim().toUpperCase())
         .filter(Boolean);
+    const hasRole = (targetRole: string) => roleParts.includes(targetRole);
     const isOperationalWorkflowUser = roleParts.some((r) =>
         ['MAKER', 'CHECKER', 'MANAGER', 'ADMIN', 'USERADMIN'].includes(r)
     );
@@ -69,10 +70,10 @@ export const Preview = (props: any) => {
     const isOperationalActionable =
         ['ADMIN', 'USERADMIN'].includes(role) &&
         (statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'TEMP_CLOSED');
-    const isMakerActionable = role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER');
-    const isCheckerActionable = role === 'CHECKER' && statusPrelims === 'MEMO_SUBMITTED';
+    const isMakerActionable = hasRole('MAKER') && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER');
+    const isCheckerActionable = hasRole('CHECKER') && (statusPrelims === 'MEMO_SUBMITTED' || statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER');
     const isManagerActionable =
-        role === 'MANAGER' &&
+        hasRole('MANAGER') &&
         (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER');
     const isPfActionable =
         role === 'PENSION_FUND' &&
@@ -103,8 +104,10 @@ export const Preview = (props: any) => {
     const [actionDateError, setActionDateError] = useState<string | undefined>();
     const [actionFile, setActionFile] = useState<File | null>(null);
     const [checkerUsers, setCheckerUsers] = useState<any[]>([]);
+    const [makerUsers, setMakerUsers] = useState<any[]>([]);
     const [managerUsers, setManagerUsers] = useState<any[]>([]);
     const [pfUsers, setPfUsers] = useState<any[]>([]);
+    const [selectedMakerUserId, setSelectedMakerUserId] = useState<string>('');
     const [selectedCheckerUserId, setSelectedCheckerUserId] = useState<string>('');
     const [selectedManagerUserId, setSelectedManagerUserId] = useState<string>('');
     const [selectedPfUserId, setSelectedPfUserId] = useState<string>('');
@@ -145,7 +148,7 @@ export const Preview = (props: any) => {
     useEffect(() => {
         const loadAssignmentUsers = async () => {
             try {
-                if (usersState.role === 'MAKER') {
+                if (hasRole('MAKER')) {
                     const res = await fetchCheckerUsers();
                     const list = res?.data || [];
                     setCheckerUsers(list);
@@ -155,7 +158,15 @@ export const Preview = (props: any) => {
                         setSelectedCheckerUserId(String(list[0].id));
                     }
                 }
-                if (usersState.role === 'CHECKER') {
+                if (hasRole('CHECKER')) {
+                    const makerRes = await fetchMakerUsers();
+                    const makerList = makerRes?.data || [];
+                    setMakerUsers(makerList);
+                    if (prelimApplicationState.prelimApplication.assignedMakerUserId != null) {
+                        setSelectedMakerUserId(String(prelimApplicationState.prelimApplication.assignedMakerUserId));
+                    } else if (makerList.length > 0) {
+                        setSelectedMakerUserId(String(makerList[0].id));
+                    }
                     const res = await fetchManagerUsers();
                     const list = res?.data || [];
                     setManagerUsers(list);
@@ -165,7 +176,7 @@ export const Preview = (props: any) => {
                         setSelectedManagerUserId(String(list[0].id));
                     }
                 }
-                if (usersState.role === 'MANAGER') {
+                if (hasRole('MANAGER')) {
                     const res = await fetchPensionFundUsers();
                     const list = res?.data || [];
                     setPfUsers(list);
@@ -544,7 +555,25 @@ export const Preview = (props: any) => {
                                         </FormControl>
                                     )}
 
-                                    {(usersState.role === 'CHECKER' && statusPrelims === 'MEMO_SUBMITTED') && (
+                                    {(hasRole('CHECKER') && (statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
+                                        <FormControl sx={{ minWidth: 260 }}>
+                                            <InputLabel id="maker-user-label">Select Maker</InputLabel>
+                                            <Select
+                                                labelId="maker-user-label"
+                                                value={selectedMakerUserId}
+                                                label="Select Maker"
+                                                onChange={(e) => setSelectedMakerUserId(String(e.target.value))}
+                                            >
+                                                {makerUsers.map((user) => (
+                                                    <MenuItem key={user.id} value={String(user.id)}>
+                                                        {user.contactPerson || user.username} ({user.username})
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    )}
+
+                                    {(hasRole('CHECKER') && statusPrelims === 'MEMO_SUBMITTED') && (
                                         <FormControl sx={{ minWidth: 260 }}>
                                             <InputLabel id="manager-user-label">Select Manager</InputLabel>
                                             <Select
@@ -657,7 +686,7 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(usersState.role === 'CHECKER' && statusPrelims === 'MEMO_SUBMITTED') && (
+                                    {(hasRole('CHECKER') && statusPrelims === 'MEMO_SUBMITTED') && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                             <Button color='warning' id='revert-to-maker' onClick={async () => {
                                                 const remark = String(commentPreview || '').trim();
@@ -697,6 +726,30 @@ export const Preview = (props: any) => {
                                                 Forward to Manager
                                             </Button>
                                         </Box>
+                                    )}
+
+                                    {(hasRole('CHECKER') && (statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
+                                        <Button color='primary' id='assign-maker' onClick={async () => {
+                                            const remark = String(commentPreview || '').trim();
+                                            if (!hasEvidence(remark)) {
+                                                alert("Please provide either a comment or upload a document.");
+                                                return;
+                                            }
+                                            if (!selectedMakerUserId) {
+                                                alert("Please select a maker.");
+                                                return;
+                                            }
+                                            const attachment = await uploadActionFile(Number(id), 'assign-maker');
+                                            await postWorkflowAction(Number(id), 'assign-maker', {
+                                                makerUserId: Number(selectedMakerUserId),
+                                                remark,
+                                                attachmentBucket: attachment.attachmentBucket,
+                                                attachmentName: attachment.attachmentName,
+                                            });
+                                            navigate('/home');
+                                        }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                            Assign Maker
+                                        </Button>
                                     )}
 
                                     {(usersState.role === 'MANAGER' && (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
