@@ -569,12 +569,12 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                         }}
                     >
                         <CircularProgress color="inherit" size={48} thickness={4} aria-label="Verifying documents" />
-                        <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
+                        {/* <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
                             Verifying mandatory documents…
                         </Typography>
                         <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 440 }}>
                             Checking uploaded files and KMP requirements. This may take a few seconds.
-                        </Typography>
+                        </Typography> */}
                     </Box>
                 </Backdrop>
             </Box>
