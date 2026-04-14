@@ -74,7 +74,7 @@ export const Preview = (props: any) => {
     const isCheckerActionable = hasRole('CHECKER') && (statusPrelims === 'MEMO_SUBMITTED' || statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER');
     const isManagerActionable =
         hasRole('MANAGER') &&
-        (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER');
+        (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER' || statusPrelims === 'APPROVED_BY_PF');
     const isPfActionable =
         role === 'PENSION_FUND' &&
         statusPrelims === 'MANAGER_FORWARDED_TO_PF' &&
