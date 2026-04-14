@@ -121,9 +121,10 @@ const Declaration = (props: any) => {
         return true;
     };
 
-    const kycDocumentBuckets = ["kycBoardDirectors", "boardResolution"];
+    const kycDocumentBuckets = ["kycIndicativeListOfDocuments", "kycAnnexureBoardDirectors", "boardResolution"];
     const kycDocumentLabels: Record<string, string> = {
-        kycBoardDirectors: "Annexure I - Details/KYC documents",
+        kycIndicativeListOfDocuments: "Indicative_List_of_Documents_for_KYC",
+        kycAnnexureBoardDirectors: "Annexure_I_Details_of_Board_of_Directors",
         boardResolution: "Annexure II - KYC form"
     };
 
@@ -396,10 +397,19 @@ const Declaration = (props: any) => {
                                 <Box sx={{ mb: 4 }}>
                                     {[
                                         {
-                                            id: "kycBoardDirectors",
                                             text: "1. Details and KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment Management Team to be provided in the format attached in Annexure I and Annexure II. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address: permanent and correspondent), Two passport size photograph for purpose of KYC.",
                                             templateLabel: "Download Template",
-                                            href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip"
+                                            href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip",
+                                            uploads: [
+                                                {
+                                                    id: "kycIndicativeListOfDocuments",
+                                                    validationTitle: "Indicative_List_of_Documents_for_KYC"
+                                                },
+                                                {
+                                                    id: "kycAnnexureBoardDirectors",
+                                                    validationTitle: "Annexure_I_Details_of_Board_of_Directors"
+                                                }
+                                            ]
                                         },
                                         {
                                             id: "boardResolution",
@@ -430,9 +440,21 @@ const Declaration = (props: any) => {
                                                 >
                                                     {item.templateLabel}
                                                 </Button>}
-                                                <span style={{ marginTop: '10px' }}>
-                                                    <DocumentChip label="Upload Document" validationTitle={item.validationTitle} id={`${item.id}${effectiveId}`} />
-                                                </span>
+                                                {item.uploads?.length ? (
+                                                    item.uploads.map((upload: any) => (
+                                                        <span key={upload.id} style={{ marginTop: '10px' }}>
+                                                            <DocumentChip
+                                                                label={`Upload ${upload.validationTitle}`}
+                                                                validationTitle={upload.validationTitle}
+                                                                id={`${upload.id}${effectiveId}`}
+                                                            />
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <span style={{ marginTop: '10px' }}>
+                                                        <DocumentChip label="Upload Document" validationTitle={item.validationTitle} id={`${item.id}${effectiveId}`} />
+                                                    </span>
+                                                )}
                                             </Box>
                                         </Box>
                                     ))}
