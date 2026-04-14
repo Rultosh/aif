@@ -23,6 +23,8 @@ import { isAllDocsAvailable } from './docsMandateApi'
 import { ModalComponent } from '../../../../components/ModalComponent'
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import FileUploadService from "../../../../components/FileUploadService";
+import { postWorkflowAction } from "../fundOverviewData/fundOverviewDataApi";
 
 export const Preview = (props: any) => {
 
@@ -66,7 +68,10 @@ export const Preview = (props: any) => {
     const isOperationalActionable =
         ['ADMIN', 'USERADMIN'].includes(role) &&
         (statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'TEMP_CLOSED');
-    const hasActionToPerform = isApplicantActionable || isOperationalActionable;
+    const isMakerActionable = role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER');
+    const isCheckerActionable = role === 'CHECKER' && statusPrelims === 'MEMO_SUBMITTED';
+    const isManagerActionable = role === 'MANAGER' && prelimApplicationState.prelimApplication.assignedMakerUserId != null && statusPrelims !== 'SANCTIONED';
+    const hasActionToPerform = isApplicantActionable || isOperationalActionable || isMakerActionable || isCheckerActionable || isManagerActionable;
 
     const handleSuccessDialogClose = () => {
         setShowSuccessDialog(false);
@@ -89,6 +94,7 @@ export const Preview = (props: any) => {
 
     const [actionDate, setActionDate] = useState<Date>(prelimApplicationState.prelimApplication.actionDate || new Date());
     const [actionDateError, setActionDateError] = useState<string | undefined>();
+    const [actionFile, setActionFile] = useState<File | null>(null);
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -138,6 +144,16 @@ export const Preview = (props: any) => {
         }
     }
 
+    const uploadActionFile = async (applicationId: number, action: string) => {
+        if (!actionFile) return {};
+        const bucket = `workflow-action-${applicationId}-${action.toLowerCase()}`;
+        const uploaded = await FileUploadService.upload(bucket, actionFile, false, () => { });
+        const uploadedName = uploaded?.data?.name || actionFile.name;
+        return { attachmentBucket: bucket, attachmentName: uploadedName };
+    };
+
+    const hasEvidence = (comment: string) => comment.length > 0 || actionFile != null;
+
     async function handleClickSave(ev: any, commentOverride?: string) {
 
         setActionDateError(undefined);
@@ -148,10 +164,21 @@ export const Preview = (props: any) => {
             console.log("prelimId", Number(id), "intendedStatus", intendedStatus)
             try {
                 const remarkToSend = (commentOverride ?? String(commentPreview || '')).trim();
+                if (!hasEvidence(remarkToSend)) {
+                    alert("Please provide either a comment or upload a document.");
+                    return;
+                }
+                const attachment = await uploadActionFile(Number(id), String(intendedStatus));
                 await dispatch(
                     createApplicationAsync(
                         wrapArgument(
-                            actionUid, { id: Number(id), statusComments: remarkToSend, status: intendedStatus }
+                            actionUid, {
+                            id: Number(id),
+                            statusComments: remarkToSend,
+                            attachmentBucket: attachment.attachmentBucket,
+                            attachmentName: attachment.attachmentName,
+                            status: intendedStatus
+                        }
                         )
                     )
                 ).unwrap();
@@ -179,13 +206,21 @@ export const Preview = (props: any) => {
         if (actionDate === null || actionDate == undefined) {
             setActionDateError("Please entre an action date.");
         } else {
+            const trimmedComment = String(commentPreview || '').trim();
+            if (!hasEvidence(trimmedComment)) {
+                alert("Please provide either a comment or upload a document.");
+                return;
+            }
+            const attachment = await uploadActionFile(Number(id), String(intendedStatus));
             console.log("prelimId", Number(id))
             dispatch(
                 createApplicationAsync(
                     wrapArgument(
                         actionUid, {
                         id: Number(id),
-                        statusComments: commentPreview,
+                        statusComments: trimmedComment,
+                        attachmentBucket: attachment.attachmentBucket,
+                        attachmentName: attachment.attachmentName,
                         actionDate: actionDate,
                         status: intendedStatus
                     }
@@ -197,7 +232,7 @@ export const Preview = (props: any) => {
     }
 
     const validationSchema = Yup.object().shape({
-        previewComments: Yup.string().required("Comment is required")
+        previewComments: Yup.string().nullable()
     });
 
     const {
@@ -371,6 +406,22 @@ export const Preview = (props: any) => {
                                                 ...fieldSx, mb: 3
                                             }}
                                         />
+                                        <Box sx={{ mb: 3 }}>
+                                            <Button variant="outlined" component="label" sx={{ textTransform: 'none' }}>
+                                                Upload supporting document (optional)
+                                                <input
+                                                    type="file"
+                                                    hidden
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0] || null;
+                                                        setActionFile(file);
+                                                    }}
+                                                />
+                                            </Button>
+                                            <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#64748b' }}>
+                                                {actionFile ? actionFile.name : 'No file selected. Provide comment or upload file.'}
+                                            </Typography>
+                                        </Box>
                                     </>
                                 )}
 
@@ -400,6 +451,81 @@ export const Preview = (props: any) => {
                                     {(usersState.role == 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE')) && (
                                         <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', px: 4, fontWeight: 700, backgroundColor: '#4caf50' }}>
                                             Submit Application
+                                        </Button>
+                                    )}
+
+                                    {(usersState.role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER')) && (
+                                        <Button color='primary' id='memo-submit' onClick={async () => {
+                                            const remark = String(commentPreview || '').trim();
+                                            if (!hasEvidence(remark)) {
+                                                alert("Please provide either a comment or upload a document.");
+                                                return;
+                                            }
+                                            const attachment = await uploadActionFile(Number(id), 'memo-submit');
+                                            await postWorkflowAction(Number(id), 'memo-submit', {
+                                                remark,
+                                                attachmentBucket: attachment.attachmentBucket,
+                                                attachmentName: attachment.attachmentName,
+                                            });
+                                            navigate('/home');
+                                        }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                            Submit Memo
+                                        </Button>
+                                    )}
+
+                                    {(usersState.role === 'CHECKER' && statusPrelims === 'MEMO_SUBMITTED') && (
+                                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                                            <Button color='warning' id='revert-to-maker' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'revert-to-maker');
+                                                await postWorkflowAction(Number(id), 'revert-to-maker', {
+                                                    remark,
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Revert to Maker
+                                            </Button>
+                                            <Button color='success' id='sanction' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'sanction');
+                                                await postWorkflowAction(Number(id), 'sanction', {
+                                                    remark,
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Sanction
+                                            </Button>
+                                        </Box>
+                                    )}
+
+                                    {(usersState.role === 'MANAGER' && prelimApplicationState.prelimApplication.assignedMakerUserId != null) && (
+                                        <Button color='primary' id='manager-reassign' onClick={async () => {
+                                            const remark = String(commentPreview || '').trim();
+                                            if (!hasEvidence(remark)) {
+                                                alert("Please provide either a comment or upload a document.");
+                                                return;
+                                            }
+                                            const attachment = await uploadActionFile(Number(id), 'manager-reassign');
+                                            await postWorkflowAction(Number(id), 'manager-reassign', {
+                                                remark,
+                                                attachmentBucket: attachment.attachmentBucket,
+                                                attachmentName: attachment.attachmentName,
+                                            });
+                                            navigate('/home');
+                                        }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                            Reassign
                                         </Button>
                                     )}
 

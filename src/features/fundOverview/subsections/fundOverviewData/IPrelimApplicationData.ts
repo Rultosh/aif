@@ -273,5 +273,7 @@ export interface IApplicationData {
   id: Number | undefined,
   actionDate?: Date,
   statusComments: String | undefined,
+  attachmentBucket?: String | undefined,
+  attachmentName?: String | undefined,
   status: String | undefined,
 }

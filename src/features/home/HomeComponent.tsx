@@ -73,6 +73,7 @@ export const Home = (pros: any) => {
     const [assignMakerRowId, setAssignMakerRowId] = useState<number | null>(null);
     const [selectedMakerUserId, setSelectedMakerUserId] = useState<string>('');
     const [assignMakerRemark, setAssignMakerRemark] = useState<string>('Assigned maker');
+    const [assignMakerFile, setAssignMakerFile] = useState<File | null>(null);
     const [managerReassignOpen, setManagerReassignOpen] = useState(false);
     const [managerReassignRowId, setManagerReassignRowId] = useState<number | null>(null);
     const [managerSelectedMakerUserId, setManagerSelectedMakerUserId] = useState<string>('');
@@ -251,6 +252,7 @@ export const Home = (pros: any) => {
     const closeAssignMakerDialog = () => {
         setAssignMakerOpen(false);
         setAssignMakerRowId(null);
+        setAssignMakerFile(null);
     };
 
     const openManagerReassignDialog = (row: IPrelimApplicationData) => {
@@ -270,14 +272,29 @@ export const Home = (pros: any) => {
         setManagerReassignMakerOptions([]);
     };
 
-    const submitAssignMaker = () => {
+    const submitAssignMaker = async () => {
         if (!assignMakerRowId || !selectedMakerUserId) {
             return;
+        }
+        const trimmedRemark = (assignMakerRemark || '').trim();
+        if (!trimmedRemark && !assignMakerFile) {
+            alert('Please provide either a comment or upload a document.');
+            return;
+        }
+        let attachmentBucket: string | undefined;
+        let attachmentName: string | undefined;
+        if (assignMakerFile) {
+            const bucket = `workflow-action-${assignMakerRowId}-assign-maker`;
+            const uploaded = await FileUploadService.upload(bucket, assignMakerFile, false, () => { });
+            attachmentBucket = bucket;
+            attachmentName = uploaded?.data?.name || assignMakerFile.name;
         }
         callAndRefresh(
             postWorkflowAction(assignMakerRowId, 'assign-maker', {
                 makerUserId: Number(selectedMakerUserId),
-                remark: assignMakerRemark || 'Assigned maker'
+                remark: trimmedRemark,
+                attachmentBucket,
+                attachmentName,
             })
         );
         closeAssignMakerDialog();
@@ -520,78 +537,6 @@ export const Home = (pros: any) => {
                     }
                     openAssignMakerDialog(row);
                 }}>Assign Maker</Button>
-            );
-        }
-        if (hasActiveRole('MAKER') && (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER')) {
-            return (
-                <Button size="small" variant="outlined" onClick={() => {
-                    if (typeof row.id !== 'number') {
-                        alert('Invalid application id.');
-                        return;
-                    }
-                    openMemoSubmitDialog(row.id);
-                }}>Submit Memo</Button>
-            );
-        }
-        if (hasActiveRole('MAKER') && status === 'MEMO_SUBMITTED') {
-            return (
-                <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                        if (typeof row.id !== 'number') {
-                            alert('Invalid application id.');
-                            return;
-                        }
-                        downloadMemoForApplication(row.id);
-                    }}
-                >
-                    Download Memo
-                </Button>
-            );
-        }
-        if (hasActiveRole('CHECKER') && status === 'MEMO_SUBMITTED') {
-            return (
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button size="small" variant="outlined" onClick={() => {
-                        if (typeof row.id !== 'number') {
-                            alert('Invalid application id.');
-                            return;
-                        }
-                        downloadMemoForApplication(row.id);
-                    }}>Download Memo</Button>
-                    <Button size="small" variant="outlined" color="warning" onClick={() => {
-                        const remark = window.prompt('Revert remarks', 'Reverted to maker') || 'Reverted to maker';
-                        callAndRefresh(postWorkflowAction(row.id, 'revert-to-maker', { remark }));
-                    }}>Revert</Button>
-                    <Button size="small" variant="outlined" color="success" onClick={() => {
-                        const remark = window.prompt('Sanction remarks', 'Sanctioned') || 'Sanctioned';
-                        callAndRefresh(postWorkflowAction(row.id, 'sanction', { remark }));
-                    }}>Sanction</Button>
-                </Box>
-            );
-        }
-        if (hasActiveRole('MANAGER')) {
-            const hasAssignedMaker = row.assignedMakerUserId != null;
-            return (
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button size="small" variant="outlined" onClick={() => {
-                        if (typeof row.id !== 'number') {
-                            alert('Invalid application id.');
-                            return;
-                        }
-                        downloadMemoForApplication(row.id);
-                    }}>Download Memo</Button>
-                    {status !== 'SANCTIONED' && hasAssignedMaker && (
-                        <Button size="small" variant="outlined" onClick={() => {
-                            if (typeof row.id !== 'number') {
-                                alert('Invalid application id.');
-                                return;
-                            }
-                            openManagerReassignDialog(row);
-                        }}>Reassign</Button>
-                    )}
-                </Box>
             );
         }
         return <Typography variant="caption" sx={{ color: '#64748b' }}>-</Typography>;
@@ -951,6 +896,19 @@ export const Home = (pros: any) => {
                                 value={assignMakerRemark}
                                 onChange={(e) => setAssignMakerRemark(e.target.value)}
                             />
+                            <Box sx={{ mt: 2 }}>
+                                <Button variant="outlined" component="label">
+                                    Upload supporting document
+                                    <input
+                                        type="file"
+                                        hidden
+                                        onChange={(e) => setAssignMakerFile(e.target.files?.[0] || null)}
+                                    />
+                                </Button>
+                                <Typography sx={{ mt: 1, fontSize: '13px', color: '#64748b' }}>
+                                    {assignMakerFile ? assignMakerFile.name : 'Optional. Either remark or document is mandatory.'}
+                                </Typography>
+                            </Box>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={closeAssignMakerDialog}>Cancel</Button>

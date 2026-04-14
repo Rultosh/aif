@@ -6,6 +6,9 @@ export interface IHistory extends IEntity {
   createdOn: string | undefined,
   createdByName: string | undefined,
   remarks: string | undefined,
+  attachmentBucket?: string | undefined,
+  attachmentName?: string | undefined,
+  applicantVisible?: boolean | undefined,
   history: string | undefined,
 }
 
@@ -17,5 +20,8 @@ export const defaultIHistory : IHistory = {
   createdOn: undefined,
   createdByName: undefined,
   remarks: undefined,
+  attachmentBucket: undefined,
+  attachmentName: undefined,
+  applicantVisible: undefined,
   history: undefined,
 }

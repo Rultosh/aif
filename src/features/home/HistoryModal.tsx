@@ -41,7 +41,8 @@ export const HistoryModal = (props: any) => {
         // "Stage",
         "Status",
         "Created On",
-        "Remarks"]
+        "Remarks",
+        "Document"]
 
     let headerComponent = []
 
@@ -74,11 +75,22 @@ export const HistoryModal = (props: any) => {
                                     {/* <TableCell align="center">{row.stage}</TableCell> */}
                                     <TableCell align="center">{row.status}</TableCell>
                                     <TableCell align="center">{row.createdOn}</TableCell>
-                                    <TableCell align="center">{row.remarks}</TableCell>
+                                    <TableCell align="center">{row.remarks || '-'}</TableCell>
+                                    <TableCell align="center">
+                                        {row.attachmentBucket && row.attachmentName ? (
+                                            <a
+                                                href={`${process.env.REACT_APP_FILE_SERVER_URL || process.env.REACT_APP_API_BASE_URL}/files/${row.attachmentBucket}/${row.attachmentName}?access_token=${localStorage.getItem('token')}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                View
+                                            </a>
+                                        ) : '-'}
+                                    </TableCell>
                                 </TableRow>
                             )) : <>
                                 <TableRow>
-                                    <TableCell align="center" colSpan={4}>No Rows To Display</TableCell>
+                                    <TableCell align="center" colSpan={5}>No Rows To Display</TableCell>
                                 </TableRow> </>
                             }
                         </TableBody>
