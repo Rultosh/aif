@@ -13,6 +13,7 @@ import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { changeUserPasswordAsync, selectedforgotPassword } from '../forgotPassword/forgotPasswordSlice'
 import { defaultIChangePassword } from './IChangePassword'
 import {ModalComponent} from '../../components/ModalComponent'
+import { isStrongPassword, STRONG_PASSWORD_HELPER_TEXT } from "../../lib/passwordPolicy";
 
 
 const ChangePassword = (props:any) => {
@@ -39,6 +40,10 @@ const ChangePassword = (props:any) => {
         }
         if (String(formData.password) !== String(formData.matchingPassword)) {
             setPasswordError('New Password and Confirm Password should be identical.');
+            return;
+        }
+        if (!isStrongPassword(String(formData.password))) {
+            setPasswordError(STRONG_PASSWORD_HELPER_TEXT);
             return;
         }
         setShowResponse(true)
@@ -205,6 +210,7 @@ const ChangePassword = (props:any) => {
                                                     value={formData["password"] || ''}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
+                                                    helperText={STRONG_PASSWORD_HELPER_TEXT}
                                                 />
                                             </Grid>
 

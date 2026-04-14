@@ -12,6 +12,7 @@ import signupBg from '../../images/signup_ai.jpeg';
 import viewIcon from '../../images/view.svg';
 import hideIcon from '../../images/hide.svg';
 import { defaultIChangePassword } from "../changePassword/IChangePassword";
+import { isStrongPassword, STRONG_PASSWORD_HELPER_TEXT } from "../../lib/passwordPolicy";
 
 const ForgotPassword = () => {
     const fieldSx = {
@@ -57,6 +58,10 @@ const ForgotPassword = () => {
         }
         if (String(formData.password) !== String(formData.matchingPassword)) {
             setPasswordError('New Password and Confirm Password should be identical.');
+            return;
+        }
+        if (!isStrongPassword(String(formData.password))) {
+            setPasswordError(STRONG_PASSWORD_HELPER_TEXT);
             return;
         }
         setIsSubmitting(true);
@@ -203,6 +208,7 @@ const ForgotPassword = () => {
                                                     </InputAdornment>
                                                 ),
                                             }}
+                                            helperText={passwordError ? undefined : STRONG_PASSWORD_HELPER_TEXT}
                                         />
                                     </Grid>
 
