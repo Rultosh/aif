@@ -45,7 +45,7 @@ const Declaration = (props: any) => {
     /** Accordion panels "1"|"2" with document / prelim-id validation issues (mild red shell). */
     const [declarationDocAccordionErrors, setDeclarationDocAccordionErrors] = useState<string[]>([]);
     const [declarationDocsValidating, setDeclarationDocsValidating] = useState(false);
-    const [declarationValidateTitle, setDeclarationValidateTitle] = useState('Validating…');
+    // const [declarationValidateTitle, setDeclarationValidateTitle] = useState('');
     /** Single mellow info toast for mandatory uploads or declaration checkbox reminder. */
     const [declarationSoftToastMessage, setDeclarationSoftToastMessage] = useState<string | null>(null);
     /** True after user tries “Save & Continue to Preview” without accepting; cleared when they accept. */
@@ -133,7 +133,7 @@ const Declaration = (props: any) => {
         }
 
         if (currentPanel === "1") {
-            setDeclarationValidateTitle('Validating KYC…');
+            // setDeclarationValidateTitle('Validating KYC…');
             setDeclarationDocsValidating(true);
             try {
                 const ok = await validateRequiredDocuments(kycDocumentBuckets);
@@ -148,7 +148,7 @@ const Declaration = (props: any) => {
         }
 
         if (currentPanel === "2") {
-            setDeclarationValidateTitle('Validating supporting documents…');
+            // setDeclarationValidateTitle('Validating supporting documents…');
             setDeclarationDocsValidating(true);
             try {
                 const ok = await validateRequiredDocuments(supportingDocumentBuckets);
@@ -180,7 +180,7 @@ const Declaration = (props: any) => {
                         setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '1', '2'])));
                         return;
                     }
-                    setDeclarationValidateTitle('Validating KYC and supporting documents…');
+                    // setDeclarationValidateTitle('Validating KYC and supporting documents…');
                     setDeclarationDocsValidating(true);
                     try {
                         const kycOk = await checkBucketsUploaded(kycDocumentBuckets);
@@ -790,12 +790,12 @@ const Declaration = (props: any) => {
                         }}
                     >
                         <CircularProgress color="inherit" size={48} thickness={4} />
-                        <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
+                        {/* <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
                             {declarationValidateTitle}
                         </Typography>
                         <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 420 }}>
                             Please wait while we verify your uploads in the background.
-                        </Typography>
+                        </Typography> */}
                     </Box>
                 </Backdrop>
             </div>

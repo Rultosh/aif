@@ -1041,7 +1041,7 @@ export const Home = (pros: any) => {
                         <DialogTitle>Confirm Start Application</DialogTitle>
                         <DialogContent>
                             <Typography sx={{ mt: 1 }}>
-                                Kindly review the eligibility criteria provided on the website prior to initiating the application.
+                            Kindly check the FAQs and review the eligibility criteria provided on the website prior to initiating the application.
                             </Typography>
                             <Link
                                 href={
@@ -1060,7 +1060,7 @@ export const Home = (pros: any) => {
                                     '&:hover': { textDecoration: 'underline' },
                                 }}
                             >
-                                View eligibility criteria
+                                Review eligibility criteria
                             </Link>
                         </DialogContent>
                         <DialogActions>

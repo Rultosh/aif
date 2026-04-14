@@ -48,6 +48,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const resolvedPrelimId = Number(prelimAppicationId || id);
 
     const MIN_DATE = dayjs("2020-01-01");
+    const MAX_DATE = dayjs();
 
     const dispatch = useAppDispatch()
 
@@ -973,7 +974,10 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                         inputFormat="DD/MM/YYYY"
                                         disableFuture
                                         minDate={MIN_DATE}
-                                        shouldDisableDate={(d) => dayjs(d).isBefore(MIN_DATE, 'day')}
+                                        maxDate={MAX_DATE}
+                                        shouldDisableDate={(d) =>
+                                            dayjs(d).isBefore(MIN_DATE, 'day') || dayjs(d).isAfter(MAX_DATE, 'day')
+                                        }
                                         value={field.value || null}
                                         onChange={(newValue: Dayjs | null) => {
                                             field.onChange(newValue);

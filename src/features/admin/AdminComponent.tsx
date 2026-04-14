@@ -77,7 +77,7 @@ const Admin = (props: any) => {
 
     };
 
-    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Email OTP", "Approve", "Assign Manager", "Set Password Email", "Delete"]
+    const adminHeaders = ["Id", "UserName", "Company Name", "Sebi Registration", "Sebi Registration Date", "Contact Person", "Phone Number", "Title", "State", "City", "Address", "Role", "Date of Registration", "Timestamp", "Email OTP", "Approve", "Assign Manager", "Set Password Email", "Delete"]
     const handleDeleteUser = (row: IUser) => {
         if (row.id == null) {
             return;
@@ -92,7 +92,20 @@ const Admin = (props: any) => {
     }
 
 
-    let adminHeaderComponent = []
+    const sortByRegisteredOnAsc = (users: IUser[]) => [...users].sort((a, b) => {
+        const aTime = a.registeredOn ? dayjs(a.registeredOn).valueOf() : 0;
+        const bTime = b.registeredOn ? dayjs(b.registeredOn).valueOf() : 0;
+        return aTime - bTime;
+    });
+
+    const pendingUsers = sortByRegisteredOnAsc(
+        usersState.users.filter((user) => String(user.role || "").toUpperCase() === "REGISTERED")
+    );
+    const approvedUsers = sortByRegisteredOnAsc(
+        usersState.users.filter((user) => String(user.role || "").toUpperCase() !== "REGISTERED")
+    );
+
+    const adminHeaderComponent: React.ReactNode[] = []
 
     for (let i = 0; i < adminHeaders.length; i++) {
         adminHeaderComponent.push(
@@ -101,6 +114,108 @@ const Admin = (props: any) => {
             </React.Fragment>)
     }
 
+
+    const renderUserRows = (users: IUser[]) => (
+        users.map((row) => {
+            return <TableRow key={`${row.id}`}>
+                <TableCell align="center">{row.id}</TableCell>
+                <TableCell align="center">{row.username}</TableCell>
+                <TableCell align="center">{row.companyName}</TableCell>
+                <TableCell align="center">{row.sebiRegistration}</TableCell>
+                <TableCell align="center">{row.sebiRegistrationDate && dayjs(row.sebiRegistrationDate).format("DD/MM/YYYY")}</TableCell>
+                <TableCell align="center">{row.contactPerson}</TableCell>
+                <TableCell align="center">{row.phoneNumber}</TableCell>
+                <TableCell align="center">{row.title}</TableCell>
+                <TableCell align="center">{row.state}</TableCell>
+                <TableCell align="center">{row.city}</TableCell>
+                <TableCell align="center">{row.address}</TableCell>
+                <TableCell align="center">{row.role}</TableCell>
+                <TableCell align="center">{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY")}</TableCell>
+                <TableCell align="center">{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY HH:mm:ss")}</TableCell>
+                <TableCell align="center">
+                    <Tooltip title="Require email OTP at login (only when MFA is enabled on the server)">
+                        <FormControlLabel
+                            sx={{ m: 0, justifyContent: 'center' }}
+                            control={
+                                <Switch
+                                    size="small"
+                                    checked={!!row.otpRequired}
+                                    onChange={(_, checked) => {
+                                        if (row.id != null) {
+                                            dispatch(updateUserOtpRequiredAsync(
+                                                wrapArgument(actionUid, { id: Number(row.id), otpRequired: checked })
+                                            ));
+                                        }
+                                    }}
+                                    color="primary"
+                                />
+                            }
+                            label=""
+                            labelPlacement="end"
+                        />
+                    </Tooltip>
+                </TableCell>
+                <TableCell align="center">
+                    <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} />
+                </TableCell>
+                <TableCell align="center">
+                    {row.role === 'CHECKER' ? (
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={async () => {
+                                if (row.id == null) return;
+                                try {
+                                    await assignManagerRole(Number(row.id));
+                                    dispatch(fetchUsersAsync(wrapArgument(actionUid, props.prelimApplicationId)));
+                                } catch (e: any) {
+                                    alert(e?.response?.data || e?.message || 'Failed to assign manager role');
+                                }
+                            }}
+                        >
+                            Promote
+                        </Button>
+                    ) : <></>}
+                </TableCell>
+                <TableCell align="center">
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={async () => {
+                            if (row.id == null) return;
+                            try {
+                                await sendSetPasswordEmail(Number(row.id));
+                                alert(`Set password email sent to ${row.username}`);
+                            } catch (e: any) {
+                                alert(e?.response?.data || e?.message || 'Failed to send set password email');
+                            }
+                        }}
+                    >
+                        Send
+                    </Button>
+                </TableCell>
+                <TableCell align="center">
+                    <Delete sx={{ cursor: 'pointer', color: '#d32f2f' }} onClick={() => handleDeleteUser(row)} />
+                </TableCell>
+
+            </TableRow>
+        })
+    );
+
+    const renderUsersTable = (users: IUser[]) => (
+        <TableContainer component={Paper} sx={{ maxHeight: 260, mb: 3 }}>
+            <Table sx={{ minWidth: 700, mb: 1 }} aria-label="customized table">
+                <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
+                    <TableRow sx={{ backgroundColor: '#34344b' }}>
+                        {adminHeaderComponent}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {renderUserRows(users)}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
 
     return (
         <div className="homeComp" style={{ height: 670 }}>
@@ -113,102 +228,14 @@ const Admin = (props: any) => {
                                 Add Operational User
                             </Button>
                         </Box>
-                        <TableContainer component={Paper} sx={{ maxHeight: 540 }}>
-                            <Table sx={{ minWidth: 700, mb: 1 }} aria-label="customized table">
-                                <TableHead sx={{ backgroundColor: '#f2f2f2' }}>
-                                    <TableRow sx={{ backgroundColor: '#34344b' }}>
-                                        {adminHeaderComponent}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {
-                                        usersState.users.map((row) => {
-                                            return <TableRow key={`${row.id}`}>
-                                                <TableCell align="center">{row.id}</TableCell>
-                                                <TableCell align="center">{row.username}</TableCell>
-                                                <TableCell align="center">{row.companyName}</TableCell>
-                                                <TableCell align="center">{row.sebiRegistration}</TableCell>
-                                                <TableCell align="center">{row.sebiRegistrationDate && dayjs(row.sebiRegistrationDate).format("DD/MM/YYYY")}</TableCell>
-                                                <TableCell align="center">{row.contactPerson}</TableCell>
-                                                <TableCell align="center">{row.phoneNumber}</TableCell>
-                                                <TableCell align="center">{row.title}</TableCell>
-                                                <TableCell align="center">{row.state}</TableCell>
-                                                <TableCell align="center">{row.city}</TableCell>
-                                                <TableCell align="center">{row.address}</TableCell>
-                                                <TableCell align="center">{row.role}</TableCell>
-                                                <TableCell align="center">{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY")}</TableCell>
-                                                <TableCell align="center">
-                                                    <Tooltip title="Require email OTP at login (only when MFA is enabled on the server)">
-                                                        <FormControlLabel
-                                                            sx={{ m: 0, justifyContent: 'center' }}
-                                                            control={
-                                                                <Switch
-                                                                    size="small"
-                                                                    checked={!!row.otpRequired}
-                                                                    onChange={(_, checked) => {
-                                                                        if (row.id != null) {
-                                                                            dispatch(updateUserOtpRequiredAsync(
-                                                                                wrapArgument(actionUid, { id: Number(row.id), otpRequired: checked })
-                                                                            ));
-                                                                        }
-                                                                    }}
-                                                                    color="primary"
-                                                                />
-                                                            }
-                                                            label=""
-                                                            labelPlacement="end"
-                                                        />
-                                                    </Tooltip>
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <Edit sx={{ cursor: 'pointer' }} onClick={() => handleOpen(row)} />
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    {row.role === 'CHECKER' ? (
-                                                        <Button
-                                                            size="small"
-                                                            variant="outlined"
-                                                            onClick={async () => {
-                                                                if (row.id == null) return;
-                                                                try {
-                                                                    await assignManagerRole(Number(row.id));
-                                                                    dispatch(fetchUsersAsync(wrapArgument(actionUid, props.prelimApplicationId)));
-                                                                } catch (e: any) {
-                                                                    alert(e?.response?.data || e?.message || 'Failed to assign manager role');
-                                                                }
-                                                            }}
-                                                        >
-                                                            Promote
-                                                        </Button>
-                                                    ) : <></>}
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <Button
-                                                        size="small"
-                                                        variant="outlined"
-                                                        onClick={async () => {
-                                                            if (row.id == null) return;
-                                                            try {
-                                                                await sendSetPasswordEmail(Number(row.id));
-                                                                alert(`Set password email sent to ${row.username}`);
-                                                            } catch (e: any) {
-                                                                alert(e?.response?.data || e?.message || 'Failed to send set password email');
-                                                            }
-                                                        }}
-                                                    >
-                                                        Send
-                                                    </Button>
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <Delete sx={{ cursor: 'pointer', color: '#d32f2f' }} onClick={() => handleDeleteUser(row)} />
-                                                </TableCell>
-                                                
-                                            </TableRow>
-                                        })
-                                    }
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        <Typography variant="h6" sx={{ px: 2, pt: 1, pb: 1 }}>
+                            Pending Approval Users ({pendingUsers.length})
+                        </Typography>
+                        {renderUsersTable(pendingUsers)}
+                        <Typography variant="h6" sx={{ px: 2, pt: 1, pb: 1 }}>
+                            Approved Users ({approvedUsers.length})
+                        </Typography>
+                        {renderUsersTable(approvedUsers)}
                         {open ? <RoleComponent open={open} userDetails = {selectedRow} handleClose={handleClose}></RoleComponent> : <></>}
                         <AddOperationalUserModal
                             open={openAddOperational}

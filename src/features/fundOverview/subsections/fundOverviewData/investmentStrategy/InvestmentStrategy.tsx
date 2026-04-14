@@ -177,7 +177,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         if (!hasDocument) {
             setRiskAssessmentDocMissing(true);
             if (!silent) {
-                setDocumentError("Risk Assessment and Mitigation Plan document is required.");
+                setDocumentError("Risk Assessment and Mitigation Plan document is mandatory.");
             } else {
                 setDocumentError('');
             }

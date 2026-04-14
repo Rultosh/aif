@@ -1155,12 +1155,12 @@ export const Fund = (props: any) => {
                     }}
                 >
                     <CircularProgress color="inherit" size={48} thickness={4} />
-                    <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 360 }}>
+                    {/* <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 360 }}>
                         Validating fund sections…
                     </Typography>
                     <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 400 }}>
                         Please wait while we validate your entries and mandatory document uploads in the background.
-                    </Typography>
+                    </Typography> */}
                 </Box>
             </Backdrop>
 

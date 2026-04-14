@@ -67,7 +67,7 @@ export const QueryResolutionModal = (props: any) => {
     >
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-            <Typography variant="subtitle1" sx={{ flex: 1,fontWeight: 'bolder', color: '#363062', mb: 2 }}>{"To: " +  (usersState.role === 'ADMIN' ? props?.prelimDetails?.createdByName || "User" : 'VCF ADMIN')}</Typography>
+            <Typography variant="subtitle1" sx={{ flex: 1,fontWeight: 'bolder', color: '#363062', mb: 2 }}>{"To: " +  (usersState.role === 'ADMIN' ? props?.prelimDetails?.createdByName || "User" : 'AIF ADMIN')}</Typography>
             <Divider sx={{ mb: 2 }} />
                 <Card sx={{ display: 'flex', background: '#f2f2f2' }}>
                     
