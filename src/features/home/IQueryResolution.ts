@@ -7,6 +7,8 @@ export interface IQueryResolution extends IEntity {
   updatedBy: string | undefined,
   updatedOn: string | undefined,
   query: string | undefined,
+  attachmentBucket?: string | undefined,
+  attachmentName?: string | undefined,
   
   
 }
@@ -20,4 +22,6 @@ export const defaultIQueryResolution : IQueryResolution = {
   updatedBy: undefined,
   updatedOn: undefined,
   query: undefined,
+  attachmentBucket: undefined,
+  attachmentName: undefined,
 }

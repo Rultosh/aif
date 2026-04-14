@@ -5,7 +5,11 @@ import { IQueryResolution } from "./IQueryResolution";
 export function postQuery(queryDetails:IQueryResolution) {
   return api({
     method: 'post',
-    data: {query:queryDetails.query},
+    data: {
+      query: queryDetails.query,
+      attachmentBucket: queryDetails.attachmentBucket,
+      attachmentName: queryDetails.attachmentName,
+    },
     url: `api/prelims/${queryDetails.id}/queries`
   });
 }

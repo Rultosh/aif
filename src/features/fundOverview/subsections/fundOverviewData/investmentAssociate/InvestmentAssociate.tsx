@@ -274,12 +274,12 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
                 }}
             >
                 <CircularProgress color="inherit" size={48} thickness={4} aria-label="Verifying document uploads" />
-                <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
+                {/* <Typography variant="h6" component="p" sx={{ fontWeight: 600, maxWidth: 400 }}>
                     Verifying mandatory documents…
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.88, maxWidth: 440 }}>
                     Checking resume/CV uploads for each non-KMP team member.
-                </Typography>
+                </Typography> */}
             </Box>
         </Backdrop>
         <Snackbar

@@ -858,7 +858,7 @@ export const Home = (pros: any) => {
                     </Paper>
                     {openQueryModal ? <QueryResolutionModal
                         isActive={openQueryModal}
-                        open={() => openModel(selectedRow)}
+                        open={openQueryModal}
                         close={closeModel}
                         prelimDetails={selectedRow}
                     ></QueryResolutionModal>
@@ -866,7 +866,7 @@ export const Home = (pros: any) => {
 
                     {openHistoryModal ? <HistoryModal
                         isActive={openHistoryModal}
-                        open={() => openModelHistory(selectedRowHistory)}
+                        open={openHistoryModal}
                         close={closeModelHistory}
                         prelimDetails={selectedRowHistory}
                     ></HistoryModal>

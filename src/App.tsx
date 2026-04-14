@@ -91,7 +91,16 @@ function App() {
   const THEME = createTheme({
     typography: {
       "fontFamily": "'Poppins', sans-serif",
-    }
+    },
+    components: {
+      MuiInputBase: {
+        defaultProps: {
+          inputProps: {
+            autoComplete: 'off',
+          },
+        },
+      },
+    },
   });
   const navigate = useNavigate();
   const location = useLocation();

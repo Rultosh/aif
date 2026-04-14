@@ -25,7 +25,6 @@ const initialState: InitialState = {
 export const fetchQuriesAsync = createAsyncThunk(
   'fetchQuriesAsync/getAll',
   async (args: ActionWrapper<string | undefined>, {rejectWithValue}) => { 
-    console.log("fetchQuriesAsync called...")
     try {
       if(args.argument) {
         const response = await getQuery(args.argument);
@@ -43,7 +42,6 @@ export const fetchQuriesAsync = createAsyncThunk(
 export const postQuriesAsync = createAsyncThunk(
   'postQuriesAsync/create',
   async (args: ActionWrapper<IQueryResolution>, {rejectWithValue}) => { 
-    console.log("fetchContributorDetailsAsync called...")
     try {
       if(args.argument) {
         const response = await postQuery(args.argument);
