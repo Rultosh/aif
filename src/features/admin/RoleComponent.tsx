@@ -18,7 +18,7 @@ const RoleComponent = (props: any) => {
     const [data, setData] = useState(userDetails || {} as IUser)
     const currentRole = String(userDetails?.role || "").toUpperCase();
     const isRegistered = currentRole === "REGISTERED";
-    const roles = ['USER', 'USERADMIN', 'CHECKER', 'MAKER', 'MANAGER', 'CHECKER,MANAGER', 'CLOSED', 'ADMIN'];
+    const roles = ['USER', 'PENSION_FUND', 'USERADMIN', 'CHECKER', 'MAKER', 'MANAGER', 'CHECKER,MANAGER', 'CLOSED', 'ADMIN'];
     const [selectedRole, setSelectedRole] = useState<string>(currentRole || roles[0]);
 
     const style = {

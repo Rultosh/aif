@@ -119,7 +119,7 @@ export const Home = (pros: any) => {
                 ? prelimApplications.prelimApplications
                 : initialAssessmentList;
         const normalizedRole = String(activeRole || '').toUpperCase();
-        const isPfUser = normalizedRole === 'USER'
+        const isPfUser = normalizedRole === 'PENSION_FUND'
             && (prelimApplications.prelimApplications || []).some(
                 (r) => Number(r.assignedPfUserId || 0) === Number(usersState.me?.id || 0)
             );
@@ -163,7 +163,7 @@ export const Home = (pros: any) => {
         const rows = prelimApplications.prelimApplications || [];
         const normalizedRole = String(activeRole || '').toUpperCase();
         const pfRows = rows.filter((r) => Number(r.assignedPfUserId || 0) === Number(usersState.me?.id || 0));
-        const isPfUser = normalizedRole === 'USER' && pfRows.length > 0;
+        const isPfUser = normalizedRole === 'PENSION_FUND' && pfRows.length > 0;
         const base = [{ id: 'all', label: 'All', count: rows.length }];
         if (normalizedRole === 'MAKER') {
             const assigned = rows.filter((r) => ['MAKER_ASSIGNED', 'REVERTED_TO_MAKER', 'REVERTED_TO_MANAGER'].includes(String(r.status || '').toUpperCase())).length;
@@ -471,25 +471,25 @@ export const Home = (pros: any) => {
         "Fund Name",
         "Contact Person",
         "Status",
+        "Pending With (Email ID)",
         "Start Date",
         "Target Corpus",
         "Contribution",
         "Download",
         "Query",
         "History",
-        "Progress",
     ];
     const tableHeadersInitialAssessment = [
         "Fund Name",
         "Contact Person",
         "Status",
+        "Pending With (Email ID)",
         "Application created",
         "Target Corpus",
         "Contribution",
         "Avg score",
         "Query",
         "History",
-        "Progress",
     ];
     const tableHeaders = homeWorkflowTab === 1 ? tableHeadersInitialAssessment : tableHeadersWorkflow;
     const tableColumnCount = tableHeaders.length;
@@ -541,7 +541,7 @@ export const Home = (pros: any) => {
             && (role == 'CHECKER' || role == 'MAKER' || role == 'MANAGER'))
             return true
         if ((row.status === 'MANAGER_FORWARDED_TO_PF' || row.status === 'APPROVED_BY_PF' || row.status === 'REJECTED_BY_PF')
-            && role == 'USER'
+            && role == 'PENSION_FUND'
             && Number(row.assignedPfUserId || 0) === Number(usersState.me?.id || 0))
             return true
         return false
@@ -641,20 +641,42 @@ export const Home = (pros: any) => {
         }
     };
 
-    const workflowActionsForRow = (row: IPrelimApplicationData) => {
+    const getUserEmailById = (userId?: Number) => {
+        if (userId == null) return '';
+        const matchedUser = (usersState.users || []).find((user) => Number(user.id || 0) === Number(userId || 0));
+        return String(matchedUser?.username || '').trim();
+    };
+
+    const getPendingWithEmail = (row: IPrelimApplicationData) => {
         const status = String(row.status || '').toUpperCase();
-        if (hasActiveRole('CHECKER') && (status === 'SUBMITTED' || status === 'REVERTED_TO_MANAGER')) {
-            return (
-                <Button size="small" variant="outlined" onClick={() => {
-                    if (typeof row.id !== 'number') {
-                        alert('Invalid application id.');
-                        return;
-                    }
-                    openAssignMakerDialog(row);
-                }}>Assign Maker</Button>
-            );
+        const applicantEmail = getUserEmailById(row.createdBy) || String(row.createdByName || '').trim();
+        const makerEmail = getUserEmailById(row.assignedMakerUserId);
+        const checkerEmail = getUserEmailById(row.assignedCheckerUserId);
+        const managerEmail = getUserEmailById(row.assignedManagerUserId);
+        const pfEmail = getUserEmailById(row.assignedPfUserId);
+
+        if (status === 'CREATED' || status === 'REVISE' || status === 'REVERTED_TO_APPLICANT') {
+            return applicantEmail || '-';
         }
-        return <Typography variant="caption" sx={{ color: '#64748b' }}>-</Typography>;
+        if (status === 'SUBMITTED' || status === 'MEMO_SUBMITTED') {
+            return checkerEmail || '-';
+        }
+        if (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER') {
+            return makerEmail || '-';
+        }
+        if (status === 'CHECKER_FORWARDED_TO_MANAGER' || status === 'REVERTED_TO_MANAGER') {
+            return managerEmail || '-';
+        }
+        if (status === 'MANAGER_FORWARDED_TO_PF') {
+            return pfEmail || '-';
+        }
+        if (status === 'APPROVED_BY_PF' || status === 'REJECTED_BY_PF') {
+            return managerEmail || '-';
+        }
+        if (status === 'SANCTIONED') {
+            return applicantEmail || '-';
+        }
+        return '-';
     };
 
     const showListPaginationFooter = shouldShowListPaginationFooter({
@@ -864,6 +886,9 @@ export const Home = (pros: any) => {
                                                     )}
                                                 </TableCell>
                                                 <TableCell align="left" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
+                                                <TableCell align="left" sx={{ color: '#1e293b' }}>
+                                                    {getPendingWithEmail(row)}
+                                                </TableCell>
                                                 <TableCell align="left" sx={{ color: '#64748b', width: '20%' }}>
                                                     {isInitialTab
                                                         ? (row.createdOn
@@ -902,11 +927,6 @@ export const Home = (pros: any) => {
                                                     <IconButton size="small" sx={{ p: '2px', color: '#37c5ab', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => openModelHistory(row)}>
                                                         <HistoryCustomIcon style={{ width: '22px', height: '20px', fill: 'currentColor' }} />
                                                     </IconButton>
-                                                </TableCell>
-                                                <TableCell align="left">
-                                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                                        {workflowActionsForRow(row)}
-                                                    </Box>
                                                 </TableCell>
                                             </TableRow>
                                         }) : <TableRow><TableCell colSpan={tableColumnCount} align="center" sx={{ py: 3 }}>No applications found matching your search criteria</TableCell></TableRow>

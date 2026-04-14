@@ -115,7 +115,7 @@ export const FundOverview = (props: any) => {
         { label: 'Preview', path: 'preview' },
     ];
 
-    const filteredSteps = ['USERADMIN', 'ADMIN'].includes(usersState.role || '')
+    const filteredSteps = ['USERADMIN', 'ADMIN', 'PENSION_FUND'].includes(usersState.role || '')
         ? allSteps.filter(s => s.path === 'preview')
         : allSteps;
 
@@ -137,12 +137,16 @@ export const FundOverview = (props: any) => {
         statusPrelims !== undefined &&
         String(statusPrelims) === 'CREATED';
 
+    const pfCannotAccessPreliminary =
+        usersState.role === 'PENSION_FUND' &&
+        !pathname.toLowerCase().includes('preview');
+
     const applicationNotFound =
         !isNewApplicationRoute &&
         prelimApplicationState.status.fetchStatus === FetchStatus.FAILED &&
         prelimApplicationState.status.responseCode === ResponseCode.NOT_FOUND;
 
-    const isRestricted = applicationNotFound || adminCannotAccessPreliminary || userCannotAccessPreliminary;
+    const isRestricted = applicationNotFound || adminCannotAccessPreliminary || userCannotAccessPreliminary || pfCannotAccessPreliminary;
 
     // const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 

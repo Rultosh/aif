@@ -75,7 +75,7 @@ export const Preview = (props: any) => {
         role === 'MANAGER' &&
         (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER');
     const isPfActionable =
-        role === 'USER' &&
+        role === 'PENSION_FUND' &&
         statusPrelims === 'MANAGER_FORWARDED_TO_PF' &&
         Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0);
     const hasActionToPerform = isApplicantActionable || isOperationalActionable || isMakerActionable || isCheckerActionable || isManagerActionable || isPfActionable;
@@ -709,7 +709,7 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(usersState.role === 'USER' && statusPrelims === 'MANAGER_FORWARDED_TO_PF' && Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0)) && (
+                                    {(usersState.role === 'PENSION_FUND' && statusPrelims === 'MANAGER_FORWARDED_TO_PF' && Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0)) && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                             <Button color='success' id='pf-approve' onClick={async () => {
                                                 const remark = String(commentPreview || '').trim();
