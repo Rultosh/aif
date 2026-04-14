@@ -43,7 +43,7 @@ import { ReactComponent as HistoryCustomIcon } from '../../images/history.svg';
 import { ReactComponent as SettingCustomIcon } from '../../images/setting.svg';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { fetchMakerUsers, postWorkflowAction, fetchPrelimsInitialAssessmentOnly } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
+import { fetchMakerUsers, fetchCheckerUsers, fetchManagerUsers, fetchPensionFundUsers, postWorkflowAction, fetchPrelimsInitialAssessmentOnly } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
 import FileUploadService from '../../components/FileUploadService';
 import { shouldShowListPaginationFooter } from '../../lib/listPaginationVisibility';
 
@@ -80,6 +80,7 @@ export const Home = (pros: any) => {
     const [managerReassignRemark, setManagerReassignRemark] = useState<string>('Reassigned by manager');
     const [managerReassignMakerOptions, setManagerReassignMakerOptions] = useState<IUser[]>([]);
     const [makerUsers, setMakerUsers] = useState<IUser[]>([]);
+    const [assigneeEmailsById, setAssigneeEmailsById] = useState<Record<number, string>>({});
     const [memoSubmitOpen, setMemoSubmitOpen] = useState(false);
     const [memoSubmitRowId, setMemoSubmitRowId] = useState<number | null>(null);
     const [memoSubmitRemark, setMemoSubmitRemark] = useState<string>('Memo submitted');
@@ -286,6 +287,37 @@ export const Home = (pros: any) => {
         };
         loadMakers();
     }, [activeRole]);
+
+    useEffect(() => {
+        const loadAssigneeEmails = async () => {
+            try {
+                const [makersRes, checkersRes, managersRes, pfUsersRes] = await Promise.all([
+                    fetchMakerUsers(),
+                    fetchCheckerUsers(),
+                    fetchManagerUsers(),
+                    fetchPensionFundUsers(),
+                ]);
+                const allUsers: IUser[] = [
+                    ...(makersRes?.data || []),
+                    ...(checkersRes?.data || []),
+                    ...(managersRes?.data || []),
+                    ...(pfUsersRes?.data || []),
+                ];
+                const mergedMap = allUsers.reduce((acc, user) => {
+                    const id = Number(user.id || 0);
+                    const username = String(user.username || '').trim();
+                    if (id > 0 && username) {
+                        acc[id] = username;
+                    }
+                    return acc;
+                }, {} as Record<number, string>);
+                setAssigneeEmailsById(mergedMap);
+            } catch {
+                setAssigneeEmailsById({});
+            }
+        };
+        void loadAssigneeEmails();
+    }, []);
 
     useEffect(() => {
         if (!showInitialAssessmentTab || homeWorkflowTab !== 1) {
@@ -643,11 +675,19 @@ export const Home = (pros: any) => {
 
     const getUserEmailById = (userId?: Number) => {
         if (userId == null) return '';
+        const fromAssigneeMap = assigneeEmailsById[Number(userId || 0)];
+        if (fromAssigneeMap) {
+            return fromAssigneeMap;
+        }
         const matchedUser = (usersState.users || []).find((user) => Number(user.id || 0) === Number(userId || 0));
         return String(matchedUser?.username || '').trim();
     };
 
     const getPendingWithEmail = (row: IPrelimApplicationData) => {
+        const backendPendingWith = String(row.pendingWithEmail || '').trim();
+        if (backendPendingWith) {
+            return backendPendingWith;
+        }
         const status = String(row.status || '').toUpperCase();
         const applicantEmail = getUserEmailById(row.createdBy) || String(row.createdByName || '').trim();
         const makerEmail = getUserEmailById(row.assignedMakerUserId);

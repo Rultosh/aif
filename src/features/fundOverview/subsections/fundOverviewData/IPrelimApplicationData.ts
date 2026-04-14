@@ -136,6 +136,8 @@ export interface IPrelimApplicationData {
   initialAssessmentLinked?: boolean | undefined,
   /** Fund name from registration: `vcf_users.company_name` (API-enriched on prelim list/get). */
   registrationAifName?: string | undefined,
+  /** Email id of the user currently responsible for this application (API-enriched). */
+  pendingWithEmail?: string | undefined,
 }
 
 export const defaultIPrelimApplicationData: IPrelimApplicationData = {
@@ -271,6 +273,7 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   initialSelfRatingScore: undefined,
   initialAssessmentLinked: undefined,
   registrationAifName: undefined,
+  pendingWithEmail: undefined,
 }
 
 export interface IApplicationData {
