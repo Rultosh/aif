@@ -10,6 +10,7 @@ import React, * as Rect from 'react'
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks'
 import { defaultIISelfRating, ISelfRating } from "./ISelfRating";
 import { selectSelfRatings, fetchSelfRatingAsync, createSelfRatingAsync, updateSelfRatingAsync, createIndependentSelfRatingAsync } from "./selfRatingSlice";
+import { reportSelfRatingSubmissionOutcome } from "./selfRatingApi";
 import { wrapArgument } from "../../../../lib/api-status/actionWrapper";
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
@@ -381,11 +382,21 @@ export const SelfRating = (props: any) => {
             await handleClickSave();
             const currentScore = Number(selfRatingValue.score || 0);
             const averageScore = (currentScore / selfQuestions.length);
+            const notifyOutcome = async (failed: boolean) => {
+                if (!Number(id)) return;
+                try {
+                    await reportSelfRatingSubmissionOutcome(Number(id), failed);
+                } catch {
+                    // Non-blocking: IA result modal should still be shown even if telemetry call fails.
+                }
+            };
             // alert(averageScore)
             if (averageScore >= 5) {
+                await notifyOutcome(false);
                 setModalType('success');
                 setIsSubmitted(true);
             } else {
+                await notifyOutcome(true);
                 setModalType('fail');
                 setIsSubmitted(false);
             }

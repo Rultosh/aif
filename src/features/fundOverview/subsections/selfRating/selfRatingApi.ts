@@ -39,3 +39,11 @@ export function deleteSelfRating(selfRating:ISelfRating) {
   });
 }
 
+export function reportSelfRatingSubmissionOutcome(prelimAppId: Number, failed: boolean) {
+  return api({
+    method: 'post',
+    data: { failed },
+    url: `api/prelims/${prelimAppId}/selfRatings/submissionOutcome`
+  });
+}
+

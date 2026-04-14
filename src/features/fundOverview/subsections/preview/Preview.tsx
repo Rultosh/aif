@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup, TextField, Dialog, DialogContent, Zoom } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup, TextField, Dialog, DialogContent, Zoom, InputLabel, Select, MenuItem } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
@@ -25,6 +25,7 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import FileUploadService from "../../../../components/FileUploadService";
 import { postWorkflowAction } from "../fundOverviewData/fundOverviewDataApi";
+import { fetchCheckerUsers, fetchManagerUsers, fetchPensionFundUsers } from "../fundOverviewData/fundOverviewDataApi";
 
 export const Preview = (props: any) => {
 
@@ -70,8 +71,14 @@ export const Preview = (props: any) => {
         (statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'TEMP_CLOSED');
     const isMakerActionable = role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER');
     const isCheckerActionable = role === 'CHECKER' && statusPrelims === 'MEMO_SUBMITTED';
-    const isManagerActionable = role === 'MANAGER' && prelimApplicationState.prelimApplication.assignedMakerUserId != null && statusPrelims !== 'SANCTIONED';
-    const hasActionToPerform = isApplicantActionable || isOperationalActionable || isMakerActionable || isCheckerActionable || isManagerActionable;
+    const isManagerActionable =
+        role === 'MANAGER' &&
+        (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER');
+    const isPfActionable =
+        role === 'USER' &&
+        statusPrelims === 'MANAGER_FORWARDED_TO_PF' &&
+        Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0);
+    const hasActionToPerform = isApplicantActionable || isOperationalActionable || isMakerActionable || isCheckerActionable || isManagerActionable || isPfActionable;
 
     const handleSuccessDialogClose = () => {
         setShowSuccessDialog(false);
@@ -95,6 +102,12 @@ export const Preview = (props: any) => {
     const [actionDate, setActionDate] = useState<Date>(prelimApplicationState.prelimApplication.actionDate || new Date());
     const [actionDateError, setActionDateError] = useState<string | undefined>();
     const [actionFile, setActionFile] = useState<File | null>(null);
+    const [checkerUsers, setCheckerUsers] = useState<any[]>([]);
+    const [managerUsers, setManagerUsers] = useState<any[]>([]);
+    const [pfUsers, setPfUsers] = useState<any[]>([]);
+    const [selectedCheckerUserId, setSelectedCheckerUserId] = useState<string>('');
+    const [selectedManagerUserId, setSelectedManagerUserId] = useState<string>('');
+    const [selectedPfUserId, setSelectedPfUserId] = useState<string>('');
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -127,6 +140,46 @@ export const Preview = (props: any) => {
 
         //setStatusPrelims(prelimApplicationState.prelimApplication.status)
     }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
+
+    useEffect(() => {
+        const loadAssignmentUsers = async () => {
+            try {
+                if (usersState.role === 'MAKER') {
+                    const res = await fetchCheckerUsers();
+                    const list = res?.data || [];
+                    setCheckerUsers(list);
+                    if (prelimApplicationState.prelimApplication.assignedCheckerUserId != null) {
+                        setSelectedCheckerUserId(String(prelimApplicationState.prelimApplication.assignedCheckerUserId));
+                    } else if (list.length > 0) {
+                        setSelectedCheckerUserId(String(list[0].id));
+                    }
+                }
+                if (usersState.role === 'CHECKER') {
+                    const res = await fetchManagerUsers();
+                    const list = res?.data || [];
+                    setManagerUsers(list);
+                    if (prelimApplicationState.prelimApplication.assignedManagerUserId != null) {
+                        setSelectedManagerUserId(String(prelimApplicationState.prelimApplication.assignedManagerUserId));
+                    } else if (list.length > 0) {
+                        setSelectedManagerUserId(String(list[0].id));
+                    }
+                }
+                if (usersState.role === 'MANAGER') {
+                    const res = await fetchPensionFundUsers();
+                    const list = res?.data || [];
+                    setPfUsers(list);
+                    if (prelimApplicationState.prelimApplication.assignedPfUserId != null) {
+                        setSelectedPfUserId(String(prelimApplicationState.prelimApplication.assignedPfUserId));
+                    } else if (list.length > 0) {
+                        setSelectedPfUserId(String(list[0].id));
+                    }
+                }
+            } catch {
+                // keep UI usable even when assignee lookups fail
+            }
+        };
+        loadAssignmentUsers();
+    }, [usersState.role, prelimApplicationState.prelimApplication.assignedCheckerUserId, prelimApplicationState.prelimApplication.assignedManagerUserId, prelimApplicationState.prelimApplication.assignedPfUserId]);
 
     async function checkAllDocsOk(prelimId: string | undefined, applicationName: string) {
         if (usersState.role === 'ADMIN') {
@@ -163,7 +216,11 @@ export const Preview = (props: any) => {
         if (await checkAllDocsOk(id, "prelims")) {
             console.log("prelimId", Number(id), "intendedStatus", intendedStatus)
             try {
-                const remarkToSend = (commentOverride ?? String(commentPreview || '')).trim();
+                let remarkToSend = (commentOverride ?? String(commentPreview || '')).trim();
+                if (String(intendedStatus) === 'submit' && !hasEvidence(remarkToSend)) {
+                    // Applicant submit should not force "supporting document" upload.
+                    remarkToSend = "Submitted by applicant";
+                }
                 if (!hasEvidence(remarkToSend)) {
                     alert("Please provide either a comment or upload a document.");
                     return;
@@ -406,22 +463,24 @@ export const Preview = (props: any) => {
                                                 ...fieldSx, mb: 3
                                             }}
                                         />
-                                        <Box sx={{ mb: 3 }}>
-                                            <Button variant="outlined" component="label" sx={{ textTransform: 'none' }}>
-                                                Upload supporting document (optional)
-                                                <input
-                                                    type="file"
-                                                    hidden
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0] || null;
-                                                        setActionFile(file);
-                                                    }}
-                                                />
-                                            </Button>
-                                            <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#64748b' }}>
-                                                {actionFile ? actionFile.name : 'No file selected. Provide comment or upload file.'}
-                                            </Typography>
-                                        </Box>
+                                        {!isApplicantActionable && (
+                                            <Box sx={{ mb: 3 }}>
+                                                <Button variant="outlined" component="label" sx={{ textTransform: 'none' }}>
+                                                    Upload supporting document (optional)
+                                                    <input
+                                                        type="file"
+                                                        hidden
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0] || null;
+                                                            setActionFile(file);
+                                                        }}
+                                                    />
+                                                </Button>
+                                                <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#64748b' }}>
+                                                    {actionFile ? actionFile.name : 'No file selected. Provide comment or upload file.'}
+                                                </Typography>
+                                            </Box>
+                                        )}
                                     </>
                                 )}
 
@@ -448,6 +507,60 @@ export const Preview = (props: any) => {
                                 )}
 
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                                    {(usersState.role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER')) && (
+                                        <FormControl sx={{ minWidth: 260 }}>
+                                            <InputLabel id="checker-user-label">Select Checker</InputLabel>
+                                            <Select
+                                                labelId="checker-user-label"
+                                                value={selectedCheckerUserId}
+                                                label="Select Checker"
+                                                onChange={(e) => setSelectedCheckerUserId(String(e.target.value))}
+                                            >
+                                                {checkerUsers.map((user) => (
+                                                    <MenuItem key={user.id} value={String(user.id)}>
+                                                        {user.contactPerson || user.username} ({user.username})
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    )}
+
+                                    {(usersState.role === 'CHECKER' && statusPrelims === 'MEMO_SUBMITTED') && (
+                                        <FormControl sx={{ minWidth: 260 }}>
+                                            <InputLabel id="manager-user-label">Select Manager</InputLabel>
+                                            <Select
+                                                labelId="manager-user-label"
+                                                value={selectedManagerUserId}
+                                                label="Select Manager"
+                                                onChange={(e) => setSelectedManagerUserId(String(e.target.value))}
+                                            >
+                                                {managerUsers.map((user) => (
+                                                    <MenuItem key={user.id} value={String(user.id)}>
+                                                        {user.contactPerson || user.username} ({user.username})
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    )}
+
+                                    {(usersState.role === 'MANAGER' && statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER') && (
+                                        <FormControl sx={{ minWidth: 260 }}>
+                                            <InputLabel id="pf-user-label">Select PF User</InputLabel>
+                                            <Select
+                                                labelId="pf-user-label"
+                                                value={selectedPfUserId}
+                                                label="Select PF User"
+                                                onChange={(e) => setSelectedPfUserId(String(e.target.value))}
+                                            >
+                                                {pfUsers.map((user) => (
+                                                    <MenuItem key={user.id} value={String(user.id)}>
+                                                        {user.contactPerson || user.username} ({user.username})
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    )}
+
                                     {(usersState.role == 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE')) && (
                                         <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', px: 4, fontWeight: 700, backgroundColor: '#4caf50' }}>
                                             Submit Application
@@ -455,22 +568,61 @@ export const Preview = (props: any) => {
                                     )}
 
                                     {(usersState.role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER')) && (
-                                        <Button color='primary' id='memo-submit' onClick={async () => {
-                                            const remark = String(commentPreview || '').trim();
-                                            if (!hasEvidence(remark)) {
-                                                alert("Please provide either a comment or upload a document.");
-                                                return;
-                                            }
-                                            const attachment = await uploadActionFile(Number(id), 'memo-submit');
-                                            await postWorkflowAction(Number(id), 'memo-submit', {
-                                                remark,
-                                                attachmentBucket: attachment.attachmentBucket,
-                                                attachmentName: attachment.attachmentName,
-                                            });
-                                            navigate('/home');
-                                        }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                            Submit Memo
-                                        </Button>
+                                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                                            <Button color='primary' id='memo-submit' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                if (!selectedCheckerUserId) {
+                                                    alert("Please select a checker.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'memo-submit');
+                                                await postWorkflowAction(Number(id), 'memo-submit', {
+                                                    remark,
+                                                    checkerUserId: Number(selectedCheckerUserId),
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Submit Memo
+                                            </Button>
+                                            <Button color='warning' id='maker-revert-manager' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'maker-revert-manager');
+                                                await postWorkflowAction(Number(id), 'maker-revert-manager', {
+                                                    remark,
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Revert to Manager
+                                            </Button>
+                                            <Button color='error' id='maker-revert-applicant' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'maker-revert-applicant');
+                                                await postWorkflowAction(Number(id), 'maker-revert-applicant', {
+                                                    remark,
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Revert to Applicant
+                                            </Button>
+                                        </Box>
                                     )}
 
                                     {(usersState.role === 'CHECKER' && statusPrelims === 'MEMO_SUBMITTED') && (
@@ -491,42 +643,107 @@ export const Preview = (props: any) => {
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revert to Maker
                                             </Button>
-                                            <Button color='success' id='sanction' onClick={async () => {
+                                            <Button color='success' id='checker-forward-manager' onClick={async () => {
                                                 const remark = String(commentPreview || '').trim();
                                                 if (!hasEvidence(remark)) {
                                                     alert("Please provide either a comment or upload a document.");
                                                     return;
                                                 }
-                                                const attachment = await uploadActionFile(Number(id), 'sanction');
-                                                await postWorkflowAction(Number(id), 'sanction', {
+                                                if (!selectedManagerUserId) {
+                                                    alert("Please select a manager.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'checker-forward-manager');
+                                                await postWorkflowAction(Number(id), 'checker-forward-manager', {
+                                                    remark,
+                                                    managerUserId: Number(selectedManagerUserId),
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Forward to Manager
+                                            </Button>
+                                        </Box>
+                                    )}
+
+                                    {(usersState.role === 'MANAGER' && (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
+                                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                                            <Button color='primary' id='manager-forward-pf' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                if (!selectedPfUserId) {
+                                                    alert("Please select a PF user.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'manager-forward-pf');
+                                                await postWorkflowAction(Number(id), 'manager-forward-pf', {
+                                                    remark,
+                                                    pfUserId: Number(selectedPfUserId),
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Forward to PF
+                                            </Button>
+                                            <Button color='warning' id='manager-revert-maker' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'manager-revert-maker');
+                                                await postWorkflowAction(Number(id), 'manager-revert-maker', {
                                                     remark,
                                                     attachmentBucket: attachment.attachmentBucket,
                                                     attachmentName: attachment.attachmentName,
                                                 });
                                                 navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Sanction
+                                                Revert to Analyst
                                             </Button>
                                         </Box>
                                     )}
 
-                                    {(usersState.role === 'MANAGER' && prelimApplicationState.prelimApplication.assignedMakerUserId != null) && (
-                                        <Button color='primary' id='manager-reassign' onClick={async () => {
-                                            const remark = String(commentPreview || '').trim();
-                                            if (!hasEvidence(remark)) {
-                                                alert("Please provide either a comment or upload a document.");
-                                                return;
-                                            }
-                                            const attachment = await uploadActionFile(Number(id), 'manager-reassign');
-                                            await postWorkflowAction(Number(id), 'manager-reassign', {
-                                                remark,
-                                                attachmentBucket: attachment.attachmentBucket,
-                                                attachmentName: attachment.attachmentName,
-                                            });
-                                            navigate('/home');
-                                        }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                            Reassign
-                                        </Button>
+                                    {(usersState.role === 'USER' && statusPrelims === 'MANAGER_FORWARDED_TO_PF' && Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0)) && (
+                                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                                            <Button color='success' id='pf-approve' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'pf-approve');
+                                                await postWorkflowAction(Number(id), 'pf-approve', {
+                                                    remark,
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Approve
+                                            </Button>
+                                            <Button color='error' id='pf-reject' onClick={async () => {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'pf-reject');
+                                                await postWorkflowAction(Number(id), 'pf-reject', {
+                                                    remark,
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                                Reject
+                                            </Button>
+                                        </Box>
                                     )}
 
                                     {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'SUBMITTED') && (

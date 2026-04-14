@@ -93,6 +93,7 @@ export const Home = (pros: any) => {
     const [homeWorkflowTab, setHomeWorkflowTab] = useState(0);
     const [initialAssessmentList, setInitialAssessmentList] = useState<IPrelimApplicationData[]>([]);
     const [initialAssessmentLoading, setInitialAssessmentLoading] = useState(false);
+    const [workflowSectionTab, setWorkflowSectionTab] = useState<string>('all');
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
     const totalEntries = prelimApplications.totalEntries || 0;
@@ -117,12 +118,100 @@ export const Home = (pros: any) => {
             homeWorkflowTab === 0
                 ? prelimApplications.prelimApplications
                 : initialAssessmentList;
+        const normalizedRole = String(activeRole || '').toUpperCase();
+        const isPfUser = normalizedRole === 'USER'
+            && (prelimApplications.prelimApplications || []).some(
+                (r) => Number(r.assignedPfUserId || 0) === Number(usersState.me?.id || 0)
+            );
         return source?.filter((app) => {
             const emailMatch = (app.createdByName || '').toLowerCase().includes(searchEmail.toLowerCase());
             const aifHaystack = `${app.registrationAifName || ''} ${app.nameOfTheFund || ''}`.toLowerCase();
             const aifNameMatch = aifHaystack.includes(searchAifName.toLowerCase());
-            return emailMatch && aifNameMatch;
+            const status = String(app.status || '').toUpperCase();
+            let sectionMatch = true;
+            if (homeWorkflowTab === 1) {
+                sectionMatch = true;
+            } else if (workflowSectionTab !== 'all') {
+                if (normalizedRole === 'MAKER') {
+                    sectionMatch = workflowSectionTab === 'assigned'
+                        && (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER' || status === 'REVERTED_TO_MANAGER');
+                } else if (normalizedRole === 'CHECKER') {
+                    if (workflowSectionTab === 'submitted') sectionMatch = status === 'SUBMITTED';
+                    else if (workflowSectionTab === 'assignedAnalyst') sectionMatch = (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER');
+                } else if (normalizedRole === 'MANAGER') {
+                    if (workflowSectionTab === 'forwardedSc') sectionMatch = (status === 'CHECKER_FORWARDED_TO_MANAGER' || status === 'REVERTED_TO_MANAGER');
+                    else if (workflowSectionTab === 'approvedPf') sectionMatch = status === 'APPROVED_BY_PF';
+                    else if (workflowSectionTab === 'rejectedPf') sectionMatch = status === 'REJECTED_BY_PF';
+                    else if (workflowSectionTab === 'sanctioned') sectionMatch = status === 'SANCTIONED';
+                } else if (isPfUser) {
+                    if (workflowSectionTab === 'forwardedPf') sectionMatch = status === 'MANAGER_FORWARDED_TO_PF';
+                    else if (workflowSectionTab === 'approvedPf') sectionMatch = status === 'APPROVED_BY_PF';
+                    else if (workflowSectionTab === 'rejectedPf') sectionMatch = status === 'REJECTED_BY_PF';
+                    sectionMatch = sectionMatch && Number(app.assignedPfUserId || 0) === Number(usersState.me?.id || 0);
+                } else if (normalizedRole === 'USER') {
+                    if (workflowSectionTab === 'created') sectionMatch = status === 'CREATED';
+                    else if (workflowSectionTab === 'submitted') sectionMatch = status === 'SUBMITTED';
+                    else if (workflowSectionTab === 'reverted') sectionMatch = status === 'REVISE';
+                    else if (workflowSectionTab === 'sanctioned') sectionMatch = status === 'SANCTIONED';
+                }
+            }
+            return emailMatch && aifNameMatch && sectionMatch;
         }) || [];
+    };
+
+    const getWorkflowSections = () => {
+        const rows = prelimApplications.prelimApplications || [];
+        const normalizedRole = String(activeRole || '').toUpperCase();
+        const pfRows = rows.filter((r) => Number(r.assignedPfUserId || 0) === Number(usersState.me?.id || 0));
+        const isPfUser = normalizedRole === 'USER' && pfRows.length > 0;
+        const base = [{ id: 'all', label: 'All', count: rows.length }];
+        if (normalizedRole === 'MAKER') {
+            const assigned = rows.filter((r) => ['MAKER_ASSIGNED', 'REVERTED_TO_MAKER', 'REVERTED_TO_MANAGER'].includes(String(r.status || '').toUpperCase())).length;
+            return assigned > 0 ? [...base, { id: 'assigned', label: 'Assigned Application', count: assigned }] : base;
+        }
+        if (normalizedRole === 'CHECKER') {
+            const submitted = rows.filter((r) => String(r.status || '').toUpperCase() === 'SUBMITTED').length;
+            const assignedAnalyst = rows.filter((r) => ['MAKER_ASSIGNED', 'REVERTED_TO_MAKER'].includes(String(r.status || '').toUpperCase())).length;
+            const sections: any[] = [...base];
+            if (submitted > 0) sections.push({ id: 'submitted', label: 'Submitted (Applicant)', count: submitted });
+            if (assignedAnalyst > 0) sections.push({ id: 'assignedAnalyst', label: 'Assigned to Analyst', count: assignedAnalyst });
+            return sections;
+        }
+        if (normalizedRole === 'MANAGER') {
+            const forwardedSc = rows.filter((r) => ['CHECKER_FORWARDED_TO_MANAGER', 'REVERTED_TO_MANAGER'].includes(String(r.status || '').toUpperCase())).length;
+            const approvedPf = rows.filter((r) => String(r.status || '').toUpperCase() === 'APPROVED_BY_PF').length;
+            const rejectedPf = rows.filter((r) => String(r.status || '').toUpperCase() === 'REJECTED_BY_PF').length;
+            const sanctioned = rows.filter((r) => String(r.status || '').toUpperCase() === 'SANCTIONED').length;
+            const sections: any[] = [...base];
+            if (forwardedSc > 0) sections.push({ id: 'forwardedSc', label: 'Forwarded to SC', count: forwardedSc });
+            if (approvedPf > 0) sections.push({ id: 'approvedPf', label: 'Approved by PF', count: approvedPf });
+            if (rejectedPf > 0) sections.push({ id: 'rejectedPf', label: 'Rejected by PF', count: rejectedPf });
+            if (sanctioned > 0) sections.push({ id: 'sanctioned', label: 'Sanctioned', count: sanctioned });
+            return sections;
+        }
+        if (isPfUser) {
+            const forwardedPf = pfRows.filter((r) => String(r.status || '').toUpperCase() === 'MANAGER_FORWARDED_TO_PF').length;
+            const approvedPf = pfRows.filter((r) => String(r.status || '').toUpperCase() === 'APPROVED_BY_PF').length;
+            const rejectedPf = pfRows.filter((r) => String(r.status || '').toUpperCase() === 'REJECTED_BY_PF').length;
+            const sections: any[] = [{ id: 'all', label: 'All', count: pfRows.length }];
+            if (forwardedPf > 0) sections.push({ id: 'forwardedPf', label: 'Forwarded to PF', count: forwardedPf });
+            if (approvedPf > 0) sections.push({ id: 'approvedPf', label: 'Approved by PF', count: approvedPf });
+            if (rejectedPf > 0) sections.push({ id: 'rejectedPf', label: 'Rejected by PF', count: rejectedPf });
+            return sections;
+        }
+        if (normalizedRole === 'USER') {
+            const created = rows.filter((r) => String(r.status || '').toUpperCase() === 'CREATED').length;
+            const submitted = rows.filter((r) => String(r.status || '').toUpperCase() === 'SUBMITTED').length;
+            const reverted = rows.filter((r) => String(r.status || '').toUpperCase() === 'REVISE').length;
+            const sanctioned = rows.filter((r) => String(r.status || '').toUpperCase() === 'SANCTIONED').length;
+            const sections: any[] = [...base];
+            if (created > 0) sections.push({ id: 'created', label: 'Created', count: created });
+            if (submitted > 0) sections.push({ id: 'submitted', label: 'Submitted (Read only)', count: submitted });
+            if (reverted > 0) sections.push({ id: 'reverted', label: 'Reverted', count: reverted });
+            if (sanctioned > 0) sections.push({ id: 'sanctioned', label: 'Sanctioned (Read only)', count: sanctioned });
+            return sections;
+        }
+        return base;
     };
 
 
@@ -232,6 +321,10 @@ export const Home = (pros: any) => {
             setHomeWorkflowTab(0);
         }
     }, [showInitialAssessmentTab, activeRole]);
+
+    useEffect(() => {
+        setWorkflowSectionTab('all');
+    }, [homeWorkflowTab, activeRole]);
 
     const openAssignMakerDialog = (row: IPrelimApplicationData) => {
         const rowId = typeof row.id === 'number' ? row.id : Number(row.id);
@@ -436,7 +529,20 @@ export const Home = (pros: any) => {
             return true
         if ((row.status === 'CREATED' || row.status === 'REVISE') && role == 'USER')
             return true
-        if ((row.status === 'MAKER_ASSIGNED' || row.status === 'REVERTED_TO_MAKER' || row.status === 'MEMO_SUBMITTED' || row.status === 'SANCTIONED') && (role == 'CHECKER' || role == 'MAKER' || role == 'MANAGER'))
+        if ((row.status === 'MAKER_ASSIGNED'
+            || row.status === 'REVERTED_TO_MAKER'
+            || row.status === 'REVERTED_TO_MANAGER'
+            || row.status === 'MEMO_SUBMITTED'
+            || row.status === 'CHECKER_FORWARDED_TO_MANAGER'
+            || row.status === 'MANAGER_FORWARDED_TO_PF'
+            || row.status === 'APPROVED_BY_PF'
+            || row.status === 'REJECTED_BY_PF'
+            || row.status === 'SANCTIONED')
+            && (role == 'CHECKER' || role == 'MAKER' || role == 'MANAGER'))
+            return true
+        if ((row.status === 'MANAGER_FORWARDED_TO_PF' || row.status === 'APPROVED_BY_PF' || row.status === 'REJECTED_BY_PF')
+            && role == 'USER'
+            && Number(row.assignedPfUserId || 0) === Number(usersState.me?.id || 0))
             return true
         return false
     }
@@ -466,7 +572,7 @@ export const Home = (pros: any) => {
         if (activeRole == 'ADMIN' || activeRole == 'CHECKER' || activeRole == 'MANAGER') {
             return 'preview'
         }
-        let path = (status && ['SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED'].includes(status.toString())) ? 'preview' : 'fund'
+        let path = (status && ['SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED', 'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF', 'REJECTED_BY_PF'].includes(status.toString())) ? 'preview' : 'fund'
         return path;
     }
 
@@ -509,6 +615,16 @@ export const Home = (pros: any) => {
                 return "Reverted to maker";
             case "SANCTIONED":
                 return "Sanctioned";
+            case "REVERTED_TO_MANAGER":
+                return "Reverted to manager";
+            case "CHECKER_FORWARDED_TO_MANAGER":
+                return "Forwarded to manager";
+            case "MANAGER_FORWARDED_TO_PF":
+                return "Forwarded to PF";
+            case "APPROVED_BY_PF":
+                return "Approved by PF";
+            case "REJECTED_BY_PF":
+                return "Rejected by PF";
             default:
                 return "Invalid Status";
         }
@@ -592,6 +708,21 @@ export const Home = (pros: any) => {
                             >
                                 <Tab label="Workflow applications" />
                                 <Tab label="Initial assessment only" />
+                            </Tabs>
+                        </Box>
+                    )}
+                    {homeWorkflowTab === 0 && (
+                        <Box sx={{ mb: 2 }}>
+                            <Tabs
+                                value={workflowSectionTab}
+                                onChange={(_, v) => setWorkflowSectionTab(v)}
+                                variant="scrollable"
+                                allowScrollButtonsMobile
+                                sx={{ minHeight: 36, '& .MuiTab-root': { textTransform: 'none', minHeight: 36, fontWeight: 600 } }}
+                            >
+                                {getWorkflowSections().map((section: any) => (
+                                    <Tab key={section.id} value={section.id} label={`${section.label} (${section.count})`} />
+                                ))}
                             </Tabs>
                         </Box>
                     )}

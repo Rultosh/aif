@@ -103,3 +103,24 @@ export function fetchMakerUsers() {
     url: `/api/users/makers`
   });
 }
+
+export function fetchCheckerUsers() {
+  return api({
+    method: 'get',
+    url: `/api/users/checkers`
+  });
+}
+
+export function fetchManagerUsers() {
+  return api({
+    method: 'get',
+    url: `/api/users/managers`
+  });
+}
+
+export function fetchPensionFundUsers() {
+  return api({
+    method: 'get',
+    url: `/api/users/pension-funds`
+  });
+}
