@@ -128,9 +128,11 @@ export const Preview = (props: any) => {
 
     useEffect(() => {
         window.scrollTo(0, 0)
-        if (!prelimApplicationState.prelimApplication.id && id) {
+        const currentPrelimId = Number(prelimApplicationState.prelimApplication.id || 0);
+        const requestedPrelimId = Number(id || 0);
+        if (requestedPrelimId > 0 && currentPrelimId !== requestedPrelimId) {
             dispatch(getPrelimApplicationData(
-                wrapArgument(actionUid, Number(id))
+                wrapArgument(actionUid, requestedPrelimId)
             ))
         }
 
@@ -138,7 +140,7 @@ export const Preview = (props: any) => {
         if (localStorage.getItem('token') && usersState.role === undefined && usersState.status.fetchStatus === FetchStatus.IDLE) {
             dispatch(fetchRoleAsync(wrapArgument(actionUid, undefined)));
         }
-    }, [])
+    }, [id, prelimApplicationState.prelimApplication.id, dispatch, actionUid, usersState.role, usersState.status.fetchStatus])
 
     useEffect(() => {
 
