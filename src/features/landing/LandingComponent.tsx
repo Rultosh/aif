@@ -251,10 +251,8 @@ const Landing = () => {
                                 })));
                             }}>
                                 <Typography sx={{ mb: 2, fontSize: '14px', color: '#333' }}>
-                                    We sent a one-time code to <strong>{mfaPending.maskedEmail ?? 'your email'}</strong>.
-                                    {mfaPending.expiresInSeconds != null && (
-                                        <span> It expires in about {Math.ceil(mfaPending.expiresInSeconds / 60)} minutes.</span>
-                                    )}
+                                    A one-time password has been sent to your registered email ID. 
+                                    It is valid for {mfaPending.expiresInSeconds ? Math.ceil(mfaPending.expiresInSeconds / 60) : 5} minutes.
                                 </Typography>
                                 <TextField
                                     fullWidth

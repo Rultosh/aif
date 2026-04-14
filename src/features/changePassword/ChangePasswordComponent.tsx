@@ -38,7 +38,7 @@ const ChangePassword = (props:any) => {
             return;
         }
         if (String(formData.password) !== String(formData.matchingPassword)) {
-            setPasswordError('Password and Confirm Password must be the same.');
+            setPasswordError('New Password and Confirm Password should be identical.');
             return;
         }
         setShowResponse(true)

@@ -119,16 +119,17 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
         const statusIdle = investmentAssociatesState.status.fetchStatus === FetchStatus.IDLE;
         const actionIdle = investmentAssociatesState.actionStatus.fetchStatus === FetchStatus.IDLE;
         const n = investmentAssociatesState.investmentAssociates?.length ?? 0;
+        const tooFewRows = n < 1;
         const tooManyRows = n > 5;
         /** Same as KMP section: avoid reporting `false` during fetch so merge step after section 2 validation does not clear doc-gap errors. Still surface row-count violations from current state. */
         if (!statusIdle || !actionIdle) {
-            if (tooManyRows) {
+            if (tooFewRows || tooManyRows) {
                 onSectionHasErrorsChangeRef.current?.(true);
             }
             return;
         }
         const docIssue = missingResumeRowIds.length > 0;
-        onSectionHasErrorsChangeRef.current?.(docIssue || tooManyRows);
+        onSectionHasErrorsChangeRef.current?.(docIssue || tooFewRows || tooManyRows);
     }, [
         missingResumeRowIds,
         investmentAssociatesState.investmentAssociates?.length,
@@ -154,6 +155,12 @@ const InvestmentAssociate = forwardRef<InvestmentAssociateHandle, InvestmentAsso
                     return false;
                 }
                 const n = investmentAssociatesState.investmentAssociates?.length ?? 0;
+                if (n < 1) {
+                    if (!silent) {
+                        showValidationToast('Add at least one investment team member (other than KMP) before continuing.');
+                    }
+                    return false;
+                }
                 if (n > 5) {
                     if (!silent) {
                         showValidationToast('A maximum of 5 senior members (other than KMP) is allowed.');

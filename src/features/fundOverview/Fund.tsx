@@ -179,15 +179,13 @@ export const Fund = (props: any) => {
         'Some fund sections still have errors or missing mandatory documents. Review each section from the top (red highlights show where to fix). Choose Stay to keep working here, or Continue to go to the declaration step anyway.';
 
     const fundAccordionShellSx = (panelId: string) => {
-        /** Prefer the last full-fund failure list so stale per-section flags (effects not yet cleared) do not re-tint the wrong accordion — e.g. only panel 7 in `fundPanelValidationErrors` while partner state still says “has errors”. */
-        const liveErr =
-            fundPanelValidationErrors.length === 0 &&
-            ((panelId === "2" && investmentStrategySectionHasErrors) ||
-                (panelId === "3" && investmentPartnerSectionHasErrors) ||
-                (panelId === "4" && investmentAssociateSectionHasErrors) ||
-                (panelId === "5" && pastInvestmentSectionHasErrors) ||
-                (panelId === "7" && dealFlowSectionHasErrors));
-        const hasErr = fundPanelValidationErrors.includes(panelId) || liveErr;
+        /**
+         * Highlight only after explicit validation actions:
+         * - Save & Continue on a specific section, or
+         * - full-fund validation from section 7 / global Save.
+         * Do not tint from passive "live" flags on first load.
+         */
+        const hasErr = fundPanelValidationErrors.includes(panelId);
         return {
             border: '1px solid rgba(0,0,0,0.08)',
             borderRadius: '12px !important',
