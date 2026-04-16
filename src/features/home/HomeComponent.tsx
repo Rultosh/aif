@@ -561,6 +561,8 @@ export const Home = (pros: any) => {
             return true
         if ((row.status === 'CREATED' || row.status === 'REVISE') && role == 'USER')
             return true
+        if (row.status === 'SANCTIONED' && role == 'USER')
+            return true
         if ((row.status === 'MAKER_ASSIGNED'
             || row.status === 'REVERTED_TO_MAKER'
             || row.status === 'REVERTED_TO_MANAGER'
@@ -604,7 +606,7 @@ export const Home = (pros: any) => {
         if (activeRole == 'ADMIN' || activeRole == 'CHECKER' || activeRole == 'MANAGER') {
             return 'preview'
         }
-        let path = (status && ['SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED', 'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF', 'REJECTED_BY_PF'].includes(status.toString())) ? 'preview' : 'fund'
+        let path = (status && ['SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED', 'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF', 'REJECTED_BY_PF', 'SANCTIONED'].includes(status.toString())) ? 'preview' : 'fund'
         return path;
     }
 
@@ -904,7 +906,7 @@ export const Home = (pros: any) => {
                                                 {row.stage === "PRELIM" ?
                                                     <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
                                                         {isGoodToShowApplication(row) ?
-                                                            <a href={`#/preliminary/${row.id}/${activeRole === "USER" ? 'selfrating' : 'preview'}`}
+                                                            <a href={`#/preliminary/${row.id}/${getPath(row.status)}`}
                                                                 style={{ color: '#3f4bee', fontWeight: 600 }}>{fundDisplayName}</a> :
                                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
                                                                 {fundDisplayName}

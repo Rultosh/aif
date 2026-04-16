@@ -147,6 +147,12 @@ export const FundOverview = (props: any) => {
         prelimApplicationState.status.responseCode === ResponseCode.NOT_FOUND;
 
     const isRestricted = applicationNotFound || adminCannotAccessPreliminary || userCannotAccessPreliminary || pfCannotAccessPreliminary;
+    const isUserEditableFlow =
+        usersState.role === 'USER' &&
+        (isNewApplicationRoute
+            || statusPrelims === ''
+            || statusPrelims === undefined
+            || (USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(String(statusPrelims)));
 
     // const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 
@@ -180,7 +186,7 @@ export const FundOverview = (props: any) => {
                 </Box>
                 <Box sx={{ flexGrow: 1 }}>
                     {/* Chevron Stepper */}
-                    {(!isRestricted && usersState.role === 'USER') && (
+                    {(!isRestricted && isUserEditableFlow) && (
                         <Box sx={{ width: '100%', display: 'flex', gap: 0.5 }}>
                             {filteredSteps.map((s, index, array) => {
                                 const isNew = id?.toString() === 'NEW';
