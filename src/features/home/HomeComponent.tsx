@@ -69,6 +69,14 @@ const CHECKER_TAB_LABELS: Record<CheckerWorkflowTabId, string> = {
     failedApplication: 'Failed Application',
 };
 
+const MAKER_WORKFLOW_TAB_IDS = ['withMaker', 'withApplicant'] as const;
+type MakerWorkflowTabId = (typeof MAKER_WORKFLOW_TAB_IDS)[number];
+
+const MAKER_TAB_LABELS: Record<MakerWorkflowTabId, string> = {
+    withMaker: 'With Maker',
+    withApplicant: 'With Applicant',
+};
+
 /** PRELIM draft with IA completed: enriched average below 5 (aligned with self-rating submit rule). */
 function isCheckerFailedIaOnlyDraft(row: IPrelimApplicationData | undefined, statusUpper: string): boolean {
     if (!row) return false;
@@ -208,8 +216,14 @@ export const Home = (pros: any) => {
                 sectionMatch = checkerWorkflowTabForStatus(status, app) === checkerTab;
             } else if (workflowSectionTab !== 'all') {
                 if (normalizedRole === 'MAKER') {
-                    sectionMatch = workflowSectionTab === 'assigned'
-                        && (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER' || status === 'REVERTED_TO_MANAGER');
+                    const makerTab: MakerWorkflowTabId = (MAKER_WORKFLOW_TAB_IDS as readonly string[]).includes(workflowSectionTab)
+                        ? workflowSectionTab as MakerWorkflowTabId
+                        : 'withMaker';
+                    if (makerTab === 'withMaker') {
+                        sectionMatch = status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER';
+                    } else {
+                        sectionMatch = status === 'REVISE';
+                    }
                 } else if (normalizedRole === 'MANAGER') {
                     if (workflowSectionTab === 'forwardedSc') sectionMatch = (status === 'CHECKER_FORWARDED_TO_MANAGER' || status === 'REVERTED_TO_MANAGER');
                     else if (workflowSectionTab === 'approvedPf') sectionMatch = status === 'APPROVED_BY_PF';
@@ -239,8 +253,13 @@ export const Home = (pros: any) => {
         const isPfUser = normalizedRole === 'PENSION_FUND' && pfRows.length > 0;
         const base = [{ id: 'all', label: 'All', count: rows.length }];
         if (normalizedRole === 'MAKER') {
-            const assigned = rows.filter((r) => ['MAKER_ASSIGNED', 'REVERTED_TO_MAKER', 'REVERTED_TO_MANAGER'].includes(String(r.status || '').toUpperCase())).length;
-            return assigned > 0 ? [...base, { id: 'assigned', label: 'Assigned Application', count: assigned }] : base;
+            const withMaker = rows.filter((r) => ['MAKER_ASSIGNED', 'REVERTED_TO_MAKER'].includes(String(r.status || '').toUpperCase())).length;
+            const withApplicant = rows.filter((r) => String(r.status || '').toUpperCase() === 'REVISE').length;
+            return MAKER_WORKFLOW_TAB_IDS.map((id) => ({
+                id,
+                label: MAKER_TAB_LABELS[id],
+                count: id === 'withMaker' ? withMaker : withApplicant,
+            }));
         }
         if (normalizedRole === 'CHECKER') {
             return CHECKER_WORKFLOW_TAB_IDS.map((id) => ({
@@ -845,7 +864,11 @@ export const Home = (pros: any) => {
             ? (CHECKER_WORKFLOW_TAB_IDS as readonly string[]).includes(workflowSectionTab)
                 ? workflowSectionTab
                 : 'pendingAssignment'
-            : workflowSectionTab;
+            : hasActiveRole('MAKER')
+                ? (MAKER_WORKFLOW_TAB_IDS as readonly string[]).includes(workflowSectionTab)
+                    ? workflowSectionTab
+                    : 'withMaker'
+                : workflowSectionTab;
 
     return (
         <div className="homeComp">
