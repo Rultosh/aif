@@ -7,6 +7,7 @@ import { fetchQuriesAsync, postQuriesAsync, selectqueryResolution } from './quer
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { selectUsers } from '../admin/adminSlice'
 import FileUploadService from "../../components/FileUploadService";
+import { getFileServerBaseUrl } from "../../lib/fileServerBaseUrl";
 
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
@@ -176,7 +177,7 @@ export const QueryResolutionModal = (props: any) => {
                                 {q.attachmentBucket && q.attachmentName ? (
                                     <Box sx={{ mt: 1 }}>
                                         <a
-                                            href={`${process.env.REACT_APP_FILE_SERVER_URL || process.env.REACT_APP_API_BASE_URL}/files/${q.attachmentBucket}/${q.attachmentName}?access_token=${localStorage.getItem('token')}`}
+                                            href={`${getFileServerBaseUrl()}/files/${encodeURIComponent(q.attachmentBucket)}/${encodeURIComponent(q.attachmentName)}?access_token=${localStorage.getItem('token')}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >

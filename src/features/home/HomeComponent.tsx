@@ -777,7 +777,7 @@ export const Home = (pros: any) => {
             case "SANCTIONED":
                 return "Sanctioned";
             case "REVERTED_TO_MANAGER":
-                return "Reverted to manager";
+                return "Reverted to assignee";
             case "CHECKER_FORWARDED_TO_MANAGER":
                 return "With Screening Committee";
             case "MANAGER_FORWARDED_TO_PF":

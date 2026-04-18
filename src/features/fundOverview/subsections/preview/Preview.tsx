@@ -29,6 +29,7 @@ import { postWorkflowAction } from "../fundOverviewData/fundOverviewDataApi";
 import { fetchCheckerUsers, fetchManagerUsers, fetchMakerUsers } from "../fundOverviewData/fundOverviewDataApi";
 import { getHistory } from '../../../home/historyApi';
 import { IHistory } from '../../../home/IHistory';
+import { getFileServerBaseUrl } from '../../../../lib/fileServerBaseUrl';
 
 /** "By" column: actor display name from API (resolved server-side); no user id → system. */
 function commentHistoryByLabel(row: IHistory): string {
@@ -140,20 +141,20 @@ export const Preview = (props: any) => {
     }
 
     useEffect(() => {
-        window.scrollTo(0, 0)
-        const currentPrelimId = Number(prelimApplicationState.prelimApplication.id || 0);
+        window.scrollTo(0, 0);
         const requestedPrelimId = Number(id || 0);
-        if (requestedPrelimId > 0 && currentPrelimId !== requestedPrelimId) {
-            dispatch(getPrelimApplicationData(
-                wrapArgument(actionUid, requestedPrelimId)
-            ))
+        // Always reload for this route id so status (and action buttons) match the server after
+        // workflow changes elsewhere or revisiting the same application from Home.
+        if (requestedPrelimId > 0) {
+            dispatch(getPrelimApplicationData(wrapArgument(actionUid, requestedPrelimId)));
         }
+    }, [id, dispatch, actionUid]);
 
-        // Fetch user role if missing (on refresh)
+    useEffect(() => {
         if (localStorage.getItem('token') && usersState.role === undefined && usersState.status.fetchStatus === FetchStatus.IDLE) {
             dispatch(fetchRoleAsync(wrapArgument(actionUid, undefined)));
         }
-    }, [id, prelimApplicationState.prelimApplication.id, dispatch, actionUid, usersState.role, usersState.status.fetchStatus])
+    }, [dispatch, actionUid, usersState.role, usersState.status.fetchStatus])
 
     useEffect(() => {
         const prelimId = Number(id || 0);
@@ -378,8 +379,7 @@ export const Preview = (props: any) => {
     const showApplicantCommentHistoryHint =
         roleParts.includes('USER') && !isOperationalWorkflowUser;
 
-    const fileServerBase =
-        process.env.REACT_APP_FILE_SERVER_URL || process.env.REACT_APP_API_BASE_URL || '';
+    const fileServerBase = getFileServerBaseUrl();
 
     return (
         <div className="formAnimation">
@@ -456,7 +456,7 @@ export const Preview = (props: any) => {
                                                                 <Button
                                                                     size="small"
                                                                     component="a"
-                                                                    href={`${fileServerBase}/files/${row.attachmentBucket}/${row.attachmentName}?access_token=${localStorage.getItem('token')}`}
+                                                                    href={`${fileServerBase}/files/${encodeURIComponent(row.attachmentBucket)}/${encodeURIComponent(row.attachmentName)}?access_token=${localStorage.getItem('token')}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     sx={{ textTransform: 'none' }}
@@ -737,7 +737,7 @@ export const Preview = (props: any) => {
                                                 });
                                                 navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Revert to Manager
+                                                Revert to Assignee
                                             </Button>
                                             <Button color='error' id='maker-revert-applicant' onClick={async () => {
                                                 const remark = String(commentPreview || '').trim();

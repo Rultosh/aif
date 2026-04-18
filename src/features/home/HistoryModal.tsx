@@ -9,6 +9,7 @@ import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
 import { selectUsers } from '../admin/adminSlice'
 import React, * as Rect from 'react'
+import { getFileServerBaseUrl } from '../../lib/fileServerBaseUrl';
 
 export const HistoryModal = (props: any) => {
 
@@ -82,7 +83,7 @@ export const HistoryModal = (props: any) => {
                                     <TableCell align="center">
                                         {row.attachmentBucket && row.attachmentName ? (
                                             <a
-                                                href={`${process.env.REACT_APP_FILE_SERVER_URL || process.env.REACT_APP_API_BASE_URL}/files/${row.attachmentBucket}/${row.attachmentName}?access_token=${localStorage.getItem('token')}`}
+                                                href={`${getFileServerBaseUrl()}/files/${encodeURIComponent(row.attachmentBucket)}/${encodeURIComponent(row.attachmentName)}?access_token=${localStorage.getItem('token')}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
