@@ -1,18 +1,36 @@
-import { Container, Box, Button, Typography, TableCell, Paper, Table, TableBody, TableContainer, TableHead, TableRow, Tooltip, Switch, FormControlLabel, Stack } from "@mui/material";
-import logo from '../../images/logo.png'
+import {
+    Container,
+    Box,
+    Button,
+    Typography,
+    TableCell,
+    Paper,
+    Table,
+    TableBody,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Tooltip,
+    Switch,
+    FormControlLabel,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    IconButton,
+    Divider,
+} from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import CloseIcon from '@mui/icons-material/Close';
 import React, * as Rect from 'react'
 import uuid from "react-uuid";
 import NavigationBar from '../../components/NavigationBar'
-import { defaultISignup } from "../signUp/ISignup";
 import { deleteUserAsync, fetchUsersAsync, selectUsers, updateUserOtpRequiredAsync } from './adminSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
-import { Delete, Edit, MailOutline } from '@mui/icons-material'
+import { Delete, Edit, InfoOutlined, Close as CloseDialogIcon } from '@mui/icons-material'
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
 import dayjs from "dayjs";
@@ -29,7 +47,13 @@ const Admin = (props: any) => {
     const handleClose = () => setOpen(false);
     const [selectedRow , setSelectedRow] = useState({} as IUser);
     const [openAddOperational, setOpenAddOperational] = useState(false);
+    const [detailUser, setDetailUser] = useState<IUser | null>(null);
     const navigate = useNavigate();
+
+    const formatVal = (v: unknown) => {
+        if (v == null || String(v).trim() === '') return '—';
+        return String(v);
+    };
 
     function handleOpen(row:IUser)
     {
@@ -77,20 +101,17 @@ const Admin = (props: any) => {
 
     };
 
-    const coreHeaders = [
+    /** Compact table: profile fields open in the details dialog (icon next to username). */
+    const tableHeaders = [
         "Id",
         "Username",
-        "Company",
-        "SEBI reg.",
-        "SEBI reg. date",
-        "Contact",
-        "Phone",
-        "Title",
-        "State",
-        "City",
-        "Address",
         "Role",
         "Registered",
+        "Email OTP",
+        "Approve",
+        "Assign manager",
+        "Set password email",
+        "Delete",
     ] as const;
 
     const headerCellSx = {
@@ -142,151 +163,160 @@ const Admin = (props: any) => {
         usersState.users.filter((user) => String(user.role || "").toUpperCase() !== "REGISTERED")
     );
 
-    const renderCoreCells = (row: IUser) => (
-        <>
-            <TableCell align="center" sx={{ ...bodyCellSx, color: '#64748b', fontWeight: 600 }}>{row.id}</TableCell>
-            <TableCell align="left" sx={{ ...bodyCellSx, maxWidth: 200, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }} title={row.username}>{row.username}</TableCell>
-            <TableCell align="left" sx={{ ...bodyCellSx, maxWidth: 160, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }} title={row.companyName}>{row.companyName}</TableCell>
-            <TableCell align="left" sx={bodyCellSx}>{row.sebiRegistration}</TableCell>
-            <TableCell align="center" sx={bodyCellSx}>{row.sebiRegistrationDate && dayjs(row.sebiRegistrationDate).format("DD/MM/YYYY")}</TableCell>
-            <TableCell align="left" sx={bodyCellSx}>{row.contactPerson}</TableCell>
-            <TableCell align="center" sx={bodyCellSx}>{row.phoneNumber}</TableCell>
-            <TableCell align="left" sx={bodyCellSx}>{row.title}</TableCell>
-            <TableCell align="left" sx={bodyCellSx}>{row.state}</TableCell>
-            <TableCell align="left" sx={bodyCellSx}>{row.city}</TableCell>
-            <TableCell align="left" sx={{ ...bodyCellSx, maxWidth: 200, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }} title={row.address}>{row.address}</TableCell>
-            <TableCell align="center" sx={bodyCellSx}>
-                <Typography component="span" variant="caption" sx={{ fontWeight: 700, color: '#4338ca', letterSpacing: '0.02em' }}>
-                    {row.role}
-                </Typography>
-            </TableCell>
-            <TableCell align="center" sx={bodyCellSx}>{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY")}</TableCell>
-        </>
+    const headerAlign = (h: (typeof tableHeaders)[number]): 'left' | 'center' | 'right' => {
+        if (['Approve', 'Assign manager', 'Set password email', 'Delete', 'Email OTP'].includes(h)) return 'center';
+        if (['Id', 'Role', 'Registered'].includes(h)) return 'center';
+        return 'left';
+    };
+
+    const detailRow = (label: string, value: unknown) => (
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '160px 1fr' }, gap: { xs: 0.25, sm: 1 }, py: 1, borderBottom: '1px solid #f1f5f9' }}>
+            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                {label}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#0f172a', wordBreak: 'break-word' }}>
+                {formatVal(value)}
+            </Typography>
+        </Box>
     );
 
-    const renderUserRows = (users: IUser[], variant: 'pending' | 'approved') => (
-        users.map((row, idx) => {
-            return (
-                <TableRow
-                    key={`${row.id}-${variant}`}
-                    hover
-                    sx={{
-                        backgroundColor: idx % 2 === 0 ? '#ffffff' : '#f8fafc',
-                        '&:last-child td': { borderBottom: 0 },
-                    }}
-                >
-                    {renderCoreCells(row)}
-                    {variant === 'pending' && (
-                        <>
-                            <TableCell align="center" sx={{ ...bodyCellSx, whiteSpace: 'nowrap' }}>
-                                {row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY HH:mm")}
-                            </TableCell>
-                            <TableCell align="center" sx={bodyCellSx}>
-                                <Tooltip title="Require email OTP at login (only when MFA is enabled on the server)">
-                                    <FormControlLabel
-                                        sx={{ m: 0, justifyContent: 'center' }}
-                                        control={
-                                            <Switch
-                                                size="small"
-                                                checked={!!row.otpRequired}
-                                                onChange={(_, checked) => {
-                                                    if (row.id != null) {
-                                                        dispatch(updateUserOtpRequiredAsync(
-                                                            wrapArgument(actionUid, { id: Number(row.id), otpRequired: checked })
-                                                        ));
-                                                    }
-                                                }}
-                                                color="primary"
-                                            />
-                                        }
-                                        label=""
-                                        labelPlacement="end"
-                                    />
-                                </Tooltip>
-                            </TableCell>
-                            <TableCell align="right" sx={{ ...bodyCellSx, minWidth: 200 }}>
-                                <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center" flexWrap="wrap" sx={{ gap: 0.5 }}>
-                                    <Tooltip title="Approve / assign role">
-                                        <Button size="small" variant="outlined" color="primary" sx={{ minWidth: 0, px: 1 }} onClick={() => handleOpen(row)}>
-                                            <Edit sx={{ fontSize: 18 }} />
-                                        </Button>
-                                    </Tooltip>
-                                    {row.role === 'CHECKER' && (
-                                        <Tooltip title="Promote to manager">
-                                            <Button
-                                                size="small"
-                                                variant="outlined"
-                                                color="secondary"
-                                                sx={{ textTransform: 'none', fontSize: '0.7rem' }}
-                                                onClick={async () => {
-                                                    if (row.id == null) return;
-                                                    try {
-                                                        await assignManagerRole(Number(row.id));
-                                                        dispatch(fetchUsersAsync(wrapArgument(actionUid, props.prelimApplicationId)));
-                                                    } catch (e: any) {
-                                                        alert(e?.response?.data || e?.message || 'Failed to assign manager role');
-                                                    }
-                                                }}
-                                            >
-                                                Promote
-                                            </Button>
-                                        </Tooltip>
-                                    )}
-                                    <Tooltip title="Send set-password email">
-                                        <Button
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ minWidth: 0, px: 1 }}
-                                            onClick={async () => {
-                                                if (row.id == null) return;
-                                                try {
-                                                    await sendSetPasswordEmail(Number(row.id));
-                                                    alert(`Set password email sent to ${row.username}`);
-                                                } catch (e: any) {
-                                                    alert(e?.response?.data || e?.message || 'Failed to send set password email');
-                                                }
-                                            }}
-                                        >
-                                            <MailOutline sx={{ fontSize: 18 }} />
-                                        </Button>
-                                    </Tooltip>
-                                    <Tooltip title="Delete user">
-                                        <Button size="small" color="error" variant="outlined" sx={{ minWidth: 0, px: 1 }} onClick={() => handleDeleteUser(row)}>
-                                            <Delete sx={{ fontSize: 18 }} />
-                                        </Button>
-                                    </Tooltip>
-                                </Stack>
-                            </TableCell>
-                        </>
-                    )}
-                </TableRow>
-            );
-        })
-    );
-
-    const renderHeaderRow = (variant: 'pending' | 'approved') => (
+    const renderHeaderRow = () => (
         <TableRow>
-            {coreHeaders.map((h) => (
-                <TableCell key={h} align={h === 'Id' || h === 'SEBI reg. date' || h === 'Phone' || h === 'Role' || h === 'Registered' ? 'center' : 'left'} sx={headerCellSx}>
+            {tableHeaders.map((h) => (
+                <TableCell key={h} align={headerAlign(h)} sx={headerCellSx}>
                     {h}
                 </TableCell>
             ))}
-            {variant === 'pending' && (
-                <>
-                    <TableCell align="center" sx={headerCellSx}>Registered at</TableCell>
-                    <TableCell align="center" sx={headerCellSx}>Email OTP</TableCell>
-                    <TableCell align="right" sx={headerCellSx}>Actions</TableCell>
-                </>
-            )}
         </TableRow>
     );
 
-    const renderUsersTable = (users: IUser[], variant: 'pending' | 'approved') => (
+    const renderActionCells = (row: IUser) => (
+        <>
+            <TableCell align="center" sx={bodyCellSx}>
+                <Tooltip title="Require email OTP at login (only when MFA is enabled on the server)">
+                    <FormControlLabel
+                        sx={{ m: 0, justifyContent: 'center' }}
+                        control={
+                            <Switch
+                                size="small"
+                                checked={!!row.otpRequired}
+                                onChange={(_, checked) => {
+                                    if (row.id != null) {
+                                        dispatch(updateUserOtpRequiredAsync(
+                                            wrapArgument(actionUid, { id: Number(row.id), otpRequired: checked })
+                                        ));
+                                    }
+                                }}
+                                color="primary"
+                            />
+                        }
+                        label=""
+                        labelPlacement="end"
+                    />
+                </Tooltip>
+            </TableCell>
+            <TableCell align="center" sx={bodyCellSx}>
+                <Tooltip title="Assign or change role">
+                    <Edit sx={{ cursor: 'pointer', color: '#4338ca', fontSize: 22 }} onClick={() => handleOpen(row)} />
+                </Tooltip>
+            </TableCell>
+            <TableCell align="center" sx={bodyCellSx}>
+                {row.role === 'CHECKER' ? (
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
+                        onClick={async () => {
+                            if (row.id == null) return;
+                            try {
+                                await assignManagerRole(Number(row.id));
+                                dispatch(fetchUsersAsync(wrapArgument(actionUid, props.prelimApplicationId)));
+                            } catch (e: any) {
+                                alert(e?.response?.data || e?.message || 'Failed to assign manager role');
+                            }
+                        }}
+                    >
+                        Promote
+                    </Button>
+                ) : (
+                    '—'
+                )}
+            </TableCell>
+            <TableCell align="center" sx={bodyCellSx}>
+                <Button
+                    size="small"
+                    variant="outlined"
+                    sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
+                    onClick={async () => {
+                        if (row.id == null) return;
+                        try {
+                            await sendSetPasswordEmail(Number(row.id));
+                            alert(`Set password email sent to ${row.username}`);
+                        } catch (e: any) {
+                            alert(e?.response?.data || e?.message || 'Failed to send set password email');
+                        }
+                    }}
+                >
+                    Send
+                </Button>
+            </TableCell>
+            <TableCell align="center" sx={bodyCellSx}>
+                <Tooltip title="Delete user">
+                    <Delete sx={{ cursor: 'pointer', color: '#d32f2f', fontSize: 22 }} onClick={() => handleDeleteUser(row)} />
+                </Tooltip>
+            </TableCell>
+        </>
+    );
+
+    const renderUserRows = (users: IUser[]) =>
+        users.map((row, idx) => (
+            <TableRow
+                key={`${row.id}`}
+                hover
+                sx={{
+                    backgroundColor: idx % 2 === 0 ? '#ffffff' : '#f8fafc',
+                    '&:last-child td': { borderBottom: 0 },
+                }}
+            >
+                <TableCell align="center" sx={{ ...bodyCellSx, color: '#64748b', fontWeight: 600 }}>{row.id}</TableCell>
+                <TableCell align="left" sx={bodyCellSx}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0 }}>
+                        <Typography
+                            component="span"
+                            variant="body2"
+                            sx={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                            title={row.username}
+                        >
+                            {row.username}
+                        </Typography>
+                        <Tooltip title="View company & contact details">
+                            <IconButton
+                                size="small"
+                                aria-label="View user details"
+                                onClick={() => setDetailUser(row)}
+                                sx={{ color: '#4338ca', flexShrink: 0 }}
+                            >
+                                <InfoOutlined fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+                </TableCell>
+                <TableCell align="center" sx={bodyCellSx}>
+                    <Typography component="span" variant="caption" sx={{ fontWeight: 700, color: '#4338ca', letterSpacing: '0.02em' }}>
+                        {row.role}
+                    </Typography>
+                </TableCell>
+                <TableCell align="center" sx={bodyCellSx}>{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY")}</TableCell>
+                {renderActionCells(row)}
+            </TableRow>
+        ));
+
+    const renderUsersTable = (users: IUser[], ariaLabel: string) => (
         <TableContainer
             component={Paper}
             elevation={0}
             sx={{
-                maxHeight: { xs: 360, sm: 440 },
+                maxHeight: { xs: 360, sm: 480 },
                 overflow: 'auto',
                 mb: 4,
                 borderRadius: '12px',
@@ -294,19 +324,19 @@ const Admin = (props: any) => {
                 boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
             }}
         >
-            <Table size="small" stickyHeader sx={{ minWidth: variant === 'pending' ? 1180 : 980 }} aria-label={variant === 'pending' ? 'Users pending approval' : 'Approved users'}>
+            <Table size="small" stickyHeader sx={{ minWidth: 720 }} aria-label={ariaLabel}>
                 <TableHead>
-                    {renderHeaderRow(variant)}
+                    {renderHeaderRow()}
                 </TableHead>
                 <TableBody>
                     {users.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={variant === 'pending' ? coreHeaders.length + 3 : coreHeaders.length} align="center" sx={{ ...bodyCellSx, py: 5, color: '#64748b' }}>
+                            <TableCell colSpan={tableHeaders.length} align="center" sx={{ ...bodyCellSx, py: 5, color: '#64748b' }}>
                                 No users in this list.
                             </TableCell>
                         </TableRow>
                     ) : (
-                        renderUserRows(users, variant)
+                        renderUserRows(users)
                     )}
                 </TableBody>
             </Table>
@@ -331,14 +361,14 @@ const Admin = (props: any) => {
                             <Typography variant="body2" sx={{ color: '#64748b', mb: 2, mt: 0.5 }}>
                                 {pendingUsers.length} user{pendingUsers.length === 1 ? '' : 's'} awaiting role assignment
                             </Typography>
-                            {renderUsersTable(pendingUsers, 'pending')}
+                            {renderUsersTable(pendingUsers, 'Users pending approval')}
                             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', mt: 1 }}>
                                 Approved users
                             </Typography>
                             <Typography variant="body2" sx={{ color: '#64748b', mb: 2, mt: 0.5 }}>
                                 {approvedUsers.length} active operational user{approvedUsers.length === 1 ? '' : 's'}
                             </Typography>
-                            {renderUsersTable(approvedUsers, 'approved')}
+                            {renderUsersTable(approvedUsers, 'Approved users')}
                         </Box>
                         {open ? <RoleComponent open={open} userDetails = {selectedRow} handleClose={handleClose}></RoleComponent> : <></>}
                         <AddOperationalUserModal
@@ -348,6 +378,49 @@ const Admin = (props: any) => {
                                 dispatch(fetchUsersAsync(wrapArgument(actionUid, props.prelimApplicationId)));
                             }}
                         />
+                        <Dialog open={detailUser != null} onClose={() => setDetailUser(null)} maxWidth="sm" fullWidth scroll="paper">
+                            <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
+                                <Typography component="span" variant="h6" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                                    User details
+                                </Typography>
+                                <IconButton aria-label="Close" onClick={() => setDetailUser(null)} size="small">
+                                    <CloseDialogIcon />
+                                </IconButton>
+                            </DialogTitle>
+                            <DialogContent dividers sx={{ pt: 0 }}>
+                                {detailUser && (
+                                    <>
+                                        <Typography variant="subtitle2" sx={{ color: '#64748b', mb: 1, mt: 0.5 }}>
+                                            Account #{detailUser.id ?? '—'}
+                                        </Typography>
+                                        <Divider sx={{ mb: 1 }} />
+                                        {detailRow('Username', detailUser.username)}
+                                        {detailRow('Company name', detailUser.companyName)}
+                                        {detailRow('Contact person', detailUser.contactPerson)}
+                                        {detailRow('Phone', detailUser.phoneNumber)}
+                                        {detailRow('Title', detailUser.title)}
+                                        {detailRow('State', detailUser.state)}
+                                        {detailRow('City', detailUser.city)}
+                                        {detailRow('Address', detailUser.address)}
+                                        {detailRow('SEBI registration', detailUser.sebiRegistration)}
+                                        {detailRow(
+                                            'SEBI registration date',
+                                            detailUser.sebiRegistrationDate && dayjs(detailUser.sebiRegistrationDate).format('DD/MM/YYYY')
+                                        )}
+                                        {detailRow('Role', detailUser.role)}
+                                        {detailRow(
+                                            'Registered on',
+                                            detailUser.registeredOn && dayjs(detailUser.registeredOn).format('DD/MM/YYYY HH:mm:ss')
+                                        )}
+                                    </>
+                                )}
+                            </DialogContent>
+                            <DialogActions sx={{ px: 3, pb: 2 }}>
+                                <Button variant="contained" onClick={() => setDetailUser(null)} sx={{ textTransform: 'none' }}>
+                                    Close
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </Paper>
                 </Container>                        
              : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
