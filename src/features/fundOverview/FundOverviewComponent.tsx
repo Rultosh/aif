@@ -40,6 +40,7 @@ export const FundOverview = (props: any) => {
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const selfRatingState = useAppSelector(selectSelfRatings);
     const statusPrelims = prelimApplicationState.prelimApplication.status || '';
+    const statusPrelimsUpper = String(statusPrelims).trim().toUpperCase();
     const navigate = useNavigate();
 
     const { pathname } = useLocation();
@@ -66,8 +67,8 @@ export const FundOverview = (props: any) => {
         // }
     })
 
-    /** Draft (CREATED) or returned for revision (REVISE)—both use the preliminary wizard; other statuses cannot. */
-    const USER_PRELIM_ALLOWED_STATUSES = ['CREATED', 'REVISE'] as const;
+    /** Applicant may edit the preliminary wizard in these statuses only. */
+    const USER_PRELIM_ALLOWED_STATUSES = ['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT'] as const;
     const isNewApplicationRoute = !id || String(id).toUpperCase() === 'NEW';
 
     useEffect(() => {
@@ -152,7 +153,7 @@ export const FundOverview = (props: any) => {
         !isNewApplicationRoute &&
         statusPrelims !== '' &&
         statusPrelims !== undefined &&
-        !(USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(String(statusPrelims)) &&
+        !(USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(statusPrelimsUpper as (typeof USER_PRELIM_ALLOWED_STATUSES)[number]) &&
         !pathname.toLowerCase().includes('preview');
 
     /** Admins review after submit; no access to wizard while application is still draft (CREATED)—preview is allowed. */
@@ -180,7 +181,7 @@ export const FundOverview = (props: any) => {
         (isNewApplicationRoute
             || statusPrelims === ''
             || statusPrelims === undefined
-            || (USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(String(statusPrelims)));
+            || (USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(statusPrelimsUpper as (typeof USER_PRELIM_ALLOWED_STATUSES)[number]));
 
     // const pageTitle = id?.toString() === 'NEW' ? 'Add Application' : `Edit Application ${id ? `(${id})` : ''}`;
 
@@ -227,7 +228,8 @@ export const FundOverview = (props: any) => {
                                 const isActive = index === activeIndex;
 
                                 const selfRatingDone = !!selfRatingState.selfRatings?.id && !isFailed;
-                                const relaxWizardLock = String(statusPrelims) === 'REVISE';
+                                const relaxWizardLock =
+                                    statusPrelimsUpper === 'REVISE' || statusPrelimsUpper === 'REVERTED_TO_APPLICANT';
                                 const prelimWizardId = String(prelimApplicationState.prelimApplication?.id || id || '');
                                 const pathLower = pathname.toLowerCase();
                                 const fundStepReached =

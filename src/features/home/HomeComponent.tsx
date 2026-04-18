@@ -62,7 +62,7 @@ const CHECKER_WORKFLOW_TAB_IDS = [
 type CheckerWorkflowTabId = (typeof CHECKER_WORKFLOW_TAB_IDS)[number];
 
 const CHECKER_TAB_LABELS: Record<CheckerWorkflowTabId, string> = {
-    pendingAssignment: 'Application Pending Assignment',
+    pendingAssignment: 'Pending Assignment',
     assignedToMaker: 'Assigned to Maker',
     withChecker: 'With Checker',
     withScreeningCommittee: 'With Screening Committee',
@@ -114,7 +114,28 @@ function checkerWorkflowTabForStatus(statusRaw: string | undefined, row?: IPreli
     if (isCheckerFailedIaOnlyDraft(row, status)) {
         return 'failedApplication';
     }
+    /** Maker loop with applicant (revision); checker still treats queue as with maker. */
+    if (status === 'REVISE' || status === 'REVERTED_TO_APPLICANT') {
+        return 'assignedToMaker';
+    }
     return 'pendingAssignment';
+}
+
+/**
+ * Applicant home list: omit CREATED applications until Initial Assessment is finished
+ * (enriched average on the list row ≥ 5, same threshold as successful IA submit in SelfRating).
+ */
+function applicantPrelimVisibleInHomeTable(row: IPrelimApplicationData): boolean {
+    const status = String(row.status || '').trim().toUpperCase();
+    if (status !== 'CREATED') {
+        return true;
+    }
+    const raw = row.initialSelfRatingScore;
+    if (raw == null || String(raw).trim() === '') {
+        return false;
+    }
+    const avg = parseFloat(String(raw).replace(/,/g, ''));
+    return Number.isFinite(avg) && avg >= 5;
 }
 
 export const Home = (pros: any) => {
@@ -206,6 +227,9 @@ export const Home = (pros: any) => {
                 (r) => Number(r.assignedPfUserId || 0) === Number(usersState.me?.id || 0)
             );
         const filtered = source?.filter((app) => {
+            if (normalizedRole === 'USER' && !applicantPrelimVisibleInHomeTable(app)) {
+                return false;
+            }
             const status = String(app.status || '').toUpperCase();
             let sectionMatch = true;
             if (normalizedRole === 'CHECKER') {
@@ -290,11 +314,12 @@ export const Home = (pros: any) => {
             return sections;
         }
         if (normalizedRole === 'USER') {
-            const created = rows.filter((r) => String(r.status || '').toUpperCase() === 'CREATED').length;
-            const submitted = rows.filter((r) => String(r.status || '').toUpperCase() === 'SUBMITTED').length;
-            const reverted = rows.filter((r) => String(r.status || '').toUpperCase() === 'REVISE').length;
-            const sanctioned = rows.filter((r) => String(r.status || '').toUpperCase() === 'SANCTIONED').length;
-            const sections: any[] = [...base];
+            const vr = rows.filter(applicantPrelimVisibleInHomeTable);
+            const created = vr.filter((r) => String(r.status || '').toUpperCase() === 'CREATED').length;
+            const submitted = vr.filter((r) => String(r.status || '').toUpperCase() === 'SUBMITTED').length;
+            const reverted = vr.filter((r) => String(r.status || '').toUpperCase() === 'REVISE').length;
+            const sanctioned = vr.filter((r) => String(r.status || '').toUpperCase() === 'SANCTIONED').length;
+            const sections: any[] = [{ id: 'all', label: 'All', count: vr.length }];
             if (created > 0) sections.push({ id: 'created', label: 'Created', count: created });
             if (submitted > 0) sections.push({ id: 'submitted', label: 'Submitted (Read only)', count: submitted });
             if (reverted > 0) sections.push({ id: 'reverted', label: 'Reverted', count: reverted });
@@ -651,8 +676,10 @@ export const Home = (pros: any) => {
         }
         if ((row.status === 'SUBMITTED' || row.status === 'REVIEWED' || row.status === 'APPROVED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && hasActiveRole('ADMIN', 'USERADMIN', 'CHECKER', 'MANAGER'))
             return true
-        if ((row.status === 'CREATED' || row.status === 'REVISE') && hasActiveRole('USER'))
-            return true
+        const userDraftOrRevision = ['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT'];
+        if (userDraftOrRevision.includes(statusUpper) && hasActiveRole('USER')) {
+            return true;
+        }
         if (row.status === 'SANCTIONED' && hasActiveRole('USER'))
             return true
         if ((row.status === 'MAKER_ASSIGNED'
@@ -729,13 +756,21 @@ export const Home = (pros: any) => {
 
         return <Chip label={label} color={color} size="small" sx={{ fontSize: '0.7rem', fontWeight: 600, borderRadius: '6px' }} />;
     }
-    const getPath = (status: String | undefined) => {
+    const getPath = (row: IPrelimApplicationData) => {
         if (hasActiveRole('ADMIN', 'USERADMIN', 'CHECKER', 'MANAGER')) {
-            return 'preview'
+            return 'preview';
         }
-        let path = (status && ['SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED', 'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF', 'REJECTED_BY_PF', 'SANCTIONED'].includes(status.toString())) ? 'preview' : 'fund'
-        return path;
-    }
+        const s = String(row.status ?? '').trim().toUpperCase();
+        /** CREATED: IA incomplete → Initial Assessment; IA complete (same rule as home list) → Fund. */
+        if (hasActiveRole('USER') && s === 'CREATED') {
+            return applicantPrelimVisibleInHomeTable(row) ? 'fund' : 'selfrating';
+        }
+        const applicantPreviewOnly = new Set([
+            'SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED',
+            'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF', 'REJECTED_BY_PF', 'SANCTIONED',
+        ]);
+        return applicantPreviewOnly.has(s) ? 'preview' : 'fund';
+    };
 
     const getStatusDescription = (stage: String | undefined, status: String | undefined) => {
 
@@ -907,16 +942,104 @@ export const Home = (pros: any) => {
                         </Button>}
                     </Box>
                     {!isApplicantUser && (
-                        <Box sx={{ mb: 2 }}>
+                        <Box
+                            sx={{
+                                mb: 2.5,
+                                p: 0.75,
+                                borderRadius: '12px',
+                                border: '1px solid #e2e8f0',
+                                backgroundColor: '#f8fafc',
+                                boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+                            }}
+                        >
                             <Tabs
                                 value={workflowTabsSelection}
                                 onChange={(_, v) => setWorkflowSectionTab(v)}
                                 variant="scrollable"
+                                scrollButtons="auto"
                                 allowScrollButtonsMobile
-                                sx={{ minHeight: 36, '& .MuiTab-root': { textTransform: 'none', minHeight: 36, fontWeight: 600 } }}
+                                TabIndicatorProps={{
+                                    sx: {
+                                        height: 3,
+                                        borderRadius: '3px',
+                                        bgcolor: '#4338ca',
+                                    },
+                                }}
+                                sx={{
+                                    minHeight: 52,
+                                    '& .MuiTabs-scrollButtons': {
+                                        borderRadius: 1,
+                                        '&.Mui-disabled': { opacity: 0.35 },
+                                    },
+                                    '& .MuiTab-root': {
+                                        textTransform: 'none',
+                                        minHeight: 48,
+                                        py: 1,
+                                        px: 1.75,
+                                        mx: 0.25,
+                                        borderRadius: '10px',
+                                        fontSize: '0.875rem',
+                                        fontWeight: 600,
+                                        color: '#64748b',
+                                        transition: 'color 0.15s ease, background-color 0.15s ease',
+                                        '&:hover': {
+                                            color: '#334155',
+                                            backgroundColor: 'rgba(148, 163, 184, 0.12)',
+                                        },
+                                        '&.Mui-selected': {
+                                            color: '#3730a3',
+                                            backgroundColor: 'rgba(67, 56, 163, 0.08)',
+                                        },
+                                    },
+                                    '& .MuiTab-root .workflow-tab-count': {
+                                        height: 22,
+                                        minWidth: 26,
+                                        fontSize: '0.7rem',
+                                        fontWeight: 800,
+                                        backgroundColor: '#e2e8f0',
+                                        color: '#475569',
+                                    },
+                                    '& .MuiTab-root.Mui-selected .workflow-tab-count': {
+                                        backgroundColor: '#4338ca',
+                                        color: '#fff',
+                                    },
+                                }}
                             >
                                 {getWorkflowSections().map((section: any) => (
-                                    <Tab key={section.id} value={section.id} label={`${section.label} (${section.count})`} />
+                                    <Tab
+                                        key={section.id}
+                                        value={section.id}
+                                        label={
+                                            <Box
+                                                sx={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                    maxWidth: { xs: 220, sm: 'none' },
+                                                }}
+                                            >
+                                                <Typography
+                                                    component="span"
+                                                    variant="body2"
+                                                    sx={{
+                                                        fontWeight: 700,
+                                                        letterSpacing: '-0.01em',
+                                                        lineHeight: 1.25,
+                                                        textAlign: 'left',
+                                                    }}
+                                                >
+                                                    {section.label}
+                                                </Typography>
+                                                <Chip
+                                                    className="workflow-tab-count"
+                                                    label={section.count}
+                                                    size="small"
+                                                    variant="filled"
+                                                    sx={{ '& .MuiChip-label': { px: 0.75 } }}
+                                                />
+                                            </Box>
+                                        }
+                                    />
                                 ))}
                             </Tabs>
                         </Box>
@@ -1027,7 +1150,7 @@ export const Home = (pros: any) => {
                                                 {row.stage === "PRELIM" ?
                                                     <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
                                                         {isGoodToShowApplication(row) ?
-                                                            <a href={`#/preliminary/${row.id}/${getPath(row.status)}`}
+                                                            <a href={`#/preliminary/${row.id}/${getPath(row)}`}
                                                                 style={{ color: '#3f4bee', fontWeight: 600 }}>{fundDisplayName}</a> :
                                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
                                                                 {fundDisplayName}

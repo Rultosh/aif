@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Alert } from "@mui/material";
 import { useState, useEffect } from "react"
 import { questionsForMoreThanOne } from './selfRatingQuestionsMoreThanOne'
 import { questionsForFirstTime } from './selfRatingQuestionsFirstTime'
@@ -25,6 +25,27 @@ import { Controller } from "react-hook-form";
 
 type InitialState = {
     selfRatingData: any
+}
+
+/** Applicant-only: IA is final once saved with passing average (aligned with Home / submit rule). */
+function computeApplicantAssessmentLocked(
+    role: string | undefined,
+    prelimId: string | undefined,
+    selfRating: ISelfRating,
+    questionCount: number
+): boolean {
+    const roleParts = String(role || '')
+        .split(',')
+        .map((r) => r.trim().toUpperCase())
+        .filter(Boolean);
+    const isApplicant =
+        roleParts.includes('USER') &&
+        !roleParts.some((x) => ['ADMIN', 'USERADMIN', 'MAKER', 'CHECKER', 'MANAGER', 'PENSION_FUND'].includes(x));
+    if (!isApplicant) return false;
+    if (!prelimId || String(prelimId).toUpperCase() === 'NEW' || !Number(prelimId)) return false;
+    if (!selfRating?.id || questionCount <= 0) return false;
+    const avg = Number(selfRating.score || 0) / questionCount;
+    return Number.isFinite(avg) && avg >= 5;
 }
 
 export const SelfRating = (props: any) => {
@@ -70,6 +91,12 @@ export const SelfRating = (props: any) => {
         return questions;
     };
 
+    const getQuestionCountForLock = () =>
+        getRefinedQuestions(
+            selfRatingValue.managerType != null ? String(selfRatingValue.managerType) : undefined,
+            selfRatingValue.fundType != null ? String(selfRatingValue.fundType) : undefined
+        ).length;
+
     // const selfRatingCookie = getCookie('selfRating') || '0';
     // const [selfRating, setSelfRating] = useCookie('selfRating', selfRatingCookie);
 
@@ -84,12 +111,6 @@ export const SelfRating = (props: any) => {
     })
 
     const [hasJustSubmitted, setHasJustSubmitted] = useState(false);
-
-    useEffect(() => {
-        if (!hasJustSubmitted && selfRatingState.selfRatings?.id && selfRatingState.status.fetchStatus === FetchStatus.IDLE) {
-            navigate(`/preliminary/${id}/fund`, { replace: true });
-        }
-    }, [selfRatingState.selfRatings?.id, selfRatingState.status.fetchStatus, id, navigate, hasJustSubmitted]);
 
     useEffect(() => {
         dispatch(
@@ -156,6 +177,13 @@ export const SelfRating = (props: any) => {
 
     const handleClick = async (ev: any, navTo: string) => {
         try {
+            const qc = getQuestionCountForLock();
+            if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, qc)) {
+                if (navTo !== 'previous') {
+                    navigate(`/preliminary/${id}/fund`);
+                }
+                return;
+            }
             await handleClickSave();
 
             if (navTo !== 'previous') {
@@ -168,6 +196,10 @@ export const SelfRating = (props: any) => {
     }
 
     async function handleClickSave() {
+        const qc = getQuestionCountForLock();
+        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, qc)) {
+            return;
+        }
         console.log(selfRatingValue.id)
         // console.log((!selfRatingValue.id))
         // console.log(id)
@@ -225,6 +257,9 @@ export const SelfRating = (props: any) => {
 
 
     const handleChangeFundManagerType = (e: any) => {
+        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock())) {
+            return;
+        }
         // ev.preventDefault();
         // let copiedValue = { ...formData }
         // let key = ev.target.id ? ev.target.id : ev.target.name;
@@ -254,6 +289,9 @@ export const SelfRating = (props: any) => {
 
 
     const handleChange = (e: any, idx: any) => {
+        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock())) {
+            return;
+        }
         e.preventDefault();
         console.log('checking state value', selfRatingValue, e.target.value, idx)
         let copiedValue = { ...selfRatingValue };
@@ -290,6 +328,13 @@ export const SelfRating = (props: any) => {
         });
     }, [selfQuestions, selfRatingValue]);
 
+    const assessmentLocked = computeApplicantAssessmentLocked(
+        usersState.role,
+        id,
+        selfRatingValue,
+        selfQuestions.length
+    );
+
     for (let i = 0; i < selfQuestions.length; i++) {
         let qes = selfQuestions[i].id.toString().concat('. ', selfQuestions[i].text);
         let idxVal = i;
@@ -311,7 +356,7 @@ export const SelfRating = (props: any) => {
                         <CardContent sx={{ p: 3, width: '100%' }}>
                             <Grid container spacing={3}>
                                 <Grid item xs={12}>
-                                    <FormControl fullWidth>
+                                    <FormControl fullWidth disabled={assessmentLocked}>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="subtitle1" className="question-text" sx={{ fontWeight: 700, color: '#000000', transition: 'color 0.2s ease' }}>
                                                 {qes}
@@ -376,6 +421,9 @@ export const SelfRating = (props: any) => {
     const [modalType, setModalType] = useState<'success' | 'fail'>('success');
 
     const handleSubmitClick = async () => {
+        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock())) {
+            return;
+        }
         setIsLoading(true);
         try {
             setHasJustSubmitted(true);
@@ -455,6 +503,11 @@ export const SelfRating = (props: any) => {
                     </Box>
 
                     <Box sx={{ mb: 4 }}>
+                        {assessmentLocked && (
+                            <Alert severity="info" sx={{ mb: 2, borderRadius: '10px' }}>
+                                Your Initial Assessment is complete and cannot be changed. Use &quot;Continue to Fund Information&quot; to proceed.
+                            </Alert>
+                        )}
                         {/* <Card sx={{
                             display: 'flex',
                             mt: 3,
@@ -482,6 +535,7 @@ export const SelfRating = (props: any) => {
                                                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
                                                     First time IM/AMC?
                                                 </Typography>
+                                                <FormControl component="fieldset" disabled={assessmentLocked} sx={{ minWidth: 0 }}>
                                                 <RadioGroup
                                                     row
                                                     value={managerType === "Experienced Fund Manager" ? "no" : "yes"}
@@ -496,6 +550,7 @@ export const SelfRating = (props: any) => {
                                                     <FormControlLabel value="yes" control={<Radio size="small" sx={controlSx} />} label="Yes" />
                                                     <FormControlLabel value="no" control={<Radio size="small" sx={controlSx} />} label="No" />
                                                 </RadioGroup>
+                                                </FormControl>
                                             </Box>
                                         </Grid>
                                         <Grid item xs={12} md={6}>
@@ -503,6 +558,7 @@ export const SelfRating = (props: any) => {
                                                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#000000' }}>
                                                     Type of Fund?
                                                 </Typography>
+                                                <FormControl component="fieldset" disabled={assessmentLocked} sx={{ minWidth: 0 }}>
                                                 <RadioGroup
                                                     row
                                                     value={selfRatingValue.fundType || "Equity Oriented Fund"}
@@ -514,6 +570,7 @@ export const SelfRating = (props: any) => {
                                                     <FormControlLabel value="Equity Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Equity Oriented Fund" />
                                                     <FormControlLabel value="Debt Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented Fund" />
                                                 </RadioGroup>
+                                                </FormControl>
                                             </Box>
                                         </Grid>
                                     </Grid>
@@ -553,7 +610,7 @@ export const SelfRating = (props: any) => {
                         </Box>
 
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                            {!isSubmitted ? (
+                            {!(isSubmitted || assessmentLocked) ? (
                                 <Button
                                     onClick={() => setShowConfirmModal(true)}
                                     variant="contained"
@@ -621,9 +678,11 @@ export const SelfRating = (props: any) => {
                 }}
             >
                 <Button
-                    onClick={(e) => !isSubmitted ? setShowConfirmModal(true) : handleNextClick(e)}
+                    onClick={(e) =>
+                        !(isSubmitted || assessmentLocked) ? setShowConfirmModal(true) : handleNextClick(e)
+                    }
                     variant="contained"
-                    disabled={isLoading || (!isSubmitted && !allAnswered)}
+                    disabled={isLoading || (!(isSubmitted || assessmentLocked) && !allAnswered)}
                     sx={{
                         minWidth: 'auto',
                         width: isLoading ? '80px' : '48px',

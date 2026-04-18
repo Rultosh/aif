@@ -84,8 +84,9 @@ export const Preview = (props: any) => {
     const [commentHistory, setCommentHistory] = useState<IHistory[]>([]);
     /** Preview: only fund applicants should return to declaration; not maker/checker/manager/admin. */
     const showBackToDeclaration = roleParts.includes('USER') && !isOperationalWorkflowUser;
-    const isApplicantActionable =
-        role === 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE');
+    const statusPrelimsUpper = String(statusPrelims || '').trim().toUpperCase();
+    const applicantEditableStatuses = new Set(['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT']);
+    const isApplicantActionable = hasRole('USER') && applicantEditableStatuses.has(statusPrelimsUpper);
     const isOperationalActionable =
         ['ADMIN', 'USERADMIN'].includes(role) &&
         (statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'TEMP_CLOSED');
@@ -694,7 +695,7 @@ export const Preview = (props: any) => {
                                         </FormControl>
                                     )}
 
-                                    {(usersState.role == 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE')) && (
+                                    {(hasRole('USER') && applicantEditableStatuses.has(statusPrelimsUpper)) && (
                                         <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', px: 4, fontWeight: 700, backgroundColor: '#4caf50' }}>
                                             Submit Application
                                         </Button>
