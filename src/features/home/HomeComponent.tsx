@@ -99,7 +99,6 @@ function checkerWorkflowTabForStatus(statusRaw: string | undefined, row?: IPreli
     if (
         [
             'CHECKER_FORWARDED_TO_MANAGER',
-            'REVERTED_TO_MANAGER',
             'MANAGER_FORWARDED_TO_PF',
             'APPROVED_BY_PF',
             'SANCTIONED',
@@ -214,17 +213,17 @@ export const Home = (pros: any) => {
                     ? workflowSectionTab
                     : 'pendingAssignment';
                 sectionMatch = checkerWorkflowTabForStatus(status, app) === checkerTab;
+            } else if (normalizedRole === 'MAKER') {
+                const makerTab: MakerWorkflowTabId = (MAKER_WORKFLOW_TAB_IDS as readonly string[]).includes(workflowSectionTab)
+                    ? workflowSectionTab as MakerWorkflowTabId
+                    : 'withMaker';
+                if (makerTab === 'withMaker') {
+                    sectionMatch = status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER';
+                } else {
+                    sectionMatch = status === 'REVISE';
+                }
             } else if (workflowSectionTab !== 'all') {
-                if (normalizedRole === 'MAKER') {
-                    const makerTab: MakerWorkflowTabId = (MAKER_WORKFLOW_TAB_IDS as readonly string[]).includes(workflowSectionTab)
-                        ? workflowSectionTab as MakerWorkflowTabId
-                        : 'withMaker';
-                    if (makerTab === 'withMaker') {
-                        sectionMatch = status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER';
-                    } else {
-                        sectionMatch = status === 'REVISE';
-                    }
-                } else if (normalizedRole === 'MANAGER') {
+                if (normalizedRole === 'MANAGER') {
                     if (workflowSectionTab === 'forwardedSc') sectionMatch = (status === 'CHECKER_FORWARDED_TO_MANAGER' || status === 'REVERTED_TO_MANAGER');
                     else if (workflowSectionTab === 'approvedPf') sectionMatch = status === 'APPROVED_BY_PF';
                     else if (workflowSectionTab === 'rejectedPf') sectionMatch = status === 'REJECTED_BY_PF';
