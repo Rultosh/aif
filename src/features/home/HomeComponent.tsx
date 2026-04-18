@@ -1,15 +1,15 @@
 import '../../index.css';
-import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab, CircularProgress } from '@mui/material';
+import { Alert, Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab, Card, CardContent, Snackbar } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NavigationBar from '../../components/NavigationBar'
 import React, * as Rect from 'react'
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import { wrapArgument } from '../../lib/api-status/actionWrapper';
-import { createPrelimApplicationAsync, createPrelimStarterAsync, getPrelimApplicationList, getPrelimApplicationAllList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
+import { createPrelimApplicationAsync, createPrelimStarterAsync, getPrelimApplicationList, IPageInfo, PrelimApplicationState, selectPrelimApplication } from '../fundOverview/subsections/fundOverviewData/prelimApplicationDataSlice';
 import logo from '../../images/logo.png';
 import logoNps from '../../images/logo_nps.png';
 import uuid from "react-uuid";
@@ -43,9 +43,72 @@ import { ReactComponent as HistoryCustomIcon } from '../../images/history.svg';
 import { ReactComponent as SettingCustomIcon } from '../../images/setting.svg';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { fetchMakerUsers, fetchCheckerUsers, fetchManagerUsers, fetchPensionFundUsers, postWorkflowAction, fetchPrelimsInitialAssessmentOnly } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import { fetchMakerUsers, fetchCheckerUsers, fetchManagerUsers, fetchPensionFundUsers, postWorkflowAction } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
 import FileUploadService from '../../components/FileUploadService';
 import { shouldShowListPaginationFooter } from '../../lib/listPaginationVisibility';
+import { computeCompositeQueueScore, experiencedImAmcTableLabel } from '../../lib/queueCompositeScore';
+import { opaqueInfoToastAlertSx } from '../../lib/ui/opaqueInfoToastAlertSx';
+
+/** Checker workflow list: exactly these five sections (no "All"). */
+const CHECKER_WORKFLOW_TAB_IDS = [
+    'pendingAssignment',
+    'assignedToMaker',
+    'withChecker',
+    'withScreeningCommittee',
+    'failedApplication',
+] as const;
+
+type CheckerWorkflowTabId = (typeof CHECKER_WORKFLOW_TAB_IDS)[number];
+
+const CHECKER_TAB_LABELS: Record<CheckerWorkflowTabId, string> = {
+    pendingAssignment: 'Application Pending Assignment',
+    assignedToMaker: 'Assigned to Maker',
+    withChecker: 'With Checker',
+    withScreeningCommittee: 'With Screening Committee',
+    failedApplication: 'Failed Application',
+};
+
+/** PRELIM draft with IA completed: enriched average below 5 (aligned with self-rating submit rule). */
+function isCheckerFailedIaOnlyDraft(row: IPrelimApplicationData | undefined, statusUpper: string): boolean {
+    if (!row) return false;
+    const draftLike = !statusUpper || statusUpper === 'CREATED' || statusUpper === 'REVISE';
+    if (!draftLike) return false;
+    const st = String(row.stage || '').trim().toUpperCase();
+    if (st && st !== 'PRELIM') return false;
+    const raw = row.initialSelfRatingScore;
+    if (raw == null || String(raw).trim() === '') return false;
+    const avg = parseFloat(String(raw).replace(/,/g, ''));
+    return Number.isFinite(avg) && avg < 5;
+}
+
+/** Maps prelim status (and draft IA outcome) to exactly one checker list tab. */
+function checkerWorkflowTabForStatus(statusRaw: string | undefined, row?: IPrelimApplicationData): CheckerWorkflowTabId {
+    const status = String(statusRaw || '').trim().toUpperCase();
+    if (status === 'SUBMITTED') return 'pendingAssignment';
+    if (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER') return 'assignedToMaker';
+    if (status === 'MEMO_SUBMITTED') return 'withChecker';
+    if (
+        [
+            'CHECKER_FORWARDED_TO_MANAGER',
+            'REVERTED_TO_MANAGER',
+            'MANAGER_FORWARDED_TO_PF',
+            'APPROVED_BY_PF',
+            'SANCTIONED',
+            'REVIEWED',
+            'APPROVED',
+        ].includes(status)
+    ) {
+        return 'withScreeningCommittee';
+    }
+    if (['REJECTED_BY_PF', 'REJECTED', 'CLOSED', 'TEMP_CLOSED'].includes(status)) {
+        return 'failedApplication';
+    }
+    if (isCheckerFailedIaOnlyDraft(row, status)) {
+        return 'failedApplication';
+    }
+    return 'pendingAssignment';
+}
 
 export const Home = (pros: any) => {
 
@@ -87,17 +150,20 @@ export const Home = (pros: any) => {
     const [memoFile, setMemoFile] = useState<File | null>(null);
     const [memoError, setMemoError] = useState<string>('');
     const [memoUploading, setMemoUploading] = useState<boolean>(false);
+    const [contactDetailsRow, setContactDetailsRow] = useState<IPrelimApplicationData | null>(null);
     const [startApplicationConfirmOpen, setStartApplicationConfirmOpen] = useState(false);
-    const [searchEmail, setSearchEmail] = useState<string>('');
     const [searchAifName, setSearchAifName] = useState<string>('');
-    /** 0 = main workflow list, 1 = prelims with no linked self-rating yet (initial assessment only). */
-    const [homeWorkflowTab, setHomeWorkflowTab] = useState(0);
-    const [initialAssessmentList, setInitialAssessmentList] = useState<IPrelimApplicationData[]>([]);
-    const [initialAssessmentLoading, setInitialAssessmentLoading] = useState(false);
+    const [searchFundType, setSearchFundType] = useState<string>('');
+    const [startApplicationToast, setStartApplicationToast] = useState<string | null>(null);
     const [workflowSectionTab, setWorkflowSectionTab] = useState<string>('all');
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
     const totalEntries = prelimApplications.totalEntries || 0;
+    const listQuery = useMemo((): IPageInfo => ({
+        ...pageInfo,
+        searchAifName: searchAifName.trim() || undefined,
+        fundType: searchFundType.trim() || undefined,
+    }), [pageInfo, searchAifName, searchFundType]);
     const hasActiveRole = (...roles: string[]) =>
         roles.some((role) =>
             activeRole.split(',').map((r) => r.trim().toUpperCase()).includes(role.toUpperCase())
@@ -106,39 +172,44 @@ export const Home = (pros: any) => {
     const handleChange = (event: SelectChangeEvent) => {
         let updatedPageInfo = { ...pageInfo, pageSize: parseInt(event.target.value), pageNumber: 0 }
         setPageInfoSelect(parseInt(event.target.value));
-        setPageInfo(updatedPageInfo)
-        dispatch(getPrelimApplicationList(wrapArgument(
-            actionUid, updatedPageInfo
-        )))
+        setPageInfo(updatedPageInfo);
     };
 
-    const showInitialAssessmentTab = hasActiveRole('CHECKER') || hasActiveRole('MANAGER');
+    const isApplicantUser = activeRole === 'USER';
+
+    /** Maps AIF Category Type (fund form) to table Fund Type: Equity / Debt. */
+    const getFundTypeTableLabel = (row: IPrelimApplicationData) => {
+        const raw = String(row.aifCategoryType || '').trim();
+        if (!raw) return '—';
+        const equityTypes = ['Equity Oriented AIF', 'Equity Oriented Fund'];
+        const debtTypes = ['Debt Oriented AIF', 'Debt Oriented Fund'];
+        if (equityTypes.includes(raw)) return 'Equity';
+        if (debtTypes.includes(raw)) return 'Debt';
+        const lower = raw.toLowerCase();
+        if (lower.includes('equity')) return 'Equity';
+        if (lower.includes('debt')) return 'Debt';
+        return '—';
+    };
 
     const getFilteredApplications = () => {
-        const source =
-            homeWorkflowTab === 0
-                ? prelimApplications.prelimApplications
-                : initialAssessmentList;
+        const source = prelimApplications.prelimApplications;
         const normalizedRole = String(activeRole || '').toUpperCase();
         const isPfUser = normalizedRole === 'PENSION_FUND'
             && (prelimApplications.prelimApplications || []).some(
                 (r) => Number(r.assignedPfUserId || 0) === Number(usersState.me?.id || 0)
             );
-        return source?.filter((app) => {
-            const emailMatch = (app.createdByName || '').toLowerCase().includes(searchEmail.toLowerCase());
-            const aifHaystack = `${app.registrationAifName || ''} ${app.nameOfTheFund || ''}`.toLowerCase();
-            const aifNameMatch = aifHaystack.includes(searchAifName.toLowerCase());
+        const filtered = source?.filter((app) => {
             const status = String(app.status || '').toUpperCase();
             let sectionMatch = true;
-            if (homeWorkflowTab === 1) {
-                sectionMatch = true;
+            if (normalizedRole === 'CHECKER') {
+                const checkerTab = (CHECKER_WORKFLOW_TAB_IDS as readonly string[]).includes(workflowSectionTab)
+                    ? workflowSectionTab
+                    : 'pendingAssignment';
+                sectionMatch = checkerWorkflowTabForStatus(status, app) === checkerTab;
             } else if (workflowSectionTab !== 'all') {
                 if (normalizedRole === 'MAKER') {
                     sectionMatch = workflowSectionTab === 'assigned'
                         && (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER' || status === 'REVERTED_TO_MANAGER');
-                } else if (normalizedRole === 'CHECKER') {
-                    if (workflowSectionTab === 'submitted') sectionMatch = status === 'SUBMITTED';
-                    else if (workflowSectionTab === 'assignedAnalyst') sectionMatch = (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER');
                 } else if (normalizedRole === 'MANAGER') {
                     if (workflowSectionTab === 'forwardedSc') sectionMatch = (status === 'CHECKER_FORWARDED_TO_MANAGER' || status === 'REVERTED_TO_MANAGER');
                     else if (workflowSectionTab === 'approvedPf') sectionMatch = status === 'APPROVED_BY_PF';
@@ -156,8 +227,9 @@ export const Home = (pros: any) => {
                     else if (workflowSectionTab === 'sanctioned') sectionMatch = status === 'SANCTIONED';
                 }
             }
-            return emailMatch && aifNameMatch && sectionMatch;
+            return sectionMatch;
         }) || [];
+        return filtered;
     };
 
     const getWorkflowSections = () => {
@@ -171,12 +243,11 @@ export const Home = (pros: any) => {
             return assigned > 0 ? [...base, { id: 'assigned', label: 'Assigned Application', count: assigned }] : base;
         }
         if (normalizedRole === 'CHECKER') {
-            const submitted = rows.filter((r) => String(r.status || '').toUpperCase() === 'SUBMITTED').length;
-            const assignedAnalyst = rows.filter((r) => ['MAKER_ASSIGNED', 'REVERTED_TO_MAKER'].includes(String(r.status || '').toUpperCase())).length;
-            const sections: any[] = [...base];
-            if (submitted > 0) sections.push({ id: 'submitted', label: 'Submitted (Applicant)', count: submitted });
-            if (assignedAnalyst > 0) sections.push({ id: 'assignedAnalyst', label: 'Assigned to Analyst', count: assignedAnalyst });
-            return sections;
+            return CHECKER_WORKFLOW_TAB_IDS.map((id) => ({
+                id,
+                label: CHECKER_TAB_LABELS[id],
+                count: rows.filter((r) => checkerWorkflowTabForStatus(String(r.status), r) === id).length,
+            }));
         }
         if (normalizedRole === 'MANAGER') {
             const forwardedSc = rows.filter((r) => ['CHECKER_FORWARDED_TO_MANAGER', 'REVERTED_TO_MANAGER'].includes(String(r.status || '').toUpperCase())).length;
@@ -184,7 +255,7 @@ export const Home = (pros: any) => {
             const rejectedPf = rows.filter((r) => String(r.status || '').toUpperCase() === 'REJECTED_BY_PF').length;
             const sanctioned = rows.filter((r) => String(r.status || '').toUpperCase() === 'SANCTIONED').length;
             const sections: any[] = [...base];
-            if (forwardedSc > 0) sections.push({ id: 'forwardedSc', label: 'Forwarded to SC', count: forwardedSc });
+            if (forwardedSc > 0) sections.push({ id: 'forwardedSc', label: 'With Screening Committee', count: forwardedSc });
             if (approvedPf > 0) sections.push({ id: 'approvedPf', label: 'Approved by PF', count: approvedPf });
             if (rejectedPf > 0) sections.push({ id: 'rejectedPf', label: 'Rejected by PF', count: rejectedPf });
             if (sanctioned > 0) sections.push({ id: 'sanctioned', label: 'Sanctioned', count: sanctioned });
@@ -216,17 +287,32 @@ export const Home = (pros: any) => {
     };
 
 
-    const handleSearchEmailChange = (e: any) => {
-        setSearchEmail(e.target.value);
-    };
-
     const handleSearchAifNameChange = (e: any) => {
         setSearchAifName(e.target.value);
     };
 
     const handleClearSearch = () => {
-        setSearchEmail('');
         setSearchAifName('');
+        setSearchFundType('');
+        setPageInfo((prev) => ({ ...prev, pageNumber: 0, sortBy: undefined, sortDir: 'asc' }));
+    };
+
+    const getStartApplicationErrorText = (error: unknown): string => {
+        if (typeof error === 'string') {
+            return error;
+        }
+        const e = error as { message?: string; response?: { data?: { message?: string } | string } };
+        if (e?.message && typeof e.message === 'string') {
+            return e.message;
+        }
+        const data = e?.response?.data;
+        if (typeof data === 'string') {
+            return data;
+        }
+        if (data && typeof data === 'object' && typeof (data as { message?: string }).message === 'string') {
+            return (data as { message: string }).message;
+        }
+        return 'An unexpected error occurred while starting the application.';
     };
 
     const proceedStartApplication = async () => {
@@ -235,9 +321,9 @@ export const Home = (pros: any) => {
                 createPrelimStarterAsync(wrapArgument(actionUid, prelimApplicationState.prelimApplication))
             ).unwrap();
             navigate(`/Preliminary/${application.id}/selfRating`)
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Failed to start application:", error);
-            alert(error?.message || "An unexpected error occurred while starting the application.");
+            setStartApplicationToast(getStartApplicationErrorText(error));
         }
     };
 
@@ -260,20 +346,14 @@ export const Home = (pros: any) => {
     }
 
     useEffect(() => {
-        console.log('here')
-        dispatch(getPrelimApplicationList(wrapArgument(
-            actionUid, pageInfo
-        )))
-    }, [prelimApplications.prelimApplication])
+        dispatch(getPrelimApplicationList(wrapArgument(actionUid, listQuery)));
+    }, [dispatch, actionUid, listQuery, prelimApplications.prelimApplication]);
 
     useEffect(() => {
-        console.log("checking homeunauth", CheckAuth.isUnauthorized)
         if (CheckAuth.isUnauthorized) {
-            navigate('/login')
+            navigate('/login');
         }
-        // Fetch total count once on mount
-        dispatch(getPrelimApplicationAllList(wrapArgument(actionUid, pageInfo)))
-    }, [])
+    }, [navigate])
 
     useEffect(() => {
         const loadMakers = async () => {
@@ -320,43 +400,13 @@ export const Home = (pros: any) => {
     }, []);
 
     useEffect(() => {
-        if (!showInitialAssessmentTab || homeWorkflowTab !== 1) {
-            return;
+        const isChecker = activeRole.split(',').map((r) => r.trim().toUpperCase()).includes('CHECKER');
+        if (isChecker) {
+            setWorkflowSectionTab('pendingAssignment');
+        } else {
+            setWorkflowSectionTab('all');
         }
-        let cancelled = false;
-        const run = async () => {
-            setInitialAssessmentLoading(true);
-            try {
-                const response = await fetchPrelimsInitialAssessmentOnly();
-                if (!cancelled) {
-                    setInitialAssessmentList(response.data || []);
-                }
-            } catch (e: any) {
-                if (!cancelled) {
-                    setInitialAssessmentList([]);
-                    alert(e?.response?.data?.message || e?.message || 'Failed to load initial-assessment list.');
-                }
-            } finally {
-                if (!cancelled) {
-                    setInitialAssessmentLoading(false);
-                }
-            }
-        };
-        void run();
-        return () => {
-            cancelled = true;
-        };
-    }, [showInitialAssessmentTab, homeWorkflowTab]);
-
-    useEffect(() => {
-        if (!showInitialAssessmentTab) {
-            setHomeWorkflowTab(0);
-        }
-    }, [showInitialAssessmentTab, activeRole]);
-
-    useEffect(() => {
-        setWorkflowSectionTab('all');
-    }, [homeWorkflowTab, activeRole]);
+    }, [activeRole]);
 
     const openAssignMakerDialog = (row: IPrelimApplicationData) => {
         const rowId = typeof row.id === 'number' ? row.id : Number(row.id);
@@ -500,68 +550,92 @@ export const Home = (pros: any) => {
     };
 
     const tableHeadersWorkflow = [
-        "Fund Name",
+        "AIF Name",
         "Contact Person",
         "Status",
-        "Pending With (Email ID)",
+        "Pending With",
         "Start Date",
         "Target Corpus",
-        "Contribution",
+        "Fund Type",
+        "Fund Manager Experience",
+        "IA Score",
+        "Total Score",
         "Download",
         "Query",
         "History",
     ];
-    const tableHeadersInitialAssessment = [
-        "Fund Name",
+    const tableHeadersWorkflowApplicant = [
+        "AIF Name",
         "Contact Person",
         "Status",
-        "Pending With (Email ID)",
-        "Application created",
+        "Start Date",
         "Target Corpus",
-        "Contribution",
-        "Avg score",
+        "Fund Type",
+        "Fund Manager Experience",
+        "Download",
         "Query",
-        "History",
     ];
-    const tableHeaders = homeWorkflowTab === 1 ? tableHeadersInitialAssessment : tableHeadersWorkflow;
+    const tableHeaders = isApplicantUser ? tableHeadersWorkflowApplicant : tableHeadersWorkflow;
     const tableColumnCount = tableHeaders.length;
 
-    let headerComponent = []
+    const SORTABLE_HEADER_KEYS: Record<string, string> = isApplicantUser
+        ? { 'Target Corpus': 'TARGET_CORPUS' }
+        : { 'Target Corpus': 'TARGET_CORPUS', 'IA Score': 'IA_SCORE', 'Total Score': 'TOTAL_SCORE' };
 
-    for (let i = 0; i < tableHeaders.length; i++) {
-        headerComponent.push(
-            <React.Fragment key={tableHeaders[i]}>
-                <TableCell align="left" sx={{ fontWeight: '600', color: '#1a1a1a', p: '12px 10px', fontSize: '13px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#e9e9f6' }}>{tableHeaders[i]}</TableCell>
-            </React.Fragment>)
-    }
+    const requestListSort = (apiSortKey: string) => {
+        const nextDir: 'asc' | 'desc' =
+            pageInfo.sortBy === apiSortKey && pageInfo.sortDir === 'asc' ? 'desc' : 'asc';
+        setPageInfo((prev) => ({
+            ...prev,
+            pageNumber: 0,
+            sortBy: apiSortKey,
+            sortDir: nextDir,
+        }));
+    };
 
-    // const detailedTableHeaders = ["Sidbi Reference Number", "Contact Person", "Status"]
-
-    // let detailedHeaderComponent = []
-
-    // for (let i = 0; i < detailedTableHeaders.length; i++) {
-    //     detailedHeaderComponent.push(
-    //         <React.Fragment >
-    //             <TableCell align="center" sx={{ fontWeight: 'bold' }}>{detailedTableHeaders[i]}</TableCell>
-    //         </React.Fragment>)
-    // }
+    const headerComponent = tableHeaders.map((label, i) => {
+        const sortKey = SORTABLE_HEADER_KEYS[label];
+        const isDownloadCol = label === 'Download';
+        return (
+            <TableCell
+                key={`${label}-${i}`}
+                align={isDownloadCol ? 'center' : 'left'}
+                sx={{ fontWeight: '600', color: '#1a1a1a', p: '12px 10px', fontSize: '13px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#e9e9f6' }}
+            >
+                {sortKey ? (
+                    <TableSortLabel
+                        active={pageInfo.sortBy === sortKey}
+                        direction={pageInfo.sortBy === sortKey ? (pageInfo.sortDir || 'asc') : 'asc'}
+                        onClick={() => requestListSort(sortKey)}
+                        hideSortIcon={pageInfo.sortBy !== sortKey}
+                        sx={{ '&.MuiTableSortLabel-root': { fontWeight: 600, color: '#1a1a1a' } }}
+                    >
+                        {label}
+                    </TableSortLabel>
+                ) : (
+                    label
+                )}
+            </TableCell>
+        );
+    });
 
     const goToPage = (pageNo: number) => {
-        let updatedPageInfo = { ...pageInfo, pageNumber: pageNo }
-        setPageInfo(updatedPageInfo)
-        setPageInfoSelect(pageInfo.pageSize);
-        dispatch(getPrelimApplicationList(wrapArgument(
-            actionUid, updatedPageInfo
-        )))
+        const updatedPageInfo = { ...pageInfo, pageNumber: pageNo };
+        setPageInfo(updatedPageInfo);
+        setPageInfoSelect(updatedPageInfo.pageSize);
     }
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
-        let role = activeRole;
-        if ((row.status === 'SUBMITTED' || row.status === 'REVIEWED' || row.status === 'APPROVED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && (role == 'ADMIN' || role == 'CHECKER' || role == 'MANAGER'))
+        const statusUpper = String(row.status ?? '').trim().toUpperCase();
+        if (hasActiveRole('CHECKER')) {
+            if (isCheckerFailedIaOnlyDraft(row, statusUpper)) return true;
+            if (['REJECTED', 'REJECTED_BY_PF', 'CLOSED', 'TEMP_CLOSED'].includes(statusUpper)) return true;
+        }
+        if ((row.status === 'SUBMITTED' || row.status === 'REVIEWED' || row.status === 'APPROVED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && hasActiveRole('ADMIN', 'USERADMIN', 'CHECKER', 'MANAGER'))
             return true
-        if ((row.status === 'CREATED' || row.status === 'REVISE') && role == 'USER')
+        if ((row.status === 'CREATED' || row.status === 'REVISE') && hasActiveRole('USER'))
             return true
-        if (row.status === 'SANCTIONED' && role == 'USER')
+        if (row.status === 'SANCTIONED' && hasActiveRole('USER'))
             return true
         if ((row.status === 'MAKER_ASSIGNED'
             || row.status === 'REVERTED_TO_MAKER'
@@ -572,21 +646,56 @@ export const Home = (pros: any) => {
             || row.status === 'APPROVED_BY_PF'
             || row.status === 'REJECTED_BY_PF'
             || row.status === 'SANCTIONED')
-            && (role == 'CHECKER' || role == 'MAKER' || role == 'MANAGER'))
+            && hasActiveRole('CHECKER', 'MAKER', 'MANAGER'))
             return true
         if ((row.status === 'MANAGER_FORWARDED_TO_PF' || row.status === 'APPROVED_BY_PF' || row.status === 'REJECTED_BY_PF')
-            && role == 'PENSION_FUND'
+            && hasActiveRole('PENSION_FUND')
             && Number(row.assignedPfUserId || 0) === Number(usersState.me?.id || 0))
             return true
         return false
     }
 
+    /** High-level labels only; hides maker/checker/manager/PF workflow detail. */
+    const getApplicantFacingStatusLabel = (stage: String | undefined, status: String | undefined): string => {
+        if (stage !== 'PRELIM') {
+            if (status === 'REVIEWED') return 'Pending final approval';
+            return 'Approved';
+        }
+        const statusNorm = status == null || String(status).trim() === '' ? '' : String(status).trim().toUpperCase();
+        if (statusNorm === '') return 'Initial assessment';
+        if (statusNorm === 'CREATED') return 'Pending submission';
+        if (statusNorm === 'REVISE' || statusNorm === 'REVERTED_TO_APPLICANT') return 'Pending revision';
+        if (statusNorm === 'SANCTIONED') return 'Sanctioned';
+        if (statusNorm === 'REJECTED_BY_PF') return 'Not approved';
+        if (statusNorm === 'APPROVED') return 'Approved';
+        if (statusNorm === 'REJECTED') return 'Rejected';
+        if (statusNorm === 'TEMP_CLOSED') return 'Temporarily closed';
+        if (statusNorm === 'CLOSED') return 'Closed';
+        const underReview = new Set([
+            'SUBMITTED', 'MAKER_ASSIGNED', 'REVERTED_TO_MAKER', 'MEMO_SUBMITTED', 'REVIEWED',
+            'CHECKER_FORWARDED_TO_MANAGER', 'REVERTED_TO_MANAGER', 'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF',
+        ]);
+        if (underReview.has(statusNorm)) return 'Under review';
+        return 'Under review';
+    };
+
     const getStatusChip = (row: IPrelimApplicationData) => {
         const status = row.status;
+        const statusUpper = String(status ?? '').toUpperCase();
         let color: "success" | "error" | "warning" | "info" | "default" | "primary" | "secondary" = "default";
-        let label = String(getStatusDescription(row.stage, status));
+        const label = isApplicantUser
+            ? getApplicantFacingStatusLabel(row.stage, status)
+            : String(getStatusDescription(row.stage, status));
 
-        if (status === 'APPROVED' || label === 'Approved') {
+        if (isApplicantUser) {
+            if (statusUpper === 'APPROVED' || label === 'Approved') color = 'success';
+            else if (statusUpper === 'SANCTIONED') color = 'success';
+            else if (['REJECTED', 'CLOSED', 'REJECTED_BY_PF'].includes(statusUpper)) color = 'error';
+            else if (statusUpper === 'REVISE' || statusUpper === 'REVERTED_TO_APPLICANT') color = 'warning';
+            else if (statusUpper === 'CREATED') color = 'primary';
+            else if (label === 'Under review' || statusUpper === 'TEMP_CLOSED') color = 'warning';
+            else color = 'default';
+        } else if (status === 'APPROVED' || label === 'Approved') {
             color = "success";
         } else if (status === 'REJECTED' || status === 'CLOSED') {
             color = "error";
@@ -603,7 +712,7 @@ export const Home = (pros: any) => {
         return <Chip label={label} color={color} size="small" sx={{ fontSize: '0.7rem', fontWeight: 600, borderRadius: '6px' }} />;
     }
     const getPath = (status: String | undefined) => {
-        if (activeRole == 'ADMIN' || activeRole == 'CHECKER' || activeRole == 'MANAGER') {
+        if (hasActiveRole('ADMIN', 'USERADMIN', 'CHECKER', 'MANAGER')) {
             return 'preview'
         }
         let path = (status && ['SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED', 'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF', 'REJECTED_BY_PF', 'SANCTIONED'].includes(status.toString())) ? 'preview' : 'fund'
@@ -652,7 +761,7 @@ export const Home = (pros: any) => {
             case "REVERTED_TO_MANAGER":
                 return "Reverted to manager";
             case "CHECKER_FORWARDED_TO_MANAGER":
-                return "Forwarded to manager";
+                return "With Screening Committee";
             case "MANAGER_FORWARDED_TO_PF":
                 return "Forwarded to PF";
             case "APPROVED_BY_PF":
@@ -668,8 +777,7 @@ export const Home = (pros: any) => {
     const callAndRefresh = async (promise: Promise<any>) => {
         try {
             await promise;
-            dispatch(getPrelimApplicationList(wrapArgument(actionUid, pageInfo)));
-            dispatch(getPrelimApplicationAllList(wrapArgument(actionUid, pageInfo)));
+            dispatch(getPrelimApplicationList(wrapArgument(actionUid, listQuery)));
         } catch (e: any) {
             alert(e?.response?.data?.message || e?.message || 'Action failed');
         }
@@ -721,10 +829,23 @@ export const Home = (pros: any) => {
         return '-';
     };
 
+    const getAifDisplayNameForContactCard = (row: IPrelimApplicationData) =>
+        String(row.registrationAifName || '').trim()
+        || String(row.nameOfTheFund || '').trim()
+        || String(row.createdByName || '').trim()
+        || '—';
+
     const showListPaginationFooter = shouldShowListPaginationFooter({
         filteredRowCount: getFilteredApplications().length,
-        logicalTotalCount: homeWorkflowTab === 0 ? totalEntries : initialAssessmentList.length,
+        logicalTotalCount: totalEntries,
     });
+
+    const workflowTabsSelection =
+        hasActiveRole('CHECKER')
+            ? (CHECKER_WORKFLOW_TAB_IDS as readonly string[]).includes(workflowSectionTab)
+                ? workflowSectionTab
+                : 'pendingAssignment'
+            : workflowSectionTab;
 
     return (
         <div className="homeComp">
@@ -763,22 +884,10 @@ export const Home = (pros: any) => {
                             Start Application
                         </Button>}
                     </Box>
-                    {showInitialAssessmentTab && (
+                    {!isApplicantUser && (
                         <Box sx={{ mb: 2 }}>
                             <Tabs
-                                value={homeWorkflowTab}
-                                onChange={(_, v) => setHomeWorkflowTab(v)}
-                                sx={{ minHeight: 42, '& .MuiTab-root': { textTransform: 'none', fontWeight: 600 } }}
-                            >
-                                <Tab label="Workflow applications" />
-                                <Tab label="Initial assessment only" />
-                            </Tabs>
-                        </Box>
-                    )}
-                    {homeWorkflowTab === 0 && (
-                        <Box sx={{ mb: 2 }}>
-                            <Tabs
-                                value={workflowSectionTab}
+                                value={workflowTabsSelection}
                                 onChange={(_, v) => setWorkflowSectionTab(v)}
                                 variant="scrollable"
                                 allowScrollButtonsMobile
@@ -806,22 +915,6 @@ export const Home = (pros: any) => {
                                     <TextField
                                         fullWidth
                                         size="small"
-                                        label="Search by Email ID"
-                                        placeholder="Enter email or name"
-                                        value={searchEmail}
-                                        onChange={handleSearchEmailChange}
-                                        variant="outlined"
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                backgroundColor: '#ffffff',
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
                                         label="Search by AIF Name"
                                         placeholder="Enter fund name"
                                         value={searchAifName}
@@ -833,6 +926,24 @@ export const Home = (pros: any) => {
                                             }
                                         }}
                                     />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={4}>
+                                    <FormControl fullWidth size="small">
+                                        <InputLabel id="search-fund-type-label">Fund Type</InputLabel>
+                                        <Select
+                                            labelId="search-fund-type-label"
+                                            label="Fund Type"
+                                            value={searchFundType}
+                                            onChange={(e) => setSearchFundType(String(e.target.value))}
+                                            sx={{
+                                                backgroundColor: '#ffffff',
+                                            }}
+                                        >
+                                            <MenuItem value="">All</MenuItem>
+                                            <MenuItem value="Equity">Equity</MenuItem>
+                                            <MenuItem value="Debt">Debt</MenuItem>
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6} md={4}>
                                     <Button
@@ -869,19 +980,7 @@ export const Home = (pros: any) => {
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        homeWorkflowTab === 1 && initialAssessmentLoading ? (
-                                            <TableRow>
-                                                <TableCell colSpan={tableColumnCount} align="center" sx={{ py: 5 }}>
-                                                    <CircularProgress size={32} />
-                                                </TableCell>
-                                            </TableRow>
-                                        ) : getFilteredApplications().length > 0 ? getFilteredApplications().map((row, index) => {
-                                            const isInitialTab = homeWorkflowTab === 1;
-                                            const scoreRaw = row.initialSelfRatingScore;
-                                            const scoreDisplay =
-                                                scoreRaw != null && String(scoreRaw).trim() !== ''
-                                                    ? String(scoreRaw).trim()
-                                                    : '';
+                                        getFilteredApplications().length > 0 ? getFilteredApplications().map((row, index) => {
                                             const targetCorpusDisplay = (() => {
                                                 const v = row.sdTotalTargetCorpus as unknown;
                                                 if (v == null) return '';
@@ -914,62 +1013,92 @@ export const Home = (pros: any) => {
                                                     </TableCell> : <TableCell align="left" component="th" scope="row" sx={{ py: '16px', pl: '24px' }}>
                                                         {<Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{fundDisplayName}</Typography>}
                                                     </TableCell>}
-                                                <TableCell align="left" sx={{ color: '#64748b' }}>
-                                                    {isInitialTab ? (
-                                                        <Link
-                                                            href={`#/preliminary/${row.id}/preview`}
-                                                            underline="hover"
-                                                            sx={{ fontWeight: 600, fontSize: '14px', color: '#3f4bee' }}
+                                                <TableCell align="center" sx={{ color: '#64748b' }}>
+                                                    <Tooltip title="AIF & contact details">
+                                                        <IconButton
+                                                            size="small"
+                                                            aria-label="Show AIF and contact person details"
+                                                            onClick={() => setContactDetailsRow(row)}
+                                                            sx={{
+                                                                color: '#64748b',
+                                                                '&:hover': { backgroundColor: '#f1f5f9', color: '#3f4bee' },
+                                                            }}
                                                         >
-                                                            {row.createdByName || 'View preview'}
-                                                        </Link>
-                                                    ) : (
-                                                        row.createdByName
-                                                    )}
+                                                            <PersonOutlineIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
                                                 </TableCell>
                                                 <TableCell align="left" sx={{ minWidth: '160px' }}>{getStatusChip(row)}</TableCell>
+                                                {!isApplicantUser && (
                                                 <TableCell align="left" sx={{ color: '#1e293b' }}>
                                                     {getPendingWithEmail(row)}
                                                 </TableCell>
-                                                <TableCell align="left" sx={{ color: '#64748b', width: '20%' }}>
-                                                    {isInitialTab
-                                                        ? (row.createdOn
-                                                            ? Moment(String(row.createdOn)).format('DD MMM YYYY')
-                                                            : '-')
-                                                        : (row.applicationSubmissionDate
-                                                            ? Moment(String(row.applicationSubmissionDate)).format('DD MMM YYYY')
-                                                            : '-')}
+                                                )}
+                                                <TableCell align="left" sx={{ color: '#64748b', whiteSpace: 'nowrap' }}>
+                                                    {row.applicationSubmissionDate
+                                                        ? Moment(String(row.applicationSubmissionDate)).format('DD MMM YYYY')
+                                                        : '-'}
                                                 </TableCell>
                                                 <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{targetCorpusDisplay}</TableCell>
-                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{String(row.contributionSought || 0)}</TableCell>
-                                                {!isInitialTab ? (
-                                                    <TableCell align="left">
-                                                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                                                            <Tooltip title="Download Preview">
-                                                                <IconButton size="small" sx={{ color: '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
-                                                                    <FileDownloadIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title="Download ZIP">
-                                                                <IconButton size="small" sx={{ color: '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
-                                                                    <FileDownloadIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        </Box>
-                                                    </TableCell>
-                                                ) : (
-                                                    <TableCell align="left" sx={{ fontWeight: 600, color: '#1e293b' }}>{scoreDisplay}</TableCell>
+                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>
+                                                    {getFundTypeTableLabel(row)}
+                                                </TableCell>
+                                                <TableCell
+                                                    align="left"
+                                                    sx={{ fontWeight: 500, color: '#1e293b' }}
+                                                    title="Experienced IM/AMC? (Yes = experienced, No = first-time)"
+                                                >
+                                                    {experiencedImAmcTableLabel(row)}
+                                                </TableCell>
+                                                {!isApplicantUser && (
+                                                <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>
+                                                    {(() => {
+                                                        const scoreRaw = row.initialSelfRatingScore;
+                                                        if (scoreRaw != null && String(scoreRaw).trim() !== '') {
+                                                            return String(scoreRaw).trim();
+                                                        }
+                                                        return '—';
+                                                    })()}
+                                                </TableCell>
                                                 )}
+                                                {!isApplicantUser && (
+                                                <TableCell
+                                                    align="left"
+                                                    sx={{ fontWeight: 500, color: '#1e293b' }}
+                                                    title="Composite queue score (0–10): 70% Initial Assessment + 15% Investment Experience + 15% Target Corpus"
+                                                >
+                                                    {(() => {
+                                                        const total = computeCompositeQueueScore(row);
+                                                        return total != null ? String(total) : '—';
+                                                    })()}
+                                                </TableCell>
+                                                )}
+                                                <TableCell align="center" sx={{ verticalAlign: 'middle' }}>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, width: '100%' }}>
+                                                        <Tooltip title="Download Preview">
+                                                            <IconButton size="small" sx={{ color: '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
+                                                                <FileDownloadIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Download ZIP">
+                                                            <IconButton size="small" sx={{ color: '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
+                                                                <FileDownloadIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
+                                                </TableCell>
                                                 <TableCell align="left">
                                                     <IconButton size="small" sx={{ p: '2px', color: '#476bbc', '&:hover': { backgroundColor: '#f0f4ff' } }} onClick={() => openModel(row)}>
                                                         <EmailListIcon style={{ width: '22px', height: '22px', fill: 'currentColor' }} />
                                                     </IconButton>
                                                 </TableCell>
+                                                {!isApplicantUser && (
                                                 <TableCell align="left">
                                                     <IconButton size="small" sx={{ p: '2px', color: '#37c5ab', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => openModelHistory(row)}>
                                                         <HistoryCustomIcon style={{ width: '22px', height: '20px', fill: 'currentColor' }} />
                                                     </IconButton>
                                                 </TableCell>
+                                                )}
                                             </TableRow>
                                         }) : <TableRow><TableCell colSpan={tableColumnCount} align="center" sx={{ py: 3 }}>No applications found matching your search criteria</TableCell></TableRow>
                                     }
@@ -1003,13 +1132,13 @@ export const Home = (pros: any) => {
                             </Box>
 
                             <Typography sx={{ fontSize: '14px', color: '#64748b' }}>
-                                Showing {getFilteredApplications().length > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {getFilteredApplications().length > 0 ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, getFilteredApplications().length) : 0} of {getFilteredApplications().length} results
+                                Showing {totalEntries > 0 ? pageInfo.pageNumber * pageInfo.pageSize + 1 : 0} to {totalEntries > 0 ? Math.min((pageInfo.pageNumber + 1) * pageInfo.pageSize, totalEntries) : 0} of {totalEntries} results
                             </Typography>
 
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                {Math.ceil(getFilteredApplications().length / pageInfo.pageSize) > 1 && (
+                                {Math.ceil(totalEntries / pageInfo.pageSize) > 1 && (
                                     <Pagination
-                                        count={Math.ceil(getFilteredApplications().length / pageInfo.pageSize)}
+                                        count={Math.ceil(totalEntries / pageInfo.pageSize)}
                                         page={pageInfo.pageNumber + 1}
                                         onChange={(event, value) => goToPage(value - 1)}
                                         color="primary"
@@ -1140,6 +1269,71 @@ export const Home = (pros: any) => {
                             </Button>
                         </DialogActions>
                     </Dialog>
+                    <Dialog
+                        open={contactDetailsRow != null}
+                        onClose={() => setContactDetailsRow(null)}
+                        fullWidth
+                        maxWidth="sm"
+                    >
+                        <DialogTitle>{'AIF & contact'}</DialogTitle>
+                        <DialogContent>
+                            {contactDetailsRow && (
+                                <Card variant="outlined" sx={{ mt: 1 }}>
+                                    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        <Box>
+                                            <Typography variant="caption" color="text.secondary">
+                                                AIF name
+                                            </Typography>
+                                            <Typography variant="body1" sx={{ fontWeight: 600, mt: 0.25 }}>
+                                                {getAifDisplayNameForContactCard(contactDetailsRow)}
+                                            </Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography variant="caption" color="text.secondary">
+                                                Contact person
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 0.25 }}>
+                                                {String(
+                                                    contactDetailsRow.applicantContactPerson
+                                                    || contactDetailsRow.createdByName
+                                                    || '',
+                                                ).trim() || '—'}
+                                            </Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography variant="caption" color="text.secondary">
+                                                Email
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 0.25, wordBreak: 'break-word' }}>
+                                                {String(contactDetailsRow.applicantContactEmail || '').trim()
+                                                    || getUserEmailById(contactDetailsRow.createdBy)
+                                                    || '—'}
+                                            </Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography variant="caption" color="text.secondary">
+                                                Phone
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 0.25 }}>
+                                                {String(contactDetailsRow.applicantContactPhone || '').trim() || '—'}
+                                            </Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography variant="caption" color="text.secondary">
+                                                Address
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 0.25, whiteSpace: 'pre-wrap' }}>
+                                                {String(contactDetailsRow.applicantContactAddress || '').trim() || '—'}
+                                            </Typography>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setContactDetailsRow(null)}>Close</Button>
+                        </DialogActions>
+                    </Dialog>
                     <Dialog open={managerReassignOpen} onClose={closeManagerReassignDialog} fullWidth maxWidth="sm">
                         <DialogTitle>Reassign Maker</DialogTitle>
                         <DialogContent>
@@ -1223,6 +1417,25 @@ export const Home = (pros: any) => {
                             </Button>
                         </DialogActions>
                     </Dialog>
+                    <Snackbar
+                        open={startApplicationToast !== null}
+                        autoHideDuration={12000}
+                        onClose={(_, reason) => {
+                            if (reason === 'clickaway') return;
+                            setStartApplicationToast(null);
+                        }}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                        sx={{ zIndex: (theme) => theme.zIndex.modal + 12 }}
+                    >
+                        <Alert
+                            onClose={() => setStartApplicationToast(null)}
+                            severity="info"
+                            variant="standard"
+                            sx={opaqueInfoToastAlertSx}
+                        >
+                            {startApplicationToast}
+                        </Alert>
+                    </Snackbar>
                 </Container>
             </> : (
                 <Backdrop

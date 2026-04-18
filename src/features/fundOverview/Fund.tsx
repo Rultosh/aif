@@ -176,7 +176,7 @@ export const Fund = (props: any) => {
     const mergeLiveAccordionErrorsIntoValidations = (v: boolean[]): boolean[] => [...v];
 
     const FUND_COMPLETENESS_TOAST_TEXT =
-        'Some fund sections still have errors or missing mandatory documents. Review each section from the top (red highlights show where to fix). Choose Stay to keep working here, or Continue to go to the declaration step anyway.';
+        'All fields in this section are mandatory. Please fill in the required details before moving to the next section. You may continue to the next section if needed; however, all mandatory details must be filled in before submitting the application.';
 
     const fundAccordionShellSx = (panelId: string) => {
         /**

@@ -131,14 +131,21 @@ export interface IPrelimApplicationData {
   lpacTotalNumberAndVotingMembersDetails: String | undefined,
   lpacDecisionMakingProcess: String | undefined,
   lpacIndependentMembersDetails: String | undefined,
-  /** GET /prelims/initial-assessment-in-progress: average total score ÷ 17 (first-time) or ÷ 10 (experienced). */
+  /** Average IA (self-rating) score, same as preview Average Score (total / N by manager type); set on prelim list APIs. */
   initialSelfRatingScore?: string | undefined,
+  /** Yes = first-time fund manager, No = experienced; set on prelim list APIs. */
+  iaFundManagerExperience?: string | undefined,
   /** True when a self-rating row exists for this prelim id (GET /prelims/initial-assessment-in-progress). */
   initialAssessmentLinked?: boolean | undefined,
   /** Fund name from registration: `vcf_users.company_name` (API-enriched on prelim list/get). */
   registrationAifName?: string | undefined,
   /** Email id of the user currently responsible for this application (API-enriched). */
   pendingWithEmail?: string | undefined,
+  /** Applicant (created_by) email from registration; API-enriched. */
+  applicantContactEmail?: string | undefined,
+  applicantContactPhone?: string | undefined,
+  applicantContactAddress?: string | undefined,
+  applicantContactPerson?: string | undefined,
 }
 
 export const defaultIPrelimApplicationData: IPrelimApplicationData = {
@@ -273,9 +280,14 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   lpacDecisionMakingProcess: undefined,
   lpacIndependentMembersDetails: undefined,
   initialSelfRatingScore: undefined,
+  iaFundManagerExperience: undefined,
   initialAssessmentLinked: undefined,
   registrationAifName: undefined,
   pendingWithEmail: undefined,
+  applicantContactEmail: undefined,
+  applicantContactPhone: undefined,
+  applicantContactAddress: undefined,
+  applicantContactPerson: undefined,
 }
 
 export interface IApplicationData {

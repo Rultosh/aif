@@ -1,6 +1,7 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup, TextField, Dialog, DialogContent, Zoom, InputLabel, Select, MenuItem } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup, TextField, Dialog, DialogContent, Zoom, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
+import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -25,7 +26,23 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import FileUploadService from "../../../../components/FileUploadService";
 import { postWorkflowAction } from "../fundOverviewData/fundOverviewDataApi";
-import { fetchCheckerUsers, fetchManagerUsers, fetchPensionFundUsers, fetchMakerUsers } from "../fundOverviewData/fundOverviewDataApi";
+import { fetchCheckerUsers, fetchManagerUsers, fetchMakerUsers } from "../fundOverviewData/fundOverviewDataApi";
+import { getHistory } from '../../../home/historyApi';
+import { IHistory } from '../../../home/IHistory';
+
+/** "By" column: actor display name from API (resolved server-side); no user id → system. */
+function commentHistoryByLabel(row: IHistory): string {
+    const name = String(row.createdByName ?? '').trim();
+    const userId = row.createdBy == null ? NaN : Number(row.createdBy);
+    const hasUser = Number.isFinite(userId) && userId > 0;
+    if (!hasUser) {
+        return 'Auto Generated';
+    }
+    if (name) {
+        return name;
+    }
+    return '—';
+}
 
 export const Preview = (props: any) => {
 
@@ -61,8 +78,9 @@ export const Preview = (props: any) => {
         .filter(Boolean);
     const hasRole = (targetRole: string) => roleParts.includes(targetRole);
     const isOperationalWorkflowUser = roleParts.some((r) =>
-        ['MAKER', 'CHECKER', 'MANAGER', 'ADMIN', 'USERADMIN'].includes(r)
+        ['MAKER', 'CHECKER', 'MANAGER', 'ADMIN', 'USERADMIN', 'PENSION_FUND'].includes(r)
     );
+    const [commentHistory, setCommentHistory] = useState<IHistory[]>([]);
     /** Preview: only fund applicants should return to declaration; not maker/checker/manager/admin. */
     const showBackToDeclaration = roleParts.includes('USER') && !isOperationalWorkflowUser;
     const isApplicantActionable =
@@ -74,11 +92,9 @@ export const Preview = (props: any) => {
     const isCheckerActionable = hasRole('CHECKER') && (statusPrelims === 'MEMO_SUBMITTED' || statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER');
     const isManagerActionable =
         hasRole('MANAGER') &&
-        (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER' || statusPrelims === 'APPROVED_BY_PF');
-    const isPfActionable =
-        role === 'PENSION_FUND' &&
-        statusPrelims === 'MANAGER_FORWARDED_TO_PF' &&
-        Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0);
+        (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER');
+    /** PF approve/reject (and steps after screening committee) are not in this release. */
+    const isPfActionable = false;
     const hasActionToPerform = isApplicantActionable || isOperationalActionable || isMakerActionable || isCheckerActionable || isManagerActionable || isPfActionable;
 
     const handleSuccessDialogClose = () => {
@@ -106,12 +122,9 @@ export const Preview = (props: any) => {
     const [checkerUsers, setCheckerUsers] = useState<any[]>([]);
     const [makerUsers, setMakerUsers] = useState<any[]>([]);
     const [managerUsers, setManagerUsers] = useState<any[]>([]);
-    const [pfUsers, setPfUsers] = useState<any[]>([]);
     const [selectedMakerUserId, setSelectedMakerUserId] = useState<string>('');
     const [selectedCheckerUserId, setSelectedCheckerUserId] = useState<string>('');
     const [selectedManagerUserId, setSelectedManagerUserId] = useState<string>('');
-    const [selectedPfUserId, setSelectedPfUserId] = useState<string>('');
-    const [sanctionedAmountInr, setSanctionedAmountInr] = useState<string>('');
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -141,6 +154,26 @@ export const Preview = (props: any) => {
             dispatch(fetchRoleAsync(wrapArgument(actionUid, undefined)));
         }
     }, [id, prelimApplicationState.prelimApplication.id, dispatch, actionUid, usersState.role, usersState.status.fetchStatus])
+
+    useEffect(() => {
+        const prelimId = Number(id || 0);
+        if (!prelimId || prelimId <= 0) {
+            setCommentHistory([]);
+            return;
+        }
+        let cancelled = false;
+        getHistory(String(prelimId))
+            .then((res) => {
+                const rows = Array.isArray(res?.data) ? res.data : [];
+                if (!cancelled) setCommentHistory(rows);
+            })
+            .catch(() => {
+                if (!cancelled) setCommentHistory([]);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [id]);
 
     useEffect(() => {
 
@@ -178,22 +211,12 @@ export const Preview = (props: any) => {
                         setSelectedManagerUserId(String(list[0].id));
                     }
                 }
-                if (hasRole('MANAGER')) {
-                    const res = await fetchPensionFundUsers();
-                    const list = res?.data || [];
-                    setPfUsers(list);
-                    if (prelimApplicationState.prelimApplication.assignedPfUserId != null) {
-                        setSelectedPfUserId(String(prelimApplicationState.prelimApplication.assignedPfUserId));
-                    } else if (list.length > 0) {
-                        setSelectedPfUserId(String(list[0].id));
-                    }
-                }
             } catch {
                 // keep UI usable even when assignee lookups fail
             }
         };
         loadAssignmentUsers();
-    }, [usersState.role, prelimApplicationState.prelimApplication.assignedCheckerUserId, prelimApplicationState.prelimApplication.assignedManagerUserId, prelimApplicationState.prelimApplication.assignedPfUserId]);
+    }, [usersState.role, prelimApplicationState.prelimApplication.assignedCheckerUserId, prelimApplicationState.prelimApplication.assignedManagerUserId]);
 
     async function checkAllDocsOk(prelimId: string | undefined, applicationName: string) {
         if (usersState.role === 'ADMIN') {
@@ -344,6 +367,20 @@ export const Preview = (props: any) => {
         },
     };
 
+    const sortedCommentHistory = useMemo(
+        () =>
+            [...commentHistory].sort(
+                (a, b) => (Number(a.id) || 0) - (Number(b.id) || 0)
+            ),
+        [commentHistory]
+    );
+
+    const showApplicantCommentHistoryHint =
+        roleParts.includes('USER') && !isOperationalWorkflowUser;
+
+    const fileServerBase =
+        process.env.REACT_APP_FILE_SERVER_URL || process.env.REACT_APP_API_BASE_URL || '';
+
     return (
         <div className="formAnimation">
             <Card sx={{
@@ -373,6 +410,70 @@ export const Preview = (props: any) => {
                                 height="600"
                                 style={{ border: 'none' }}
                             ></iframe>
+                        </CardContent>
+                    </Card>
+
+                    <Card sx={{
+                        mb: 4,
+                        borderRadius: '12px',
+                        border: '1px solid rgba(54, 48, 98, 0.1)',
+                        overflow: 'hidden',
+                    }}>
+                        <CardContent sx={{ p: 0 }}>
+                            <Box sx={{ p: 2, backgroundColor: 'rgba(54, 48, 98, 0.04)', borderBottom: '1px solid rgba(54, 48, 98, 0.1)' }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#363062' }}>
+                                    Comment history
+                                </Typography>
+                            </Box>
+                            <Box sx={{ p: 2 }}>
+                                {sortedCommentHistory.length === 0 ? (
+                                    <Typography variant="body2" sx={{ color: '#64748b' }}>
+                                        No comments recorded for this application yet.
+                                    </Typography>
+                                ) : (
+                                    <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                                        <Table size="small" aria-label="Comment history">
+                                            <TableHead sx={{ backgroundColor: '#f8fafc' }}>
+                                                <TableRow>
+                                                    <TableCell sx={{ fontWeight: 700 }}>Date</TableCell>
+                                                    <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                                                    <TableCell sx={{ fontWeight: 700 }}>By</TableCell>
+                                                    <TableCell sx={{ fontWeight: 700 }}>Remarks</TableCell>
+                                                    <TableCell sx={{ fontWeight: 700 }} align="center">Document</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {sortedCommentHistory.map((row) => (
+                                                    <TableRow key={row.id != null ? `hist-${row.id}` : `hist-${row.createdOn}-${row.status}`}>
+                                                        <TableCell sx={{ whiteSpace: 'nowrap', color: '#475569' }}>
+                                                            {row.createdOn ? dayjs(String(row.createdOn)).format('DD MMM YYYY') : '—'}
+                                                        </TableCell>
+                                                        <TableCell sx={{ color: '#1e293b' }}>{row.status || '—'}</TableCell>
+                                                        <TableCell sx={{ color: '#475569' }}>{commentHistoryByLabel(row)}</TableCell>
+                                                        <TableCell sx={{ color: '#1e293b', maxWidth: 360 }}>{row.remarks?.trim() ? row.remarks : '—'}</TableCell>
+                                                        <TableCell align="center">
+                                                            {row.attachmentBucket && row.attachmentName ? (
+                                                                <Button
+                                                                    size="small"
+                                                                    component="a"
+                                                                    href={`${fileServerBase}/files/${row.attachmentBucket}/${row.attachmentName}?access_token=${localStorage.getItem('token')}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    sx={{ textTransform: 'none' }}
+                                                                >
+                                                                    View
+                                                                </Button>
+                                                            ) : (
+                                                                '—'
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                )}
+                            </Box>
                         </CardContent>
                     </Card>
 
@@ -593,37 +694,6 @@ export const Preview = (props: any) => {
                                         </FormControl>
                                     )}
 
-                                    {(hasRole('MANAGER') && statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER') && (
-                                        <FormControl sx={{ minWidth: 260 }}>
-                                            <InputLabel id="pf-user-label">Select PF User</InputLabel>
-                                            <Select
-                                                labelId="pf-user-label"
-                                                value={selectedPfUserId}
-                                                label="Select PF User"
-                                                onChange={(e) => setSelectedPfUserId(String(e.target.value))}
-                                            >
-                                                {pfUsers.map((user) => (
-                                                    <MenuItem key={user.id} value={String(user.id)}>
-                                                        {user.contactPerson || user.username} ({user.username})
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    )}
-
-                                    {(usersState.role === 'PENSION_FUND' && statusPrelims === 'MANAGER_FORWARDED_TO_PF' && Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0)) && (
-                                        <TextField
-                                            sx={{ minWidth: 260 }}
-                                            label="Sanctioned Amount (INR)"
-                                            value={sanctionedAmountInr}
-                                            onChange={(e) => setSanctionedAmountInr(e.target.value)}
-                                            placeholder="Enter amount in Rupees"
-                                            type="number"
-                                            inputProps={{ min: 1, step: "0.01" }}
-                                            required
-                                        />
-                                    )}
-
                                     {(usersState.role == 'USER' && (statusPrelims == 'CREATED' || statusPrelims == 'REVISE')) && (
                                         <Button color='success' id='submit' onClick={handleSubmit(onSubmit)} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', px: 4, fontWeight: 700, backgroundColor: '#4caf50' }}>
                                             Submit Application
@@ -725,7 +795,7 @@ export const Preview = (props: any) => {
                                                 });
                                                 navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Forward to Manager
+                                                Mark application as &apos;With Screening Committee&apos;
                                             </Button>
                                         </Box>
                                     )}
@@ -756,27 +826,6 @@ export const Preview = (props: any) => {
 
                                     {(hasRole('MANAGER') && (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                            <Button color='primary' id='manager-forward-pf' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
-                                                }
-                                                if (!selectedPfUserId) {
-                                                    alert("Please select a PF user.");
-                                                    return;
-                                                }
-                                                const attachment = await uploadActionFile(Number(id), 'manager-forward-pf');
-                                                await postWorkflowAction(Number(id), 'manager-forward-pf', {
-                                                    remark,
-                                                    pfUserId: Number(selectedPfUserId),
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
-                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Forward to PF
-                                            </Button>
                                             <Button color='warning' id='manager-revert-maker' onClick={async () => {
                                                 const remark = String(commentPreview || '').trim();
                                                 if (!hasEvidence(remark)) {
@@ -792,70 +841,6 @@ export const Preview = (props: any) => {
                                                 navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revert to Analyst
-                                            </Button>
-                                        </Box>
-                                    )}
-
-                                    {(hasRole('MANAGER')
-                                        && statusPrelims === 'APPROVED_BY_PF'
-                                        && Number(prelimApplicationState.prelimApplication.assignedManagerUserId || 0) === Number(usersState.me?.id || 0)) && (
-                                        <Button color='success' id='sanction' onClick={async () => {
-                                            const remark = String(commentPreview || '').trim();
-                                            if (!hasEvidence(remark)) {
-                                                alert("Please provide either a comment or upload a document.");
-                                                return;
-                                            }
-                                            const attachment = await uploadActionFile(Number(id), 'sanction');
-                                            await postWorkflowAction(Number(id), 'sanction', {
-                                                remark,
-                                                attachmentBucket: attachment.attachmentBucket,
-                                                attachmentName: attachment.attachmentName,
-                                            });
-                                            navigate('/home');
-                                        }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                            Mark as Sanctioned
-                                        </Button>
-                                    )}
-
-                                    {(usersState.role === 'PENSION_FUND' && statusPrelims === 'MANAGER_FORWARDED_TO_PF' && Number(prelimApplicationState.prelimApplication.assignedPfUserId || 0) === Number(usersState.me?.id || 0)) && (
-                                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                            <Button color='success' id='pf-approve' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
-                                                }
-                                                const normalizedAmount = String(sanctionedAmountInr || '').trim();
-                                                if (!normalizedAmount || Number(normalizedAmount) <= 0) {
-                                                    alert("Please enter sanctioned amount in Rupees.");
-                                                    return;
-                                                }
-                                                const attachment = await uploadActionFile(Number(id), 'pf-approve');
-                                                await postWorkflowAction(Number(id), 'pf-approve', {
-                                                    remark,
-                                                    sanctionedAmountInr: normalizedAmount,
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
-                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Approve
-                                            </Button>
-                                            <Button color='error' id='pf-reject' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
-                                                }
-                                                const attachment = await uploadActionFile(Number(id), 'pf-reject');
-                                                await postWorkflowAction(Number(id), 'pf-reject', {
-                                                    remark,
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
-                                            }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Reject
                                             </Button>
                                         </Box>
                                     )}

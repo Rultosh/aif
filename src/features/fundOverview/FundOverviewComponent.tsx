@@ -43,6 +43,16 @@ export const FundOverview = (props: any) => {
     const navigate = useNavigate();
 
     const { pathname } = useLocation();
+
+    /** Non-applicant roles: preliminary app is view-only via PDF preview (no wizard steps). */
+    const operationalPreviewOnlyRoles = new Set([
+        'MAKER', 'CHECKER', 'MANAGER', 'ADMIN', 'USERADMIN', 'PENSION_FUND',
+    ]);
+    const roleParts = (usersState.role || '')
+        .split(',')
+        .map((r) => r.trim().toUpperCase())
+        .filter(Boolean);
+    const isOperationalPrelimViewer = roleParts.some((r) => operationalPreviewOnlyRoles.has(r));
     // const selfRatingCookie = getCookie('selfRating') || '0';
     // const [selfRating, setSelfRating] = useCookie('selfRating', selfRatingCookie);
     // const [selfRatingLink, setSelfRatingLink] = useCookie('selfRatingLink', '0');
@@ -56,16 +66,31 @@ export const FundOverview = (props: any) => {
         // }
     })
 
-    useEffect(() => {
-        if (!id) {
-            navigate("/preliminary/NEW/selfrating")
-            // navigate("/preliminary/1/selfrating")
-        }
-    });
-
     /** Draft (CREATED) or returned for revision (REVISE)—both use the preliminary wizard; other statuses cannot. */
     const USER_PRELIM_ALLOWED_STATUSES = ['CREATED', 'REVISE'] as const;
     const isNewApplicationRoute = !id || String(id).toUpperCase() === 'NEW';
+
+    useEffect(() => {
+        if (id) return;
+        if (isOperationalPrelimViewer) {
+            navigate('/home');
+            return;
+        }
+        navigate('/preliminary/NEW/selfrating');
+    }, [id, isOperationalPrelimViewer, navigate]);
+
+    useEffect(() => {
+        if (!isOperationalPrelimViewer) return;
+        const raw = String(id || '').trim();
+        const idUpper = raw.toUpperCase();
+        if (!raw || idUpper === 'NEW' || !Number.isFinite(Number(raw)) || Number(raw) <= 0) {
+            navigate('/home', { replace: true });
+            return;
+        }
+        const pathLower = pathname.toLowerCase();
+        if (pathLower.includes('/preview')) return;
+        navigate(`/preliminary/${Number(raw)}/preview`, { replace: true });
+    }, [isOperationalPrelimViewer, pathname, id, navigate]);
 
     useEffect(() => {
         if (isNewApplicationRoute) return;
@@ -115,30 +140,32 @@ export const FundOverview = (props: any) => {
         { label: 'Preview', path: 'preview' },
     ];
 
-    const filteredSteps = ['USERADMIN', 'ADMIN', 'PENSION_FUND'].includes(usersState.role || '')
-        ? allSteps.filter(s => s.path === 'preview')
+    const filteredSteps = isOperationalPrelimViewer
+        ? allSteps.filter((s) => s.path === 'preview')
         : allSteps;
 
     const currentStep = filteredSteps.find(s => pathname.toLowerCase().includes(s.path.toLowerCase()))?.label || 'Application';
 
     const userCannotAccessPreliminary =
-        usersState.role === 'USER' &&
+        !isOperationalPrelimViewer &&
+        roleParts.includes('USER') &&
         !isNewApplicationRoute &&
         statusPrelims !== '' &&
         statusPrelims !== undefined &&
         !(USER_PRELIM_ALLOWED_STATUSES as readonly string[]).includes(String(statusPrelims)) &&
         !pathname.toLowerCase().includes('preview');
 
-    /** Admins review after submit; no access while application is still draft (CREATED). */
+    /** Admins review after submit; no access to wizard while application is still draft (CREATED)—preview is allowed. */
     const adminCannotAccessPreliminary =
-        ['USERADMIN', 'ADMIN'].includes(usersState.role || '') &&
+        (roleParts.includes('USERADMIN') || roleParts.includes('ADMIN')) &&
         !isNewApplicationRoute &&
         statusPrelims !== '' &&
         statusPrelims !== undefined &&
-        String(statusPrelims) === 'CREATED';
+        String(statusPrelims) === 'CREATED' &&
+        !pathname.toLowerCase().includes('preview');
 
     const pfCannotAccessPreliminary =
-        usersState.role === 'PENSION_FUND' &&
+        roleParts.includes('PENSION_FUND') &&
         !pathname.toLowerCase().includes('preview');
 
     const applicationNotFound =
@@ -148,7 +175,8 @@ export const FundOverview = (props: any) => {
 
     const isRestricted = applicationNotFound || adminCannotAccessPreliminary || userCannotAccessPreliminary || pfCannotAccessPreliminary;
     const isUserEditableFlow =
-        usersState.role === 'USER' &&
+        !isOperationalPrelimViewer &&
+        roleParts.includes('USER') &&
         (isNewApplicationRoute
             || statusPrelims === ''
             || statusPrelims === undefined

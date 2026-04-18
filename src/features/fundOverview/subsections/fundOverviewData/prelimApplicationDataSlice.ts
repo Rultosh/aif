@@ -16,7 +16,12 @@ export interface PrelimApplicationState {
 
 export interface IPageInfo {
   pageNumber: number,
-  pageSize: number
+  pageSize: number,
+  searchAifName?: string,
+  fundType?: string,
+  /** Backend: START_DATE | TARGET_CORPUS | IA_SCORE | TOTAL_SCORE */
+  sortBy?: string,
+  sortDir?: 'asc' | 'desc',
 }
 
 const initialState: PrelimApplicationState = {
@@ -226,8 +231,18 @@ const prelimApplicationDataSlice = createSlice({
       })
       .addCase(
         getPrelimApplicationList.fulfilled,
-        (state, action: PayloadAction<IPrelimApplicationData[]>) => {
-          state.prelimApplications = action.payload
+        (state, action: PayloadAction<IPrelimApplicationData[] | { content: IPrelimApplicationData[]; totalCount: number }>) => {
+          const payload = action.payload as unknown;
+          if (payload && typeof payload === 'object' && 'content' in (payload as object)) {
+            const p = payload as { content: IPrelimApplicationData[]; totalCount: number };
+            state.prelimApplications = p.content || [];
+            state.totalEntries = typeof p.totalCount === 'number' ? p.totalCount : 0;
+          } else if (Array.isArray(payload)) {
+            state.prelimApplications = payload;
+            state.totalEntries = payload.length;
+          } else {
+            state.prelimApplications = [];
+          }
           state.allStatus.fetchStatus = FetchStatus.IDLE;
         }
       )

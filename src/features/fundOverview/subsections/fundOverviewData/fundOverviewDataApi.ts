@@ -25,10 +25,24 @@ export function fetchAssociateMandatoryDocumentsStatus(prelimAppId: Number) {
   });
 }
 
-export function fetchFundOverviewList(pageInfo : IPageInfo | undefined) {
+export function fetchFundOverviewList(pageInfo: IPageInfo | undefined) {
+  const params: Record<string, string> = {};
+  if (pageInfo?.searchAifName?.trim()) {
+    params.searchAifName = pageInfo.searchAifName.trim();
+  }
+  if (pageInfo?.fundType?.trim()) {
+    params.fundType = pageInfo.fundType.trim();
+  }
+  if (pageInfo?.sortBy?.trim()) {
+    params.sortBy = pageInfo.sortBy.trim();
+  }
+  if (pageInfo?.sortDir) {
+    params.sortDir = pageInfo.sortDir;
+  }
   return api({
     method: 'get',
-    url: `/api/prelims/page/${pageInfo?.pageNumber}/${pageInfo?.pageSize}`
+    url: `/api/prelims/page/${pageInfo?.pageNumber}/${pageInfo?.pageSize}`,
+    params,
   });
 }
 
