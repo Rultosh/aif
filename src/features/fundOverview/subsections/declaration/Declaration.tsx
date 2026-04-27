@@ -399,7 +399,7 @@ const Declaration = (props: any) => {
                                         {
                                             text: "1. Details and KYC Form of the Board of Directors of Trustee Company, AMC, Sponsor, Advisory Board, Members of IC, Investment Management Team to be provided in the format attached in Annexure I and Annexure II. Along with the self-attested copy of POI (Proof of Identity), POA (Proof of address: permanent and correspondent), Two passport size photograph for purpose of KYC.",
                                             templateLabel: "Download Template",
-                                            href: "/vcf/templates/annexure-I-template-and-list-of-docs.zip",
+                                            href: "/aif/templates/annexure-I-template-and-list-of-docs.zip",
                                             uploads: [
                                                 {
                                                     id: "kycIndicativeListOfDocuments",
@@ -415,7 +415,7 @@ const Declaration = (props: any) => {
                                             id: "boardResolution",
                                             text: "2. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM",
                                             // templateLabel: "Download Template",
-                                            href: "/vcf/templates/Annexure_II_KYC_Form.xlsx",
+                                            href: "/aif/templates/Annexure_II_KYC_Form.xlsx",
                                             validationTitle: "Annexure_II_KYC_Form"
                                         }
                                     ].map((item, index) => (
@@ -560,7 +560,7 @@ const Declaration = (props: any) => {
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
-                                                    href="/vcf/templates/Details of Investment Committee Members.xlsx"
+                                                    href="/aif/templates/Details of Investment Committee Members.xlsx"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
                                                     sx={{
@@ -599,7 +599,7 @@ const Declaration = (props: any) => {
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
-                                                    href="/vcf/templates/Details of contributors of Current Fund.xlsx"
+                                                    href="/aif/templates/Details of contributors of Current Fund.xlsx"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
                                                     sx={{
@@ -638,7 +638,7 @@ const Declaration = (props: any) => {
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                                 <Button
                                                     variant="outlined"
-                                                    href="/vcf/templates/Past Investment Track Record of IM or AMC.xlsx"
+                                                    href="/aif/templates/Past Investment Track Record of IM or AMC.xlsx"
                                                     size="small"
                                                     startIcon={<DownloadIcon />}
                                                     sx={{

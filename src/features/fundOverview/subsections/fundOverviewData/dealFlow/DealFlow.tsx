@@ -464,7 +464,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
-                                        href="/vcf/templates/Details of current pipeline of deals under consideration.xlsx"
+                                        href="/aif/templates/Details of current pipeline of deals under consideration.xlsx"
                                         size="small"
                                         startIcon={<DownloadIcon />}
                                         sx={{
@@ -505,7 +505,7 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
-                                        href="/vcf/templates/Empanelled list of external Firms.xlsx"
+                                        href="/aif/templates/Empanelled list of external Firms.xlsx"
                                         size="small"
                                         startIcon={<DownloadIcon />}
                                         sx={{
