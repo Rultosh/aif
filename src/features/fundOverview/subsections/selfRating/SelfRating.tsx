@@ -51,13 +51,13 @@ function computeApplicantAssessmentLocked(
 export const SelfRating = (props: any) => {
 
     const { id } = useParams();
-    console.log(id)
+   // console.log(id)
     const [actionUid] = useState(uuid());
 
     const selfRatingState = useAppSelector(selectSelfRatings)
 
     const [selfRatingValue, setSelfRatingValue] = useState<ISelfRating>(selfRatingState.selfRatings);
-    console.log("selfRatingValue", selfRatingValue)
+   // console.log("selfRatingValue", selfRatingValue)
     const [firstTime] = useState<boolean>(selfRatingState.selfRatings.id !== undefined);
     const [scoreBoard, setScoreBoard] = useState({} as any);
     const [score, setScore] = useState('0');
@@ -137,7 +137,7 @@ export const SelfRating = (props: any) => {
 
         setSelfQuestions(questions);
         setManagerType(currentManagerType);
-
+        setFundType(currentOrientedType);
 
         const newScoreBoard: any = {};
         questions.forEach((q: any, index: number) => {
@@ -273,11 +273,12 @@ export const SelfRating = (props: any) => {
         copiedValue[key] = newValue;
 
         const mType = key === "managerType" ? newValue : (managerType || "First Time Fund Manager");
-        const aifType = key === "fundType" ? newValue : (copiedValue.fundType || "Equity Oriented Fund");
+        const aifType = key === "fundType" ? newValue : (fundType || "Equity Oriented Fund");
 
         console.log("managerType", mType);
+        console.log("fundType", aifType);
         setManagerType(mType);
-
+        setFundType(aifType);
         const questions = getRefinedQuestions(String(mType), String(aifType));
         setSelfQuestions(questions);
 
@@ -314,6 +315,7 @@ export const SelfRating = (props: any) => {
     let selfRatingQuestionComponents = []
 
     const [managerType, setManagerType] = useState<String | undefined>(selfRatingValue.managerType)
+    const [fundType, setFundType] = useState<String | undefined>(selfRatingValue.fundType)
 
     const [selfQuestions, setSelfQuestions] = useState(!managerType || managerType === "First Time Fund Manager" ?
         questionsForFirstTime.selfRatingQuestions : questionsForMoreThanOne.selfRatingQuestions);
@@ -561,7 +563,7 @@ export const SelfRating = (props: any) => {
                                                 <FormControl component="fieldset" disabled={assessmentLocked} sx={{ minWidth: 0 }}>
                                                 <RadioGroup
                                                     row
-                                                    value={selfRatingValue.fundType || "Equity Oriented Fund"}
+                                                    value={fundType || "Equity Oriented Fund"}
                                                     name="fundType"
                                                     onChange={(e) => {
                                                         handleChangeFundManagerType(e);
