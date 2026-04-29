@@ -277,6 +277,8 @@ export const SelfRating = (props: any) => {
 
         console.log("managerType", mType);
         console.log("fundType", aifType);
+        console.log("fundType copiedValue", copiedValue['fundType']);
+        console.log("managerType copiedValue", copiedValue['managerType']);
         setManagerType(mType);
         setFundType(aifType);
         const questions = getRefinedQuestions(String(mType), String(aifType));
