@@ -474,7 +474,7 @@ const Landing = () => {
                             </Button>
 
                             <Typography sx={{ textAlign: 'center', fontSize: '15px', color: '#000000', fontWeight: 500, mb: 3 }}>
-                                Don't have account? <Box component="span" sx={{ color: '#FF671F', fontWeight: 500, cursor: 'pointer' }} onClick={() => navigate('/signUp')}>Registration Here</Box>
+                                Don't have account? <Box component="span" sx={{ color: '#FF671F', fontWeight: 500, cursor: 'pointer' }} onClick={() => navigate('/signUp')}>Register Here</Box>
                             </Typography>
 
                             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>

@@ -148,7 +148,7 @@ const SignUp = () => {
             .string()
             .trim()
             .test("Invalid input entered", function (value: any) {
-                const pattern =/^[A-Za-z0-9 .-_]+$/;
+                const pattern =/^[A-Za-z0-9 .-_/]+$/;
                 const isNotValidInput = pattern.test(value);
                 if (!isNotValidInput) {
                     return false;
@@ -172,7 +172,7 @@ const SignUp = () => {
             .required("SEBI Registration is required"),
         contactPerson: Yup
             .string()
-            .matches(/^[A-Za-z ]*$/, 'Please enter valid contact person')
+            .matches(/^[A-Za-z .]*$/, 'Please enter valid contact person')
             .required("Contact Person is required"),
         sebiRegistrationDate: Yup.date()
             .nullable()
