@@ -274,7 +274,8 @@ export const SelfRating = (props: any) => {
 
         const mType = key === "managerType" ? newValue : (managerType || "First Time Fund Manager");
         const aifType = key === "fundType" ? newValue : (fundType || "Equity Oriented Fund");
-
+        copiedValue['fundType'] = aifType;
+        copiedValue['managerType'] = mType;
         console.log("managerType", mType);
         console.log("fundType", aifType);
         console.log("fundType copiedValue", copiedValue['fundType']);
