@@ -120,7 +120,7 @@ export const Preview = (props: any) => {
 
     const [actionDate, setActionDate] = useState<Date>(prelimApplicationState.prelimApplication.actionDate || new Date());
     const [actionDateError, setActionDateError] = useState<string | undefined>();
-    const [actionFile, setActionFile] = useState<File | null>(null);
+    const [actionFiles, setActionFiles] = useState<File[]>([]);
     const [checkerUsers, setCheckerUsers] = useState<any[]>([]);
     const [makerUsers, setMakerUsers] = useState<any[]>([]);
     const [managerUsers, setManagerUsers] = useState<any[]>([]);
@@ -237,14 +237,19 @@ export const Preview = (props: any) => {
     }
 
     const uploadActionFile = async (applicationId: number, action: string) => {
-        if (!actionFile) return {};
+        if (!actionFiles.length) return {};
         const bucket = `workflow-action-${applicationId}-${action.toLowerCase()}`;
-        const uploaded = await FileUploadService.upload(bucket, actionFile, false, () => { });
-        const uploadedName = uploaded?.data?.name || actionFile.name;
+        let uploadedName = actionFiles[0]?.name || '';
+        for (const file of actionFiles) {
+            const uploaded = await FileUploadService.upload(bucket, file, false, () => { });
+            if (!uploadedName) {
+                uploadedName = uploaded?.data?.name || file.name;
+            }
+        }
         return { attachmentBucket: bucket, attachmentName: uploadedName };
     };
 
-    const hasEvidence = (comment: string) => comment.length > 0 || actionFile != null;
+    const hasEvidence = (comment: string) => comment.length > 0 || actionFiles.length > 0;
 
     async function handleClickSave(ev: any, commentOverride?: string) {
 
@@ -603,15 +608,18 @@ export const Preview = (props: any) => {
                                                     Upload supporting document (optional)
                                                     <input
                                                         type="file"
+                                                        multiple
                                                         hidden
                                                         onChange={(e) => {
-                                                            const file = e.target.files?.[0] || null;
-                                                            setActionFile(file);
+                                                            const files = Array.from(e.target.files || []);
+                                                            setActionFiles(files);
                                                         }}
                                                     />
                                                 </Button>
                                                 <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#64748b' }}>
-                                                    {actionFile ? actionFile.name : 'No file selected. Provide comment or upload file.'}
+                                                    {actionFiles.length
+                                                        ? `${actionFiles.length} file${actionFiles.length > 1 ? 's' : ''} selected: ${actionFiles.map((f) => f.name).join(', ')}`
+                                                        : 'No file selected. Provide comment or upload file.'}
                                                 </Typography>
                                             </Box>
                                         )}
