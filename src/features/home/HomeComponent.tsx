@@ -650,8 +650,14 @@ export const Home = (pros: any) => {
                         active={pageInfo.sortBy === sortKey}
                         direction={pageInfo.sortBy === sortKey ? (pageInfo.sortDir || 'asc') : 'asc'}
                         onClick={() => requestListSort(sortKey)}
-                        hideSortIcon={pageInfo.sortBy !== sortKey}
-                        sx={{ '&.MuiTableSortLabel-root': { fontWeight: 600, color: '#1a1a1a' } }}
+                        hideSortIcon={false}
+                        sx={{
+                            '&.MuiTableSortLabel-root': { fontWeight: 600, color: '#1a1a1a' },
+                            '& .MuiTableSortLabel-icon': {
+                                opacity: 1,
+                                color: pageInfo.sortBy === sortKey ? '#1a1a1a' : '#94a3b8',
+                            },
+                        }}
                     >
                         {label}
                     </TableSortLabel>
