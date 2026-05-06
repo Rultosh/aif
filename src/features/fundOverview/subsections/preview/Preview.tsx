@@ -128,6 +128,8 @@ export const Preview = (props: any) => {
     const [selectedCheckerUserId, setSelectedCheckerUserId] = useState<string>('');
     const [selectedManagerUserId, setSelectedManagerUserId] = useState<string>('');
 
+    const fileIdentity = (file: File) => `${file.name}__${file.size}__${file.lastModified}`;
+
     const handleChange = (ev: any) => {
         ev.preventDefault();
         console.log('handle change', ev, ev.target.id, ev.target.value);
@@ -608,19 +610,54 @@ export const Preview = (props: any) => {
                                                     Upload supporting document (optional)
                                                     <input
                                                         type="file"
-                                                        multiple
                                                         hidden
                                                         onChange={(e) => {
-                                                            const files = Array.from(e.target.files || []);
-                                                            setActionFiles(files);
+                                                            const picked = Array.from(e.target.files || []);
+                                                            if (!picked.length) return;
+                                                            setActionFiles((prev) => {
+                                                                const seen = new Set(prev.map(fileIdentity));
+                                                                const merged = [...prev];
+                                                                for (const file of picked) {
+                                                                    const key = fileIdentity(file);
+                                                                    if (!seen.has(key)) {
+                                                                        merged.push(file);
+                                                                        seen.add(key);
+                                                                    }
+                                                                }
+                                                                return merged;
+                                                            });
+                                                            e.currentTarget.value = '';
                                                         }}
                                                     />
                                                 </Button>
-                                                <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#64748b' }}>
-                                                    {actionFiles.length
-                                                        ? `${actionFiles.length} file${actionFiles.length > 1 ? 's' : ''} selected: ${actionFiles.map((f) => f.name).join(', ')}`
-                                                        : 'No file selected. Provide comment or upload file.'}
-                                                </Typography>
+                                                {actionFiles.length ? (
+                                                    <Box sx={{ mt: 1 }}>
+                                                        {actionFiles.map((file, idx) => (
+                                                            <Box
+                                                                key={fileIdentity(file)}
+                                                                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+                                                            >
+                                                                <Typography variant="caption" sx={{ color: '#334155', wordBreak: 'break-all' }}>
+                                                                    {idx + 1}. {file.name}
+                                                                </Typography>
+                                                                <Button
+                                                                    size="small"
+                                                                    color="error"
+                                                                    sx={{ minWidth: 'auto', p: 0, textTransform: 'none' }}
+                                                                    onClick={() => {
+                                                                        setActionFiles((prev) => prev.filter((f) => fileIdentity(f) !== fileIdentity(file)));
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </Box>
+                                                        ))}
+                                                    </Box>
+                                                ) : (
+                                                    <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#64748b' }}>
+                                                        No file selected. Provide comment or upload file.
+                                                    </Typography>
+                                                )}
                                             </Box>
                                         )}
                                     </>
