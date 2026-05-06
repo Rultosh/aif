@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup, TextField, Dialog, DialogContent, Zoom, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Divider, Checkbox, FormGroup, TextField, Dialog, DialogContent, Zoom, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Snackbar, Alert, DialogTitle, CircularProgress } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect, useMemo } from "react"
 import dayjs from 'dayjs';
@@ -30,6 +30,7 @@ import { fetchCheckerUsers, fetchManagerUsers, fetchMakerUsers } from "../fundOv
 import { getHistory } from '../../../home/historyApi';
 import { IHistory } from '../../../home/IHistory';
 import { getFileServerBaseUrl } from '../../../../lib/fileServerBaseUrl';
+import { IFile } from "../../../../components/IFile";
 
 /** "By" column: actor display name from API (resolved server-side); no user id → system. */
 function commentHistoryByLabel(row: IHistory): string {
@@ -72,6 +73,13 @@ export const Preview = (props: any) => {
         (currentUserId == null || Number(reviewedById) === Number(currentUserId))
     const [showResponse, setShowResponse] = useState(false);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [uploadErrorToastOpen, setUploadErrorToastOpen] = useState(false);
+    const [uploadErrorToastMessage, setUploadErrorToastMessage] = useState("Failed to upload supporting document. Please try again.");
+    const [documentsDialogOpen, setDocumentsDialogOpen] = useState(false);
+    const [documentsDialogLoading, setDocumentsDialogLoading] = useState(false);
+    const [documentsDialogError, setDocumentsDialogError] = useState('');
+    const [documentsDialogFiles, setDocumentsDialogFiles] = useState<IFile[]>([]);
+    const [documentsDialogBucket, setDocumentsDialogBucket] = useState('');
     const role = usersState.role || '';
     const roleParts = role
         .split(',')
@@ -129,6 +137,57 @@ export const Preview = (props: any) => {
     const [selectedManagerUserId, setSelectedManagerUserId] = useState<string>('');
 
     const fileIdentity = (file: File) => `${file.name}__${file.size}__${file.lastModified}`;
+    const showUploadErrorToast = (message?: string) => {
+        setUploadErrorToastMessage(message || "Failed to upload supporting document. Please try again.");
+        setUploadErrorToastOpen(true);
+    };
+    const extractListedFiles = (response: any): IFile[] => {
+        const rows = Array.isArray(response?.data)
+            ? response.data
+            : (Array.isArray(response?.data?.files) ? response.data.files : []);
+        return rows as IFile[];
+    };
+    const openDocumentsDialog = async (bucket: string) => {
+        setDocumentsDialogBucket(bucket);
+        setDocumentsDialogOpen(true);
+        setDocumentsDialogLoading(true);
+        setDocumentsDialogError('');
+        setDocumentsDialogFiles([]);
+        try {
+            const res = await FileUploadService.list(bucket);
+            const files = extractListedFiles(res);
+            setDocumentsDialogFiles(files);
+            if (!files.length) {
+                setDocumentsDialogError('No documents found in this upload bucket.');
+            }
+        } catch (error: any) {
+            setDocumentsDialogError(error?.response?.data?.message || error?.message || 'Failed to load uploaded documents.');
+        } finally {
+            setDocumentsDialogLoading(false);
+        }
+    };
+    const parseUploadErrorMessage = (error: any, fileName: string) => {
+        const status = error?.response?.status;
+        const title = String(error?.response?.data?.title || '').toLowerCase();
+        const detail = String(error?.response?.data?.detail || '');
+        const message = String(error?.response?.data?.message || '');
+        const combined = `${title} ${detail} ${message}`.toLowerCase();
+        if (status === 413 || combined.includes('payload too large') || combined.includes('maximum upload size exceeded')) {
+            return `Upload failed for "${fileName}": file size exceeds the allowed limit.`;
+        }
+        if (combined.includes('already has a file with name')) {
+            return `A file with the same name already exists for "${fileName}". Retrying with a unique name...`;
+        }
+        return `Failed to upload "${fileName}". Please try again.`;
+    };
+    const withUniqueSuffix = (file: File) => {
+        const dot = file.name.lastIndexOf('.');
+        const hasExt = dot > 0 && dot < file.name.length - 1;
+        const base = hasExt ? file.name.slice(0, dot) : file.name;
+        const ext = hasExt ? file.name.slice(dot) : '';
+        const uniqueName = `${base}_${Date.now()}${ext}`;
+        return new File([file], uniqueName, { type: file.type, lastModified: file.lastModified });
+    };
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -244,7 +303,26 @@ export const Preview = (props: any) => {
         let uploadedName = '';
         for (let i = 0; i < actionFiles.length; i++) {
             const file = actionFiles[i];
-            const uploaded = await FileUploadService.upload(bucket, file, false, () => { });
+            let uploaded: any;
+            try {
+                uploaded = await FileUploadService.upload(bucket, file, false, () => { });
+            } catch (error) {
+                const parsedMessage = parseUploadErrorMessage(error, file.name);
+                const combined = `${String(error?.response?.data?.title || '')} ${String(error?.response?.data?.detail || '')} ${String(error?.response?.data?.message || '')}`.toLowerCase();
+                if (combined.includes('already has a file with name')) {
+                    // Retry once with a unique filename when bucket already has same filename.
+                    const uniqueFile = withUniqueSuffix(file);
+                    try {
+                        uploaded = await FileUploadService.upload(bucket, uniqueFile, false, () => { });
+                    } catch (retryError) {
+                        showUploadErrorToast(parseUploadErrorMessage(retryError, file.name));
+                        throw retryError;
+                    }
+                } else {
+                    showUploadErrorToast(parsedMessage);
+                    throw error;
+                }
+            }
             if (i === 0) {
                 uploadedName = uploaded?.data?.name || file.name;
             }
@@ -294,7 +372,7 @@ export const Preview = (props: any) => {
                 }
             } catch (error) {
                 console.error("Save failure:", error);
-                alert("An unexpected error occurred while saving.");
+                showUploadErrorToast("An unexpected error occurred while saving. Please try again.");
             }
         }
         else {
@@ -332,6 +410,9 @@ export const Preview = (props: any) => {
                 )
             );
             navigate('/home')
+        } catch (error) {
+            console.error("Close action save failure:", error);
+            showUploadErrorToast("An unexpected error occurred while saving. Please try again.");
         }
     }
 
@@ -464,10 +545,7 @@ export const Preview = (props: any) => {
                                                             {row.attachmentBucket && row.attachmentName ? (
                                                                 <Button
                                                                     size="small"
-                                                                    component="a"
-                                                                    href={`${fileServerBase}/files/${encodeURIComponent(row.attachmentBucket)}/${encodeURIComponent(row.attachmentName)}?access_token=${localStorage.getItem('token')}`}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
+                                                                    onClick={() => openDocumentsDialog(String(row.attachmentBucket))}
                                                                     sx={{ textTransform: 'none' }}
                                                                 >
                                                                     View
@@ -750,55 +828,70 @@ export const Preview = (props: any) => {
                                     {(usersState.role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER')) && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                             <Button color='primary' id='memo-submit' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
+                                                try {
+                                                    const remark = String(commentPreview || '').trim();
+                                                    if (!hasEvidence(remark)) {
+                                                        alert("Please provide either a comment or upload a document.");
+                                                        return;
+                                                    }
+                                                    if (!selectedCheckerUserId) {
+                                                        alert("Please select a checker.");
+                                                        return;
+                                                    }
+                                                    const attachment = await uploadActionFile(Number(id), 'memo-submit');
+                                                    await postWorkflowAction(Number(id), 'memo-submit', {
+                                                        remark,
+                                                        checkerUserId: Number(selectedCheckerUserId),
+                                                        attachmentBucket: attachment.attachmentBucket,
+                                                        attachmentName: attachment.attachmentName,
+                                                    });
+                                                    navigate('/home');
+                                                } catch (error) {
+                                                    console.error("Workflow action failed:", error);
+                                                    showUploadErrorToast();
                                                 }
-                                                if (!selectedCheckerUserId) {
-                                                    alert("Please select a checker.");
-                                                    return;
-                                                }
-                                                const attachment = await uploadActionFile(Number(id), 'memo-submit');
-                                                await postWorkflowAction(Number(id), 'memo-submit', {
-                                                    remark,
-                                                    checkerUserId: Number(selectedCheckerUserId),
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Submit Memo
                                             </Button>
                                             <Button color='warning' id='maker-revert-manager' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
+                                                try {
+                                                    const remark = String(commentPreview || '').trim();
+                                                    if (!hasEvidence(remark)) {
+                                                        alert("Please provide either a comment or upload a document.");
+                                                        return;
+                                                    }
+                                                    const attachment = await uploadActionFile(Number(id), 'maker-revert-manager');
+                                                    await postWorkflowAction(Number(id), 'maker-revert-manager', {
+                                                        remark,
+                                                        attachmentBucket: attachment.attachmentBucket,
+                                                        attachmentName: attachment.attachmentName,
+                                                    });
+                                                    navigate('/home');
+                                                } catch (error) {
+                                                    console.error("Workflow action failed:", error);
+                                                    showUploadErrorToast();
                                                 }
-                                                const attachment = await uploadActionFile(Number(id), 'maker-revert-manager');
-                                                await postWorkflowAction(Number(id), 'maker-revert-manager', {
-                                                    remark,
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revert to Assignee
                                             </Button>
                                             <Button color='error' id='maker-revert-applicant' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
+                                                try {
+                                                    const remark = String(commentPreview || '').trim();
+                                                    if (!hasEvidence(remark)) {
+                                                        alert("Please provide either a comment or upload a document.");
+                                                        return;
+                                                    }
+                                                    const attachment = await uploadActionFile(Number(id), 'maker-revert-applicant');
+                                                    await postWorkflowAction(Number(id), 'maker-revert-applicant', {
+                                                        remark,
+                                                        attachmentBucket: attachment.attachmentBucket,
+                                                        attachmentName: attachment.attachmentName,
+                                                    });
+                                                    navigate('/home');
+                                                } catch (error) {
+                                                    console.error("Workflow action failed:", error);
+                                                    showUploadErrorToast();
                                                 }
-                                                const attachment = await uploadActionFile(Number(id), 'maker-revert-applicant');
-                                                await postWorkflowAction(Number(id), 'maker-revert-applicant', {
-                                                    remark,
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revert to Applicant
                                             </Button>
@@ -808,39 +901,49 @@ export const Preview = (props: any) => {
                                     {(hasRole('CHECKER') && statusPrelims === 'MEMO_SUBMITTED') && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                             <Button color='warning' id='revert-to-maker' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
+                                                try {
+                                                    const remark = String(commentPreview || '').trim();
+                                                    if (!hasEvidence(remark)) {
+                                                        alert("Please provide either a comment or upload a document.");
+                                                        return;
+                                                    }
+                                                    const attachment = await uploadActionFile(Number(id), 'revert-to-maker');
+                                                    await postWorkflowAction(Number(id), 'revert-to-maker', {
+                                                        remark,
+                                                        attachmentBucket: attachment.attachmentBucket,
+                                                        attachmentName: attachment.attachmentName,
+                                                    });
+                                                    navigate('/home');
+                                                } catch (error) {
+                                                    console.error("Workflow action failed:", error);
+                                                    showUploadErrorToast();
                                                 }
-                                                const attachment = await uploadActionFile(Number(id), 'revert-to-maker');
-                                                await postWorkflowAction(Number(id), 'revert-to-maker', {
-                                                    remark,
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revert to Maker
                                             </Button>
                                             <Button color='success' id='checker-forward-manager' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
+                                                try {
+                                                    const remark = String(commentPreview || '').trim();
+                                                    if (!hasEvidence(remark)) {
+                                                        alert("Please provide either a comment or upload a document.");
+                                                        return;
+                                                    }
+                                                    if (!selectedManagerUserId) {
+                                                        alert("Please select a manager.");
+                                                        return;
+                                                    }
+                                                    const attachment = await uploadActionFile(Number(id), 'checker-forward-manager');
+                                                    await postWorkflowAction(Number(id), 'checker-forward-manager', {
+                                                        remark,
+                                                        managerUserId: Number(selectedManagerUserId),
+                                                        attachmentBucket: attachment.attachmentBucket,
+                                                        attachmentName: attachment.attachmentName,
+                                                    });
+                                                    navigate('/home');
+                                                } catch (error) {
+                                                    console.error("Workflow action failed:", error);
+                                                    showUploadErrorToast();
                                                 }
-                                                if (!selectedManagerUserId) {
-                                                    alert("Please select a manager.");
-                                                    return;
-                                                }
-                                                const attachment = await uploadActionFile(Number(id), 'checker-forward-manager');
-                                                await postWorkflowAction(Number(id), 'checker-forward-manager', {
-                                                    remark,
-                                                    managerUserId: Number(selectedManagerUserId),
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Mark application as &apos;With Screening Committee&apos;
                                             </Button>
@@ -849,23 +952,28 @@ export const Preview = (props: any) => {
 
                                     {(hasRole('CHECKER') && (statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
                                         <Button color='primary' id='assign-maker' onClick={async () => {
-                                            const remark = String(commentPreview || '').trim();
-                                            if (!hasEvidence(remark)) {
-                                                alert("Please provide either a comment or upload a document.");
-                                                return;
+                                            try {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                if (!selectedMakerUserId) {
+                                                    alert("Please select a maker.");
+                                                    return;
+                                                }
+                                                const attachment = await uploadActionFile(Number(id), 'assign-maker');
+                                                await postWorkflowAction(Number(id), 'assign-maker', {
+                                                    makerUserId: Number(selectedMakerUserId),
+                                                    remark,
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            } catch (error) {
+                                                console.error("Workflow action failed:", error);
+                                                showUploadErrorToast();
                                             }
-                                            if (!selectedMakerUserId) {
-                                                alert("Please select a maker.");
-                                                return;
-                                            }
-                                            const attachment = await uploadActionFile(Number(id), 'assign-maker');
-                                            await postWorkflowAction(Number(id), 'assign-maker', {
-                                                makerUserId: Number(selectedMakerUserId),
-                                                remark,
-                                                attachmentBucket: attachment.attachmentBucket,
-                                                attachmentName: attachment.attachmentName,
-                                            });
-                                            navigate('/home');
                                         }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                             Assign Maker
                                         </Button>
@@ -874,18 +982,23 @@ export const Preview = (props: any) => {
                                     {(hasRole('MANAGER') && (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                             <Button color='warning' id='manager-revert-maker' onClick={async () => {
-                                                const remark = String(commentPreview || '').trim();
-                                                if (!hasEvidence(remark)) {
-                                                    alert("Please provide either a comment or upload a document.");
-                                                    return;
+                                                try {
+                                                    const remark = String(commentPreview || '').trim();
+                                                    if (!hasEvidence(remark)) {
+                                                        alert("Please provide either a comment or upload a document.");
+                                                        return;
+                                                    }
+                                                    const attachment = await uploadActionFile(Number(id), 'manager-revert-maker');
+                                                    await postWorkflowAction(Number(id), 'manager-revert-maker', {
+                                                        remark,
+                                                        attachmentBucket: attachment.attachmentBucket,
+                                                        attachmentName: attachment.attachmentName,
+                                                    });
+                                                    navigate('/home');
+                                                } catch (error) {
+                                                    console.error("Workflow action failed:", error);
+                                                    showUploadErrorToast();
                                                 }
-                                                const attachment = await uploadActionFile(Number(id), 'manager-revert-maker');
-                                                await postWorkflowAction(Number(id), 'manager-revert-maker', {
-                                                    remark,
-                                                    attachmentBucket: attachment.attachmentBucket,
-                                                    attachmentName: attachment.attachmentName,
-                                                });
-                                                navigate('/home');
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revert to Analyst
                                             </Button>
@@ -1038,6 +1151,68 @@ export const Preview = (props: any) => {
                     >
                         Continue to Home
                     </Button>
+                </DialogContent>
+            </Dialog>
+
+            <Snackbar
+                open={uploadErrorToastOpen}
+                autoHideDuration={4500}
+                onClose={() => setUploadErrorToastOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setUploadErrorToastOpen(false)}
+                    severity="error"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {uploadErrorToastMessage}
+                </Alert>
+            </Snackbar>
+
+            <Dialog
+                open={documentsDialogOpen}
+                onClose={() => setDocumentsDialogOpen(false)}
+                fullWidth
+                maxWidth="sm"
+            >
+                <DialogTitle>Uploaded Documents</DialogTitle>
+                <DialogContent dividers>
+                    {documentsDialogLoading ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
+                            <CircularProgress size={20} />
+                            <Typography variant="body2">Loading documents...</Typography>
+                        </Box>
+                    ) : documentsDialogError ? (
+                        <Alert severity="warning">{documentsDialogError}</Alert>
+                    ) : (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            {documentsDialogFiles.map((file, idx) => {
+                                const fileName = String(file?.name || '');
+                                const fileUrl = String(file?.url || '');
+                                const href = fileUrl
+                                    ? `${fileUrl}?access_token=${localStorage.getItem('token')}`
+                                    : `${fileServerBase}/files/${encodeURIComponent(documentsDialogBucket)}/${encodeURIComponent(fileName)}?access_token=${localStorage.getItem('token')}`;
+                                return (
+                                    <Box key={`${fileName}-${idx}`} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                        <Typography variant="body2" sx={{ color: '#334155', wordBreak: 'break-all' }}>
+                                            {idx + 1}. {fileName || 'Untitled file'}
+                                        </Typography>
+                                        <Button
+                                            size="small"
+                                            component="a"
+                                            href={href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            sx={{ textTransform: 'none' }}
+                                        >
+                                            Download
+                                        </Button>
+                                    </Box>
+                                );
+                            })}
+                        </Box>
+                    )}
                 </DialogContent>
             </Dialog>
 
