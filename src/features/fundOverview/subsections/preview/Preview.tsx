@@ -306,7 +306,7 @@ export const Preview = (props: any) => {
             let uploaded: any;
             try {
                 uploaded = await FileUploadService.upload(bucket, file, false, () => { });
-            } catch (error) {
+            } catch (error: any) {
                 const parsedMessage = parseUploadErrorMessage(error, file.name);
                 const combined = `${String(error?.response?.data?.title || '')} ${String(error?.response?.data?.detail || '')} ${String(error?.response?.data?.message || '')}`.toLowerCase();
                 if (combined.includes('already has a file with name')) {
@@ -388,31 +388,33 @@ export const Preview = (props: any) => {
         if (actionDate === null || actionDate == undefined) {
             setActionDateError("Please entre an action date.");
         } else {
-            const trimmedComment = String(commentPreview || '').trim();
-            if (!hasEvidence(trimmedComment)) {
-                alert("Please provide either a comment or upload a document.");
-                return;
-            }
-            const attachment = await uploadActionFile(Number(id), String(intendedStatus));
-            console.log("prelimId", Number(id))
-            dispatch(
-                createApplicationAsync(
-                    wrapArgument(
-                        actionUid, {
-                        id: Number(id),
-                        statusComments: trimmedComment,
-                        attachmentBucket: attachment.attachmentBucket,
-                        attachmentName: attachment.attachmentName,
-                        actionDate: actionDate,
-                        status: intendedStatus
-                    }
+            try {
+                const trimmedComment = String(commentPreview || '').trim();
+                if (!hasEvidence(trimmedComment)) {
+                    alert("Please provide either a comment or upload a document.");
+                    return;
+                }
+                const attachment = await uploadActionFile(Number(id), String(intendedStatus));
+                console.log("prelimId", Number(id))
+                dispatch(
+                    createApplicationAsync(
+                        wrapArgument(
+                            actionUid, {
+                            id: Number(id),
+                            statusComments: trimmedComment,
+                            attachmentBucket: attachment.attachmentBucket,
+                            attachmentName: attachment.attachmentName,
+                            actionDate: actionDate,
+                            status: intendedStatus
+                        }
+                        )
                     )
-                )
-            );
-            navigate('/home')
-        } catch (error) {
-            console.error("Close action save failure:", error);
-            showUploadErrorToast("An unexpected error occurred while saving. Please try again.");
+                );
+                navigate('/home')
+            } catch (error) {
+                console.error("Close action save failure:", error);
+                showUploadErrorToast("An unexpected error occurred while saving. Please try again.");
+            }
         }
     }
 
