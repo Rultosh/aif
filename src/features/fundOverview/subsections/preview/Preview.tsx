@@ -241,10 +241,11 @@ export const Preview = (props: any) => {
     const uploadActionFile = async (applicationId: number, action: string) => {
         if (!actionFiles.length) return {};
         const bucket = `workflow-action-${applicationId}-${action.toLowerCase()}`;
-        let uploadedName = actionFiles[0]?.name || '';
-        for (const file of actionFiles) {
+        let uploadedName = '';
+        for (let i = 0; i < actionFiles.length; i++) {
+            const file = actionFiles[i];
             const uploaded = await FileUploadService.upload(bucket, file, false, () => { });
-            if (!uploadedName) {
+            if (i === 0) {
                 uploadedName = uploaded?.data?.name || file.name;
             }
         }
