@@ -38,10 +38,10 @@ export function deleteUser(userId: number) {
   });
 }
 
-export function assignManagerRole(userId: number) {
+export function assignUserAdminRole(userId: number) {
   return api({
     method: 'post',
-    url: `useradmin/users/${userId}/assign-manager`,
+    url: `useradmin/users/${userId}/assign-useradmin`,
   });
 }
 

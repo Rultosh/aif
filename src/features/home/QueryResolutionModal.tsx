@@ -20,7 +20,7 @@ export const QueryResolutionModal = (props: any) => {
     const [actionUid] = useState(uuid())
     const dispatch = useAppDispatch()
     const usersState = useAppSelector(selectUsers)
-    const [queryFile, setQueryFile] = useState<File | null>(null);
+    const [queryFiles, setQueryFiles] = useState<File[]>([]);
     const [submitError, setSubmitError] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const queryInputRef = useRef<HTMLInputElement | null>(null);
@@ -48,14 +48,17 @@ export const QueryResolutionModal = (props: any) => {
         }
     }, [isOpen]);
 
+    const fileIdentity = (f: File) => `${f.name}__${f.size}__${f.lastModified}`;
+
     async function handleSubmit(){
         const trimmedQuery = String(formData.query || "").trim();
-        if (!trimmedQuery && !queryFile) {
+        if (!trimmedQuery && !queryFiles.length) {
             setSubmitError("Please add a comment or upload a document.");
             return;
         }
-        if (queryFile && queryFile.size > MAX_UPLOAD_BYTES) {
-            setSubmitError("Selected file is too large. Maximum allowed size is 5 MB.");
+        const oversized = queryFiles.find(f => f.size > MAX_UPLOAD_BYTES);
+        if (oversized) {
+            setSubmitError(`File "${oversized.name}" is too large. Maximum allowed size is 5 MB.`);
             return;
         }
         if (isSubmitting) {
@@ -65,11 +68,15 @@ export const QueryResolutionModal = (props: any) => {
         try {
             let attachmentBucket: string | undefined;
             let attachmentName: string | undefined;
-            if (queryFile) {
+            if (queryFiles.length) {
                 const bucket = `prelim-query-${id}`;
-                const uploaded = await FileUploadService.upload(bucket, queryFile, false, () => {});
+                const uploadedNames: string[] = [];
+                for (const file of queryFiles) {
+                    const uploaded = await FileUploadService.upload(bucket, file, false, () => {});
+                    uploadedNames.push(uploaded?.data?.name || file.name);
+                }
                 attachmentBucket = bucket;
-                attachmentName = uploaded?.data?.name || queryFile.name;
+                attachmentName = uploadedNames.join(',');
             }
             await dispatch(postQuriesAsync(
                 wrapArgument(actionUid, {
@@ -81,7 +88,7 @@ export const QueryResolutionModal = (props: any) => {
                 })
             )).unwrap();
             setFormData(defaultIQueryResolution);
-            setQueryFile(null);
+            setQueryFiles([]);
             setSubmitError("");
             fetchQueries();
         } catch (e: any) {
@@ -176,13 +183,17 @@ export const QueryResolutionModal = (props: any) => {
                                 </Typography>
                                 {q.attachmentBucket && q.attachmentName ? (
                                     <Box sx={{ mt: 1 }}>
-                                        <a
-                                            href={`${getFileServerBaseUrl()}/files/${encodeURIComponent(q.attachmentBucket)}/${encodeURIComponent(q.attachmentName)}?access_token=${localStorage.getItem('token')}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            View attachment
-                                        </a>
+                                        {q.attachmentName.split(',').map((name, idx) => (
+                                            <Box key={idx}>
+                                                <a
+                                                    href={`${getFileServerBaseUrl()}/files/${encodeURIComponent(q.attachmentBucket!)}/${encodeURIComponent(name.trim())}?access_token=${localStorage.getItem('token')}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {idx + 1}. {name.trim()}
+                                                </a>
+                                            </Box>
+                                        ))}
                                     </Box>
                                 ) : null}
                             </Box>
@@ -223,21 +234,55 @@ export const QueryResolutionModal = (props: any) => {
                                             type="file"
                                             hidden
                                             onChange={(e) => {
-                                                const selectedFile = e.target.files?.[0] || null;
-                                                if (selectedFile && selectedFile.size > MAX_UPLOAD_BYTES) {
-                                                    setQueryFile(null);
-                                                    setSubmitError("Selected file is too large. Maximum allowed size is 5 MB.");
-                                                    return;
-                                                }
-                                                setQueryFile(selectedFile);
+                                                const picked = Array.from(e.target.files || []);
+                                                if (!picked.length) return;
+                                                setQueryFiles((prev) => {
+                                                    const seen = new Set(prev.map(fileIdentity));
+                                                    const merged = [...prev];
+                                                    for (const file of picked) {
+                                                        const key = fileIdentity(file);
+                                                        if (!seen.has(key)) {
+                                                            merged.push(file);
+                                                            seen.add(key);
+                                                        }
+                                                    }
+                                                    return merged;
+                                                });
                                                 setSubmitError("");
+                                                e.currentTarget.value = '';
                                             }}
                                         />
                                     </Button>
-                                    <Typography variant="caption" sx={{ color: '#64748b' }}>
-                                        {queryFile ? queryFile.name : "Optional. Either comment or document is required. Max file size: 5 MB."}
-                                    </Typography>
                                 </Stack>
+                                {queryFiles.length ? (
+                                    <Box sx={{ mt: 1 }}>
+                                        {queryFiles.map((file, idx) => (
+                                            <Box
+                                                key={fileIdentity(file)}
+                                                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+                                            >
+                                                <Typography variant="caption" sx={{ color: '#334155', wordBreak: 'break-all' }}>
+                                                    {idx + 1}. {file.name}
+                                                </Typography>
+                                                <Button
+                                                    size="small"
+                                                    color="error"
+                                                    sx={{ minWidth: 'auto', p: 0, textTransform: 'none' }}
+                                                    disabled={isSubmitting}
+                                                    onClick={() => {
+                                                        setQueryFiles((prev) => prev.filter((f) => fileIdentity(f) !== fileIdentity(file)));
+                                                    }}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </Box>
+                                        ))}
+                                    </Box>
+                                ) : (
+                                    <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#64748b' }}>
+                                        Optional. Either comment or document is required. Max file size: 5 MB each.
+                                    </Typography>
+                                )}
                             </Grid>
                             {submitError ? (
                                 <Grid item xs={12}>

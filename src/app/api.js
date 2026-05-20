@@ -37,7 +37,7 @@ client.interceptors.request.use(function(config) {
 client.interceptors.response.use(function (response) {
   return response;
 }, async function (error) {
-  if (error && error.response && error.response.status === 401 ){
+  if (error && error.response && (error.response.status === 401 || error.response.status === 403) ){
     const originalRequest = error.config;
     if (!originalRequest) {
       localStorage.clear();
@@ -49,7 +49,7 @@ client.interceptors.response.use(function (response) {
       url.includes("/auth/authenticate") ||
       url.includes("/auth/mfa/verify") ||
       url.includes("/auth/refresh");
-    if (!isAuthCall && !originalRequest._retry) {
+    if (!isAuthCall && !originalRequest._retry && error.response.status === 401) {
       originalRequest._retry = true;
       const refresh = localStorage.getItem('refreshToken');
       if (refresh) {
@@ -64,6 +64,7 @@ client.interceptors.response.use(function (response) {
     }
     localStorage.clear();
     CheckAuth.setIsUnauthorized();
+    window.location.href = '/aif#/login';
   }
   
   return Promise.reject(error);

@@ -11,6 +11,34 @@ import { selectUsers } from '../admin/adminSlice'
 import React, * as Rect from 'react'
 import { getFileServerBaseUrl } from '../../lib/fileServerBaseUrl';
 
+function formatStatusLabel(status: string | undefined): string {
+    if (!status) return '—';
+    const map: Record<string, string> = {
+        CREATED: 'Created',
+        SUBMITTED: 'Submitted',
+        REVIEWED: 'Reviewed',
+        REVISE: 'Revision Requested',
+        REVERTED_TO_APPLICANT: 'Reverted to Applicant',
+        APPROVED: 'Approved',
+        REJECTED: 'Rejected',
+        TEMP_CLOSED: 'Temporarily Closed',
+        CLOSED: 'Closed',
+        MAKER_ASSIGNED: 'Maker Assigned',
+        MEMO_SUBMITTED: 'Memo Submitted',
+        REVERTED_TO_MAKER: 'Reverted to Maker',
+        REVERTED_TO_CHECKER: 'Reverted to Checker',
+        REVERTED_TO_MANAGER: 'Reverted to Checker',
+        CHECKER_FORWARDED_TO_USERADMIN: 'Forwarded to User Admin',
+        CHECKER_FORWARDED_TO_MANAGER: 'Forwarded to User Admin',
+        USERADMIN_FORWARDED_TO_PF: 'Forwarded to PF',
+        MANAGER_FORWARDED_TO_PF: 'Forwarded to PF',
+        APPROVED_BY_PF: 'Approved by PF',
+        REJECTED_BY_PF: 'Rejected by PF',
+        SANCTIONED: 'Sanctioned',
+    };
+    return map[status.toUpperCase()] ?? status;
+}
+
 export const HistoryModal = (props: any) => {
 
     const id = props?.prelimDetails?.id
@@ -75,7 +103,7 @@ export const HistoryModal = (props: any) => {
                             {state?.histories ? state?.histories?.map((row: IHistory) => (
                                 <TableRow key={`${row.id}`}>
                                     {/* <TableCell align="center">{row.stage}</TableCell> */}
-                                    <TableCell align="center">{row.status}</TableCell>
+                                    <TableCell align="center">{formatStatusLabel(row.status)}</TableCell>
                                     <TableCell align="center">
                                         {row.createdOn ? dayjs(row.createdOn).format("DD MMM YYYY") : "-"}
                                     </TableCell>

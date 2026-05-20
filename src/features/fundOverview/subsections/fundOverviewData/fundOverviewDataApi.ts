@@ -111,6 +111,13 @@ export function postWorkflowAction(
   });
 }
 
+export function deletePrelimApplication(prelimAppId: number) {
+  return api({
+    method: 'delete',
+    url: `/api/prelims/${prelimAppId}`
+  });
+}
+
 export function fetchMakerUsers() {
   return api({
     method: 'get',
@@ -125,11 +132,16 @@ export function fetchCheckerUsers() {
   });
 }
 
-export function fetchManagerUsers() {
+export function fetchUserAdminUsers() {
   return api({
     method: 'get',
-    url: `/api/users/managers`
+    url: `/api/users/user-admins`
   });
+}
+
+/** @deprecated use fetchUserAdminUsers */
+export function fetchManagerUsers() {
+  return fetchUserAdminUsers();
 }
 
 export function fetchPensionFundUsers() {

@@ -19,7 +19,8 @@ function UserAdminRoute({ children }) {
             const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), '=');
             const decoded = JSON.parse(window.atob(padded));
             const roles = Array.isArray(decoded?.rol) ? decoded.rol.map((r) => String(r).toUpperCase()) : [];
-            return roles.includes("USERADMIN");
+            // Accept USERADMIN or legacy MANAGER as valid user admin role
+            return roles.includes("USERADMIN") || roles.includes("MANAGER");
         } catch {
             return false;
         }
@@ -37,10 +38,10 @@ function UserAdminRoute({ children }) {
             })
        }
 
-       if(user.role !== "USERADMIN" && !hasUserAdminRoleInToken()) {
+       const activeRole = localStorage.getItem('activeRole') || '';
+       if(activeRole !== "USERADMIN" && !hasUserAdminRoleInToken()) {
         navigate({
             pathname: '/login',
-            // state: { from: {pathname: '/home'} }
         })
        }
     })

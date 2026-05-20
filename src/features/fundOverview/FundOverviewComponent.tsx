@@ -47,7 +47,7 @@ export const FundOverview = (props: any) => {
 
     /** Non-applicant roles: preliminary app is view-only via PDF preview (no wizard steps). */
     const operationalPreviewOnlyRoles = new Set([
-        'MAKER', 'CHECKER', 'MANAGER', 'ADMIN', 'USERADMIN', 'PENSION_FUND',
+        'MAKER', 'CHECKER', 'ADMIN', 'USERADMIN', 'PENSION_FUND',
     ]);
     const roleParts = (usersState.role || '')
         .split(',')

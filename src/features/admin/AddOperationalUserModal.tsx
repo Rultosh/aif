@@ -80,7 +80,7 @@ const AddOperationalUserModal = ({ open, onClose, onCreated }: Props) => {
             >
               <MenuItem value="CHECKER">CHECKER</MenuItem>
               <MenuItem value="MAKER">MAKER</MenuItem>
-              <MenuItem value="MANAGER">MANAGER</MenuItem>
+              <MenuItem value="CHECKER,USERADMIN">CHECKER + USERADMIN</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={6}><TextField fullWidth label="Address" value={formData.address} onChange={(e) => handleChange("address", e.target.value)} /></Grid>

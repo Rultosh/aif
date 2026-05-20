@@ -26,7 +26,8 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import FileUploadService from "../../../../components/FileUploadService";
 import { postWorkflowAction } from "../fundOverviewData/fundOverviewDataApi";
-import { fetchCheckerUsers, fetchManagerUsers, fetchMakerUsers } from "../fundOverviewData/fundOverviewDataApi";
+import { fetchCheckerUsers, fetchUserAdminUsers, fetchMakerUsers } from "../fundOverviewData/fundOverviewDataApi";
+import { hasCheckerAndUserAdmin, normalizeWorkflowStatus } from "../../../../lib/workflowStatus";
 import { getHistory } from '../../../home/historyApi';
 import { IHistory } from '../../../home/IHistory';
 import { getFileServerBaseUrl } from '../../../../lib/fileServerBaseUrl';
@@ -44,6 +45,34 @@ function commentHistoryByLabel(row: IHistory): string {
         return name;
     }
     return '—';
+}
+
+function formatStatusLabel(status: string | undefined): string {
+    if (!status) return '—';
+    const map: Record<string, string> = {
+        CREATED: 'Created',
+        SUBMITTED: 'Submitted',
+        REVIEWED: 'Reviewed',
+        REVISE: 'Revision Requested',
+        REVERTED_TO_APPLICANT: 'Reverted to Applicant',
+        APPROVED: 'Approved',
+        REJECTED: 'Rejected',
+        TEMP_CLOSED: 'Temporarily Closed',
+        CLOSED: 'Closed',
+        MAKER_ASSIGNED: 'Maker Assigned',
+        MEMO_SUBMITTED: 'Memo Submitted',
+        REVERTED_TO_MAKER: 'Reverted to Maker',
+        REVERTED_TO_CHECKER: 'Reverted to Checker',
+        REVERTED_TO_MANAGER: 'Reverted to Checker',
+        CHECKER_FORWARDED_TO_USERADMIN: 'Forwarded to User Admin',
+        CHECKER_FORWARDED_TO_MANAGER: 'Forwarded to User Admin',
+        USERADMIN_FORWARDED_TO_PF: 'Forwarded to PF',
+        MANAGER_FORWARDED_TO_PF: 'Forwarded to PF',
+        APPROVED_BY_PF: 'Approved by PF',
+        REJECTED_BY_PF: 'Rejected by PF',
+        SANCTIONED: 'Sanctioned',
+    };
+    return map[status.toUpperCase()] ?? status;
 }
 
 export const Preview = (props: any) => {
@@ -87,25 +116,25 @@ export const Preview = (props: any) => {
         .filter(Boolean);
     const hasRole = (targetRole: string) => roleParts.includes(targetRole);
     const isOperationalWorkflowUser = roleParts.some((r) =>
-        ['MAKER', 'CHECKER', 'MANAGER', 'ADMIN', 'USERADMIN', 'PENSION_FUND'].includes(r)
+        ['MAKER', 'CHECKER', 'USERADMIN', 'ADMIN', 'PENSION_FUND'].includes(r)
     );
     const [commentHistory, setCommentHistory] = useState<IHistory[]>([]);
-    /** Preview: only fund applicants should return to declaration; not maker/checker/manager/admin. */
+    /** Preview: only fund applicants should return to declaration; not maker/checker/useradmin/admin. */
     const showBackToDeclaration = roleParts.includes('USER') && !isOperationalWorkflowUser;
-    const statusPrelimsUpper = String(statusPrelims || '').trim().toUpperCase();
+    const statusPrelimsUpper = normalizeWorkflowStatus(String(statusPrelims || '').trim());
     const applicantEditableStatuses = new Set(['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT']);
     const isApplicantActionable = hasRole('USER') && applicantEditableStatuses.has(statusPrelimsUpper);
     const isOperationalActionable =
-        ['ADMIN', 'USERADMIN'].includes(role) &&
-        (statusPrelims == 'SUBMITTED' || statusPrelims == 'REVIEWED' || statusPrelims == 'TEMP_CLOSED');
-    const isMakerActionable = hasRole('MAKER') && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER');
-    const isCheckerActionable = hasRole('CHECKER') && (statusPrelims === 'MEMO_SUBMITTED' || statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER');
-    const isManagerActionable =
-        hasRole('MANAGER') &&
-        (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER');
+        (role === 'ADMIN' || role === 'USERADMIN') &&
+        (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVIEWED' || statusPrelimsUpper === 'TEMP_CLOSED');
+    const isMakerActionable = hasRole('MAKER') && (statusPrelimsUpper === 'MAKER_ASSIGNED' || statusPrelimsUpper === 'REVERTED_TO_MAKER');
+    const isCheckerActionable = hasRole('CHECKER') && (statusPrelimsUpper === 'MEMO_SUBMITTED' || statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVERTED_TO_CHECKER');
+    const isScActionable =
+        hasCheckerAndUserAdmin(role) &&
+        statusPrelimsUpper === 'CHECKER_FORWARDED_TO_USERADMIN';
     /** PF approve/reject (and steps after screening committee) are not in this release. */
     const isPfActionable = false;
-    const hasActionToPerform = isApplicantActionable || isOperationalActionable || isMakerActionable || isCheckerActionable || isManagerActionable || isPfActionable;
+    const hasActionToPerform = isApplicantActionable || isOperationalActionable || isMakerActionable || isCheckerActionable || isScActionable || isPfActionable;
 
     const handleSuccessDialogClose = () => {
         setShowSuccessDialog(false);
@@ -131,10 +160,10 @@ export const Preview = (props: any) => {
     const [actionFiles, setActionFiles] = useState<File[]>([]);
     const [checkerUsers, setCheckerUsers] = useState<any[]>([]);
     const [makerUsers, setMakerUsers] = useState<any[]>([]);
-    const [managerUsers, setManagerUsers] = useState<any[]>([]);
+    const [userAdminUsers, setUserAdminUsers] = useState<any[]>([]);
     const [selectedMakerUserId, setSelectedMakerUserId] = useState<string>('');
     const [selectedCheckerUserId, setSelectedCheckerUserId] = useState<string>('');
-    const [selectedManagerUserId, setSelectedManagerUserId] = useState<string>('');
+    const [selectedUserAdminUserId, setSelectedUserAdminUserId] = useState<string>('');
 
     const fileIdentity = (file: File) => `${file.name}__${file.size}__${file.lastModified}`;
     const showUploadErrorToast = (message?: string) => {
@@ -265,13 +294,16 @@ export const Preview = (props: any) => {
                     } else if (makerList.length > 0) {
                         setSelectedMakerUserId(String(makerList[0].id));
                     }
-                    const res = await fetchManagerUsers();
+                    const res = await fetchUserAdminUsers();
                     const list = res?.data || [];
-                    setManagerUsers(list);
-                    if (prelimApplicationState.prelimApplication.assignedManagerUserId != null) {
-                        setSelectedManagerUserId(String(prelimApplicationState.prelimApplication.assignedManagerUserId));
+                    setUserAdminUsers(list);
+                    const assignedUserAdminId =
+                        prelimApplicationState.prelimApplication.assignedUserAdminUserId
+                        ?? (prelimApplicationState.prelimApplication as any).assignedManagerUserId;
+                    if (assignedUserAdminId != null) {
+                        setSelectedUserAdminUserId(String(assignedUserAdminId));
                     } else if (list.length > 0) {
-                        setSelectedManagerUserId(String(list[0].id));
+                        setSelectedUserAdminUserId(String(list[0].id));
                     }
                 }
             } catch {
@@ -279,7 +311,7 @@ export const Preview = (props: any) => {
             }
         };
         loadAssignmentUsers();
-    }, [usersState.role, prelimApplicationState.prelimApplication.assignedCheckerUserId, prelimApplicationState.prelimApplication.assignedManagerUserId]);
+    }, [usersState.role, prelimApplicationState.prelimApplication.assignedCheckerUserId, prelimApplicationState.prelimApplication.assignedUserAdminUserId]);
 
     async function checkAllDocsOk(prelimId: string | undefined, applicationName: string) {
         if (usersState.role === 'ADMIN') {
@@ -540,7 +572,7 @@ export const Preview = (props: any) => {
                                                         <TableCell sx={{ whiteSpace: 'nowrap', color: '#475569' }}>
                                                             {row.createdOn ? dayjs(String(row.createdOn)).format('DD MMM YYYY') : '—'}
                                                         </TableCell>
-                                                        <TableCell sx={{ color: '#1e293b' }}>{row.status || '—'}</TableCell>
+                                                        <TableCell sx={{ color: '#1e293b' }}>{formatStatusLabel(row.status)}</TableCell>
                                                         <TableCell sx={{ color: '#475569' }}>{commentHistoryByLabel(row)}</TableCell>
                                                         <TableCell sx={{ color: '#1e293b', maxWidth: 360 }}>{row.remarks?.trim() ? row.remarks : '—'}</TableCell>
                                                         <TableCell align="center">
@@ -785,7 +817,7 @@ export const Preview = (props: any) => {
                                         </FormControl>
                                     )}
 
-                                    {(hasRole('CHECKER') && (statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
+                                    {(hasRole('CHECKER') && (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVERTED_TO_CHECKER')) && (
                                         <FormControl sx={{ minWidth: 260 }}>
                                             <InputLabel id="maker-user-label">Select Maker</InputLabel>
                                             <Select
@@ -803,20 +835,27 @@ export const Preview = (props: any) => {
                                         </FormControl>
                                     )}
 
-                                    {(hasRole('CHECKER') && statusPrelims === 'MEMO_SUBMITTED') && (
+                                    {(hasRole('CHECKER') && statusPrelimsUpper === 'MEMO_SUBMITTED') && (
                                         <FormControl sx={{ minWidth: 260 }}>
-                                            <InputLabel id="manager-user-label">Select Manager</InputLabel>
+                                            <InputLabel id="useradmin-user-label">Select User Admin</InputLabel>
                                             <Select
-                                                labelId="manager-user-label"
-                                                value={selectedManagerUserId}
-                                                label="Select Manager"
-                                                onChange={(e) => setSelectedManagerUserId(String(e.target.value))}
+                                                labelId="useradmin-user-label"
+                                                value={selectedUserAdminUserId}
+                                                label="Select User Admin"
+                                                onChange={(e) => setSelectedUserAdminUserId(String(e.target.value))}
+                                                displayEmpty
                                             >
-                                                {managerUsers.map((user) => (
-                                                    <MenuItem key={user.id} value={String(user.id)}>
-                                                        {user.contactPerson || user.username} ({user.username})
+                                                {userAdminUsers.length === 0 ? (
+                                                    <MenuItem value="" disabled>
+                                                        No user admin found — assign USERADMIN role in Admin
                                                     </MenuItem>
-                                                ))}
+                                                ) : (
+                                                    userAdminUsers.map((user) => (
+                                                        <MenuItem key={user.id} value={String(user.id)}>
+                                                            {user.contactPerson || user.username} ({user.username})
+                                                        </MenuItem>
+                                                    ))
+                                                )}
                                             </Select>
                                         </FormControl>
                                     )}
@@ -855,15 +894,15 @@ export const Preview = (props: any) => {
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Submit Memo
                                             </Button>
-                                            <Button color='warning' id='maker-revert-manager' onClick={async () => {
+                                            <Button color='warning' id='maker-revert-checker' onClick={async () => {
                                                 try {
                                                     const remark = String(commentPreview || '').trim();
                                                     if (!hasEvidence(remark)) {
                                                         alert("Please provide either a comment or upload a document.");
                                                         return;
                                                     }
-                                                    const attachment = await uploadActionFile(Number(id), 'maker-revert-manager');
-                                                    await postWorkflowAction(Number(id), 'maker-revert-manager', {
+                                                    const attachment = await uploadActionFile(Number(id), 'maker-revert-checker');
+                                                    await postWorkflowAction(Number(id), 'maker-revert-checker', {
                                                         remark,
                                                         attachmentBucket: attachment.attachmentBucket,
                                                         attachmentName: attachment.attachmentName,
@@ -874,7 +913,7 @@ export const Preview = (props: any) => {
                                                     showUploadErrorToast();
                                                 }
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Revert to Assignee
+                                                Revert to Checker
                                             </Button>
                                             <Button color='error' id='maker-revert-applicant' onClick={async () => {
                                                 try {
@@ -900,7 +939,7 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(hasRole('CHECKER') && statusPrelims === 'MEMO_SUBMITTED') && (
+                                    {(hasRole('CHECKER') && statusPrelimsUpper === 'MEMO_SUBMITTED') && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                             <Button color='warning' id='revert-to-maker' onClick={async () => {
                                                 try {
@@ -923,21 +962,21 @@ export const Preview = (props: any) => {
                                             }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revert to Maker
                                             </Button>
-                                            <Button color='success' id='checker-forward-manager' onClick={async () => {
+                                            <Button color='success' id='checker-forward-useradmin' onClick={async () => {
                                                 try {
                                                     const remark = String(commentPreview || '').trim();
                                                     if (!hasEvidence(remark)) {
                                                         alert("Please provide either a comment or upload a document.");
                                                         return;
                                                     }
-                                                    if (!selectedManagerUserId) {
-                                                        alert("Please select a manager.");
+                                                    if (!selectedUserAdminUserId) {
+                                                        alert("Please select a user admin.");
                                                         return;
                                                     }
-                                                    const attachment = await uploadActionFile(Number(id), 'checker-forward-manager');
-                                                    await postWorkflowAction(Number(id), 'checker-forward-manager', {
+                                                    const attachment = await uploadActionFile(Number(id), 'checker-forward-useradmin');
+                                                    await postWorkflowAction(Number(id), 'checker-forward-useradmin', {
                                                         remark,
-                                                        managerUserId: Number(selectedManagerUserId),
+                                                        userAdminUserId: Number(selectedUserAdminUserId),
                                                         attachmentBucket: attachment.attachmentBucket,
                                                         attachmentName: attachment.attachmentName,
                                                     });
@@ -952,7 +991,7 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(hasRole('CHECKER') && (statusPrelims === 'SUBMITTED' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
+                                    {(hasRole('CHECKER') && (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVERTED_TO_CHECKER')) && (
                                         <Button color='primary' id='assign-maker' onClick={async () => {
                                             try {
                                                 const remark = String(commentPreview || '').trim();
@@ -981,17 +1020,17 @@ export const Preview = (props: any) => {
                                         </Button>
                                     )}
 
-                                    {(hasRole('MANAGER') && (statusPrelims === 'CHECKER_FORWARDED_TO_MANAGER' || statusPrelims === 'REVERTED_TO_MANAGER')) && (
+                                    {isScActionable && (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                            <Button color='warning' id='manager-revert-maker' onClick={async () => {
+                                            <Button color='warning' id='useradmin-revert-maker' onClick={async () => {
                                                 try {
                                                     const remark = String(commentPreview || '').trim();
                                                     if (!hasEvidence(remark)) {
                                                         alert("Please provide either a comment or upload a document.");
                                                         return;
                                                     }
-                                                    const attachment = await uploadActionFile(Number(id), 'manager-revert-maker');
-                                                    await postWorkflowAction(Number(id), 'manager-revert-maker', {
+                                                    const attachment = await uploadActionFile(Number(id), 'useradmin-revert-maker');
+                                                    await postWorkflowAction(Number(id), 'useradmin-revert-maker', {
                                                         remark,
                                                         attachmentBucket: attachment.attachmentBucket,
                                                         attachmentName: attachment.attachmentName,
@@ -1007,7 +1046,7 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'SUBMITTED') && (
+                                    {((usersState.role === 'ADMIN' || usersState.role === 'USERADMIN') && statusPrelimsUpper === 'SUBMITTED') && (
                                         <Box sx={{ display: 'flex', gap: 2 }}>
                                             <Button color='success' id='review' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Forward for Recommendation
@@ -1028,7 +1067,7 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'REVIEWED') && (
+                                    {((usersState.role === 'ADMIN' || usersState.role === 'USERADMIN') && statusPrelimsUpper === 'REVIEWED') && (
                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                             {isCurrentUserForwarder && (
                                                 <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 480 }}>
@@ -1057,7 +1096,7 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(['ADMIN', 'USERADMIN'].includes(usersState.role || '') && statusPrelims == 'TEMP_CLOSED') && (
+                                    {((usersState.role === 'ADMIN' || usersState.role === 'USERADMIN') && statusPrelimsUpper === 'TEMP_CLOSED') && (
                                         <Button color='primary' id='reopen' onClick={handleClickSaveCloseAction} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                             Reopen Application
                                         </Button>
