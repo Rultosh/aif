@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/aif/portal/static/css/main.13a92cbc.css",
-    "main.js": "/aif/portal/static/js/main.89df1f41.js",
+    "main.js": "/aif/portal/static/js/main.9bc19b95.js",
     "static/js/787.51358596.chunk.js": "/aif/portal/static/js/787.51358596.chunk.js",
     "static/media/login_videos.mp4": "/aif/portal/static/media/login_videos.7124616488525dc40951.mp4",
     "static/media/user_manual.pdf": "/aif/portal/static/media/user_manual.ac832908c3da5c92068b.pdf",
@@ -24,11 +24,11 @@
     "static/media/arrow_sign_in.svg": "/aif/portal/static/media/arrow_sign_in.228104960787599be75a.svg",
     "static/media/arrow_check_eligibility.svg": "/aif/portal/static/media/arrow_check_eligibility.7fe4472e8e96a76b31f6.svg",
     "main.13a92cbc.css.map": "/aif/portal/static/css/main.13a92cbc.css.map",
-    "main.89df1f41.js.map": "/aif/portal/static/js/main.89df1f41.js.map",
+    "main.9bc19b95.js.map": "/aif/portal/static/js/main.9bc19b95.js.map",
     "787.51358596.chunk.js.map": "/aif/portal/static/js/787.51358596.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.13a92cbc.css",
-    "static/js/main.89df1f41.js"
+    "static/js/main.9bc19b95.js"
   ]
 }
