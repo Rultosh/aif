@@ -827,7 +827,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                       <Button
                         variant="outlined"
-                        href="/aif/templates/Details of investments undertaken by the Partner in the past 10 years.xlsx"
+                        href="/aif/portal/templates/Details of investments undertaken by the Partner in the past 10 years.xlsx"
                         size="small"
                         startIcon={<DownloadIcon />}
                         sx={{

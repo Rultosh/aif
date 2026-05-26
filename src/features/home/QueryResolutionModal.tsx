@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import uuid from "react-uuid";
 import { defaultIQueryResolution, IQueryResolution } from "./IQueryResolution";
-import { fetchQuriesAsync, postQuriesAsync, selectqueryResolution } from './queryResolutionSlice'
+import { clearQueries, fetchQuriesAsync, postQuriesAsync, selectqueryResolution } from './queryResolutionSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { selectUsers } from '../admin/adminSlice'
 import FileUploadService from "../../components/FileUploadService";
@@ -38,7 +38,11 @@ export const QueryResolutionModal = (props: any) => {
         const justOpened = isOpen && !wasOpenRef.current;
         wasOpenRef.current = isOpen;
         if (justOpened) {
+            dispatch(clearQueries());
             fetchQueries();
+        }
+        if (!isOpen) {
+            dispatch(clearQueries());
         }
     }, [isOpen, id, dispatch, actionUid])
 
@@ -159,11 +163,6 @@ export const QueryResolutionModal = (props: any) => {
             <Typography variant="body2" sx={{ color: '#334155', mb: 2, fontWeight: 600 }}>
                 {"Subject: Query for " + (props?.prelimDetails?.registrationAifName || props?.prelimDetails?.nameOfTheFund || `Application #${id || '-'}`)}
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                <Button variant="outlined" size="small" sx={{ textTransform: 'none' }} onClick={fetchQueries} disabled={isSubmitting}>
-                    Refresh
-                </Button>
-            </Box>
             <Divider sx={{ mb: 2 }} />
                 <Card sx={{ display: 'flex', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                     <CardContent sx={{ flex: 1, maxHeight: '45vh', overflow: 'auto' }}>
@@ -216,11 +215,11 @@ export const QueryResolutionModal = (props: any) => {
                                     id="query"
                                     multiline
                                     rows={3}
-                                    label={usersState.role == 'USER' ? "Add your comment/query" : "Provide comment/resolution"}
+                                    label={usersState.role == 'USER' ? "Add your query" : "Provide query response"}
                                     value={formData["query"] || ''}
                                     variant="outlined"
                                     onChange={handleChange}
-                                    placeholder="Write details here..."
+                                    placeholder="Write query details here..."
                                     inputRef={queryInputRef}
                                     autoFocus
                                     disabled={isSubmitting}

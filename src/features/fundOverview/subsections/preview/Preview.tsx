@@ -402,7 +402,7 @@ export const Preview = (props: any) => {
                 } else {
                     navigate('/home')
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Save failure:", error);
                 showUploadErrorToast("An unexpected error occurred while saving. Please try again.");
             }
@@ -443,7 +443,7 @@ export const Preview = (props: any) => {
                     )
                 );
                 navigate('/home')
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Close action save failure:", error);
                 showUploadErrorToast("An unexpected error occurred while saving. Please try again.");
             }
@@ -887,7 +887,7 @@ export const Preview = (props: any) => {
                                                         attachmentName: attachment.attachmentName,
                                                     });
                                                     navigate('/home');
-                                                } catch (error) {
+                                                } catch (error: any) {
                                                     console.error("Workflow action failed:", error);
                                                     showUploadErrorToast();
                                                 }
@@ -908,7 +908,7 @@ export const Preview = (props: any) => {
                                                         attachmentName: attachment.attachmentName,
                                                     });
                                                     navigate('/home');
-                                                } catch (error) {
+                                                } catch (error: any) {
                                                     console.error("Workflow action failed:", error);
                                                     showUploadErrorToast();
                                                 }
@@ -929,7 +929,7 @@ export const Preview = (props: any) => {
                                                         attachmentName: attachment.attachmentName,
                                                     });
                                                     navigate('/home');
-                                                } catch (error) {
+                                                } catch (error: any) {
                                                     console.error("Workflow action failed:", error);
                                                     showUploadErrorToast();
                                                 }
@@ -955,7 +955,7 @@ export const Preview = (props: any) => {
                                                         attachmentName: attachment.attachmentName,
                                                     });
                                                     navigate('/home');
-                                                } catch (error) {
+                                                } catch (error: any) {
                                                     console.error("Workflow action failed:", error);
                                                     showUploadErrorToast();
                                                 }
@@ -981,7 +981,7 @@ export const Preview = (props: any) => {
                                                         attachmentName: attachment.attachmentName,
                                                     });
                                                     navigate('/home');
-                                                } catch (error) {
+                                                } catch (error: any) {
                                                     console.error("Workflow action failed:", error);
                                                     showUploadErrorToast();
                                                 }
@@ -1011,7 +1011,7 @@ export const Preview = (props: any) => {
                                                     attachmentName: attachment.attachmentName,
                                                 });
                                                 navigate('/home');
-                                            } catch (error) {
+                                            } catch (error: any) {
                                                 console.error("Workflow action failed:", error);
                                                 showUploadErrorToast();
                                             }
@@ -1036,7 +1036,7 @@ export const Preview = (props: any) => {
                                                         attachmentName: attachment.attachmentName,
                                                     });
                                                     navigate('/home');
-                                                } catch (error) {
+                                                } catch (error: any) {
                                                     console.error("Workflow action failed:", error);
                                                     showUploadErrorToast();
                                                 }
@@ -1195,22 +1195,6 @@ export const Preview = (props: any) => {
                 </DialogContent>
             </Dialog>
 
-            <Snackbar
-                open={uploadErrorToastOpen}
-                autoHideDuration={4500}
-                onClose={() => setUploadErrorToastOpen(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-                <Alert
-                    onClose={() => setUploadErrorToastOpen(false)}
-                    severity="error"
-                    variant="filled"
-                    sx={{ width: '100%' }}
-                >
-                    {uploadErrorToastMessage}
-                </Alert>
-            </Snackbar>
-
             <Dialog
                 open={documentsDialogOpen}
                 onClose={() => setDocumentsDialogOpen(false)}
@@ -1256,6 +1240,22 @@ export const Preview = (props: any) => {
                     )}
                 </DialogContent>
             </Dialog>
+
+            <Snackbar
+                open={uploadErrorToastOpen}
+                autoHideDuration={4500}
+                onClose={() => setUploadErrorToastOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setUploadErrorToastOpen(false)}
+                    severity="error"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {uploadErrorToastMessage}
+                </Alert>
+            </Snackbar>
 
             <style>
                 {`

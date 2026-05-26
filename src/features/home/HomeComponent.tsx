@@ -1243,7 +1243,7 @@ export const Home = (pros: any) => {
                                                 <TableCell
                                                     align="left"
                                                     sx={{ fontWeight: 500, color: '#1e293b' }}
-                                                    title="Composite queue score (0–10): 70% Initial Assessment + 15% Investment Experience + 15% Target Corpus"
+                                                    title="Composite queue score (0–10): 70% Initial Assessment + 30% Target Corpus"
                                                 >
                                                     {(() => {
                                                         const total = computeCompositeQueueScore(row);

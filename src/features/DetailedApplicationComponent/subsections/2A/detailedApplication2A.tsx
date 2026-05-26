@@ -193,7 +193,7 @@ export const DetailedApplication2A = (props:any) => {
                             <Grid container spacing={2}>
                                 <Grid item xs="auto">
                                     <Button 
-                                        href="/templates/NPS Trust ASF-FFS Detailed Application.pdf"
+                                        href="/aif/portal/templates/NPS Trust ASF-FFS Detailed Application.pdf"
                                         sx={{ background: "#363062", color: "white" 
                                     }} >Click here</Button>
                                 </Grid>

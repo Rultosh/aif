@@ -58,7 +58,13 @@ const queryResolutionSlice = createSlice({
   name: 'queryResolution',
   initialState,
   reducers: {
-    
+    clearQueries: state => {
+      state.queries = [];
+      state.query = {} as IQueryResolution;
+      state.response = undefined;
+      state.status.fetchStatus = FetchStatus.IDLE;
+      state.actionStatus.fetchStatus = FetchStatus.IDLE;
+    }
   },
   extraReducers: builder => {
     builder.addCase(fetchQuriesAsync.pending, state => {
@@ -93,6 +99,6 @@ const queryResolutionSlice = createSlice({
 })
 
 export default queryResolutionSlice.reducer
-// export const { saveFormData } = fundOverviewDataSlice.actions
+export const { clearQueries } = queryResolutionSlice.actions
 
 export const selectqueryResolution = (state: RootState) => state.queryResolution;

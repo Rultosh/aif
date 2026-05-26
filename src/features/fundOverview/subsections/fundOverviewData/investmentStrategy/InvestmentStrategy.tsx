@@ -461,7 +461,7 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
                                     <Button
                                         variant="outlined"
-                                        href="/aif/templates/Risk Assessment and Mitigation Plan.xlsx"
+                                        href="/aif/portal/templates/Risk Assessment and Mitigation Plan.xlsx"
                                         size="small"
                                         startIcon={<DownloadIcon />}
                                         sx={{

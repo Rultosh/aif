@@ -180,7 +180,7 @@ export const DetailedApplication2H = (props:any) => {
                         <CardContent sx={{ flex: 1 }}>
                             <Grid item xs={3}>
                                 <div style={{margin: "15px"}}>
-                                    <Button href="/templates/SASF_Fund Track Record Template.xlsx">Download Template</Button>
+                                    <Button href="/aif/portal/templates/SASF_Fund Track Record Template.xlsx">Download Template</Button>
                                     <UploadComponents id={`imPastFund${parentId}`}></UploadComponents>
                                 </div>
                             </Grid>

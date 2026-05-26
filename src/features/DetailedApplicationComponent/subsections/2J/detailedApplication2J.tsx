@@ -110,7 +110,7 @@ export const DetailedApplication2J = (props: any) => {
                         <Grid item xs={4}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
-                                href="/templates/Fundname_Annexure I.doc"
+                                href="/aif/portal/templates/Fundname_Annexure I.doc"
                                 startIcon={<FileDownloadIcon />}
                                 variant="contained"
                                 disableElevation
@@ -145,7 +145,7 @@ export const DetailedApplication2J = (props: any) => {
                         <Grid item xs={4}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
-                                href="/templates/Fundname_Annexure II.zip"
+                                href="/aif/portal/templates/Fundname_Annexure II.zip"
                                 startIcon={<FileDownloadIcon />}
                                 variant="contained"
                                 disableElevation
@@ -182,7 +182,7 @@ export const DetailedApplication2J = (props: any) => {
                         <Grid item xs={4}>
                             <Button
                                 //onClick={(e) => handleClick(e, "previous")}
-                                href="/templates/Annexure III_SIDBI KYC.zip"
+                                href="/aif/portal/templates/Annexure III_SIDBI KYC.zip"
                                 startIcon={<FileDownloadIcon />}
                                 variant="contained"
                                 disableElevation
