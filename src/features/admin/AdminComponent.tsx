@@ -34,7 +34,7 @@ import { Delete, Edit, InfoOutlined, Close as CloseDialogIcon } from '@mui/icons
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
 import dayjs from "dayjs";
-import { assignManagerRole, sendSetPasswordEmail } from "./adminApi";
+import { assignUserAdminRole, sendSetPasswordEmail } from "./adminApi";
 import AddOperationalUserModal from "./AddOperationalUserModal";
 
 const Admin = (props: any) => {
@@ -109,7 +109,6 @@ const Admin = (props: any) => {
         "Registered",
         "Email OTP",
         "Approve",
-        "Assign manager",
         "Set password email",
         "Delete",
     ] as const;
@@ -150,6 +149,14 @@ const Admin = (props: any) => {
     }
 
 
+    const formatRoleLabel = (role: string | undefined) => {
+        const normalized = String(role || '').toUpperCase();
+        if (normalized === 'CHECKER,MANAGER' || normalized === 'CHECKER,USERADMIN') {
+            return 'CHECKER + USERADMIN';
+        }
+        return role || '—';
+    };
+
     const sortByRegisteredOnAsc = (users: IUser[]) => [...users].sort((a, b) => {
         const aTime = a.registeredOn ? dayjs(a.registeredOn).valueOf() : 0;
         const bTime = b.registeredOn ? dayjs(b.registeredOn).valueOf() : 0;
@@ -159,12 +166,22 @@ const Admin = (props: any) => {
     const pendingUsers = sortByRegisteredOnAsc(
         usersState.users.filter((user) => String(user.role || "").toUpperCase() === "REGISTERED")
     );
-    const approvedUsers = sortByRegisteredOnAsc(
-        usersState.users.filter((user) => String(user.role || "").toUpperCase() !== "REGISTERED")
+    // Operational users: CHECKER, MAKER, USERADMIN, ADMIN, CHECKER+USERADMIN, DISABLED
+    const operationalUsers = sortByRegisteredOnAsc(
+        usersState.users.filter((user) => {
+            const role = String(user.role || "").toUpperCase();
+            return role !== "REGISTERED" && role !== "USER";
+        })
     );
+    // Applicant/registered users who have been approved (role = USER)
+    const applicantUsers = sortByRegisteredOnAsc(
+        usersState.users.filter((user) => String(user.role || "").toUpperCase() === "USER")
+    );
+    // Keep for backward compat (used in table count)
+    const approvedUsers = [...operationalUsers, ...applicantUsers];
 
     const headerAlign = (h: (typeof tableHeaders)[number]): 'left' | 'center' | 'right' => {
-        if (['Approve', 'Assign manager', 'Set password email', 'Delete', 'Email OTP'].includes(h)) return 'center';
+        if (['Approve', 'Assign User Admin', 'Set password email', 'Delete', 'Email OTP'].includes(h)) return 'center';
         if (['Id', 'Role', 'Registered'].includes(h)) return 'center';
         return 'left';
     };
@@ -190,7 +207,10 @@ const Admin = (props: any) => {
         </TableRow>
     );
 
-    const renderActionCells = (row: IUser) => (
+    const renderActionCells = (row: IUser) => {
+        const roleUpper = String(row.role || '').toUpperCase();
+        const isApplicant = roleUpper === 'USER';
+        return (
         <>
             <TableCell align="center" sx={bodyCellSx}>
                 <Tooltip title="Require email OTP at login (only when MFA is enabled on the server)">
@@ -216,30 +236,13 @@ const Admin = (props: any) => {
                 </Tooltip>
             </TableCell>
             <TableCell align="center" sx={bodyCellSx}>
-                <Tooltip title="Assign or change role">
-                    <Edit sx={{ cursor: 'pointer', color: '#4338ca', fontSize: 22 }} onClick={() => handleOpen(row)} />
-                </Tooltip>
-            </TableCell>
-            <TableCell align="center" sx={bodyCellSx}>
-                {row.role === 'CHECKER' ? (
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
-                        onClick={async () => {
-                            if (row.id == null) return;
-                            try {
-                                await assignManagerRole(Number(row.id));
-                                dispatch(fetchUsersAsync(wrapArgument(actionUid, props.prelimApplicationId)));
-                            } catch (e: any) {
-                                alert(e?.response?.data || e?.message || 'Failed to assign manager role');
-                            }
-                        }}
-                    >
-                        Promote
-                    </Button>
+                {/* Pencil only for operational users, not for applicants (USER role) */}
+                {!isApplicant ? (
+                    <Tooltip title="Assign or change role">
+                        <Edit sx={{ cursor: 'pointer', color: '#4338ca', fontSize: 22 }} onClick={() => handleOpen(row)} />
+                    </Tooltip>
                 ) : (
-                    '—'
+                    <Typography variant="caption" sx={{ color: '#94a3b8' }}>—</Typography>
                 )}
             </TableCell>
             <TableCell align="center" sx={bodyCellSx}>
@@ -266,7 +269,8 @@ const Admin = (props: any) => {
                 </Tooltip>
             </TableCell>
         </>
-    );
+        );
+    };
 
     const renderUserRows = (users: IUser[]) =>
         users.map((row, idx) => (
@@ -303,7 +307,7 @@ const Admin = (props: any) => {
                 </TableCell>
                 <TableCell align="center" sx={bodyCellSx}>
                     <Typography component="span" variant="caption" sx={{ fontWeight: 700, color: '#4338ca', letterSpacing: '0.02em' }}>
-                        {row.role}
+                        {formatRoleLabel(row.role)}
                     </Typography>
                 </TableCell>
                 <TableCell align="center" sx={bodyCellSx}>{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY")}</TableCell>
@@ -362,13 +366,22 @@ const Admin = (props: any) => {
                                 {pendingUsers.length} user{pendingUsers.length === 1 ? '' : 's'} awaiting role assignment
                             </Typography>
                             {renderUsersTable(pendingUsers, 'Users pending approval')}
+
                             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', mt: 1 }}>
-                                Approved users
+                                Operational users
                             </Typography>
                             <Typography variant="body2" sx={{ color: '#64748b', mb: 2, mt: 0.5 }}>
-                                {approvedUsers.length} active operational user{approvedUsers.length === 1 ? '' : 's'}
+                                {operationalUsers.length} active operational user{operationalUsers.length === 1 ? '' : 's'} (Checker, Maker, Admin, UserAdmin)
                             </Typography>
-                            {renderUsersTable(approvedUsers, 'Approved users')}
+                            {renderUsersTable(operationalUsers, 'Operational users')}
+
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', mt: 1 }}>
+                                Registered applicants
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#64748b', mb: 2, mt: 0.5 }}>
+                                {applicantUsers.length} approved applicant{applicantUsers.length === 1 ? '' : 's'} (fund applicants)
+                            </Typography>
+                            {renderUsersTable(applicantUsers, 'Registered applicants')}
                         </Box>
                         {open ? <RoleComponent open={open} userDetails = {selectedRow} handleClose={handleClose}></RoleComponent> : <></>}
                         <AddOperationalUserModal

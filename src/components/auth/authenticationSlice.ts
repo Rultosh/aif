@@ -74,13 +74,22 @@ function decodeRolesFromToken(token: string | undefined): string[] {
     const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
     const payload = JSON.parse(window.atob(padded));
     const roles = payload?.rol;
+    let parsed: string[] = [];
     if (Array.isArray(roles)) {
-      return roles.map((r) => String(r).toUpperCase());
+      parsed = roles.map((r) => String(r).toUpperCase());
+    } else if (typeof roles === "string") {
+      parsed = roles.split(",").map((r: string) => r.trim().toUpperCase()).filter(Boolean);
     }
-    if (typeof roles === "string") {
-      return roles.split(",").map((r: string) => r.trim().toUpperCase()).filter(Boolean);
+    // Normalize legacy MANAGER → USERADMIN
+    if (parsed.includes("MANAGER")) {
+      parsed = parsed.map((r) => r === "MANAGER" ? "USERADMIN" : r);
     }
-    return [];
+    // If user has both CHECKER and USERADMIN (or legacy CHECKER+MANAGER),
+    // show as two separate options: CHECKER (checker dashboard) and USERADMIN (admin page)
+    if (parsed.includes("CHECKER") && parsed.includes("USERADMIN")) {
+      return ["CHECKER", "USERADMIN"];
+    }
+    return parsed;
   } catch {
     return [];
   }

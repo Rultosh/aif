@@ -2,6 +2,7 @@ import '../../index.css';
 import { Alert, Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab, Card, CardContent, Snackbar } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
 import NavigationBar from '../../components/NavigationBar'
 import React, * as Rect from 'react'
 import { useState, useEffect, useMemo } from "react"
@@ -44,7 +45,8 @@ import { ReactComponent as SettingCustomIcon } from '../../images/setting.svg';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import { fetchMakerUsers, fetchCheckerUsers, fetchManagerUsers, fetchPensionFundUsers, postWorkflowAction } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
+import { fetchMakerUsers, fetchCheckerUsers, fetchUserAdminUsers, fetchPensionFundUsers, postWorkflowAction, deletePrelimApplication } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
+import { hasCheckerAndUserAdmin, normalizeWorkflowStatus } from '../../lib/workflowStatus';
 import FileUploadService from '../../components/FileUploadService';
 import { shouldShowListPaginationFooter } from '../../lib/listPaginationVisibility';
 import { computeCompositeQueueScore, experiencedImAmcTableLabel } from '../../lib/queueCompositeScore';
@@ -92,13 +94,15 @@ function isCheckerFailedIaOnlyDraft(row: IPrelimApplicationData | undefined, sta
 
 /** Maps prelim status (and draft IA outcome) to exactly one checker list tab. */
 function checkerWorkflowTabForStatus(statusRaw: string | undefined, row?: IPrelimApplicationData): CheckerWorkflowTabId {
-    const status = String(statusRaw || '').trim().toUpperCase();
+    const status = normalizeWorkflowStatus(String(statusRaw || '').trim());
     if (status === 'SUBMITTED') return 'pendingAssignment';
     if (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER') return 'assignedToMaker';
     if (status === 'MEMO_SUBMITTED') return 'withChecker';
     if (
         [
+            'CHECKER_FORWARDED_TO_USERADMIN',
             'CHECKER_FORWARDED_TO_MANAGER',
+            'USERADMIN_FORWARDED_TO_PF',
             'MANAGER_FORWARDED_TO_PF',
             'APPROVED_BY_PF',
             'SANCTIONED',
@@ -165,11 +169,11 @@ export const Home = (pros: any) => {
     const [selectedMakerUserId, setSelectedMakerUserId] = useState<string>('');
     const [assignMakerRemark, setAssignMakerRemark] = useState<string>('Assigned maker');
     const [assignMakerFile, setAssignMakerFile] = useState<File | null>(null);
-    const [managerReassignOpen, setManagerReassignOpen] = useState(false);
-    const [managerReassignRowId, setManagerReassignRowId] = useState<number | null>(null);
-    const [managerSelectedMakerUserId, setManagerSelectedMakerUserId] = useState<string>('');
-    const [managerReassignRemark, setManagerReassignRemark] = useState<string>('Reassigned by manager');
-    const [managerReassignMakerOptions, setManagerReassignMakerOptions] = useState<IUser[]>([]);
+    const [userAdminReassignOpen, setUserAdminReassignOpen] = useState(false);
+    const [userAdminReassignRowId, setUserAdminReassignRowId] = useState<number | null>(null);
+    const [userAdminSelectedMakerUserId, setUserAdminSelectedMakerUserId] = useState<string>('');
+    const [userAdminReassignRemark, setUserAdminReassignRemark] = useState<string>('Reassigned by user admin');
+    const [userAdminReassignMakerOptions, setUserAdminReassignMakerOptions] = useState<IUser[]>([]);
     const [makerUsers, setMakerUsers] = useState<IUser[]>([]);
     const [assigneeEmailsById, setAssigneeEmailsById] = useState<Record<number, string>>({});
     const [memoSubmitOpen, setMemoSubmitOpen] = useState(false);
@@ -230,7 +234,7 @@ export const Home = (pros: any) => {
             if (normalizedRole === 'USER' && !applicantPrelimVisibleInHomeTable(app)) {
                 return false;
             }
-            const status = String(app.status || '').toUpperCase();
+            const status = normalizeWorkflowStatus(String(app.status || ''));
             let sectionMatch = true;
             if (normalizedRole === 'CHECKER') {
                 const checkerTab = (CHECKER_WORKFLOW_TAB_IDS as readonly string[]).includes(workflowSectionTab)
@@ -247,13 +251,15 @@ export const Home = (pros: any) => {
                     sectionMatch = status === 'REVISE';
                 }
             } else if (workflowSectionTab !== 'all') {
-                if (normalizedRole === 'MANAGER') {
-                    if (workflowSectionTab === 'forwardedSc') sectionMatch = (status === 'CHECKER_FORWARDED_TO_MANAGER' || status === 'REVERTED_TO_MANAGER');
+                if (hasCheckerAndUserAdmin(usersState.role || '')) {
+                    if (workflowSectionTab === 'forwardedSc') {
+                        sectionMatch = status === 'CHECKER_FORWARDED_TO_USERADMIN';
+                    }
                     else if (workflowSectionTab === 'approvedPf') sectionMatch = status === 'APPROVED_BY_PF';
                     else if (workflowSectionTab === 'rejectedPf') sectionMatch = status === 'REJECTED_BY_PF';
                     else if (workflowSectionTab === 'sanctioned') sectionMatch = status === 'SANCTIONED';
                 } else if (isPfUser) {
-                    if (workflowSectionTab === 'forwardedPf') sectionMatch = status === 'MANAGER_FORWARDED_TO_PF';
+                    if (workflowSectionTab === 'forwardedPf') sectionMatch = status === 'USERADMIN_FORWARDED_TO_PF';
                     else if (workflowSectionTab === 'approvedPf') sectionMatch = status === 'APPROVED_BY_PF';
                     else if (workflowSectionTab === 'rejectedPf') sectionMatch = status === 'REJECTED_BY_PF';
                     sectionMatch = sectionMatch && Number(app.assignedPfUserId || 0) === Number(usersState.me?.id || 0);
@@ -291,8 +297,10 @@ export const Home = (pros: any) => {
                 count: rows.filter((r) => checkerWorkflowTabForStatus(String(r.status), r) === id).length,
             }));
         }
-        if (normalizedRole === 'MANAGER') {
-            const forwardedSc = rows.filter((r) => ['CHECKER_FORWARDED_TO_MANAGER', 'REVERTED_TO_MANAGER'].includes(String(r.status || '').toUpperCase())).length;
+        if (hasCheckerAndUserAdmin(usersState.role || '')) {
+            const forwardedSc = rows.filter((r) =>
+                normalizeWorkflowStatus(String(r.status || '')) === 'CHECKER_FORWARDED_TO_USERADMIN'
+            ).length;
             const approvedPf = rows.filter((r) => String(r.status || '').toUpperCase() === 'APPROVED_BY_PF').length;
             const rejectedPf = rows.filter((r) => String(r.status || '').toUpperCase() === 'REJECTED_BY_PF').length;
             const sanctioned = rows.filter((r) => String(r.status || '').toUpperCase() === 'SANCTIONED').length;
@@ -304,7 +312,7 @@ export const Home = (pros: any) => {
             return sections;
         }
         if (isPfUser) {
-            const forwardedPf = pfRows.filter((r) => String(r.status || '').toUpperCase() === 'MANAGER_FORWARDED_TO_PF').length;
+            const forwardedPf = pfRows.filter((r) => normalizeWorkflowStatus(String(r.status || '')) === 'USERADMIN_FORWARDED_TO_PF').length;
             const approvedPf = pfRows.filter((r) => String(r.status || '').toUpperCase() === 'APPROVED_BY_PF').length;
             const rejectedPf = pfRows.filter((r) => String(r.status || '').toUpperCase() === 'REJECTED_BY_PF').length;
             const sections: any[] = [{ id: 'all', label: 'All', count: pfRows.length }];
@@ -400,7 +408,7 @@ export const Home = (pros: any) => {
 
     useEffect(() => {
         const loadMakers = async () => {
-            if (!(hasActiveRole('CHECKER') || hasActiveRole('MANAGER'))) return;
+            if (!hasActiveRole('CHECKER')) return;
             try {
                 const response = await fetchMakerUsers();
                 setMakerUsers(response.data || []);
@@ -414,16 +422,16 @@ export const Home = (pros: any) => {
     useEffect(() => {
         const loadAssigneeEmails = async () => {
             try {
-                const [makersRes, checkersRes, managersRes, pfUsersRes] = await Promise.all([
+                const [makersRes, checkersRes, userAdminsRes, pfUsersRes] = await Promise.all([
                     fetchMakerUsers(),
                     fetchCheckerUsers(),
-                    fetchManagerUsers(),
+                    fetchUserAdminUsers(),
                     fetchPensionFundUsers(),
                 ]);
                 const allUsers: IUser[] = [
                     ...(makersRes?.data || []),
                     ...(checkersRes?.data || []),
-                    ...(managersRes?.data || []),
+                    ...(userAdminsRes?.data || []),
                     ...(pfUsersRes?.data || []),
                 ];
                 const mergedMap = allUsers.reduce((acc, user) => {
@@ -473,21 +481,21 @@ export const Home = (pros: any) => {
         setAssignMakerFile(null);
     };
 
-    const openManagerReassignDialog = (row: IPrelimApplicationData) => {
+    const openUserAdminReassignDialog = (row: IPrelimApplicationData) => {
         const assignedMakerId = row.assignedMakerUserId != null ? Number(row.assignedMakerUserId) : null;
         const filteredMakers = makerUsers.filter((user) => Number(user.id) !== assignedMakerId);
-        setManagerReassignMakerOptions(filteredMakers);
+        setUserAdminReassignMakerOptions(filteredMakers);
         const rowId = typeof row.id === 'number' ? row.id : Number(row.id);
-        setManagerReassignRowId(rowId);
-        setManagerSelectedMakerUserId(filteredMakers[0]?.id ? String(filteredMakers[0].id) : '');
-        setManagerReassignRemark('Reassigned by manager');
-        setManagerReassignOpen(true);
+        setUserAdminReassignRowId(rowId);
+        setUserAdminSelectedMakerUserId(filteredMakers[0]?.id ? String(filteredMakers[0].id) : '');
+        setUserAdminReassignRemark('Reassigned by user admin');
+        setUserAdminReassignOpen(true);
     };
 
-    const closeManagerReassignDialog = () => {
-        setManagerReassignOpen(false);
-        setManagerReassignRowId(null);
-        setManagerReassignMakerOptions([]);
+    const closeUserAdminReassignDialog = () => {
+        setUserAdminReassignOpen(false);
+        setUserAdminReassignRowId(null);
+        setUserAdminReassignMakerOptions([]);
     };
 
     const submitAssignMaker = async () => {
@@ -518,18 +526,18 @@ export const Home = (pros: any) => {
         closeAssignMakerDialog();
     };
 
-    const submitManagerReassign = () => {
-        if (!managerReassignRowId || !managerSelectedMakerUserId) {
+    const submitUserAdminReassign = () => {
+        if (!userAdminReassignRowId || !userAdminSelectedMakerUserId) {
             return;
         }
         callAndRefresh(
-            postWorkflowAction(managerReassignRowId, 'manager-reassign', {
-                makerUserId: Number(managerSelectedMakerUserId),
+            postWorkflowAction(userAdminReassignRowId, 'useradmin-reassign', {
+                makerUserId: Number(userAdminSelectedMakerUserId),
                 checkerUserId: null,
-                remark: managerReassignRemark || 'Reassigned by manager'
+                remark: userAdminReassignRemark || 'Reassigned by user admin'
             })
         );
-        closeManagerReassignDialog();
+        closeUserAdminReassignDialog();
     };
 
     const openMemoSubmitDialog = (rowId: number) => {
@@ -606,6 +614,7 @@ export const Home = (pros: any) => {
         "Download",
         "Query",
         "History",
+        ...(hasActiveRole('ADMIN') ? ["Delete"] : []),
     ];
     const tableHeadersWorkflowApplicant = [
         "AIF Name",
@@ -675,31 +684,33 @@ export const Home = (pros: any) => {
     }
 
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
-        const statusUpper = String(row.status ?? '').trim().toUpperCase();
+        const statusUpper = normalizeWorkflowStatus(String(row.status ?? '').trim());
         if (hasActiveRole('CHECKER')) {
             if (isCheckerFailedIaOnlyDraft(row, statusUpper)) return true;
             if (['REJECTED', 'REJECTED_BY_PF', 'CLOSED', 'TEMP_CLOSED'].includes(statusUpper)) return true;
         }
-        if ((row.status === 'SUBMITTED' || row.status === 'REVIEWED' || row.status === 'APPROVED' || row.status == 'TEMP_CLOSED' || row.status == 'CLOSED') && hasActiveRole('ADMIN', 'USERADMIN', 'CHECKER', 'MANAGER'))
+        if ((statusUpper === 'SUBMITTED' || statusUpper === 'REVIEWED' || statusUpper === 'APPROVED' || statusUpper === 'TEMP_CLOSED' || statusUpper === 'CLOSED') && hasActiveRole('ADMIN', 'CHECKER'))
+            return true
+        if (statusUpper === 'SUBMITTED' && usersState.role === 'USERADMIN')
             return true
         const userDraftOrRevision = ['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT'];
         if (userDraftOrRevision.includes(statusUpper) && hasActiveRole('USER')) {
             return true;
         }
-        if (row.status === 'SANCTIONED' && hasActiveRole('USER'))
+        if (statusUpper === 'SANCTIONED' && hasActiveRole('USER'))
             return true
-        if ((row.status === 'MAKER_ASSIGNED'
-            || row.status === 'REVERTED_TO_MAKER'
-            || row.status === 'REVERTED_TO_MANAGER'
-            || row.status === 'MEMO_SUBMITTED'
-            || row.status === 'CHECKER_FORWARDED_TO_MANAGER'
-            || row.status === 'MANAGER_FORWARDED_TO_PF'
-            || row.status === 'APPROVED_BY_PF'
-            || row.status === 'REJECTED_BY_PF'
-            || row.status === 'SANCTIONED')
-            && hasActiveRole('CHECKER', 'MAKER', 'MANAGER'))
+        if ((statusUpper === 'MAKER_ASSIGNED'
+            || statusUpper === 'REVERTED_TO_MAKER'
+            || statusUpper === 'REVERTED_TO_CHECKER'
+            || statusUpper === 'MEMO_SUBMITTED'
+            || statusUpper === 'CHECKER_FORWARDED_TO_USERADMIN'
+            || statusUpper === 'USERADMIN_FORWARDED_TO_PF'
+            || statusUpper === 'APPROVED_BY_PF'
+            || statusUpper === 'REJECTED_BY_PF'
+            || statusUpper === 'SANCTIONED')
+            && (hasActiveRole('CHECKER', 'MAKER') || hasCheckerAndUserAdmin(usersState.role || '')))
             return true
-        if ((row.status === 'MANAGER_FORWARDED_TO_PF' || row.status === 'APPROVED_BY_PF' || row.status === 'REJECTED_BY_PF')
+        if ((statusUpper === 'USERADMIN_FORWARDED_TO_PF' || statusUpper === 'APPROVED_BY_PF' || statusUpper === 'REJECTED_BY_PF')
             && hasActiveRole('PENSION_FUND')
             && Number(row.assignedPfUserId || 0) === Number(usersState.me?.id || 0))
             return true
@@ -712,7 +723,7 @@ export const Home = (pros: any) => {
             if (status === 'REVIEWED') return 'Pending final approval';
             return 'Approved';
         }
-        const statusNorm = status == null || String(status).trim() === '' ? '' : String(status).trim().toUpperCase();
+        const statusNorm = normalizeWorkflowStatus(status == null || String(status).trim() === '' ? '' : String(status).trim());
         if (statusNorm === '') return 'Initial assessment';
         if (statusNorm === 'CREATED') return 'Pending submission';
         if (statusNorm === 'REVISE' || statusNorm === 'REVERTED_TO_APPLICANT') return 'Pending revision';
@@ -723,11 +734,12 @@ export const Home = (pros: any) => {
         if (statusNorm === 'TEMP_CLOSED') return 'Temporarily closed';
         if (statusNorm === 'CLOSED') return 'Closed';
         const underReview = new Set([
-            'SUBMITTED', 'MAKER_ASSIGNED', 'REVERTED_TO_MAKER', 'MEMO_SUBMITTED', 'REVIEWED',
-            'CHECKER_FORWARDED_TO_MANAGER', 'REVERTED_TO_MANAGER', 'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF',
+            'MAKER_ASSIGNED', 'REVERTED_TO_MAKER', 'MEMO_SUBMITTED', 'REVIEWED',
+            'CHECKER_FORWARDED_TO_USERADMIN', 'REVERTED_TO_CHECKER', 'USERADMIN_FORWARDED_TO_PF', 'APPROVED_BY_PF',
         ]);
-        if (underReview.has(statusNorm)) return 'Under review';
-        return 'Under review';
+        if (statusNorm === 'SUBMITTED') return 'Application is in Queue';
+        if (underReview.has(statusNorm)) return 'Application is under review';
+        return 'Application is under review';
     };
 
     const getStatusChip = (row: IPrelimApplicationData) => {
@@ -744,7 +756,7 @@ export const Home = (pros: any) => {
             else if (['REJECTED', 'CLOSED', 'REJECTED_BY_PF'].includes(statusUpper)) color = 'error';
             else if (statusUpper === 'REVISE' || statusUpper === 'REVERTED_TO_APPLICANT') color = 'warning';
             else if (statusUpper === 'CREATED') color = 'primary';
-            else if (label === 'Under review' || statusUpper === 'TEMP_CLOSED') color = 'warning';
+            else if (label === 'Under review' || label === 'Application is in Queue' || label === 'Application is under review' || statusUpper === 'TEMP_CLOSED') color = 'warning';
             else color = 'default';
         } else if (status === 'APPROVED' || label === 'Approved') {
             color = "success";
@@ -763,17 +775,17 @@ export const Home = (pros: any) => {
         return <Chip label={label} color={color} size="small" sx={{ fontSize: '0.7rem', fontWeight: 600, borderRadius: '6px' }} />;
     }
     const getPath = (row: IPrelimApplicationData) => {
-        if (hasActiveRole('ADMIN', 'USERADMIN', 'CHECKER', 'MANAGER')) {
+        if (hasActiveRole('ADMIN', 'CHECKER') || usersState.role === 'USERADMIN') {
             return 'preview';
         }
-        const s = String(row.status ?? '').trim().toUpperCase();
+        const s = normalizeWorkflowStatus(String(row.status ?? '').trim());
         /** CREATED: IA incomplete → Initial Assessment; IA complete (same rule as home list) → Fund. */
         if (hasActiveRole('USER') && s === 'CREATED') {
             return applicantPrelimVisibleInHomeTable(row) ? 'fund' : 'selfrating';
         }
         const applicantPreviewOnly = new Set([
             'SUBMITTED', 'REVIEWED', 'APPROVED', 'TEMP_CLOSED', 'CLOSED',
-            'MANAGER_FORWARDED_TO_PF', 'APPROVED_BY_PF', 'REJECTED_BY_PF', 'SANCTIONED',
+            'USERADMIN_FORWARDED_TO_PF', 'APPROVED_BY_PF', 'REJECTED_BY_PF', 'SANCTIONED',
         ]);
         return applicantPreviewOnly.has(s) ? 'preview' : 'fund';
     };
@@ -787,12 +799,12 @@ export const Home = (pros: any) => {
             return "Approved";
         }
 
-        const statusNorm = status == null || String(status).trim() === '' ? '' : String(status).trim().toUpperCase();
+        const statusNorm = normalizeWorkflowStatus(status == null || String(status).trim() === '' ? '' : String(status).trim());
         if (statusNorm === '') {
             return "Initial assessment";
         }
 
-        switch (status) {
+        switch (statusNorm) {
             case "CREATED":
                 return "Pending submission";
             case "SUBMITTED":
@@ -817,11 +829,11 @@ export const Home = (pros: any) => {
                 return "Reverted to maker";
             case "SANCTIONED":
                 return "Sanctioned";
-            case "REVERTED_TO_MANAGER":
-                return "Reverted to assignee";
-            case "CHECKER_FORWARDED_TO_MANAGER":
+            case "REVERTED_TO_CHECKER":
+                return "Reverted to checker";
+            case "CHECKER_FORWARDED_TO_USERADMIN":
                 return "With Screening Committee";
-            case "MANAGER_FORWARDED_TO_PF":
+            case "USERADMIN_FORWARDED_TO_PF":
                 return "Forwarded to PF";
             case "APPROVED_BY_PF":
                 return "Approved by PF";
@@ -842,6 +854,19 @@ export const Home = (pros: any) => {
         }
     };
 
+    const handleDeleteApplication = async (row: IPrelimApplicationData) => {
+        if (row.id == null) return;
+        const fundName = String(row.registrationAifName || row.nameOfTheFund || row.createdByName || row.id).trim();
+        const confirmed = window.confirm(`Delete application "${fundName}"? This cannot be undone.`);
+        if (!confirmed) return;
+        try {
+            await deletePrelimApplication(Number(row.id));
+            dispatch(getPrelimApplicationList(wrapArgument(actionUid, listQuery)));
+        } catch (e: any) {
+            alert(e?.response?.data?.message || e?.message || 'Failed to delete application.');
+        }
+    };
+
     const getUserEmailById = (userId?: Number) => {
         if (userId == null) return '';
         const fromAssigneeMap = assigneeEmailsById[Number(userId || 0)];
@@ -857,30 +882,32 @@ export const Home = (pros: any) => {
         if (backendPendingWith) {
             return backendPendingWith;
         }
-        const status = String(row.status || '').toUpperCase();
+        const status = normalizeWorkflowStatus(String(row.status || ''));
         const applicantEmail = getUserEmailById(row.createdBy) || String(row.createdByName || '').trim();
         const makerEmail = getUserEmailById(row.assignedMakerUserId);
         const checkerEmail = getUserEmailById(row.assignedCheckerUserId);
-        const managerEmail = getUserEmailById(row.assignedManagerUserId);
+        const userAdminEmail = getUserEmailById(
+            row.assignedUserAdminUserId ?? (row as any).assignedManagerUserId
+        );
         const pfEmail = getUserEmailById(row.assignedPfUserId);
 
         if (status === 'CREATED' || status === 'REVISE' || status === 'REVERTED_TO_APPLICANT') {
             return applicantEmail || '-';
         }
-        if (status === 'SUBMITTED' || status === 'MEMO_SUBMITTED') {
+        if (status === 'SUBMITTED' || status === 'MEMO_SUBMITTED' || status === 'REVERTED_TO_CHECKER') {
             return checkerEmail || '-';
         }
         if (status === 'MAKER_ASSIGNED' || status === 'REVERTED_TO_MAKER') {
             return makerEmail || '-';
         }
-        if (status === 'CHECKER_FORWARDED_TO_MANAGER' || status === 'REVERTED_TO_MANAGER') {
-            return managerEmail || '-';
+        if (status === 'CHECKER_FORWARDED_TO_USERADMIN') {
+            return userAdminEmail || '-';
         }
-        if (status === 'MANAGER_FORWARDED_TO_PF') {
+        if (status === 'USERADMIN_FORWARDED_TO_PF') {
             return pfEmail || '-';
         }
         if (status === 'APPROVED_BY_PF' || status === 'REJECTED_BY_PF') {
-            return managerEmail || '-';
+            return userAdminEmail || '-';
         }
         if (status === 'SANCTIONED') {
             return applicantEmail || '-';
@@ -1250,6 +1277,19 @@ export const Home = (pros: any) => {
                                                     </IconButton>
                                                 </TableCell>
                                                 )}
+                                                {hasActiveRole('ADMIN') && (
+                                                <TableCell align="center">
+                                                    <Tooltip title="Delete application">
+                                                        <IconButton
+                                                            size="small"
+                                                            sx={{ color: '#d32f2f', '&:hover': { backgroundColor: '#fef2f2' } }}
+                                                            onClick={() => handleDeleteApplication(row)}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </TableCell>
+                                                )}
                                             </TableRow>
                                         }) : <TableRow><TableCell colSpan={tableColumnCount} align="center" sx={{ py: 3 }}>No applications found matching your search criteria</TableCell></TableRow>
                                     }
@@ -1485,18 +1525,18 @@ export const Home = (pros: any) => {
                             <Button onClick={() => setContactDetailsRow(null)}>Close</Button>
                         </DialogActions>
                     </Dialog>
-                    <Dialog open={managerReassignOpen} onClose={closeManagerReassignDialog} fullWidth maxWidth="sm">
+                    <Dialog open={userAdminReassignOpen} onClose={closeUserAdminReassignDialog} fullWidth maxWidth="sm">
                         <DialogTitle>Reassign Maker</DialogTitle>
                         <DialogContent>
                             <FormControl fullWidth sx={{ mt: 1 }}>
-                                <InputLabel id="manager-reassign-maker-user-label">Maker User</InputLabel>
+                                <InputLabel id="useradmin-reassign-maker-user-label">Maker User</InputLabel>
                                 <Select
-                                    labelId="manager-reassign-maker-user-label"
-                                    value={managerSelectedMakerUserId}
+                                    labelId="useradmin-reassign-maker-user-label"
+                                    value={userAdminSelectedMakerUserId}
                                     label="Maker User"
-                                    onChange={(e) => setManagerSelectedMakerUserId(e.target.value)}
+                                    onChange={(e) => setUserAdminSelectedMakerUserId(e.target.value)}
                                 >
-                                    {managerReassignMakerOptions.map((user) => (
+                                    {userAdminReassignMakerOptions.map((user) => (
                                         <MenuItem key={user.id} value={String(user.id)}>
                                             {user.contactPerson || user.username} ({user.username})
                                         </MenuItem>
@@ -1507,13 +1547,13 @@ export const Home = (pros: any) => {
                                 fullWidth
                                 sx={{ mt: 2 }}
                                 label="Remark"
-                                value={managerReassignRemark}
-                                onChange={(e) => setManagerReassignRemark(e.target.value)}
+                                value={userAdminReassignRemark}
+                                onChange={(e) => setUserAdminReassignRemark(e.target.value)}
                             />
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={closeManagerReassignDialog}>Cancel</Button>
-                            <Button onClick={submitManagerReassign} variant="contained" disabled={!managerSelectedMakerUserId}>
+                            <Button onClick={closeUserAdminReassignDialog}>Cancel</Button>
+                            <Button onClick={submitUserAdminReassign} variant="contained" disabled={!userAdminSelectedMakerUserId}>
                                 Reassign
                             </Button>
                         </DialogActions>

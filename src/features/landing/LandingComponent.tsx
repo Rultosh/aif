@@ -90,10 +90,8 @@ const Landing = () => {
         }
         if (token) {
             const effectiveRole = (activeRole || usersState.role || tokenRoles[0] || '').toUpperCase();
-            if (['USERADMIN'].includes(effectiveRole)) {
+            if (effectiveRole === 'USERADMIN') {
                 navigate('/admin');
-            } else if (['ADMIN', 'CHECKER', 'MAKER', 'MANAGER', 'USER'].includes(effectiveRole)) {
-                navigate('/home');
             } else {
                 navigate('/home');
             }
@@ -310,7 +308,9 @@ const Landing = () => {
                                     sx={{ mb: 2, '& .MuiOutlinedInput-root': { backgroundColor: '#fff', borderRadius: '6px' } }}
                                 >
                                     {state.availableRoles.map((role) => (
-                                        <MenuItem key={role} value={role}>{role}</MenuItem>
+                                        <MenuItem key={role} value={role}>
+                                            {role}
+                                        </MenuItem>
                                     ))}
                                 </TextField>
                                 <Button

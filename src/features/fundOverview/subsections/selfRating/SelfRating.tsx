@@ -40,7 +40,7 @@ function computeApplicantAssessmentLocked(
         .filter(Boolean);
     const isApplicant =
         roleParts.includes('USER') &&
-        !roleParts.some((x) => ['ADMIN', 'USERADMIN', 'MAKER', 'CHECKER', 'MANAGER', 'PENSION_FUND'].includes(x));
+        !roleParts.some((x) => ['ADMIN', 'USERADMIN', 'MAKER', 'CHECKER', 'PENSION_FUND'].includes(x));
     if (!isApplicant) return false;
     if (!prelimId || String(prelimId).toUpperCase() === 'NEW' || !Number(prelimId)) return false;
     if (!selfRating?.id || questionCount <= 0) return false;

@@ -6,6 +6,7 @@ import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import uuid from "react-uuid";
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { useNavigate } from 'react-router-dom';
+import { hasCheckerAndUserAdmin } from '../../lib/workflowStatus';
 
 
 const RoleComponent = (props: any) => {
@@ -16,10 +17,22 @@ const RoleComponent = (props: any) => {
     const navigate = useNavigate()
     const { userDetails } = props
     const [data, setData] = useState(userDetails || {} as IUser)
-    const currentRole = String(userDetails?.role || "").toUpperCase();
+    const rawRole = String(userDetails?.role || "").toUpperCase();
+    const currentRole = hasCheckerAndUserAdmin(rawRole) || rawRole.includes('MANAGER')
+        ? "CHECKER,USERADMIN"
+        : rawRole;
     const isRegistered = currentRole === "REGISTERED";
-    const roles = ['USER', 'PENSION_FUND', 'USERADMIN', 'CHECKER', 'MAKER', 'MANAGER', 'CHECKER,MANAGER', 'CLOSED', 'ADMIN'];
-    const [selectedRole, setSelectedRole] = useState<string>(currentRole || roles[0]);
+
+    // Context-aware role lists:
+    // - Pending approval (REGISTERED users) → only USER (they are fund applicants)
+    // - Operational users → no USER (they are staff)
+    const rolesForPending = ['USER', 'DISABLED'];
+    const rolesForOperational = ['USERADMIN', 'CHECKER', 'MAKER', 'CHECKER,USERADMIN', 'DISABLED', 'ADMIN'];
+    const roles = isRegistered ? rolesForPending : rolesForOperational;
+
+    const [selectedRole, setSelectedRole] = useState<string>(
+        isRegistered ? 'USER' : (currentRole || rolesForOperational[0])
+    );
 
     const style = {
         position: 'absolute' as 'absolute',
@@ -55,9 +68,10 @@ const RoleComponent = (props: any) => {
             );
             return;
         }
+        // Always use selectedRole (not data.role which still holds "REGISTERED")
         dispatch(
             approveUsersAsync(
-                wrapArgument(actionUid, data)
+                wrapArgument(actionUid, { ...data, role: selectedRole })
             )
         )
     }
@@ -87,7 +101,7 @@ const RoleComponent = (props: any) => {
                                         onChange={handleSelectChange}
                                     >
                                         {roles.map((role) => (
-                                            <MenuItem key={role} value={role}>{role === "CHECKER,MANAGER" ? "CHECKER + MANAGER" : role}</MenuItem>
+                                            <MenuItem key={role} value={role}>{role === "CHECKER,USERADMIN" ? "CHECKER + USERADMIN" : role}</MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
