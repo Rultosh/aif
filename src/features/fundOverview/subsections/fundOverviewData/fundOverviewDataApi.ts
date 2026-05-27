@@ -118,13 +118,6 @@ export function deletePrelimApplication(prelimAppId: number) {
   });
 }
 
-export function softDeletePrelimApplication(prelimAppId: number) {
-  return api({
-    method: 'post',
-    url: `/api/prelims/${prelimAppId}/soft-delete`
-  });
-}
-
 export function fetchMakerUsers() {
   return api({
     method: 'get',

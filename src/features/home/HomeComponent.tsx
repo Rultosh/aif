@@ -1,5 +1,5 @@
 import '../../index.css';
-import { Alert, Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab, Card, CardContent, Snackbar, Badge } from '@mui/material';
+import { Alert, Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Container, FormControl, InputLabel, Typography, Pagination, MenuItem, Breadcrumbs, Link, Chip, Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab, Card, CardContent, Snackbar } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -45,7 +45,7 @@ import { ReactComponent as SettingCustomIcon } from '../../images/setting.svg';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import { fetchMakerUsers, fetchCheckerUsers, fetchUserAdminUsers, fetchPensionFundUsers, postWorkflowAction, deletePrelimApplication, softDeletePrelimApplication } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
+import { fetchMakerUsers, fetchCheckerUsers, fetchUserAdminUsers, fetchPensionFundUsers, postWorkflowAction, deletePrelimApplication } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
 import { hasCheckerAndUserAdmin, normalizeWorkflowStatus } from '../../lib/workflowStatus';
 import FileUploadService from '../../components/FileUploadService';
 import { shouldShowListPaginationFooter } from '../../lib/listPaginationVisibility';
@@ -390,10 +390,6 @@ export const Home = (pros: any) => {
 
     function closeModel() {
         setOpenQueryModal(false);
-        // Refresh the home list after a short delay to ensure backend has processed mark-as-read
-        setTimeout(() => {
-            dispatch(getPrelimApplicationList(wrapArgument(actionUid, listQuery)));
-        }, 500);
     }
 
     function closeModelHistory() {
@@ -618,7 +614,6 @@ export const Home = (pros: any) => {
         "Download",
         "Query",
         "History",
-        ...(hasActiveRole('CHECKER') && workflowSectionTab === 'failedApplication' ? ["Archive"] : []),
         ...(hasActiveRole('ADMIN') ? ["Delete"] : []),
     ];
     const tableHeadersWorkflowApplicant = [
@@ -869,19 +864,6 @@ export const Home = (pros: any) => {
             dispatch(getPrelimApplicationList(wrapArgument(actionUid, listQuery)));
         } catch (e: any) {
             alert(e?.response?.data?.message || e?.message || 'Failed to delete application.');
-        }
-    };
-
-    const handleSoftDeleteApplication = async (row: IPrelimApplicationData) => {
-        if (row.id == null) return;
-        const fundName = String(row.registrationAifName || row.nameOfTheFund || row.createdByName || row.id).trim();
-        const confirmed = window.confirm(`Archive failed application "${fundName}"? This will hide it from the list.`);
-        if (!confirmed) return;
-        try {
-            await softDeletePrelimApplication(Number(row.id));
-            dispatch(getPrelimApplicationList(wrapArgument(actionUid, listQuery)));
-        } catch (e: any) {
-            alert(e?.response?.data?.message || e?.message || 'Failed to archive application.');
         }
     };
 
@@ -1284,41 +1266,15 @@ export const Home = (pros: any) => {
                                                     </Box>
                                                 </TableCell>
                                                 <TableCell align="left">
-                                                    <Badge
-                                                        variant="dot"
-                                                        color="error"
-                                                        invisible={!row.unreadQueryCount || row.unreadQueryCount === 0}
-                                                        sx={{
-                                                            '& .MuiBadge-dot': {
-                                                                backgroundColor: '#ef4444',
-                                                                width: '8px',
-                                                                height: '8px',
-                                                            }
-                                                        }}
-                                                    >
-                                                        <IconButton size="small" sx={{ p: '2px', color: '#476bbc', '&:hover': { backgroundColor: '#f0f4ff' } }} onClick={() => openModel(row)}>
-                                                            <EmailListIcon style={{ width: '22px', height: '22px', fill: 'currentColor' }} />
-                                                        </IconButton>
-                                                    </Badge>
+                                                    <IconButton size="small" sx={{ p: '2px', color: '#476bbc', '&:hover': { backgroundColor: '#f0f4ff' } }} onClick={() => openModel(row)}>
+                                                        <EmailListIcon style={{ width: '22px', height: '22px', fill: 'currentColor' }} />
+                                                    </IconButton>
                                                 </TableCell>
                                                 {!isApplicantUser && (
                                                 <TableCell align="left">
                                                     <IconButton size="small" sx={{ p: '2px', color: '#37c5ab', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => openModelHistory(row)}>
                                                         <HistoryCustomIcon style={{ width: '22px', height: '20px', fill: 'currentColor' }} />
                                                     </IconButton>
-                                                </TableCell>
-                                                )}
-                                                {hasActiveRole('CHECKER') && checkerWorkflowTabForStatus(String(row.status), row) === 'failedApplication' && (
-                                                <TableCell align="center">
-                                                    <Tooltip title="Archive failed application">
-                                                        <IconButton
-                                                            size="small"
-                                                            sx={{ color: '#d32f2f', '&:hover': { backgroundColor: '#fef2f2' } }}
-                                                            onClick={() => handleSoftDeleteApplication(row)}
-                                                        >
-                                                            <DeleteIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Tooltip>
                                                 </TableCell>
                                                 )}
                                                 {hasActiveRole('ADMIN') && (

@@ -21,9 +21,3 @@ export function getQuery(id:string) {
   });
 }
 
-export function markQueriesAsRead(applicationId: string | number) {
-  return api({
-    method: 'post',
-    url: `api/prelims/${applicationId}/queries/mark-as-read`
-  });
-}
