@@ -8,6 +8,7 @@ import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { selectUsers } from '../admin/adminSlice'
 import FileUploadService from "../../components/FileUploadService";
 import { getFileServerBaseUrl } from "../../lib/fileServerBaseUrl";
+import { markQueriesAsRead } from './queryResolutionApi';
 
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
@@ -32,6 +33,15 @@ export const QueryResolutionModal = (props: any) => {
         dispatch(fetchQuriesAsync(
             wrapArgument(actionUid, id)
         ));
+        // Mark queries as read when fetching them
+        markQueriesAsRead(id)
+            .then(() => {
+                console.log('Queries marked as read for application:', id);
+            })
+            .catch(err => {
+                console.error('Failed to mark queries as read:', err);
+                // Don't block the UI if this fails
+            });
     };
 
     useEffect(() => {
@@ -152,13 +162,7 @@ export const QueryResolutionModal = (props: any) => {
             <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
                 {usersState.role === 'ADMIN'
                     ? `To: ${props?.prelimDetails?.createdByName || "Applicant"}`
-                    : (
-                        <>
-                            Please login to online portal{" "}
-                            <a href={portalUrl} target="_blank" rel="noopener noreferrer">{portalUrl}</a>{" "}
-                            to provide resolution.
-                        </>
-                    )}
+                    : null}
             </Typography>
             <Typography variant="body2" sx={{ color: '#334155', mb: 2, fontWeight: 600 }}>
                 {"Subject: Query for " + (props?.prelimDetails?.registrationAifName || props?.prelimDetails?.nameOfTheFund || `Application #${id || '-'}`)}
