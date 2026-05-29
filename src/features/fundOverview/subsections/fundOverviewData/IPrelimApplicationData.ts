@@ -146,6 +146,8 @@ export interface IPrelimApplicationData {
   applicantContactPhone?: string | undefined,
   applicantContactAddress?: string | undefined,
   applicantContactPerson?: string | undefined,
+  /** Number of unread queries (queries created by others, not by current user); set on prelim list APIs. */
+  unreadQueryCount?: number | undefined,
 }
 
 export const defaultIPrelimApplicationData: IPrelimApplicationData = {
