@@ -178,7 +178,7 @@ const SignUp = () => {
             .nullable()
             .transform((curr, orig) => orig === '' ? null : curr)
             .typeError("Please enter a valid date")
-            .min(new Date(2020, 0, 1), "SEBI Registration Date must be on or after 01/01/2020")
+            .min(new Date(2011, 0, 1), "SEBI Registration Date must be on or after 01/01/2011")
             .max(new Date(), "SEBI Registration Date cannot be a future date")
             .required("SEBI Registration Date is required"),
         username: Yup
