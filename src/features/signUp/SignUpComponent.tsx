@@ -356,9 +356,9 @@ const SignUp = () => {
                                                 label="SEBI - Registration Date"
                                                 inputFormat='DD/MM/YYYY'
                                                 disableFuture
-                                                minDate={dayjs('2020-01-01')}
+                                                minDate={dayjs('2011-01-01')}
                                                 maxDate={dayjs()}
-                                                shouldDisableDate={(date) => dayjs(date).isBefore(dayjs('2020-01-01'), 'day')}
+                                                shouldDisableDate={(date) => dayjs(date).isBefore(dayjs('2011-01-01'), 'day')}
                                                 onChange={(newValue) => field.onChange(newValue)}
                                                 renderInput={(params) => (
                                                     <TextField
