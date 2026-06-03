@@ -4,6 +4,7 @@ export interface ISignup extends IEntity {
 
   username: string | undefined,
   companyName: string | undefined,
+  schemeName: string | undefined,
   contactPerson: string | undefined,
   title: string | undefined,
   phoneNumber: string | undefined,
@@ -21,6 +22,7 @@ export const defaultISignup: ISignup = {
   parentId: undefined,
   username: undefined,
   companyName: undefined,
+  schemeName: undefined,
   contactPerson: undefined,
   phoneNumber: undefined,
   state: undefined,

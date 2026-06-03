@@ -71,6 +71,13 @@ export function createOperationalUser(payload: {
   });
 }
 
+export function getUserApplicationCount(userId: number) {
+  return api({
+    method: 'get',
+    url: `useradmin/users/${userId}/application-count`,
+  });
+}
+
 export function patchUserRoles(userId: number, role: string) {
   return api({
     method: 'patch',
