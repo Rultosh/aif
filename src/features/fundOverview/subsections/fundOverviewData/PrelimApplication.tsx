@@ -38,6 +38,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const { id } = useParams();
     const usersState = useAppSelector(selectUsers);
     const selfRatingState = useAppSelector(selectSelfRatings);
+    const selectedScheme = useAppSelector(state => state.eligibilityQuestioner.scheme);
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState<IPrelimApplicationData>(prelimApplicationState.prelimApplication || defaultIPrelimApplicationData);
     console.log('prelimApplicationState', prelimApplicationState)
@@ -115,6 +116,10 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             if (!data.nameOfTheFund && usersState.me?.companyName) {
                 data.nameOfTheFund = usersState.me.companyName;
             }
+            // Auto-populate Scheme Name from user state if field is empty
+            if (!data.scheme && usersState.me?.schemeName) {
+                data.scheme = usersState.me.schemeName;
+            }
             // Default AIF category type from Initial Assessment selection when empty.
             if (!data.aifCategoryType && initialAssessmentFundType) {
                 data.aifCategoryType = initialAssessmentFundType as any;
@@ -148,8 +153,13 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                 setValue("nameOfTheFund", usersState.me.companyName, { shouldValidate: true });
                 setPrelimApplicationFormData(prev => ({ ...prev, nameOfTheFund: usersState.me.companyName || '' }));
             }
+            // If the form data exists but scheme is missing, and we have user data, sync it
+            if (prelimApplicationState.prelimApplication?.id && !prelimApplicationFormData.scheme && usersState.me.schemeName) {
+                setValue("scheme", usersState.me.schemeName, { shouldValidate: false });
+                setPrelimApplicationFormData(prev => ({ ...prev, scheme: usersState.me.schemeName || '' }));
+            }
         }
-    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me, selfRatingState?.selfRatings?.fundType, managerTypeValue])
+    }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus, usersState.me, selfRatingState?.selfRatings?.fundType, managerTypeValue, selectedScheme])
 
     const setDateValue = (key: string, value: any) => {
         let copiedValue: IPrelimApplicationData = { ...prelimApplicationFormData };
@@ -782,6 +792,27 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             {...register("nameOfTheFund")}
                             error={!!errors.nameOfTheFund}
                             helperText={errors.nameOfTheFund?.message as string}
+                            onChange={handleChange}
+                            variant="outlined"
+                            sx={{ ...fieldSx, backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <TextField
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            required
+                            fullWidth
+                            id="scheme"
+                            label="Scheme Name"
+                            value={String(prelimApplicationFormData.scheme || selectedScheme || '')}
+                            {...register("scheme")}
+                            error={!!errors.scheme}
+                            helperText={errors.scheme?.message as string}
                             onChange={handleChange}
                             variant="outlined"
                             sx={{ ...fieldSx, backgroundColor: 'rgba(0, 0, 0, 0.05)' }}

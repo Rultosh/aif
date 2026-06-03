@@ -4,6 +4,7 @@ export interface IUser extends IEntity {
 
   username: string | undefined,
   companyName: string | undefined,
+  schemeName?: string | undefined,
   contactPerson: string | undefined,
   title: string | undefined,
   phoneNumber: string | undefined,

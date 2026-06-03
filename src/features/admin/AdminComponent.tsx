@@ -34,7 +34,7 @@ import { Delete, Edit, InfoOutlined, Close as CloseDialogIcon } from '@mui/icons
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
 import dayjs from "dayjs";
-import { assignUserAdminRole, sendSetPasswordEmail } from "./adminApi";
+import { assignUserAdminRole, sendSetPasswordEmail, getUserApplicationCount } from "./adminApi";
 import AddOperationalUserModal from "./AddOperationalUserModal";
 
 const Admin = (props: any) => {
@@ -68,7 +68,6 @@ const Admin = (props: any) => {
     })
 
     useEffect(() => {
-        console.log('calling fetchUsersAsync');
         dispatch(fetchUsersAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
@@ -76,7 +75,6 @@ const Admin = (props: any) => {
     }, [usersState.actionStatus.fetchStatus === FetchStatus.IDLE, usersState.status.fetchStatus == FetchStatus.IDLE])
 
     useEffect(() => {
-        console.log('calling fetchUsersAsync');
         dispatch(fetchUsersAsync(
             wrapArgument(actionUid, props.prelimApplicationId)
         ))
@@ -135,17 +133,45 @@ const Admin = (props: any) => {
         color: '#1e293b',
         verticalAlign: 'middle' as const,
     };
-    const handleDeleteUser = (row: IUser) => {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
+    const [userApplicationCount, setUserApplicationCount] = useState(0);
+
+    const handleDeleteUser = async (row: IUser) => {
         if (row.id == null) {
             return;
         }
-        const confirmed = window.confirm(`Delete user ${row.username}? This action cannot be undone.`);
-        if (!confirmed) {
-            return;
+        
+        // Check if user has applications
+        try {
+            const response = await getUserApplicationCount(Number(row.id));
+            const count = response.data;
+            
+            setUserToDelete(row);
+            setUserApplicationCount(count || 0);
+            setDeleteDialogOpen(true);
+        } catch (error: any) {
+            console.error('Error fetching application count:', error);
+            // Fallback: show dialog with 0 count if API call fails
+            setUserToDelete(row);
+            setUserApplicationCount(0);
+            setDeleteDialogOpen(true);
         }
-        dispatch(deleteUserAsync(
-            wrapArgument(actionUid, Number(row.id))
-        ));
+    }
+
+    const confirmDeleteUser = () => {
+        if (userToDelete?.id) {
+            dispatch(deleteUserAsync(wrapArgument(actionUid, Number(userToDelete.id))));
+            setDeleteDialogOpen(false);
+            setUserToDelete(null);
+            setUserApplicationCount(0);
+        }
+    }
+
+    const cancelDeleteUser = () => {
+        setDeleteDialogOpen(false);
+        setUserToDelete(null);
+        setUserApplicationCount(0);
     }
 
 
@@ -438,6 +464,57 @@ const Admin = (props: any) => {
                 </Container>                        
              : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
 
+            {/* Delete User Confirmation Dialog */}
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={cancelDeleteUser}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle sx={{ backgroundColor: '#f44336', color: 'white', fontWeight: 600 }}>
+                    Confirm User Deletion
+                </DialogTitle>
+                <DialogContent sx={{ mt: 2 }}>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                        Are you sure you want to delete user <strong>{userToDelete?.username}</strong>?
+                    </Typography>
+                    
+                    {userApplicationCount > 0 && (
+                        <Box sx={{ 
+                            backgroundColor: '#fff3e0', 
+                            border: '1px solid #ff9800', 
+                            borderRadius: '8px', 
+                            p: 2, 
+                            mb: 2 
+                        }}>
+                            <Typography variant="body2" sx={{ color: '#e65100', fontWeight: 600, mb: 1 }}>
+                                ⚠️ Warning
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#000' }}>
+                                This user has <strong>{userApplicationCount}</strong> application(s) associated with their account.
+                                Deleting this user will also mark all their applications as deleted.
+                            </Typography>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button 
+                        onClick={cancelDeleteUser} 
+                        variant="outlined"
+                        sx={{ borderRadius: '8px', textTransform: 'none' }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={confirmDeleteUser} 
+                        variant="contained" 
+                        color="error"
+                        sx={{ borderRadius: '8px', textTransform: 'none' }}
+                    >
+                        Delete User{userApplicationCount > 0 ? ` & ${userApplicationCount} Application(s)` : ''}
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
         </div>
 

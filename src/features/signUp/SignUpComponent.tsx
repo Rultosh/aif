@@ -147,16 +147,14 @@ const SignUp = () => {
         companyName: Yup
             .string()
             .trim()
-            .test("Invalid input entered", function (value: any) {
-                const pattern =/^[A-Za-z0-9 .-_/]+$/;
-                const isNotValidInput = pattern.test(value);
-                if (!isNotValidInput) {
-                    return false;
-                } else {
-                    return true;
-                }
-            })
+            .test("no-html-tags", "HTML tags are not allowed", (value: any) => !value || !String(value).match(/<[^>]*>/))
             .required("Company Name is required"),
+        schemeName: Yup
+            .string()
+            .trim()
+            .test("no-html-tags", "HTML tags are not allowed", (value: any) => !value || !String(value).match(/<[^>]*>/))
+            .max(200, "Scheme Name must be at most 200 characters")
+            .required("Scheme Name is required"),
         sebiRegistration: Yup
             .string()
             .trim()
@@ -172,7 +170,8 @@ const SignUp = () => {
             .required("SEBI Registration is required"),
         contactPerson: Yup
             .string()
-            .matches(/^[A-Za-z .]*$/, 'Please enter valid contact person')
+            .trim()
+            .test("no-html-tags", "HTML tags are not allowed", (value: any) => !value || !String(value).match(/<[^>]*>/))
             .required("Contact Person is required"),
         sebiRegistrationDate: Yup.date()
             .nullable()
@@ -380,6 +379,21 @@ const SignUp = () => {
                                 <TextField
                                     required
                                     fullWidth
+                    id="schemeName"
+                    label="Scheme Name"
+                    value={formData["schemeName"] || ''}
+                    {...register("schemeName")}
+                    error={!!errors.schemeName}
+                    helperText={errors.schemeName?.message as string}
+                    onChange={handleChange}
+                    sx={fieldSx}
+                    inputProps={{ maxLength: 200 }}
+                />
+            </Grid>
+            <Grid item xs={4}>
+                <TextField
+                    required
+                    fullWidth
                                     id="companyName"
                                     label="AIF Name"
                                     value={formData["companyName"] || ''}
