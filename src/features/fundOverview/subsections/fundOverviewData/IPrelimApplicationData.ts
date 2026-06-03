@@ -7,6 +7,8 @@ export interface IPrelimApplicationData {
   reviewedByUserId: Number | undefined,
   assignedCheckerUserId?: Number | undefined,
   assignedMakerUserId?: Number | undefined,
+  /** Screening committee / manager assignee (API may also send as assignedUserAdminUserId). */
+  assignedManagerUserId?: Number | undefined,
   assignedUserAdminUserId?: Number | undefined,
   assignedPfUserId?: Number | undefined,
   sanctionedAmountInr?: string | undefined,
@@ -156,6 +158,7 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   reviewedByUserId: undefined,
   assignedCheckerUserId: undefined,
   assignedMakerUserId: undefined,
+  assignedManagerUserId: undefined,
   assignedUserAdminUserId: undefined,
   assignedPfUserId: undefined,
   sanctionedAmountInr: undefined,
