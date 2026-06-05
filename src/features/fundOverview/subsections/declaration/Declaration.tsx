@@ -402,21 +402,22 @@ const Declaration = (props: any) => {
                                             href: "/aif/portal/templates/annexure-I-template-and-list-of-docs.zip",
                                             uploads: [
                                                 {
-                                                    id: "kycIndicativeListOfDocuments",
-                                                    validationTitle: "Indicative_List_of_Documents_for_KYC"
-                                                },
-                                                {
                                                     id: "kycAnnexureBoardDirectors",
                                                     validationTitle: "Annexure_I_Details_of_Board_of_Directors"
+                                                },
+                                                {
+                                                    id: "boardResolution",
+                                                    validationTitle: "Annexure_II_KYC_Form"
                                                 }
+                                                
                                             ]
                                         },
                                         {
-                                            id: "boardResolution",
+                                            id: "kycIndicativeListOfDocuments",
                                             text: "2. Board resolution or the requisite documents for such authorization to submit application on behalf of the IM",
                                             // templateLabel: "Download Template",
                                             href: "/aif/portal/templates/Annexure_II_KYC_Form.xlsx",
-                                            validationTitle: "Annexure_II_KYC_Form"
+                                            validationTitle: "Board_Resolution"
                                         }
                                     ].map((item, index) => (
                                         <Box key={item.id} sx={{ mb: index === 0 ? 4 : 0, p: 2, borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)', backgroundColor: 'rgba(0,0,0,0.01)' }}>
@@ -452,7 +453,7 @@ const Declaration = (props: any) => {
                                                     ))
                                                 ) : (
                                                     <span style={{ marginTop: '10px' }}>
-                                                        <DocumentChip label="Upload Document" validationTitle={item.validationTitle} id={`${item.id}${effectiveId}`} />
+                                                        <DocumentChip label={`Upload ${item.validationTitle}`} validationTitle={item.validationTitle} id={`${item.id}${effectiveId}`} />
                                                     </span>
                                                 )}
                                             </Box>
