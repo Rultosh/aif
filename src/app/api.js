@@ -64,7 +64,7 @@ client.interceptors.response.use(function (response) {
     }
     localStorage.clear();
     CheckAuth.setIsUnauthorized();
-    window.location.href = '/aif/portal/login';
+    window.location.href = '/aif/portal/#/login';
   }
   
   return Promise.reject(error);
