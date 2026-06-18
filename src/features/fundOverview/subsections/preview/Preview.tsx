@@ -125,8 +125,8 @@ export const Preview = (props: any) => {
     const applicantEditableStatuses = new Set(['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT']);
     const isApplicantActionable = hasRole('USER') && applicantEditableStatuses.has(statusPrelimsUpper);
     const isOperationalActionable =
-        (role === 'ADMIN' || role === 'USERADMIN') &&
-        (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVIEWED' || statusPrelimsUpper === 'TEMP_CLOSED');
+        (role === 'ADMIN' && !['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT', 'SANCTIONED'].includes(statusPrelimsUpper)) ||
+        (role === 'USERADMIN' && (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVIEWED' || statusPrelimsUpper === 'TEMP_CLOSED'));
     const isMakerActionable = hasRole('MAKER') && (statusPrelimsUpper === 'MAKER_ASSIGNED' || statusPrelimsUpper === 'REVERTED_TO_MAKER');
     const isCheckerActionable = hasRole('CHECKER') && (statusPrelimsUpper === 'MEMO_SUBMITTED' || statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVERTED_TO_CHECKER');
     const isScActionable =
@@ -164,6 +164,7 @@ export const Preview = (props: any) => {
     const [selectedMakerUserId, setSelectedMakerUserId] = useState<string>('');
     const [selectedCheckerUserId, setSelectedCheckerUserId] = useState<string>('');
     const [selectedUserAdminUserId, setSelectedUserAdminUserId] = useState<string>('');
+    const [adminActionRole, setAdminActionRole] = useState<string>('CHECKER');
 
     const fileIdentity = (file: File) => `${file.name}__${file.size}__${file.lastModified}`;
     const showUploadErrorToast = (message?: string) => {
@@ -275,7 +276,7 @@ export const Preview = (props: any) => {
     useEffect(() => {
         const loadAssignmentUsers = async () => {
             try {
-                if (hasRole('MAKER')) {
+                if (hasRole('MAKER') || hasRole('ADMIN')) {
                     const res = await fetchCheckerUsers();
                     const list = res?.data || [];
                     setCheckerUsers(list);
@@ -285,7 +286,7 @@ export const Preview = (props: any) => {
                         setSelectedCheckerUserId(String(list[0].id));
                     }
                 }
-                if (hasRole('CHECKER')) {
+                if (hasRole('CHECKER') || hasRole('ADMIN')) {
                     const makerRes = await fetchMakerUsers();
                     const makerList = makerRes?.data || [];
                     setMakerUsers(makerList);
@@ -799,7 +800,25 @@ export const Preview = (props: any) => {
                                 )}
 
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                                    {(usersState.role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER')) && (
+                                    {hasRole('ADMIN') && !['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT', 'SANCTIONED'].includes(statusPrelimsUpper) && (
+                                        <FormControl sx={{ minWidth: 260 }}>
+                                            <InputLabel id="admin-action-role-label">Select Role</InputLabel>
+                                            <Select
+                                                labelId="admin-action-role-label"
+                                                value={adminActionRole}
+                                                label="Select Role"
+                                                onChange={(e) => setAdminActionRole(String(e.target.value))}
+                                            >
+                                                <MenuItem value="CHECKER">Checker</MenuItem>
+                                                {prelimApplicationState.prelimApplication.assignedMakerUserId != null && (
+                                                    <MenuItem value="MAKER">Maker</MenuItem>
+                                                )}
+                                            </Select>
+                                        </FormControl>
+                                    )}
+
+                                    {((usersState.role === 'MAKER' && (statusPrelims === 'MAKER_ASSIGNED' || statusPrelims === 'REVERTED_TO_MAKER')) ||
+                                      (hasRole('ADMIN') && !['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT', 'SANCTIONED'].includes(statusPrelimsUpper) && adminActionRole === 'CHECKER')) && (
                                         <FormControl sx={{ minWidth: 260 }}>
                                             <InputLabel id="checker-user-label">Select Checker</InputLabel>
                                             <Select
@@ -817,7 +836,8 @@ export const Preview = (props: any) => {
                                         </FormControl>
                                     )}
 
-                                    {(hasRole('CHECKER') && (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVERTED_TO_CHECKER')) && (
+                                    {((hasRole('CHECKER') && (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVERTED_TO_CHECKER')) ||
+                                      (hasRole('ADMIN') && prelimApplicationState.prelimApplication.assignedMakerUserId != null && !['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT', 'SANCTIONED'].includes(statusPrelimsUpper) && adminActionRole === 'MAKER')) && (
                                         <FormControl sx={{ minWidth: 260 }}>
                                             <InputLabel id="maker-user-label">Select Maker</InputLabel>
                                             <Select
@@ -991,7 +1011,8 @@ export const Preview = (props: any) => {
                                         </Box>
                                     )}
 
-                                    {(hasRole('CHECKER') && (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVERTED_TO_CHECKER')) && (
+                                    {((hasRole('CHECKER') && (statusPrelimsUpper === 'SUBMITTED' || statusPrelimsUpper === 'REVERTED_TO_CHECKER')) ||
+                                      (hasRole('ADMIN') && prelimApplicationState.prelimApplication.assignedMakerUserId != null && !['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT', 'SANCTIONED'].includes(statusPrelimsUpper) && adminActionRole === 'MAKER')) && (
                                         <Button color='primary' id='assign-maker' onClick={async () => {
                                             try {
                                                 const remark = String(commentPreview || '').trim();
@@ -1003,8 +1024,9 @@ export const Preview = (props: any) => {
                                                     alert("Please select a maker.");
                                                     return;
                                                 }
-                                                const attachment = await uploadActionFile(Number(id), 'assign-maker');
-                                                await postWorkflowAction(Number(id), 'assign-maker', {
+                                                const actionName = hasRole('ADMIN') ? 'admin-reassign-maker' : 'assign-maker';
+                                                const attachment = await uploadActionFile(Number(id), actionName);
+                                                await postWorkflowAction(Number(id), actionName, {
                                                     makerUserId: Number(selectedMakerUserId),
                                                     remark,
                                                     attachmentBucket: attachment.attachmentBucket,
@@ -1016,7 +1038,37 @@ export const Preview = (props: any) => {
                                                 showUploadErrorToast();
                                             }
                                         }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                            Assign Maker
+                                            {hasRole('ADMIN') ? 'Reassign Maker' : 'Assign Maker'}
+                                        </Button>
+                                    )}
+
+                                    {(hasRole('ADMIN') && !['CREATED', 'REVISE', 'REVERTED_TO_APPLICANT', 'SANCTIONED'].includes(statusPrelimsUpper) && adminActionRole === 'CHECKER') && (
+                                        <Button color='success' id='assign-checker' onClick={async () => {
+                                            try {
+                                                const remark = String(commentPreview || '').trim();
+                                                if (!hasEvidence(remark)) {
+                                                    alert("Please provide either a comment or upload a document.");
+                                                    return;
+                                                }
+                                                if (!selectedCheckerUserId) {
+                                                    alert("Please select a checker.");
+                                                    return;
+                                                }
+                                                const actionName = statusPrelimsUpper === 'SUBMITTED' ? 'assign-checker' : 'admin-reassign-checker';
+                                                const attachment = await uploadActionFile(Number(id), actionName);
+                                                await postWorkflowAction(Number(id), actionName, {
+                                                    checkerUserId: Number(selectedCheckerUserId),
+                                                    remark,
+                                                    attachmentBucket: attachment.attachmentBucket,
+                                                    attachmentName: attachment.attachmentName,
+                                                });
+                                                navigate('/home');
+                                            } catch (error: any) {
+                                                console.error("Workflow action failed:", error);
+                                                showUploadErrorToast();
+                                            }
+                                        }} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
+                                            {statusPrelimsUpper === 'SUBMITTED' ? 'Assign Checker' : 'Reassign Checker'}
                                         </Button>
                                     )}
 
@@ -1048,9 +1100,6 @@ export const Preview = (props: any) => {
 
                                     {((usersState.role === 'ADMIN' || usersState.role === 'USERADMIN') && statusPrelimsUpper === 'SUBMITTED') && (
                                         <Box sx={{ display: 'flex', gap: 2 }}>
-                                            <Button color='success' id='review' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
-                                                Forward for Recommendation
-                                            </Button>
                                             <Button color='warning' id='revise' onClick={handleClickSave} variant="contained" sx={{ textTransform: 'none', borderRadius: '8px', fontWeight: 700 }}>
                                                 Revise
                                             </Button>

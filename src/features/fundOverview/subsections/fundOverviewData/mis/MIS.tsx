@@ -11,6 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
 import * as Yup from "yup";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -39,25 +40,27 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[\s\S]*$/;
+
     const validationSchema = Yup.object().shape({
-        msMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        msInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        msExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        msDirectorshipsPolicy: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        msMeetingFrequency: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        msInvestigationDetails: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        msExclusiveVC: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        msDirectorshipsPolicy: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        otConsolidatedInfo: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        otNAVFrequency: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        otValuationReport: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        otNAVGuidelines: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
     });
 
     const {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<IPrelimApplicationData>({
         resolver: yupResolver(validationSchema),
+        mode: "all",
         defaultValues: prelimApplicationState.prelimApplication || {}
     });
 
@@ -120,8 +123,8 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.msMeetingFrequency}
                             helperText={errors.msMeetingFrequency?.message as string}
                             variant="outlined"
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("msMeetingFrequency"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -177,8 +180,8 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.msInvestigationDetails}
                             helperText={errors.msInvestigationDetails?.message as string}
                             variant="outlined"
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("msInvestigationDetails"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -191,8 +194,8 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.msExclusiveVC}
                             helperText={errors.msExclusiveVC?.message as string}
                             variant="outlined"
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("msExclusiveVC"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -205,8 +208,8 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                             error={!!errors.msDirectorshipsPolicy}
                             helperText={errors.msDirectorshipsPolicy?.message as string}
                             variant="outlined"
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("msDirectorshipsPolicy"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -223,8 +226,8 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.otConsolidatedInfo?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("otConsolidatedInfo"), FIELD_LIMITS.LONG_TEXT)}
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting</Typography>
                             <TextField
@@ -236,8 +239,8 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.otNAVFrequency?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("otNAVFrequency"), FIELD_LIMITS.LONG_TEXT)}
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Detailed valuation report</Typography>
                             <TextField
@@ -249,8 +252,8 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.otValuationReport?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("otValuationReport"), FIELD_LIMITS.LONG_TEXT)}
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Guidelines for calculating NAV</Typography>
                             <TextField
@@ -262,8 +265,8 @@ const MIS = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.otNAVGuidelines?.message as string}
                                 variant="outlined"
                                 sx={{ mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("otNAVGuidelines"), FIELD_LIMITS.LONG_TEXT)}
                         </Box>
                     </Grid>
 

@@ -3,7 +3,8 @@ import { RootState } from "../../app/store"
 import { ActionWrapper } from "../../lib/api-status/actionWrapper"
 import { getError } from "../../lib/api-status/errorHandler"
 import {IUser, IUserApprove} from "./IUser"
-import {fetchUsers, approveUser, whoAmI, patchUserOtpRequired, deleteUser, patchUserRoles} from './adminApi'
+import { IUpdateProfileResult } from "./IUpdateProfileResult"
+import {fetchUsers, approveUser, whoAmI, patchUserOtpRequired, deleteUser, patchUserRoles, updateUserProfile} from './adminApi'
 import { FetchStatus, IStatus } from '../../lib/api-status/IStatus'
 
 
@@ -104,6 +105,21 @@ export const deleteUserAsync = createAsyncThunk(
   }
 );
 
+export const updateUserProfileAsync = createAsyncThunk(
+  'users/updateProfile',
+  async (args: ActionWrapper<{ username?: string; phoneNumber?: string; contactPerson?: string }>, { rejectWithValue }) => {
+    try {
+      if (!args.argument) {
+        return rejectWithValue({ message: 'Missing profile data' });
+      }
+      const response = await updateUserProfile(args.argument);
+      return response.data as IUpdateProfileResult;
+    } catch (reason) {
+      return rejectWithValue(getError(reason));
+    }
+  }
+);
+
 export const updateUserRolesAsync = createAsyncThunk(
   'users/updateRoles',
   async (args: ActionWrapper<{ id: number; role: string }>, { rejectWithValue }) => {
@@ -177,6 +193,9 @@ const usersSlice = createSlice({
     })
     .addCase(deleteUserAsync.fulfilled, (state, action: PayloadAction<number>) => {
       state.users = state.users.filter((row) => row.id !== action.payload);
+    })
+    .addCase(updateUserProfileAsync.fulfilled, (state, action: PayloadAction<IUpdateProfileResult>) => {
+      state.me = action.payload.user;
     })
     .addCase(updateUserRolesAsync.fulfilled, (state, action: PayloadAction<IUser>) => {
       const updated = action.payload;

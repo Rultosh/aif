@@ -25,6 +25,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import { getCharCount, FIELD_LIMITS } from "../../utils/validationUtils";
 
 const SignUp = () => {
     const fieldSx = {
@@ -342,8 +343,9 @@ const SignUp = () => {
                                     helperText={errors.sebiRegistration?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
-                                    inputProps={{maxLength :200}}
+                                    inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
                                 />
+                                {getCharCount(formData["sebiRegistration"], FIELD_LIMITS.SHORT_TEXT)}
                             </Grid>
                             <Grid item xs={4}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -387,8 +389,9 @@ const SignUp = () => {
                     helperText={errors.schemeName?.message as string}
                     onChange={handleChange}
                     sx={fieldSx}
-                    inputProps={{ maxLength: 200 }}
+                    inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
                 />
+                                {getCharCount(formData["schemeName"], FIELD_LIMITS.SHORT_TEXT)}
             </Grid>
             <Grid item xs={4}>
                 <TextField
@@ -402,8 +405,9 @@ const SignUp = () => {
                                     helperText={errors.companyName?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
-                                    inputProps={{maxLength :200}}
+                                    inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
                                 />
+                                {getCharCount(formData["companyName"], FIELD_LIMITS.SHORT_TEXT)}
                             </Grid>
 
                             <Grid item xs={8}>
@@ -453,8 +457,9 @@ const SignUp = () => {
                                                 ml: '-1px'
                                             }
                                         }}
-                                        inputProps={{maxLength :200}}
-                                    />
+                                        inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
+                                />
+                                {getCharCount(formData["contactPerson"], FIELD_LIMITS.SHORT_TEXT)}
                                 </Box>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', px: 1 }}>
                                     {errors.title && (
@@ -482,8 +487,9 @@ const SignUp = () => {
                                     helperText={errors.username?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
-                                    inputProps={{maxLength :200}}
+                                    inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
                                 />
+                                {getCharCount(formData["username"], FIELD_LIMITS.SHORT_TEXT)}
                             </Grid>
 
                             <Grid item xs={4}>
@@ -592,8 +598,9 @@ const SignUp = () => {
                                     helperText={errors.address?.message as string}
                                     onChange={handleChange}
                                     sx={fieldSx}
-                                    inputProps={{maxLength :500}}
+                                    inputProps={{maxLength: FIELD_LIMITS.ADDRESS}}
                                 />
+                                {getCharCount(formData["address"], FIELD_LIMITS.ADDRESS)}
                             </Grid>
 
                             <Grid item xs={12} sx={{ mt: 1, mb: 0, display: 'flex', gap: 3, justifyContent: 'center' }}>

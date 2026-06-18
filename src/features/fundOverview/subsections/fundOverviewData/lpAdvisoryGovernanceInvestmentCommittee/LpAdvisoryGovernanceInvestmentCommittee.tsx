@@ -9,6 +9,7 @@ import { FetchStatus } from "../../../../../lib/api-status/IStatus";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -38,15 +39,15 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
             reset(prelimApplicationState.prelimApplication, { keepDirtyValues: !isInitialLoad });
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[\s\S]*$/;
+
     const validationSchema = Yup.object().shape({
-        lpacDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        lpacMemberSelectionDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        lpacLpParticipationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        //lpacBindingApprovalRightsDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        lpacTotalNumberAndVotingMembersDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        lpacDecisionMakingProcess: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        lpacIndependentMembersDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        lpacDetails: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        lpacMemberSelectionDetails: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        lpacLpParticipationDetails: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        //lpacBindingApprovalRightsDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+        lpacTotalNumberAndVotingMembersDetails: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        lpacDecisionMakingProcess: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
+        lpacIndependentMembersDetails: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
     });
 
     const {
@@ -122,8 +123,8 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
         return (
             <Box sx={{ p: 3, textAlign: 'center' }}>
                 <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>
-                <Button 
-                    variant="outlined" 
+                <Button
+                    variant="outlined"
                     onClick={() => {
                         if (Number(prelimAppicationId)) {
                             dispatch(getPrelimApplicationData(wrapArgument(actionUid, Number(prelimAppicationId))));
@@ -151,8 +152,8 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("lpacDetails"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
                     <Grid item xs={12} sx={qSx}>
                         <Typography variant="body1" sx={labelSx}>2. How are LPAC members selected? Are large LPs automatically entitled to LPAC seats?</Typography>
@@ -165,8 +166,8 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacMemberSelectionDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("lpacMemberSelectionDetails"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -180,8 +181,8 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacTotalNumberAndVotingMembersDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("lpacTotalNumberAndVotingMembersDetails"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -195,8 +196,8 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacDecisionMakingProcess?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("lpacDecisionMakingProcess"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -210,8 +211,8 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacIndependentMembersDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("lpacIndependentMembersDetails"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -225,8 +226,8 @@ const LpAdvisoryGovernanceInvestmentCommittee = forwardRef((props: PrelimApplica
                             helperText={errors.lpacLpParticipationDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("lpacLpParticipationDetails"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12}>

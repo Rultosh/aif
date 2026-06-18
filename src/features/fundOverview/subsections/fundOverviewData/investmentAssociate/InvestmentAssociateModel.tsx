@@ -17,6 +17,7 @@ import { IInvestmentResponsibleAsLead, defaultIIInvestmentResponsibleAsLead } fr
 import { getAllInvestmentResponsibleAsNonLeadsAsnyc, selectInvestmentResponsibleAsNonLeads, createInvestmentResponsibleAsNonLeadAsync, updateInvestmentResponsibleAsNonLeadAsync, deleteInvestmentResponsibleAsNonLeadAsync } from "../../profile-new/investmentResponsibleAsNonLead/investmentResponsibleAsNonLeadSlice";
 import { IInvestmentResponsibleAsNonLead, defaultIIInvestmentResponsibleAsNonLead } from "../../profile-new/investmentResponsibleAsNonLead/IInvestmentResponsibleAsNonLead";
 import Moment from 'moment';
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
 
 interface InvestmentAssociateModelProps {
   investmentAssociateFormData: IInvestmentAssociate,
@@ -151,18 +152,17 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     setShowNonLeadForm(false);
     setEditingNonLeadInvestment(defaultIIInvestmentResponsibleAsNonLead);
   };
-  const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/\*\+&@]+$/;
   const investmentValidationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     amountInvested: Yup.number().typeError("Must be a number").required("Amount is required"),
     dateOfInvestment: Yup.string().required("Date of investment is required").nullable(),
     dateofExitorWriteOff: Yup.string().required("Date of exit or write off is required").nullable(),
-    exitOrWriteOff: Yup.string().required("Required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    moic: Yup.string().required("MOIC is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    exitOrWriteOff: Yup.string().required("Required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    moic: Yup.string().required("MOIC is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
-    comment: Yup.string().required("Comment is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    howWasTheDealSourced: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    addressOfCompany: Yup.string().required("Address of company is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)")
+    comment: Yup.string().required("Comment is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    howWasTheDealSourced: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    addressOfCompany: Yup.string().required("Address of company is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed")
   });
 
   const {
@@ -273,25 +273,24 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
   };
 
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
-  const htmlTagsNotAllowed = "Tags not allowed in input.";
 
   const validationSchema = Yup.object().shape({
     title: Yup.string()
       .matches(/^[A-Za-z. ]*$/, 'Please enter valid title')
       .required("Title is required")
       .nullable(),
-    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     age: Yup.number()
       .typeError("Age must be a number")
       .min(0, "Age cannot be negative")
       .max(100, "Age cannot be greater than 100")
       .required("Age is required")
       .nullable(),
-    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     investmentExperience: Yup.string().required("Experience in AIF Business is required").nullable(),
-    description: Yup.string().required("Brief Details Of AIF Business Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    description: Yup.string().required("Brief Details Of AIF Business Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).test("word-limit", "Brief Details Of AIF Business Experience cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).test("word-limit", "Area of Expertise cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
   });
 
   const {
@@ -299,6 +298,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
     setValue,
     register,
     reset,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -392,7 +392,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                     ml: '-1px'
                   }, '& .MuiFormLabel-asterisk': { display: 'none' }
                 }}
-                inputProps={{ maxLength: 200 }}
+                inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -409,7 +409,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 200 }}
+                inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -444,7 +444,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 200 }}
+                inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -491,8 +491,8 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 1000 }}
               />
+              {getWordCount(watch("description"), FIELD_LIMITS.LONG_TEXT)}
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -510,8 +510,8 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 1000 }}
               />
+              {getWordCount(watch("areaOfExpertise"), FIELD_LIMITS.LONG_TEXT)}
             </Grid>
             {investmentAssociateFormData.id && (
               <Grid item xs={12}>

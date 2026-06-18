@@ -143,6 +143,14 @@ const authticationSlice = createSlice({
     setActiveRole: (state, action: PayloadAction<string>) => {
       state.activeRole = action.payload;
       localStorage.setItem("activeRole", action.payload);
+    },
+    setSessionTokens: (state, action: PayloadAction<{ token: string; refreshToken?: string }>) => {
+      state.token = action.payload.token;
+      localStorage.setItem('token', action.payload.token);
+      if (action.payload.refreshToken) {
+        localStorage.setItem('refreshToken', action.payload.refreshToken);
+      }
+      state.availableRoles = decodeRolesFromToken(action.payload.token);
     }
   },
   extraReducers: builder => {
@@ -226,7 +234,7 @@ const authticationSlice = createSlice({
 })
 
 export default authticationSlice.reducer
-export const { setErrorMessage, clearErrorMessage, clearMfaPending, setActiveRole } = authticationSlice.actions
+export const { setErrorMessage, clearErrorMessage, clearMfaPending, setActiveRole, setSessionTokens } = authticationSlice.actions
 
 export const selectAuthenticatedUser = (state: RootState) => state.auth;
 export const selectMfaPending = (state: RootState) => state.auth.mfaPending;
