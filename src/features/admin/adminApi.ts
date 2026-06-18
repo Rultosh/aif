@@ -23,6 +23,14 @@ export function whoAmI() {
   });
 }
 
+export function updateUserProfile(payload: { username?: string; phoneNumber?: string; contactPerson?: string }) {
+  return api({
+    method: 'patch',
+    url: `api/users/me`,
+    data: payload,
+  });
+}
+
 export function patchUserOtpRequired(userId: number, otpRequired: boolean) {
   return api({
     method: 'patch',

@@ -25,9 +25,9 @@ const RoleComponent = (props: any) => {
 
     // Context-aware role lists:
     // - Pending approval (REGISTERED users) → only USER (they are fund applicants)
-    // - Operational users → no USER (they are staff)
-    const rolesForPending = ['USER', 'DISABLED'];
-    const rolesForOperational = ['USERADMIN', 'CHECKER', 'MAKER', 'CHECKER,USERADMIN', 'DISABLED', 'ADMIN'];
+    // - Operational users → no USER (they are staff), no DISABLED (use enable/disable buttons instead)
+    const rolesForPending = ['USER'];
+    const rolesForOperational = ['USERADMIN', 'CHECKER', 'MAKER', 'CHECKER,USERADMIN', 'ADMIN'];
     const roles = isRegistered ? rolesForPending : rolesForOperational;
 
     const [selectedRole, setSelectedRole] = useState<string>(

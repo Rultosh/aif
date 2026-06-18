@@ -1,17 +1,13 @@
-import { Box, Button, Card, CardActionArea, CardContent, Container, FormControl, FormControlLabel, FormLabel, Grid, Link, Radio, RadioGroup, ToggleButton, Toolbar, Typography, Paper, IconButton, Stack } from '@mui/material';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import React, * as Rect from 'react'
-import { useState } from "react"
+import { Box, Button, Container, Toolbar, Typography, Paper, IconButton, Stack } from '@mui/material';
+import { useAppSelector, useAppDispatch } from '../../app/hooks'
+import { updateResults } from './eligibilityResultsSice'
+import { useEffect } from 'react'
+import CloseIcon from '@mui/icons-material/Close';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { useNavigate } from 'react-router-dom';
 import successImg from '../../images/success.png'
 import failureImg from '../../images/failure.png'
 import loadingImg from '../../images/loading.png'
-import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import { fetchResults, updateResults } from './eligibilityResultsSice'
-import { useEffect } from 'react'
-import CloseIcon from '@mui/icons-material/Close';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { useNavigate } from 'react-router-dom';
 
 
 const EligibilityResults = () => {
@@ -19,7 +15,6 @@ const EligibilityResults = () => {
     const isEligible = useAppSelector(state => state.eligibilityResults.eligibleToApply)
     const isLoading = useAppSelector(state => state.eligibilityResults.loading)
     const tempRes = useAppSelector(state => state.eligibilityQuestioner.results)
-    const scheme = useAppSelector(state => state.eligibilityQuestioner.scheme)
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
@@ -27,20 +22,6 @@ const EligibilityResults = () => {
     useEffect(() => {
         dispatch(updateResults(tempRes))
     }, [])
-
-    let resultTextSuccess = {
-        "Fund of funds": ["Fund of Funds"],
-        "Asipre for Start-ups": ["Asipre for Start-ups"],
-        "UP Start-up Fund": ["UP Start-up Fund"],
-        "Odisha Startup Fund": ["Odisha Startup Fund"]
-    }
-
-    let resultText = {
-        "Fund of funds": ["NPS Trust's Fund of Funds for Startups (FFS) is intended to support AIFs to invest in startups.", "Based on Your size and/or structure, you do not meet the minimum eligible requirement for contribution under FFS."],
-        "Aspire for MSME": ["NPS Trust’s ASPIRE fund is intended to support AIFs to invest in MSME.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under ASPIRE fund scheme."],
-        "UP Start-up Fund": ["NPS Trust’s UP Startup fund is intended to support AIFs to invest in startups.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under UP Startup fund scheme."],
-        "Odisha Startup Fund": ["NPS Trust’s UP Startup fund is intended to support AIFs to invest in startups.", "Based on your size and/or structure, you do not meet the minimum eligible requirement for contribution under UP Startup fund scheme."]
-    }
 
 
 
@@ -100,8 +81,6 @@ const EligibilityResults = () => {
                                         </Typography>
                                         <Typography variant="body1" sx={{ color: '#64748b', mb: 4, lineHeight: 1.7 }}>
                                             You meet the minimum eligibility requirement for applying for contribution under NPS Bharat Fund of Funds. Please login/sign-up to proceed.
-                                            {/* Based on your size and structure, you may be eligible for contribution through NPS Trust's */}
-                                            {/* <span style={{ color: '#363062', fontWeight: 700, marginLeft: '4px' }}>{scheme}</span>. */}
                                         </Typography>
 
                                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ justifyContent: 'center' }}>
@@ -149,12 +128,6 @@ const EligibilityResults = () => {
                                         <Typography variant="body1" sx={{ color: '#475569', mb: 1, fontWeight: 600 }}>
                                             You do not meet the minimum eligibility requirement for applying for contribution under NPS Bharat Fund of Funds.
                                         </Typography>
-                                        {/* <Typography variant="body1" sx={{ color: '#475569', mb: 1, fontWeight: 600 }}>
-                                            {resultText[scheme as keyof typeof resultText][0]}
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: '#64748b', mb: 4, lineHeight: 1.6 }}>
-                                            {resultText[scheme as keyof typeof resultText][1]}
-                                        </Typography> */}
 
                                         <Button
                                             startIcon={<HelpOutlineIcon />}

@@ -14,6 +14,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import { PrelimApplicationState, selectPrelimApplication } from "../prelimApplicationDataSlice";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
 
 interface InvestmentPastModelProps {
   investmentPastFormData: IInvestmentPast,
@@ -206,12 +207,11 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
   };
 
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
-  const htmlTagsNotAllowed = "Tags not allowed in input.";
-  const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/\*\+&@]+$/;
+
   const validationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-    briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).test("word-limit", "Business Introduction cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     dateOfInvestment: Yup.date()
       .nullable()
       .transform((curr, orig) => orig === '' ? null : curr)
@@ -233,9 +233,10 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     grossIrr: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Gross IRR is required").nullable(),
     timeTakenFromSourcingToClosure: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Time taken from sourcing to closure is required").min(0, "Time cannot be negative").nullable(),
     // conflictOfInterest: Yup.string().required("Conflict of Interest is required").nullable(),
-    stakeOfEmployee: Yup.string().nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    investmentStageFundingRound: Yup.string().required("Investment Stage / Funding Round is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-    investmentStageDealSourced: Yup.string().required("Deal Sourced Information is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    conflictOfInterest: Yup.string().test("word-limit", "Conflict Of Interest cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    stakeOfEmployee: Yup.string().nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    investmentStageFundingRound: Yup.string().required("Investment Stage / Funding Round is required").test("word-limit", "Investment Stage / Funding Round cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    investmentStageDealSourced: Yup.string().required("Deal Sourced Information is required").test("word-limit", "Deal Sourced Information cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
   });
 
   const {
@@ -244,6 +245,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     getValues,
     register,
     reset,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -314,7 +316,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               variant="outlined"
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 200 }}
+              inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -358,7 +360,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               variant="outlined"
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 200 }}
+              inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
             />
           </Grid>
           {/* <Grid item xs={12} md={6}>
@@ -437,8 +439,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.briefProfile?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 1000 }}
             />
+            {getWordCount(watch("briefProfile"), FIELD_LIMITS.LONG_TEXT)}
           </Grid>
 
           {isEquityOriented && (<Grid item xs={12} md={4}>
@@ -500,7 +502,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               variant="outlined"
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 200 }}
+              inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -516,7 +518,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               variant="outlined"
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 200 }}
+              inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -567,8 +569,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.investmentStageFundingRound?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 1000 }}
             />
+            {getWordCount(watch("investmentStageFundingRound"), FIELD_LIMITS.LONG_TEXT)}
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -585,8 +587,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.investmentStageDealSourced?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 1000 }}
             />
+            {getWordCount(watch("investmentStageDealSourced"), FIELD_LIMITS.LONG_TEXT)}
           </Grid>
           <Grid item xs={12} md={12}>
             <TextField
@@ -623,8 +625,8 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
               helperText={errors.conflictOfInterest?.message as string}
               onChange={handleChange}
               sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-              inputProps={{ maxLength: 1000 }}
             />
+            {getWordCount(watch("conflictOfInterest"), FIELD_LIMITS.LONG_TEXT)}
           </Grid>
 
           {/* <Grid item xs={12}>

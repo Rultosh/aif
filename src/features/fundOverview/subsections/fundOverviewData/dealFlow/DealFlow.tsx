@@ -15,6 +15,7 @@ import FileUploadService from "../../../../../components/FileUploadService";
 import { useParams } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import DocumentChip from "../../../../../components/DocumentChip";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
 
 export type DealFlowSubmitResult = true | { ok: false; highlightPanel: '3' | '4' | '7' };
 
@@ -62,25 +63,21 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication, { keepDirtyValues: !isInitialLoad });
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[\s\S]*$/;
+
     const validationSchema = Yup.object().shape({
-        dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        //dfCurrentPipeline: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        // dfSourcingBreakdown: Yup.string().required("This field is required").nullable(),
-        // dfConversionRatio: Yup.number().required("This field is required").nullable(),
-        dfMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfTotalDealsEvaluated: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
+        dfMeetingFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
+        dfInvestigationDetails: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
+        dfExclusiveVC: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
         dfDirectorshipsPolicy: isEquityOriented
-            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)")
+            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT))
             : Yup.string().nullable(),
-        dfConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        //dfValuationReport: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        dfDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        dfConsolidatedInfo: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
+        dfNAVFrequency: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
+        dfNAVGuidelines: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
+        dfMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
+        dfContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
+        dfDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)),
     });
 
     const {
@@ -266,8 +263,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
         return (
             <Box sx={{ p: 3, textAlign: 'center' }}>
                 <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>
-                <Button 
-                    variant="outlined" 
+                <Button
+                    variant="outlined"
                     onClick={() => {
                         if (Number(prelimAppicationId)) {
                             dispatch(getPrelimApplicationData(wrapArgument(actionUid, Number(prelimAppicationId))));
@@ -295,8 +292,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfTotalDealsEvaluated?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("dfTotalDealsEvaluated"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -310,8 +307,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfMeetingFrequency?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("dfMeetingFrequency"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -325,8 +322,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfInvestigationDetails?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("dfInvestigationDetails"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -340,8 +337,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfExclusiveVC?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("dfExclusiveVC"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     {isEquityOriented && (<Grid item xs={12} sx={qSx}>
@@ -355,8 +352,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfDirectorshipsPolicy?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("dfDirectorshipsPolicy"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
                     )}
                     <Grid item xs={12} sx={qSx}>
@@ -370,8 +367,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfMonitoringActivities?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("dfMonitoringActivities"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -385,8 +382,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfContributorTerms?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("dfContributorTerms"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -400,8 +397,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.dfDecisionApprovals?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("dfDecisionApprovals"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12}>
@@ -418,8 +415,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfConsolidatedInfo?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("dfConsolidatedInfo"), FIELD_LIMITS.LONG_TEXT)}
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>b) Frequency of NAV reporting (quarterly/ half-yearly).</Typography>
                             <TextField
@@ -431,8 +428,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfNAVFrequency?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("dfNAVFrequency"), FIELD_LIMITS.LONG_TEXT)}
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>c) Guidelines for calculating NAV.</Typography>
                             <TextField
@@ -444,8 +441,8 @@ const DealFlow = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.dfNAVGuidelines?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("dfNAVGuidelines"), FIELD_LIMITS.LONG_TEXT)}
                         </Box>
                     </Grid>
 

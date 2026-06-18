@@ -11,6 +11,7 @@ import { resetUserPasswordAsync, selectedforgotPassword } from '../forgotPasswor
 import { defaultIResetPassword } from './IResetPassword'
 import signupBg from '../../images/signup_ai.jpeg';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import { FIELD_LIMITS } from "../../utils/validationUtils";
 
 const ResetPassword = () => {
     const fieldSx = {
@@ -167,7 +168,7 @@ const ResetPassword = () => {
                                             sx={fieldSx}
                                             error={!!error}
                                             helperText={error}
-                                            inputProps={{maxLength :200}}
+                                            inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
                                         />
                                     </Grid>
 

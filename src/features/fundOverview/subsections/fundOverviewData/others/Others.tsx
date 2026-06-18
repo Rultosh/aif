@@ -12,6 +12,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useParams } from 'react-router-dom';
 import DocumentChip from "../../../../../components/DocumentChip";
 import * as Yup from "yup";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -42,14 +43,13 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
             reset(prelimApplicationState.prelimApplication, { keepDirtyValues: !isInitialLoad });
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[\s\S]*$/;
     const validationSchema = Yup.object().shape({
-       // otExternalFirms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        //otPlacementAgents: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        otDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
-        //otEmployeeCost: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+        // otExternalFirms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+        otMonitoringActivities: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+        otContributorTerms: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+        //otPlacementAgents: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+        otDecisionApprovals: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+        //otEmployeeCost: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     });
 
     const {
@@ -110,8 +110,8 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
         return (
             <Box sx={{ p: 3, textAlign: 'center' }}>
                 <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>
-                <Button 
-                    variant="outlined" 
+                <Button
+                    variant="outlined"
                     onClick={() => {
                         if (Number(prelimAppicationId)) {
                             dispatch(getPrelimApplicationData(wrapArgument(actionUid, Number(prelimAppicationId))));
@@ -139,7 +139,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otMonitoringActivities?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
+                            inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
                         />
                     </Grid>
 
@@ -154,7 +154,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otContributorTerms?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
+                            inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
                         />
                     </Grid>
 
@@ -169,7 +169,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otDecisionApprovals?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
+                            inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
                         />
                     </Grid>
 

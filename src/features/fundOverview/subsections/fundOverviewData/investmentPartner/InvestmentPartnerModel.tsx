@@ -19,6 +19,7 @@ import { IInvestmentResponsibleAsNonLead, defaultIIInvestmentResponsibleAsNonLea
 import Moment from 'moment';
 import DocumentChip from "../../../../../components/DocumentChip";
 import DownloadIcon from '@mui/icons-material/Download';
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
 
 
 interface InvestmentPartnerModelProps {
@@ -134,9 +135,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     setShowNonLeadForm(false);
     setEditingNonLeadInvestment(defaultIIInvestmentResponsibleAsNonLead);
   };
-  const freeformRegx = /^[a-zA-Z0-9_\.\-, _()/\*\+&@]+$/;
   const investmentValidationSchema = Yup.object().shape({
-    nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)"),
+    nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     amountInvested: Yup.number().typeError("Must be a number").required("Amount is required").min(0, "Amount cannot be negative"),
     dateOfInvestment: Yup.date()
       .nullable()
@@ -149,11 +149,11 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
       .typeError("Please enter a valid date")
       .required("Date of exit or write off is required"),
     // exitOrWriteOff: Yup.string().required("Required").nullable(),
-    moic: Yup.string().required("MOIC is required").nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
+    moic: Yup.string().required("MOIC is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     irrPercent: Yup.number().typeError("Must be a number").required("IRR % is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100").nullable(),
     comment: Yup.string().required("Comment on the Exit/Write off Process is required").nullable(),
-    howWasTheDealSourced: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
-    addressOfCompany: Yup.string().required("Address of company is required").nullable().matches(freeformRegx, "No Spl. charactors accepted,except (, . - _)")
+    howWasTheDealSourced: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    addressOfCompany: Yup.string().required("Address of company is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed")
   });
 
   const {
@@ -168,8 +168,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     mode: "all",
   });
 
-  console.log("Submit Error", leadErrors);
-
   const {
     control: nonLeadControl,
     register: nonLeadRegister,
@@ -181,8 +179,6 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     resolver: yupResolver(investmentValidationSchema),
     mode: "all",
   });
-
-  console.log("Submit Error", leadErrors);
 
   const onLeadSubmit = (data: any) => {
     const payload = { ...data, teamMemberId: Number(investmentPartnerFormData.id) };
@@ -272,28 +268,27 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   };
 
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
-  const htmlTagsNotAllowed = "Tags not allowed in input.";
 
   const validationSchema = Yup.object().shape({
     title: Yup.string()
       .matches(/^[A-Za-z. ]*$/, 'Please enter valid title')
       .required("Title is required")
       .nullable(),
-    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
-    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
+    name: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    designation: Yup.string().required("Designation is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     age: Yup.number()
       .typeError("Age must be a number")
       .min(0, "Age cannot be negative")
       .max(100, "Age cannot be greater than 100")
       .required("Age is required")
       .nullable(),
-    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
-    description: Yup.string().required("Brief details of AIF Business Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
+    qualification: Yup.string().required("Qualification is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
+    description: Yup.string().required("Brief details of AIF Business Experience is required").test("check-script", htmlTagsNotAllowed, checkScript).test("word-limit", "Brief details of AIF Business Experience cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     vcpeExperience: Yup.string().required("Experience in AIF Business is required").nullable(),
-    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
+    areaOfExpertise: Yup.string().required("Area of Expertise is required").test("check-script", htmlTagsNotAllowed, checkScript).test("word-limit", "Area of Expertise cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     yearsWorkedTogether: Yup.number().transform((val) => (isNaN(val) ? undefined : val))
       .min(0, "Years worked together cannot be negative").required("No. Of Years Worked Together Among Partners is required"),
-    legalCasesPending: Yup.string().required("Details Of Legal Cases Pending If Any In Court Of Law is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "No Spl. charactors accepted, except (, . - _)"),
+    legalCasesPending: Yup.string().required("Details Of Legal Cases Pending If Any In Court Of Law is required").test("check-script", htmlTagsNotAllowed, checkScript).test("word-limit", "Details Of Legal Cases Pending cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
   });
 
   const {
@@ -301,6 +296,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     setValue,
     register,
     reset,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -406,7 +402,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     ml: '-1px'
                   }, '& .MuiFormLabel-asterisk': { display: 'none' }
                 }}
-                inputProps={{ maxLength: 200 }}
+                inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -423,7 +419,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 200 }}
+                inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -458,7 +454,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 200 }}
+                inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -505,8 +501,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 1000 }}
               />
+              {getWordCount(watch("description"), FIELD_LIMITS.LONG_TEXT)}
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -524,8 +520,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 1000 }}
               />
+              {getWordCount(watch("areaOfExpertise"), FIELD_LIMITS.LONG_TEXT)}
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
@@ -560,8 +556,8 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true, required: true }}
                 sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                inputProps={{ maxLength: 1000 }}
               />
+              {getWordCount(watch("legalCasesPending"), FIELD_LIMITS.LONG_TEXT)}
             </Grid>
 
             {investmentPartnerFormData.id && <>
@@ -604,7 +600,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.nameOfCompany?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                        inputProps={{ maxLength: 200 }}
+                        inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
                       />
                     </Grid>
                     <Grid item xs={12} md={3}>
@@ -700,7 +696,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.moic?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                        inputProps={{ maxLength: 200 }}
+                        inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -716,7 +712,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.addressOfCompany?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                        inputProps={{ maxLength: 1000 }}
+                        inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -732,7 +728,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.comment?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                        inputProps={{ maxLength: 1000 }}
+                        inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -748,7 +744,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                         helperText={leadErrors.howWasTheDealSourced?.message as string}
                         InputLabelProps={{ shrink: true, required: true }}
                         sx={{ ...fieldSx, '& .MuiFormLabel-asterisk': { display: 'none' } }}
-                        inputProps={{ maxLength: 1000 }}
+                        inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
                       />
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -860,7 +856,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
                       <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Experience</Typography>
                       {investmentPartnerFormData.id ? (
-                        <UploadComponents id={`sdPartnerResume${investmentPartnerFormData.id}`} signed={false} />
+                        <DocumentChip label="Upload Document" validationTitle="Resume_Testing_document" id={`sdPartnerResume${investmentPartnerFormData.id}`} />
                       ) : (
                         <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
                           Please save the form to upload documents.

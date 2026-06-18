@@ -45,7 +45,7 @@ import { ReactComponent as SettingCustomIcon } from '../../images/setting.svg';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import { fetchMakerUsers, fetchCheckerUsers, fetchUserAdminUsers, fetchPensionFundUsers, postWorkflowAction, deletePrelimApplication, softDeletePrelimApplication } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
+import { fetchMakerUsers, fetchCheckerUsers, fetchUserAdminUsers, fetchPensionFundUsers, postWorkflowAction, deletePrelimApplication, softDeletePrelimApplication, bulkDeletePrelimApplications } from '../fundOverview/subsections/fundOverviewData/fundOverviewDataApi';
 import { hasCheckerAndUserAdmin, normalizeWorkflowStatus } from '../../lib/workflowStatus';
 import FileUploadService from '../../components/FileUploadService';
 import { shouldShowListPaginationFooter } from '../../lib/listPaginationVisibility';
@@ -190,6 +190,7 @@ export const Home = (pros: any) => {
     const [workflowSectionTab, setWorkflowSectionTab] = useState<string>('all');
     const navigate = useNavigate()
     const [pageInfoSelect, setPageInfoSelect] = useState(pageInfo.pageSize)
+    const [selectedFailedAppIds, setSelectedFailedAppIds] = useState<Set<number>>(new Set());
     const totalEntries = prelimApplications.totalEntries || 0;
     const listQuery = useMemo((): IPageInfo => ({
         ...pageInfo,
@@ -605,6 +606,7 @@ export const Home = (pros: any) => {
     };
 
     const tableHeadersWorkflow = [
+        ...(hasActiveRole('CHECKER') && workflowSectionTab === 'failedApplication' ? ["Select"] : []),
         "AIF Name",
         "Contact Person",
         "Status",
@@ -618,7 +620,7 @@ export const Home = (pros: any) => {
         "Download",
         "Query",
         "History",
-        ...(hasActiveRole('CHECKER') && workflowSectionTab === 'failedApplication' ? ["Archive"] : []),
+        // Archive column removed
         ...(hasActiveRole('ADMIN') ? ["Delete"] : []),
     ];
     const tableHeadersWorkflowApplicant = [
@@ -653,6 +655,41 @@ export const Home = (pros: any) => {
     const headerComponent = tableHeaders.map((label, i) => {
         const sortKey = SORTABLE_HEADER_KEYS[label];
         const isDownloadCol = label === 'Download';
+        const isSelectCol = label === 'Select';
+        
+        // Checkbox header for select all
+        if (isSelectCol) {
+            const filteredApps = getFilteredApplications();
+            const allSelected = filteredApps.length > 0 && 
+                filteredApps.every(row => row.id != null && selectedFailedAppIds.has(Number(row.id)));
+            
+            return (
+                <TableCell
+                    key={`${label}-${i}`}
+                    align="center"
+                    sx={{ fontWeight: '600', color: '#1a1a1a', p: '12px 10px', fontSize: '13px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#e9e9f6' }}
+                >
+                    <input
+                        type="checkbox"
+                        checked={allSelected}
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                const failedIds = new Set(
+                                    filteredApps
+                                        .filter(row => row.id != null)
+                                        .map(row => Number(row.id))
+                                );
+                                setSelectedFailedAppIds(failedIds);
+                            } else {
+                                setSelectedFailedAppIds(new Set());
+                            }
+                        }}
+                        style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                    />
+                </TableCell>
+            );
+        }
+        
         return (
             <TableCell
                 key={`${label}-${i}`}
@@ -688,6 +725,30 @@ export const Home = (pros: any) => {
         setPageInfoSelect(updatedPageInfo.pageSize);
     }
 
+    const handleBulkDeleteFailedApps = async () => {
+        if (selectedFailedAppIds.size === 0) {
+            alert('Please select at least one application to delete.');
+            return;
+        }
+        
+        const confirmed = window.confirm(
+            `Are you sure you want to delete ${selectedFailedAppIds.size} selected application(s)?\n\nThis action cannot be undone. The application(s) will be permanently deleted.`
+        );
+        
+        if (!confirmed) return;
+        
+        try {
+            await bulkDeletePrelimApplications({ applicationIds: Array.from(selectedFailedAppIds) });
+            
+            setSelectedFailedAppIds(new Set());
+            dispatch(getPrelimApplicationList(wrapArgument(actionUid, listQuery)));
+            alert(`Successfully deleted ${selectedFailedAppIds.size} application(s).`);
+        } catch (error) {
+            console.error('Bulk delete error:', error);
+            alert('Failed to delete some applications. Please try again.');
+        }
+    };
+
     const isGoodToShowApplication = (row: IPrelimApplicationData) => {
         const statusUpper = normalizeWorkflowStatus(String(row.status ?? '').trim());
         if (hasActiveRole('CHECKER')) {
@@ -713,7 +774,7 @@ export const Home = (pros: any) => {
             || statusUpper === 'APPROVED_BY_PF'
             || statusUpper === 'REJECTED_BY_PF'
             || statusUpper === 'SANCTIONED')
-            && (hasActiveRole('CHECKER', 'MAKER') || hasCheckerAndUserAdmin(usersState.role || '')))
+            && (hasActiveRole('CHECKER', 'MAKER', 'ADMIN') || hasCheckerAndUserAdmin(usersState.role || '')))
             return true
         if ((statusUpper === 'USERADMIN_FORWARDED_TO_PF' || statusUpper === 'APPROVED_BY_PF' || statusUpper === 'REJECTED_BY_PF')
             && hasActiveRole('PENSION_FUND')
@@ -1160,6 +1221,25 @@ export const Home = (pros: any) => {
                         </Box>
                     </Paper>
                     )}
+                    
+                    {/* Bulk delete button - shows only when selections exist */}
+                    {hasActiveRole('CHECKER') && workflowSectionTab === 'failedApplication' && selectedFailedAppIds.size > 0 && (
+                        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end', gap: 2, alignItems: 'center' }}>
+                            <Typography variant="body2" sx={{ color: '#64748b' }}>
+                                {selectedFailedAppIds.size} application(s) selected
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                startIcon={<DeleteIcon />}
+                                onClick={handleBulkDeleteFailedApps}
+                                sx={{ textTransform: 'none', fontWeight: 600, borderRadius: '8px' }}
+                            >
+                                Delete Selected ({selectedFailedAppIds.size})
+                            </Button>
+                        </Box>
+                    )}
+                    
                     <Paper elevation={0} sx={{
                         backgroundColor: '#ffffff',
                         borderRadius: '8px',
@@ -1198,6 +1278,27 @@ export const Home = (pros: any) => {
                                                     transition: 'background-color 0.2s ease'
                                                 }}
                                             >
+                                                {/* Checkbox column for failed applications (CHECKER only) */}
+                                                {hasActiveRole('CHECKER') && workflowSectionTab === 'failedApplication' && (
+                                                    <TableCell align="center" sx={{ p: '12px 10px' }}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={row.id != null && selectedFailedAppIds.has(Number(row.id))}
+                                                            onChange={(e) => {
+                                                                if (row.id != null) {
+                                                                    const newSelected = new Set(selectedFailedAppIds);
+                                                                    if (e.target.checked) {
+                                                                        newSelected.add(Number(row.id));
+                                                                    } else {
+                                                                        newSelected.delete(Number(row.id));
+                                                                    }
+                                                                    setSelectedFailedAppIds(newSelected);
+                                                                }
+                                                            }}
+                                                            style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                                                        />
+                                                    </TableCell>
+                                                )}
                                                 {row.stage === "PRELIM" ?
                                                     <TableCell align="left" component="th" scope="row" sx={{ p: '12px 10px' }}>
                                                         {isGoodToShowApplication(row) ?
@@ -1270,18 +1371,28 @@ export const Home = (pros: any) => {
                                                 </TableCell>
                                                 )}
                                                 <TableCell align="center" sx={{ verticalAlign: 'middle' }}>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, width: '100%' }}>
-                                                        <Tooltip title="Download Preview">
-                                                            <IconButton size="small" sx={{ color: '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
-                                                                <FileDownloadIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip title="Download ZIP">
-                                                            <IconButton size="small" sx={{ color: '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
-                                                                <FileDownloadIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </Box>
+                                                    {(() => {
+                                                        const isUnsubmitted = String(row.status || '').toUpperCase() === 'CREATED';
+                                                        const disableDownload = isUnsubmitted && !isApplicantUser;
+                                                        return (
+                                                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, width: '100%' }}>
+                                                                <Tooltip title={disableDownload ? "Not submitted yet" : "Download Preview"}>
+                                                                    <span>
+                                                                        <IconButton disabled={disableDownload} size="small" sx={{ color: disableDownload ? 'action.disabled' : '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
+                                                                            <FileDownloadIcon fontSize="small" />
+                                                                        </IconButton>
+                                                                    </span>
+                                                                </Tooltip>
+                                                                <Tooltip title={disableDownload ? "Not submitted yet" : "Download ZIP"}>
+                                                                    <span>
+                                                                        <IconButton disabled={disableDownload} size="small" sx={{ color: disableDownload ? 'action.disabled' : '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
+                                                                            <FileDownloadIcon fontSize="small" />
+                                                                        </IconButton>
+                                                                    </span>
+                                                                </Tooltip>
+                                                            </Box>
+                                                        );
+                                                    })()}
                                                 </TableCell>
                                                 <TableCell align="left">
                                                     <Badge
@@ -1308,19 +1419,7 @@ export const Home = (pros: any) => {
                                                     </IconButton>
                                                 </TableCell>
                                                 )}
-                                                {hasActiveRole('CHECKER') && checkerWorkflowTabForStatus(String(row.status), row) === 'failedApplication' && (
-                                                <TableCell align="center">
-                                                    <Tooltip title="Archive failed application">
-                                                        <IconButton
-                                                            size="small"
-                                                            sx={{ color: '#d32f2f', '&:hover': { backgroundColor: '#fef2f2' } }}
-                                                            onClick={() => handleSoftDeleteApplication(row)}
-                                                        >
-                                                            <DeleteIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </TableCell>
-                                                )}
+
                                                 {hasActiveRole('ADMIN') && (
                                                 <TableCell align="center">
                                                     <Tooltip title="Delete application">

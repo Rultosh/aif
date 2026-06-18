@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
 import FileUploadService from "../../../../../components/FileUploadService";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -85,38 +86,38 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
             }, 80);
         }
     }, [prelimApplicationState.prelimApplication?.id, prelimApplicationState.status.fetchStatus]);
-    const freeformRegx = /^[\s\S]*$/; // Allow all characters for multiline fields, or more permissive set
+
     const aifCategoryType = prelimApplicationState.prelimApplication?.aifCategoryType || 'Equity Oriented AIF';
     const isEquityOriented = ['Equity Oriented AIF', 'Equity Oriented Fund'].includes(String(aifCategoryType));
     const isDebtOriented = ['Debt Oriented AIF', 'Debt Oriented Fund'].includes(String(aifCategoryType));
 
     const validationSchema = Yup.object().shape({
-        isStrategyBasis: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isStrategyBasis: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
         // isFocusSectors: Yup.string().required("This field is required").nullable(),
-        isComparisonPast: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isComparisonPast: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
         // isSignificantChange: Yup.string().required("This field is required").nullable(),
-        //isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        //isSectorSituations: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
         isControlsRights: isEquityOriented
-            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            ? Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable()
             : Yup.string().nullable(),
         isRightsProtections: isDebtOriented
-            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            ? Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable()
             : Yup.string().nullable(),
         // isInvestmentPolicy: Yup.string().required("This field is required").nullable(),
-        // isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        // isRisksMitigation: Yup.string().required("This field is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
         isRolledOverInvestments: isEquityOriented
-            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            ? Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable()
             : Yup.string().nullable(),
-        isGrossReturnObjective: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isGrossReturnObjective: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
         isTargetInvestmentSize: isEquityOriented
-            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            ? Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable()
             : Yup.string().nullable(),
         isTargetInvestmentSizePerTransaction: isDebtOriented
-            ? Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted")
+            ? Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable()
             : Yup.string().nullable(),
-        isTargetNumberInvestments: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isTargetNumberInvestments: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
         // isAverageHoldingPeriod: Yup.string().required("This field is required").nullable(),
-        isExitStrategy: Yup.string().required("This field is required").nullable().matches(freeformRegx, "No Spl. charactors accepted"),
+        isExitStrategy: Yup.string().required("This field is required").matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "This field cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
     });
 
     const {
@@ -262,8 +263,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
         return (
             <Box sx={{ p: 3, textAlign: 'center' }}>
                 <Typography variant="h6" color="error" gutterBottom>Failed to load data</Typography>
-                <Button 
-                    variant="outlined" 
+                <Button
+                    variant="outlined"
                     onClick={() => {
                         if (Number(prelimAppicationId)) {
                             dispatch(getPrelimApplicationData(wrapArgument(actionUid, Number(prelimAppicationId))));
@@ -291,8 +292,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isStrategyBasis?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("isStrategyBasis"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} sx={qSx}>
@@ -306,8 +307,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.isComparisonPast?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{ maxLength: 1000 }}
                         />
+                        {getWordCount(watch("isComparisonPast"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     {isEquityOriented && (
@@ -322,8 +323,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isControlsRights?.message as string}
                                 variant="outlined"
                                 sx={fieldSx}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("isControlsRights"), FIELD_LIMITS.LONG_TEXT)}
                         </Grid>
                     )}
 
@@ -339,8 +340,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isRightsProtections?.message as string}
                                 variant="outlined"
                                 sx={fieldSx}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("isRightsProtections"), FIELD_LIMITS.LONG_TEXT)}
                         </Grid>
                     )}
 
@@ -356,8 +357,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isRolledOverInvestments?.message as string}
                                 variant="outlined"
                                 sx={fieldSx}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("isRolledOverInvestments"), FIELD_LIMITS.LONG_TEXT)}
                         </Grid>
                     )}
 
@@ -375,8 +376,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isGrossReturnObjective?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("isGrossReturnObjective"), FIELD_LIMITS.LONG_TEXT)}
 
                             {isEquityOriented && (
                                 <>
@@ -390,8 +391,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                         helperText={errors.isTargetInvestmentSize?.message as string}
                                         variant="outlined"
                                         sx={{ ...fieldSx, mb: 2 }}
-                                        inputProps={{ maxLength: 1000 }}
                                     />
+                                    {getWordCount(watch("isTargetInvestmentSize"), FIELD_LIMITS.LONG_TEXT)}
                                 </>
                             )}
 
@@ -407,8 +408,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                         helperText={errors.isTargetInvestmentSizePerTransaction?.message as string}
                                         variant="outlined"
                                         sx={{ ...fieldSx, mb: 2 }}
-                                        inputProps={{ maxLength: 1000 }}
                                     />
+                                    {getWordCount(watch("isTargetInvestmentSizePerTransaction"), FIELD_LIMITS.LONG_TEXT)}
                                 </>
                             )}
 
@@ -422,8 +423,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isTargetNumberInvestments?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("isTargetNumberInvestments"), FIELD_LIMITS.LONG_TEXT)}
 
                             <Typography variant="body2" sx={{ ...labelSx, mt: 2 }}>d) Exit strategy</Typography>
                             <TextField
@@ -435,8 +436,8 @@ const InvestmentStrategy = forwardRef((props: PrelimApplicationProps, ref) => {
                                 helperText={errors.isExitStrategy?.message as string}
                                 variant="outlined"
                                 sx={{ ...fieldSx, mb: 2 }}
-                                inputProps={{ maxLength: 1000 }}
                             />
+                            {getWordCount(watch("isExitStrategy"), FIELD_LIMITS.LONG_TEXT)}
                         </Box>
                     </Grid>
 

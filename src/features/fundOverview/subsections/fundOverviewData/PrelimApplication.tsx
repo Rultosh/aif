@@ -21,6 +21,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { selectUsers } from '../../../admin/adminSlice';
 import { selectSelfRatings } from "../selfRating/selfRatingSlice";
 import { fetchSelfRatingAsync } from "../selfRating/selfRatingSlice";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../utils/validationUtils";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -41,7 +42,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const selectedScheme = useAppSelector(state => state.eligibilityQuestioner.scheme);
     const prelimApplicationState: PrelimApplicationState = useAppSelector(selectPrelimApplication);
     const [prelimApplicationFormData, setPrelimApplicationFormData] = useState<IPrelimApplicationData>(prelimApplicationState.prelimApplication || defaultIPrelimApplicationData);
-    console.log('prelimApplicationState', prelimApplicationState)
     const [actionUid] = useState(uuid());
     const [prelimAppicationId, setPrelimApplicationId] = useState(props.prelimApplicationId);
 
@@ -102,7 +102,6 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     const [aifNameData, setAifNameData] = useState('');
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE && prelimApplicationState.prelimApplication?.id) {
-            console.log('Syncing PrelimApplicationData...', prelimApplicationState.prelimApplication)
             let data = { ...prelimApplicationState.prelimApplication };
             const initialAssessmentFundTypeRaw = selfRatingState?.selfRatings?.fundType;
             const initialAssessmentFundType =
@@ -111,7 +110,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                     : initialAssessmentFundTypeRaw === 'Debt Oriented Fund'
                         ? 'Debt Oriented AIF'
                         : initialAssessmentFundTypeRaw;
-            
+
             // Auto-populate from user state if field is empty
             if (!data.nameOfTheFund && usersState.me?.companyName) {
                 data.nameOfTheFund = usersState.me.companyName;
@@ -138,7 +137,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             if (data.sdFirstClosingDomesticAmountDate) {
                 data.sdFirstClosingDomesticAmountDate = dayjs(data.sdFirstClosingDomesticAmountDate as any);
             }
-            
+
             const isInitialLoad = !prelimApplicationFormData?.id;
             setPrelimApplicationFormData(data);
             reset(data, { keepDirtyValues: !isInitialLoad });
@@ -147,7 +146,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
 
         if (usersState.me) {
             setAifNameData(usersState.me.companyName || '');
-            
+
             // If the form data exists but name is missing, and we have user data, sync it
             if (prelimApplicationState.prelimApplication?.id && !prelimApplicationFormData.nameOfTheFund && usersState.me.companyName) {
                 setValue("nameOfTheFund", usersState.me.companyName, { shouldValidate: true });
@@ -176,7 +175,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         return Object.keys(current).some(key => {
             const val1 = current[key];
             const val2 = original[key];
-            
+
             // Handle dayjs objects
             if (dayjs.isDayjs(val1) || dayjs.isDayjs(val2)) {
                 return !dayjs(val1).isSame(dayjs(val2));
@@ -185,7 +184,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             // Normal comparison (handle null vs undefined vs "")
             const normalizedVal1 = (val1 === null || val1 === undefined) ? "" : String(val1);
             const normalizedVal2 = (val2 === null || val2 === undefined) ? "" : String(val2);
-            
+
             return normalizedVal1 !== normalizedVal2;
         });
     };
@@ -569,12 +568,11 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     // console.log((dealSubSectorValues as any)[String(prelimApplicationFormData?.dealSector || 0)]?.values, prelimApplicationFormData?.dealSubsector);
 
     const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
-    const htmlTagsNotAllowed = "Tags not allowed in input.";
 
     const validationSchema = Yup.object().shape({
-        nameOfTheFund: Yup.string().required("Name of the Fund is required").matches(/^[a-zA-Z0-9 /\\-]*$/, "Only alphanumeric characters, / and - are allowed").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        sponsor: Yup.string().required("Sponsor is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        investmentManager: Yup.string().required("Investment Manager is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        nameOfTheFund: Yup.string().required("Name of the Fund is required").test("check-script", htmlTagsNotAllowed, checkScript).matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").nullable(),
+        sponsor: Yup.string().required("Sponsor is required").test("check-script", htmlTagsNotAllowed, checkScript).matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").max(FIELD_LIMITS.SHORT_TEXT, "Sponsor cannot exceed " + FIELD_LIMITS.SHORT_TEXT + " characters").nullable(),
+        investmentManager: Yup.string().required("Investment Manager is required").test("check-script", htmlTagsNotAllowed, checkScript).matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").max(FIELD_LIMITS.SHORT_TEXT, "Investment Manager cannot exceed " + FIELD_LIMITS.SHORT_TEXT + " characters").nullable(),
         fundManager: Yup.string().required("Fund Manager is required").nullable(),
         // dealType: Yup.string(),
         // impact: Yup.string(),
@@ -586,22 +584,16 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
             .min(new Date(2020, 0, 1), "Date cannot be before 01/01/2020")
             .max(new Date(), "Date cannot be a future date")
             .required("This value is required"),
-        dealSector: Yup.string().required("Deal Sector is required").nullable(),
+        dealSector: Yup.string().required("Deal Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "Deal Sector cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
         // dealSubsector: Yup.string().required("Deal Sub Sector is required").nullable(),
-        nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        contributionSought: Yup.string().required("Contribution Sought is required").test("test-name", "Enter value that cannot exceed 25% of target corpus", function (value: any) {
-            let sdTotalTargetCorpusVal = Number(prelimApplicationFormData.sdTotalTargetCorpus || '0');
-            let contributionSoughtVal = Number(value || '0');
-            let sdTotalTargetCorpusValCalc = sdTotalTargetCorpusVal * 0.25; // Not more than 25%
-            if (sdTotalTargetCorpusValCalc < contributionSoughtVal) {
-                return false;
-            }
-            return true;
-        }).test("max-value", "Value cannot exceed 10000", (value) => {
+        nameOfTrustee: Yup.string().required("Name of Trustee is required").test("check-script", htmlTagsNotAllowed, checkScript).matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").max(FIELD_LIMITS.SHORT_TEXT, "Name of Trustee cannot exceed " + FIELD_LIMITS.SHORT_TEXT + " characters").nullable(),
+        contributionSought: Yup.string().required("Contribution Sought is required").test("max-value", "Contribution Sought cannot exceed Total Target Corpus", function (value) {
             if (!value) return true;
-            return parseFloat(value) <= 10000;
+            const targetCorpus = this.parent.sdTotalTargetCorpus;
+            if (targetCorpus === undefined || targetCorpus === null) return true;
+            return parseFloat(value) <= parseFloat(targetCorpus);
         }).nullable(),
-        termOfFund: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Term of Fund must be a number").required("Term of Fund is required").min(0, "Negative values not allowed").max(200, "Term of Fund cannot exceed 200"),
+        termOfFund: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Term of Fund must be a number").required("Term of Fund is required").min(0, "Negative values not allowed").max(FIELD_LIMITS.SHORT_TEXT, "Term of Fund cannot exceed 200"),
         commitmentPeriod: Yup.number()
             .transform((val) => (isNaN(val) ? undefined : val))
             .typeError("Commitment Period must be a number")
@@ -620,7 +612,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         preferredReturn: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Preferred Return must be a number").required("Preferred Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         managementFees: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Management Fees must be a number").required("Management Fees is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         carriedInterest: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Carried Interest must be a number").required("Carried Interest is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
-        description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
+        description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "Description cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
         // investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
         sdDescription: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Capital raised till date must be a number").required("Capital raised till date is required").min(0, "Negative values not allowed"),
         sdTargetCorpusDomestic: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic must be a number").required("Domestic is required").min(0, "Negative values not allowed"),
@@ -831,7 +823,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
                         />
+                        {getCharCount(prelimApplicationFormData.sponsor, FIELD_LIMITS.SHORT_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} md={4}>
@@ -847,7 +841,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
                         />
+                        {getCharCount(prelimApplicationFormData.investmentManager, FIELD_LIMITS.SHORT_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} md={4}>
@@ -982,7 +978,9 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             onChange={handleChange}
                             variant="outlined"
                             sx={fieldSx}
+                            inputProps={{ maxLength: FIELD_LIMITS.SHORT_TEXT }}
                         />
+                        {getCharCount(prelimApplicationFormData.nameOfTrustee, FIELD_LIMITS.SHORT_TEXT)}
                     </Grid>
 
                     <Grid item xs={12} md={4}>
@@ -1274,6 +1272,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             variant="outlined"
                             sx={fieldSx}
                         />
+                        {getWordCount(watch("dealSector"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
                     <Grid item xs={12} md={12}>
                         <TextField
@@ -1291,6 +1290,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                             variant="outlined"
                             sx={fieldSx}
                         />
+                        {getWordCount(watch("description"), FIELD_LIMITS.LONG_TEXT)}
                     </Grid>
 
                     {/* <Grid item xs={12}>

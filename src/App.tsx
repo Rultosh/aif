@@ -2,7 +2,7 @@ import './App.css';
 import Header from './components/Header'
 import EligibilityQuestioner from './features/eligibilityQuesioner/EligibilityQuestionerComponent'
 import EligibilityResults from './features/eligibilityResults/EligibilityResultsComponent'
-import { useState, useEffect, createContext, useContext } from "react"
+import { useState, useEffect } from "react"
 import { Route, Routes } from "react-router"
 import { useNavigate, useLocation } from 'react-router-dom';
 import Landing from './features/landing/LandingComponent'
@@ -10,7 +10,7 @@ import SignUp from './features/signUp/SignUpComponent'
 import ResetPassword from './features/resetPassword/ResetPasswordComponent'
 import ForgotPassword from './features/forgotPassword/ForgotPasswordComponent'
 import ChangePassword from './features/changePassword/ChangePasswordComponent'
-import { useAppSelector, useAppDispatch } from './app/hooks'
+import { useAppSelector } from './app/hooks'
 import FundOverview from './features/fundOverview/FundOverviewComponent';
 import Fund from './features/fundOverview/Fund'
 import SelfRating from './features/fundOverview/subsections/selfRating/SelfRating'
@@ -34,20 +34,15 @@ import DetailedApplication2J from './features/DetailedApplicationComponent/subse
 import DetailedApplication2K from './features/DetailedApplicationComponent/subsections/2K/detailedApplication2K';
 import InvestmentThemeOfFund from './features/DetailedApplicationComponent/InvestmentThemeOfFund/investmentThemeOfFund';
 import EngagementAndRole from './features/DetailedApplicationComponent/EngagementAndRole/engagementAndRole';
-import PrelimApp from './features/DetailedApplicationComponent/PrelimApp/prelimApp';
 import CarryDistribution from './features/DetailedApplicationComponent/CarryDistribution/carryDistribution'
 import DetailedApplicationComponent from './features/DetailedApplicationComponent/DetailedApplicationComponent';
 import { SidbiReference } from './features/detailedApplication/sidbiReference/SidbiReference';
-import { FeatureOfFunds } from './features/detailedApplication/featureOfFunds/featureOfFunds_dep';
 import { PrivateRoute } from './components/auth/PrivateRoute';
-import { AdminRoute } from './components/auth/AdminRoute';
 import { UserAdminRoute } from './components/auth/UserAdminRoute';
 import { CheckAuth } from '../src/app/api';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Alert, Button, Snackbar, Typography } from '@mui/material';
-import BackgroundPattern from './components/BackgroundPattern';
+import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { refreshAccessToken } from './app/api';
-// import useCookie, { getCookie } from 'react-use-cookie';
 
 const PUBLIC_AUTH_FLOW_PATHS = new Set([
   '/setPassword',
@@ -520,34 +515,132 @@ function App() {
             </Route>
           </Route>
         </Routes>
-        <Snackbar
+        <Dialog
           open={showExpiryDialog}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          autoHideDuration={null}
-        >
-          <Alert
-            severity="warning"
-            variant="filled"
-            sx={{ width: '100%', alignItems: 'center' }}
-            action={
-              <>
-                <Button onClick={logoutToLogin} color="inherit" size="small">
-                  Logout
-                </Button>
-                <Button onClick={refreshTokenManually} disabled={isRefreshing} color="inherit" size="small">
-                  {isRefreshing ? 'Refreshing...' : 'Refresh token'}
-                </Button>
-              </>
+          onClose={() => { }} // Prevent closing by clicking outside
+          disableEscapeKeyDown // Prevent ESC key from closing
+          maxWidth="sm"
+          fullWidth
+          BackdropProps={{
+            sx: {
+              backdropFilter: 'blur(8px)',
+              backgroundColor: 'rgba(15, 23, 42, 0.75)',
             }
-          >
-            <Typography sx={{ fontSize: 14 }}>
-              Your session will expire in less than 1 minute. You might lose unsaved information.
+          }}
+          PaperProps={{
+            sx: {
+              borderRadius: '12px',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35)',
+              overflow: 'hidden',
+            }
+          }}
+        >
+          <DialogTitle sx={{
+            backgroundColor: '#ff6b35',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            py: 2,
+            px: 3,
+            fontSize: '18px',
+            fontWeight: 700
+          }}>
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              width: '28px',
+              height: '28px',
+              color: '#ff6b35',
+              fontSize: '16px'
+            }}>
+              ⏰
+            </Box>
+            Session Expiring Soon
+          </DialogTitle>
+          <DialogContent sx={{ py: 3, px: 3, textAlign: 'left' }}>
+            <Typography variant="body1" sx={{ mb: 1, mt: 2, color: '#1e293b', fontWeight: 700, fontSize: '16px' }}>
+              Your session will expire in less than 1 minute.
             </Typography>
-            <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
-              Time remaining: {secondsRemaining}s
+            <Typography variant="body2" sx={{ mb: 3, color: '#64748b', fontSize: '14px', lineHeight: 1.5 }}>
+              You might lose unsaved information if you don't refresh your session.
             </Typography>
-          </Alert>
-        </Snackbar>
+            <Box sx={{
+              color: '#ff6b35',
+              fontWeight: 800,
+              fontSize: '24px',
+              textAlign: 'center',
+              py: 2.5,
+              px: 3,
+              backgroundColor: '#fff3e0',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1.5,
+              width: '100%',
+              boxSizing: 'border-box',
+              animation: 'beat 1s infinite alternate ease-in-out',
+              '@keyframes beat': {
+                '0%': { transform: 'scale(1)' },
+                '100%': { transform: 'scale(1.02)' }
+              }
+            }}>
+              ⏱️ {secondsRemaining}s remaining
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 0, gap: 1.5, justifyContent: 'flex-end' }}>
+            <Button
+              onClick={logoutToLogin}
+              variant="outlined"
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '14px',
+                color: '#64748b',
+                borderColor: '#cbd5e1',
+                px: 3,
+                py: 1,
+                '&:hover': {
+                  backgroundColor: '#f8fafc',
+                  borderColor: '#94a3b8',
+                  color: '#1e293b'
+                }
+              }}
+            >
+              Logout
+            </Button>
+            <Button
+              onClick={refreshTokenManually}
+              disabled={isRefreshing}
+              variant="contained"
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '14px',
+                px: 3,
+                py: 1,
+                backgroundColor: '#ff6b35',
+                boxShadow: 'none',
+                '&:hover': {
+                  backgroundColor: '#e55a1f',
+                  boxShadow: '0 4px 12px rgba(255, 107, 53, 0.3)',
+                },
+                '&:disabled': {
+                  backgroundColor: '#cbd5e1',
+                  color: '#94a3b8'
+                }
+              }}
+            >
+              {isRefreshing ? '🔄 Refreshing...' : '✓ Refresh Session'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </ThemeProvider>
   );

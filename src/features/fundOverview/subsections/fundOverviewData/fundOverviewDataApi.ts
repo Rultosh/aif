@@ -125,6 +125,14 @@ export function softDeletePrelimApplication(prelimAppId: number) {
   });
 }
 
+export function bulkDeletePrelimApplications(payload: { applicationIds: number[] }) {
+  return api({
+    method: 'post',
+    url: `/api/prelims/bulk-soft-delete`,
+    data: payload
+  });
+}
+
 export function fetchMakerUsers() {
   return api({
     method: 'get',

@@ -19,6 +19,7 @@ import {
     DialogActions,
     IconButton,
     Divider,
+    Chip,
 } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -27,7 +28,7 @@ import { useAppSelector, useAppDispatch } from '../../app/hooks'
 import React, * as Rect from 'react'
 import uuid from "react-uuid";
 import NavigationBar from '../../components/NavigationBar'
-import { deleteUserAsync, fetchUsersAsync, selectUsers, updateUserOtpRequiredAsync } from './adminSlice'
+import { deleteUserAsync, fetchUsersAsync, selectUsers, updateUserOtpRequiredAsync, updateUserRolesAsync } from './adminSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
 import { Delete, Edit, InfoOutlined, Close as CloseDialogIcon } from '@mui/icons-material'
@@ -45,7 +46,7 @@ const Admin = (props: any) => {
     const dispatch = useAppDispatch()
     const [open, setOpen] = Rect.useState(false);
     const handleClose = () => setOpen(false);
-    const [selectedRow , setSelectedRow] = useState({} as IUser);
+    const [selectedRow, setSelectedRow] = useState({} as IUser);
     const [openAddOperational, setOpenAddOperational] = useState(false);
     const [detailUser, setDetailUser] = useState<IUser | null>(null);
     const navigate = useNavigate();
@@ -55,14 +56,13 @@ const Admin = (props: any) => {
         return String(v);
     };
 
-    function handleOpen(row:IUser)
-    {
+    function handleOpen(row: IUser) {
         setSelectedRow(row)
         setOpen(true);
     }
 
     useEffect(() => {
-        if(props.checkUnAuth){
+        if (props.checkUnAuth) {
             navigate('/login')
         }
     })
@@ -81,12 +81,9 @@ const Admin = (props: any) => {
 
     }, [open])
 
-
     function handleSubmitForm() {
         //controller.save(formData);
     }
-
-
     /* const handleChange = (ev: any) => {
          ev.preventDefault();
          let copiedValue = { ...formData }
@@ -108,7 +105,6 @@ const Admin = (props: any) => {
         "Email OTP",
         "Approve",
         "Set password email",
-        "Delete",
     ] as const;
 
     const headerCellSx = {
@@ -141,12 +137,10 @@ const Admin = (props: any) => {
         if (row.id == null) {
             return;
         }
-        
         // Check if user has applications
         try {
             const response = await getUserApplicationCount(Number(row.id));
             const count = response.data;
-            
             setUserToDelete(row);
             setUserApplicationCount(count || 0);
             setDeleteDialogOpen(true);
@@ -193,12 +187,24 @@ const Admin = (props: any) => {
         usersState.users.filter((user) => String(user.role || "").toUpperCase() === "REGISTERED")
     );
     // Operational users: CHECKER, MAKER, USERADMIN, ADMIN, CHECKER+USERADMIN, DISABLED
-    const operationalUsers = sortByRegisteredOnAsc(
-        usersState.users.filter((user) => {
+    const operationalUsers = [...usersState.users]
+        .filter((user) => {
             const role = String(user.role || "").toUpperCase();
             return role !== "REGISTERED" && role !== "USER";
         })
-    );
+        .sort((a, b) => {
+            const roleA = String(a.role || "").toUpperCase();
+            const roleB = String(b.role || "").toUpperCase();
+            const isAActive = roleA !== "DISABLED";
+            const isBActive = roleB !== "DISABLED";
+
+            if (isAActive && !isBActive) return -1;
+            if (!isAActive && isBActive) return 1;
+
+            const aTime = a.registeredOn ? dayjs(a.registeredOn).valueOf() : 0;
+            const bTime = b.registeredOn ? dayjs(b.registeredOn).valueOf() : 0;
+            return aTime - bTime;
+        });
     // Applicant/registered users who have been approved (role = USER)
     const applicantUsers = sortByRegisteredOnAsc(
         usersState.users.filter((user) => String(user.role || "").toUpperCase() === "USER")
@@ -206,8 +212,8 @@ const Admin = (props: any) => {
     // Keep for backward compat (used in table count)
     const approvedUsers = [...operationalUsers, ...applicantUsers];
 
-    const headerAlign = (h: (typeof tableHeaders)[number]): 'left' | 'center' | 'right' => {
-        if (['Approve', 'Assign User Admin', 'Set password email', 'Delete', 'Email OTP'].includes(h)) return 'center';
+    const headerAlign = (h: string): 'left' | 'center' | 'right' => {
+        if (['Approve', 'Assign User Admin', 'Set password email', 'Delete', 'Email OTP', 'Status'].includes(h)) return 'center';
         if (['Id', 'Role', 'Registered'].includes(h)) return 'center';
         return 'left';
     };
@@ -223,82 +229,137 @@ const Admin = (props: any) => {
         </Box>
     );
 
-    const renderHeaderRow = () => (
-        <TableRow>
-            {tableHeaders.map((h) => (
-                <TableCell key={h} align={headerAlign(h)} sx={headerCellSx}>
-                    {h}
-                </TableCell>
-            ))}
-        </TableRow>
-    );
-
-    const renderActionCells = (row: IUser) => {
-        const roleUpper = String(row.role || '').toUpperCase();
-        const isApplicant = roleUpper === 'USER';
+    const renderHeaderRow = (userType: 'operational' | 'applicant') => {
+        const dynamicColumn = userType === 'operational' ? 'Status' : 'Delete';
         return (
-        <>
-            <TableCell align="center" sx={bodyCellSx}>
-                <Tooltip title="Require email OTP at login (only when MFA is enabled on the server)">
-                    <FormControlLabel
-                        sx={{ m: 0, justifyContent: 'center' }}
-                        control={
-                            <Switch
-                                size="small"
-                                checked={!!row.otpRequired}
-                                onChange={(_, checked) => {
-                                    if (row.id != null) {
-                                        dispatch(updateUserOtpRequiredAsync(
-                                            wrapArgument(actionUid, { id: Number(row.id), otpRequired: checked })
-                                        ));
-                                    }
-                                }}
-                                color="primary"
-                            />
-                        }
-                        label=""
-                        labelPlacement="end"
-                    />
-                </Tooltip>
-            </TableCell>
-            <TableCell align="center" sx={bodyCellSx}>
-                {/* Pencil only for operational users, not for applicants (USER role) */}
-                {!isApplicant ? (
-                    <Tooltip title="Assign or change role">
-                        <Edit sx={{ cursor: 'pointer', color: '#4338ca', fontSize: 22 }} onClick={() => handleOpen(row)} />
-                    </Tooltip>
-                ) : (
-                    <Typography variant="caption" sx={{ color: '#94a3b8' }}>—</Typography>
-                )}
-            </TableCell>
-            <TableCell align="center" sx={bodyCellSx}>
-                <Button
-                    size="small"
-                    variant="outlined"
-                    sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
-                    onClick={async () => {
-                        if (row.id == null) return;
-                        try {
-                            await sendSetPasswordEmail(Number(row.id));
-                            alert(`Set password email sent to ${row.username}`);
-                        } catch (e: any) {
-                            alert(e?.response?.data || e?.message || 'Failed to send set password email');
-                        }
-                    }}
-                >
-                    Send
-                </Button>
-            </TableCell>
-            <TableCell align="center" sx={bodyCellSx}>
-                <Tooltip title="Delete user">
-                    <Delete sx={{ cursor: 'pointer', color: '#d32f2f', fontSize: 22 }} onClick={() => handleDeleteUser(row)} />
-                </Tooltip>
-            </TableCell>
-        </>
+            <TableRow>
+                {tableHeaders.map((h) => (
+                    <TableCell key={h} align={headerAlign(h)} sx={headerCellSx}>
+                        {h}
+                    </TableCell>
+                ))}
+                <TableCell key={dynamicColumn} align={headerAlign(dynamicColumn)} sx={headerCellSx}>
+                    {dynamicColumn}
+                </TableCell>
+            </TableRow>
         );
     };
 
-    const renderUserRows = (users: IUser[]) =>
+    const handleToggleUserStatus = (row: IUser) => {
+        if (row.id == null) return;
+
+        const currentRole = String(row.role || '').toUpperCase();
+        const isDisabled = currentRole === 'DISABLED';
+
+        // Toggle: if DISABLED → restore to last active role (default to CHECKER if unknown)
+        // if active → set to DISABLED
+        const newRole = isDisabled ? 'CHECKER' : 'DISABLED';
+
+        const confirmMessage = isDisabled
+            ? `Are you sure you want to enable ${row.username}?`
+            : `Are you sure you want to disable ${row.username}?`;
+
+        if (!window.confirm(confirmMessage)) return;
+
+        dispatch(updateUserRolesAsync(
+            wrapArgument(actionUid, { id: Number(row.id), role: newRole })
+        ));
+    };
+
+    const renderActionCells = (row: IUser, userType: 'operational' | 'applicant') => {
+        const roleUpper = String(row.role || '').toUpperCase();
+        const isApplicant = roleUpper === 'USER';
+        const isDisabled = roleUpper === 'DISABLED';
+        return (
+            <>
+                {/* Email OTP Column */}
+                <TableCell align="center" sx={bodyCellSx}>
+                    <Tooltip title="Require email OTP at login (only when MFA is enabled on the server)">
+                        <FormControlLabel
+                            sx={{ m: 0, justifyContent: 'center' }}
+                            control={
+                                <Switch
+                                    size="small"
+                                    checked={!!row.otpRequired}
+                                    onChange={(_, checked) => {
+                                        if (row.id != null) {
+                                            dispatch(updateUserOtpRequiredAsync(
+                                                wrapArgument(actionUid, { id: Number(row.id), otpRequired: checked })
+                                            ));
+                                        }
+                                    }}
+                                    color="primary"
+                                />
+                            }
+                            label=""
+                            labelPlacement="end"
+                        />
+                    </Tooltip>
+                </TableCell>
+                {/* Approve Column - Edit pencil icon */}
+                <TableCell align="center" sx={bodyCellSx}>
+                    {/* Pencil only for operational users, not for applicants (USER role) */}
+                    {!isApplicant ? (
+                        <Tooltip title="Assign or change role">
+                            <Edit sx={{ cursor: 'pointer', color: '#4338ca', fontSize: 22 }} onClick={() => handleOpen(row)} />
+                        </Tooltip>
+                    ) : (
+                        <Typography variant="caption" sx={{ color: '#94a3b8' }}>—</Typography>
+                    )}
+                </TableCell>
+
+                {/* Set Password Email Column */}
+                <TableCell align="center" sx={bodyCellSx}>
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
+                        onClick={async () => {
+                            if (row.id == null) return;
+                            try {
+                                await sendSetPasswordEmail(Number(row.id));
+                                alert(`Set password email sent to ${row.username}`);
+                            } catch (e: any) {
+                                alert(e?.response?.data || e?.message || 'Failed to send set password email');
+                            }
+                        }}
+                    >
+                        Send
+                    </Button>
+                </TableCell>
+
+                {/* Status Column - Only for operational users (Active/Disabled button) */}
+                {userType === 'operational' && (
+                    <TableCell align="center" sx={bodyCellSx}>
+                        <Button
+                            size="small"
+                            variant="contained"
+                            color={isDisabled ? "error" : "success"}
+                            onClick={() => handleToggleUserStatus(row)}
+                            sx={{
+                                textTransform: 'none',
+                                whiteSpace: 'nowrap',
+                                minWidth: '90px',
+                            }}
+                        >
+                            {isDisabled ? "Disabled" : "Active"}
+                        </Button>
+                    </TableCell>
+                )}
+
+                {/* Delete Column - Only for pending/applicant users */}
+                {userType === 'applicant' && (
+                    <TableCell align="center" sx={bodyCellSx}>
+                        <Tooltip title="Delete user">
+                            <Delete sx={{ cursor: 'pointer', color: '#d32f2f', fontSize: 22 }} onClick={() => handleDeleteUser(row)} />
+                        </Tooltip>
+                    </TableCell>
+                )}
+            </>
+        );
+    };
+
+    const renderUserRows = (users: IUser[], userType: 'operational' | 'applicant') =>
         users.map((row, idx) => (
             <TableRow
                 key={`${row.id}`}
@@ -337,41 +398,43 @@ const Admin = (props: any) => {
                     </Typography>
                 </TableCell>
                 <TableCell align="center" sx={bodyCellSx}>{row.registeredOn && dayjs(row.registeredOn).format("DD/MM/YYYY")}</TableCell>
-                {renderActionCells(row)}
+                {renderActionCells(row, userType)}
             </TableRow>
         ));
 
-    const renderUsersTable = (users: IUser[], ariaLabel: string) => (
-        <TableContainer
-            component={Paper}
-            elevation={0}
-            sx={{
-                maxHeight: { xs: 360, sm: 480 },
-                overflow: 'auto',
-                mb: 4,
-                borderRadius: '12px',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
-            }}
-        >
-            <Table size="small" stickyHeader sx={{ minWidth: 720 }} aria-label={ariaLabel}>
-                <TableHead>
-                    {renderHeaderRow()}
-                </TableHead>
-                <TableBody>
-                    {users.length === 0 ? (
-                        <TableRow>
-                            <TableCell colSpan={tableHeaders.length} align="center" sx={{ ...bodyCellSx, py: 5, color: '#64748b' }}>
-                                No users in this list.
-                            </TableCell>
-                        </TableRow>
-                    ) : (
-                        renderUserRows(users)
-                    )}
-                </TableBody>
-            </Table>
-        </TableContainer>
-    );
+    const renderUsersTable = (users: IUser[], ariaLabel: string, userType: 'operational' | 'applicant') => {
+        return (
+            <TableContainer
+                component={Paper}
+                elevation={0}
+                sx={{
+                    maxHeight: { xs: 360, sm: 480 },
+                    overflow: 'auto',
+                    mb: 4,
+                    borderRadius: '12px',
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                }}
+            >
+                <Table size="small" stickyHeader sx={{ minWidth: 720 }} aria-label={ariaLabel}>
+                    <TableHead>
+                        {renderHeaderRow(userType)}
+                    </TableHead>
+                    <TableBody>
+                        {users.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={tableHeaders.length + 1} align="center" sx={{ ...bodyCellSx, py: 5, color: '#64748b' }}>
+                                    No users in this list.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            renderUserRows(users, userType)
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    };
 
     return (
         <div className="homeComp" style={{ height: 670 }}>
@@ -391,7 +454,7 @@ const Admin = (props: any) => {
                             <Typography variant="body2" sx={{ color: '#64748b', mb: 2, mt: 0.5 }}>
                                 {pendingUsers.length} user{pendingUsers.length === 1 ? '' : 's'} awaiting role assignment
                             </Typography>
-                            {renderUsersTable(pendingUsers, 'Users pending approval')}
+                            {renderUsersTable(pendingUsers, 'Users pending approval', 'applicant')}
 
                             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', mt: 1 }}>
                                 Operational users
@@ -399,7 +462,7 @@ const Admin = (props: any) => {
                             <Typography variant="body2" sx={{ color: '#64748b', mb: 2, mt: 0.5 }}>
                                 {operationalUsers.length} active operational user{operationalUsers.length === 1 ? '' : 's'} (Checker, Maker, Admin, UserAdmin)
                             </Typography>
-                            {renderUsersTable(operationalUsers, 'Operational users')}
+                            {renderUsersTable(operationalUsers, 'Operational users', 'operational')}
 
                             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', mt: 1 }}>
                                 Registered applicants
@@ -407,9 +470,9 @@ const Admin = (props: any) => {
                             <Typography variant="body2" sx={{ color: '#64748b', mb: 2, mt: 0.5 }}>
                                 {applicantUsers.length} approved applicant{applicantUsers.length === 1 ? '' : 's'} (fund applicants)
                             </Typography>
-                            {renderUsersTable(applicantUsers, 'Registered applicants')}
+                            {renderUsersTable(applicantUsers, 'Registered applicants', 'applicant')}
                         </Box>
-                        {open ? <RoleComponent open={open} userDetails = {selectedRow} handleClose={handleClose}></RoleComponent> : <></>}
+                        {open ? <RoleComponent open={open} userDetails={selectedRow} handleClose={handleClose}></RoleComponent> : <></>}
                         <AddOperationalUserModal
                             open={openAddOperational}
                             onClose={() => setOpenAddOperational(false)}
@@ -461,8 +524,8 @@ const Admin = (props: any) => {
                             </DialogActions>
                         </Dialog>
                     </Paper>
-                </Container>                        
-             : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
+                </Container>
+                : <div style={{ padding: "20px", backgroundColor: '#f2f2f2' }}>Loading...</div>}
 
             {/* Delete User Confirmation Dialog */}
             <Dialog
@@ -478,14 +541,13 @@ const Admin = (props: any) => {
                     <Typography variant="body1" sx={{ mb: 2 }}>
                         Are you sure you want to delete user <strong>{userToDelete?.username}</strong>?
                     </Typography>
-                    
                     {userApplicationCount > 0 && (
-                        <Box sx={{ 
-                            backgroundColor: '#fff3e0', 
-                            border: '1px solid #ff9800', 
-                            borderRadius: '8px', 
-                            p: 2, 
-                            mb: 2 
+                        <Box sx={{
+                            backgroundColor: '#fff3e0',
+                            border: '1px solid #ff9800',
+                            borderRadius: '8px',
+                            p: 2,
+                            mb: 2
                         }}>
                             <Typography variant="body2" sx={{ color: '#e65100', fontWeight: 600, mb: 1 }}>
                                 ⚠️ Warning
@@ -498,16 +560,16 @@ const Admin = (props: any) => {
                     )}
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button 
-                        onClick={cancelDeleteUser} 
+                    <Button
+                        onClick={cancelDeleteUser}
                         variant="outlined"
                         sx={{ borderRadius: '8px', textTransform: 'none' }}
                     >
                         Cancel
                     </Button>
-                    <Button 
-                        onClick={confirmDeleteUser} 
-                        variant="contained" 
+                    <Button
+                        onClick={confirmDeleteUser}
+                        variant="contained"
                         color="error"
                         sx={{ borderRadius: '8px', textTransform: 'none' }}
                     >
@@ -517,7 +579,6 @@ const Admin = (props: any) => {
             </Dialog>
 
         </div>
-
     )
 }
 
