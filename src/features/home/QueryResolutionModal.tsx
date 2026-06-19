@@ -1,5 +1,6 @@
 import { Modal, Box, Card, CardContent, Typography, Divider, TextField, Button, Grid, Stack, Avatar, Chip, CircularProgress } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
+import dayjs from "dayjs";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import uuid from "react-uuid";
 import { defaultIQueryResolution, IQueryResolution } from "./IQueryResolution";
@@ -63,6 +64,21 @@ export const QueryResolutionModal = (props: any) => {
     }, [isOpen]);
 
     const fileIdentity = (f: File) => `${f.name}__${f.size}__${f.lastModified}`;
+
+    const formatDate = (dateValue: any) => {
+        if (!dateValue) return '-';
+        if (Array.isArray(dateValue)) {
+            const [year, month, day, hour, minute, second] = dateValue;
+            return dayjs(new Date(year, month - 1, day, hour || 0, minute || 0, second || 0)).format('DD-MM-YYYY HH:mm:ss');
+        }
+        if (typeof dateValue === 'string' && /^\d{2}-\d{2}-\d{4}/.test(dateValue)) {
+            const [datePart, timePart] = dateValue.split(' ');
+            const [day, month, year] = datePart.split('-');
+            const timeString = timePart ? `T${timePart}` : '';
+            return dayjs(`${year}-${month}-${day}${timeString}`).format('DD-MM-YYYY HH:mm:ss');
+        }
+        return dayjs(dateValue).format('DD-MM-YYYY HH:mm:ss');
+    };
 
     async function handleSubmit(){
         const trimmedQuery = String(formData.query || "").trim();
@@ -179,7 +195,7 @@ export const QueryResolutionModal = (props: any) => {
                                     <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
                                         {q.createdByName || "User"}
                                     </Typography>
-                                    <Chip size="small" label={q.createdOn || '-'} sx={{ ml: 'auto' }} />
+                                    <Chip size="small" label={formatDate(q.createdOn)} sx={{ ml: 'auto' }} />
                                 </Stack>
                                 <Typography variant="body2" sx={{ color: '#334155', whiteSpace: 'pre-wrap' }}>
                                     {q.query || '-'}
