@@ -856,7 +856,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                     <Box sx={{ p: 2, border: '1px dashed #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
                       <Typography variant="body2" sx={{ mb: 1 }}>Resume/CV/Experience</Typography>
                       {investmentPartnerFormData.id ? (
-                        <DocumentChip label="Upload Document" validationTitle="Resume_Testing_document" id={`sdPartnerResume${investmentPartnerFormData.id}`} />
+                        <DocumentChip label="Upload Document" id={`sdPartnerResume${investmentPartnerFormData.id}`} />
                       ) : (
                         <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#999' }}>
                           Please save the form to upload documents.
