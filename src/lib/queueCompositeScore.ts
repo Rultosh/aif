@@ -69,7 +69,7 @@ export function targetCorpusComponentScore(crores: number, equityOriented: boole
 }
 
 /**
- * Composite queue score (0–10): 70% IA + 30% target corpus.
+ * Composite queue score (0–10): 85% IA + 15% target corpus.
  * Returns null if any required input is missing.
  */
 export function computeCompositeQueueScore(row: IPrelimApplicationData): number | null {
@@ -78,6 +78,6 @@ export function computeCompositeQueueScore(row: IPrelimApplicationData): number 
     if (ia == null || crores == null) return null;
     const equity = isEquityOrientedAif(row.aifCategoryType);
     const target = targetCorpusComponentScore(crores, equity);
-    const composite = ia * 0.7 + target * 0.3;
+    const composite = ia * 0.85 + target * 0.15;
     return Math.round(composite * 100) / 100;
 }
