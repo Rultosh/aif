@@ -2,10 +2,12 @@ import { Chip } from "@mui/material";
 import React from "react";
 import { Upload } from "@mui/icons-material";
 import DocumentUpload from "./DocumentUpload";
+import FileUploadDisclaimer from "./FileUploadDisclaimer";
 import ListFiles from "./ListFiles";
 import { IFile } from "./IFile"
 import FileUploadService from "./FileUploadService";
 import uuid from "react-uuid";
+import { isResumeField as checkIsResumeField } from "../utils/validationUtils";
 
 interface DocumentChipProps {
   id: String
@@ -14,6 +16,7 @@ interface DocumentChipProps {
   validationTitle?: string
   /** Called after a successful upload so parents can re-check bucket state. */
   onAfterUpload?: () => void
+  hideDisclaimer?: boolean
 }
 
 export default function DocumentChip(props: DocumentChipProps) {
@@ -25,6 +28,8 @@ export default function DocumentChip(props: DocumentChipProps) {
     setRefreshId(uuid())
     props.onAfterUpload?.()
   }
+
+  const isResumeField = checkIsResumeField(props.id as string);
 
   return (<DocumentUpload id={props.id} onSuccess={onUploadSuccess} signed={props.signed} validationTitle={props.validationTitle}>
     <div>
@@ -46,6 +51,7 @@ export default function DocumentChip(props: DocumentChipProps) {
             }
           }
         }} />
+      {!props.hideDisclaimer && <FileUploadDisclaimer isResume={isResumeField} />}
       <ListFiles id={props.id} refreshId={refreshId} />
     </div>
   </DocumentUpload>

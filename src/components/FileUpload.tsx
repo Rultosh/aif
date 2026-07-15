@@ -4,7 +4,9 @@ import { useDropzone } from 'react-dropzone'
 import CloseIcon from '@material-ui/icons/Close';
 import { wrapArgument } from "../lib/api-status/actionWrapper";
 import FileUploadService from "./FileUploadService";
+import FileUploadDisclaimer from "./FileUploadDisclaimer";
 import { StringLiteral } from "typescript";
+import { isResumeField as checkIsResumeField } from "../utils/validationUtils";
 
 export interface FileUploadProps {
   id: String;
@@ -20,14 +22,16 @@ interface IFileUploadInfo {
 
 export default function FileUpload(props: FileUploadProps) {
 
-  const {open, setOpen} = props;
+  const { open, setOpen } = props;
   const [fileInfo, setFileInfo] = useState({ file: null } as IFileUploadInfo);
   const [progress, setProgress] = useState(0.0);
   const [error, setError] = useState('');
 
+  const isResumeField = checkIsResumeField(props.id as string);
+
   const handleClose = () => {
     setOpen(!open);
-    setFileInfo({"file": null});
+    setFileInfo({ "file": null });
     setError('');
   };
 
@@ -37,7 +41,25 @@ export default function FileUpload(props: FileUploadProps) {
       setFileInfo({ "file": file });
     })
   }, [])
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: isResumeField ? {
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+    } : {
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/zip': ['.zip'],
+      'application/x-zip-compressed': ['.zip']
+    },
+    multiple: false
+  })
 
   const uploadFiles = () => {
     console.log('uploading...', fileInfo);
@@ -58,7 +80,7 @@ export default function FileUpload(props: FileUploadProps) {
           response.data['message']
         )
       }).catch((error) => {
-        setError("Error uploading file.");
+        setError(error instanceof Error ? error.message : (error && (error as any).message) || "Error uploading file.");
       });
   }
 
@@ -75,10 +97,10 @@ export default function FileUpload(props: FileUploadProps) {
           {fileInfo.file ?
             <div style={{ textAlign: 'center' }}>
               <div>{fileInfo.file.name}</div>
-              <div style={{color: 'red'}}>{error}</div>
+              <div style={{ color: 'red' }}>{error}</div>
               {progress ?
                 <div>
-                    {progress}%
+                  {progress}%
                 </div> :
                 <Button onClick={uploadFiles}>
                   Upload
@@ -93,6 +115,7 @@ export default function FileUpload(props: FileUploadProps) {
                     <div style={{ margin: '10px' }}><p>Drag 'n' drop some files here, or click to select files</p></div>
                 }
               </div>
+              <FileUploadDisclaimer isResume={isResumeField} />
             </div>}
         </DialogContent>
       </Dialog>

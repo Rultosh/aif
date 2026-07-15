@@ -17,7 +17,7 @@ import { IInvestmentResponsibleAsLead, defaultIIInvestmentResponsibleAsLead } fr
 import { getAllInvestmentResponsibleAsNonLeadsAsnyc, selectInvestmentResponsibleAsNonLeads, createInvestmentResponsibleAsNonLeadAsync, updateInvestmentResponsibleAsNonLeadAsync, deleteInvestmentResponsibleAsNonLeadAsync } from "../../profile-new/investmentResponsibleAsNonLead/investmentResponsibleAsNonLeadSlice";
 import { IInvestmentResponsibleAsNonLead, defaultIIInvestmentResponsibleAsNonLead } from "../../profile-new/investmentResponsibleAsNonLead/IInvestmentResponsibleAsNonLead";
 import Moment from 'moment';
-import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount, standardNumericValidation, blockOverflowNumericInput } from "../../../../../utils/validationUtils";
 
 interface InvestmentAssociateModelProps {
   investmentAssociateFormData: IInvestmentAssociate,
@@ -154,7 +154,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
   };
   const investmentValidationSchema = Yup.object().shape({
     nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
-    amountInvested: Yup.number().typeError("Must be a number").required("Amount is required"),
+    amountInvested: standardNumericValidation("Amount Invested"),
     dateOfInvestment: Yup.string().required("Date of investment is required").nullable(),
     dateofExitorWriteOff: Yup.string().required("Date of exit or write off is required").nullable(),
     exitOrWriteOff: Yup.string().required("Required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
@@ -416,7 +416,7 @@ export const InvestmentAssociateModel = (props: InvestmentAssociateModelProps) =
               <TextField
                 required
                 fullWidth
-                type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                type="number" onKeyDown={blockOverflowNumericInput}
                 id="age"
                 label="Age"
                 inputProps={{ min: 0 }}

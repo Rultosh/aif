@@ -1,46 +1,32 @@
 import api from "../app/fileServerApi";
 
 class FileUploadService {
-  sanitizeFilename(filename) {
-    if (!filename) {
-      return "upload";
+  validateFilename(filename) {
+    if (!filename) return "upload";
+    // Fix for Null Byte Extension
+    if (filename.includes('\0') || filename.includes('%00') || filename.includes('\\x00')) {
+      throw new Error("Invalid filename: Null bytes are not allowed.");
     }
-    const trimmed = String(filename).trim();
-    const lastDot = trimmed.lastIndexOf(".");
-    const hasExt = lastDot > 0 && lastDot < trimmed.length - 1;
-    const base = hasExt ? trimmed.slice(0, lastDot) : trimmed;
-    const ext = hasExt ? trimmed.slice(lastDot + 1) : "";
-
-    // Server rejects names with multiple dots in basename and path-like characters.
-    const safeBase = base
-      .replace(/[.]+/g, "_")
-      .replace(/[\/\\]/g, "_")
-      .replace(/\s+/g, " ")
-      .replace(/[^\w\s()-]/g, "_")
-      .trim()
-      .replace(/\s/g, "_")
-      .replace(/_+/g, "_");
-
-    const safeExt = ext.replace(/[^\w]/g, "").toLowerCase();
-    const normalizedBase = safeBase || "upload";
-    return safeExt ? `${normalizedBase}.${safeExt}` : normalizedBase;
+    // Fix for Double Extension
+    const dotCount = (filename.match(/\./g) || []).length;
+    if (dotCount > 1) {
+      throw new Error("Invalid filename: Double extensions are not allowed.");
+    }
+    return filename;
   }
 
   upload(bucket, file, signed, onUploadProgress) {
+    try {
+      this.validateFilename(file?.name);
+    } catch (error) {
+      return Promise.reject({ message: error.message });
+    }
     let formData = new FormData();
-
     let url = `files/${bucket}`;
-
-    if(signed) {
+    if (signed) {
       url += "?signed=true"
     }
-
-    const safeName = this.sanitizeFilename(file?.name);
-    const fileToUpload = (file && safeName !== file.name)
-      ? new File([file], safeName, { type: file.type, lastModified: file.lastModified })
-      : file;
-
-    formData.append("file", fileToUpload);
+    formData.append("file", file);
     return api({
       method: 'post',
       url: url,
@@ -53,10 +39,9 @@ class FileUploadService {
       ...response,
       data: {
         ...(response?.data || {}),
-        name: safeName,
+        name: file.name,
       },
     }));
-
   }
 
   list(bucket) {
@@ -64,7 +49,13 @@ class FileUploadService {
       method: 'get',
       url: `/files/${bucket}`,
     });
+  }
 
+  getConfig() {
+    return api({
+      method: 'get',
+      url: '/files/config'
+    }).then(res => res.data);
   }
 
   delete(file) {

@@ -29,7 +29,8 @@ import { FetchStatus } from '../lib/api-status/IStatus';
 const Header = (props: any) => {
 
   const auth = useAppSelector(state => state.auth);
-  const token = auth.token || localStorage.getItem('token');
+  const isKickedOut = sessionStorage.getItem('kicked_out_crosstab') === 'true';
+  const token = !isKickedOut && (auth.token || localStorage.getItem('token'));
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const usersState = useAppSelector(selectUsers)
   const activeRole = useAppSelector(state => state.auth.activeRole) || localStorage.getItem('activeRole') || usersState.role;

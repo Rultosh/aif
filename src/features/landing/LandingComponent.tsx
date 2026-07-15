@@ -75,15 +75,17 @@ const Landing = () => {
     // console.log(usersState)
 
     useEffect(() => {
-        const token = state.token != null ? String(state.token) : localStorage.getItem('token');
+        const isKickedOut = sessionStorage.getItem('kicked_out_crosstab') === 'true';
+        const token = isKickedOut ? null : localStorage.getItem('token');
         if (token && usersState.role === undefined && usersState.status.fetchStatus === FetchStatus.IDLE) {
             dispatch(fetchRoleAsync(wrapArgument(actionId, undefined)));
         }
     }, [dispatch, state.token, usersState.role, usersState.status.fetchStatus, actionId]);
 
     useEffect(() => {
-        const token = state.token != null ? String(state.token) : localStorage.getItem('token');
-        const activeRole = state.activeRole != null ? String(state.activeRole) : localStorage.getItem('activeRole');
+        const isKickedOut = sessionStorage.getItem('kicked_out_crosstab') === 'true';
+        const token = isKickedOut ? null : localStorage.getItem('token');
+        const activeRole = localStorage.getItem('activeRole') || state.activeRole;
         const tokenRoles = state.availableRoles?.length > 0 ? state.availableRoles : parseRolesFromToken(token);
         if (token && state.availableRoles?.length > 1 && !activeRole) {
             return;
@@ -167,6 +169,7 @@ const Landing = () => {
     });
 
     const onSubmit = (data: any) => {
+        sessionStorage.removeItem('kicked_out_crosstab');
         isUserValid(data);
     };
 
@@ -337,7 +340,10 @@ const Landing = () => {
                                 </Button>
                             </Box>
                         ) : (
-                        <form onSubmit={handleSubmit(onSubmit)}>
+                        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+                            {/* Dummy inputs to bypass Chrome autofill */}
+                            <input type="text" name="email_fake" id="email_fake" style={{ opacity: 0, position: 'absolute', top: -9999, left: -9999, zIndex: -1 }} aria-hidden="true" autoComplete="off" tabIndex={-1} />
+                            <input type="password" name="password_fake" id="password_fake" style={{ opacity: 0, position: 'absolute', top: -9999, left: -9999, zIndex: -1 }} aria-hidden="true" autoComplete="new-password" tabIndex={-1} />
                             <Box sx={{ mb: 2 }}>
                                 <Typography sx={{ fontWeight: 500, mb: 0.5, color: '#000000', fontSize: '14px' }}>
                                     Email Id
@@ -347,6 +353,7 @@ const Landing = () => {
                                     placeholder="Enter Email Id"
                                     {...register("username")}
                                     error={!!errors.username}
+                                    autoComplete="new-password"
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             backgroundColor: '#fff',
@@ -377,6 +384,7 @@ const Landing = () => {
                                     placeholder="Enter Password"
                                     {...register("password")}
                                     error={!!errors.password}
+                                    autoComplete="new-password"
                                     onKeyPress={handleKeyPress}
                                     InputProps={{
                                         endAdornment: (

@@ -28,10 +28,18 @@ export async function refreshAccessToken() {
 }
 
 client.interceptors.request.use(function(config) {
-  if(config && config.headers)
-    //console.log('Interceptor', localStorage.getItem('token'));
-    config.headers['Authorization'] = "Bearer " + localStorage.getItem('token');
-    return config;
+  if (config && config.headers) {
+    const token = localStorage.getItem('token');
+    if (token && token !== 'null' && token !== 'undefined') {
+      if (typeof config.headers.set === 'function') {
+        config.headers.set('Authorization', 'Bearer ' + token);
+      } else {
+        config.headers.Authorization = 'Bearer ' + token;
+        config.headers['Authorization'] = 'Bearer ' + token;
+      }
+    }
+  }
+  return config;
 })
 
 client.interceptors.response.use(function (response) {

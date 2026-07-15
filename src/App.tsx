@@ -1,8 +1,9 @@
+import uuid from 'react-uuid';
 import './App.css';
 import Header from './components/Header'
 import EligibilityQuestioner from './features/eligibilityQuesioner/EligibilityQuestionerComponent'
 import EligibilityResults from './features/eligibilityResults/EligibilityResultsComponent'
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Route, Routes } from "react-router"
 import { useNavigate, useLocation } from 'react-router-dom';
 import Landing from './features/landing/LandingComponent'
@@ -10,7 +11,7 @@ import SignUp from './features/signUp/SignUpComponent'
 import ResetPassword from './features/resetPassword/ResetPasswordComponent'
 import ForgotPassword from './features/forgotPassword/ForgotPasswordComponent'
 import ChangePassword from './features/changePassword/ChangePasswordComponent'
-import { useAppSelector } from './app/hooks'
+import { useAppSelector, useAppDispatch } from './app/hooks'
 import FundOverview from './features/fundOverview/FundOverviewComponent';
 import Fund from './features/fundOverview/Fund'
 import SelfRating from './features/fundOverview/subsections/selfRating/SelfRating'
@@ -39,6 +40,7 @@ import DetailedApplicationComponent from './features/DetailedApplicationComponen
 import { SidbiReference } from './features/detailedApplication/sidbiReference/SidbiReference';
 import { PrivateRoute } from './components/auth/PrivateRoute';
 import { UserAdminRoute } from './components/auth/UserAdminRoute';
+import { UserRoute } from './components/auth/UserRoute';
 import { CheckAuth } from '../src/app/api';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
@@ -64,13 +66,56 @@ function isPublicAuthFlowPath(pathname: string): boolean {
 
 // export const UserContext = createContext(initialState);
 
+
+
+const getTabId = () => {
+  let tabId = sessionStorage.getItem('app_tab_id');
+  if (!tabId) {
+    tabId = uuid();
+    sessionStorage.setItem('app_tab_id', tabId);
+  }
+  return tabId;
+};
+const TAB_ID = getTabId();
+
+// Cross-tab session enforcement: newest tab wins.
+// If this tab is NOT already kicked out AND a token exists, claim the session.
+// Tab A (original) will detect the active_tab_id change via the 'storage' event,
+// flag itself as kicked out in its own sessionStorage, and reload to login.
+const _kicked = sessionStorage.getItem('kicked_out_crosstab') === 'true';
+if (!_kicked) {
+  const _initToken = localStorage.getItem('token');
+  if (_initToken) {
+    localStorage.setItem('active_tab_id', TAB_ID);
+  }
+}
+
 function App() {
   // const [user, setUser] = useState(null);
   // const [selfRatingLink, setSelfRatingLink] = useCookie('selfRatingLink', '0');
 
   // let { shoppingList } = useContext(UserContext);
   // console.log(shoppingList);
-  const userLogged = !!useAppSelector(state => state.auth.token);
+  const isKickedOut = sessionStorage.getItem('kicked_out_crosstab') === 'true';
+  const userLogged = !!useAppSelector(state => state.auth.token) && !isKickedOut;
+  const dispatch = useAppDispatch();
+  const token = useAppSelector(state => state.auth.token);
+  const mfaPending = useAppSelector(state => state.auth.mfaPending);
+
+  // When another tab claims the session (active_tab_id changes in localStorage),
+  // this tab flags ITSELF as kicked out via sessionStorage (private to this tab only),
+  // then reloads. localStorage is NOT touched so Tab B keeps its token.
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'active_tab_id' && e.newValue !== null && e.newValue !== TAB_ID) {
+        sessionStorage.setItem('kicked_out_crosstab', 'true');
+        window.location.reload();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   const checkIsCorrectStateToUpdate = (data: any, keyObj: any) => {
     let tempVal = false
     let keys = Object.keys(keyObj);
@@ -106,19 +151,20 @@ function App() {
   const [secondsRemaining, setSecondsRemaining] = useState<number>(0);
   const [overallSessionSecondsRemaining, setOverallSessionSecondsRemaining] = useState<number>(0);
 
-  const logoutToLogin = () => {
+  const logoutToLogin = useCallback(() => {
     localStorage.clear();
     CheckAuth.setIsUnauthorized();
     setShowExpiryDialog(false);
     setSessionEndsAt(null);
     navigate('/login');
-  };
+  }, [navigate]);
 
   const parseTokenExpiry = (token: string): number | null => {
     try {
       const payload = token.split('.')[1];
       if (!payload) {
-        console.debug('[session-debug] token payload missing');
+        // Security: Removed detailed session debug logging
+        console.debug('[session] token validation failed - payload missing');
         return null;
       }
       const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
@@ -127,26 +173,17 @@ function App() {
         '='
       );
       const decodedPayload = JSON.parse(window.atob(paddedPayload));
-      console.debug('[session-debug] decoded jwt payload fields', {
-        keys: Object.keys(decodedPayload || {}),
-        exp: decodedPayload?.exp ?? null,
-        iat: decodedPayload?.iat ?? null,
-        sub: decodedPayload?.sub ?? null,
-        tokenUse: decodedPayload?.token_use ?? null,
-      });
+      // Security: Safe logging without exposing sensitive token data
+      console.debug('[session] token parsed successfully');
       if (!decodedPayload?.exp) {
-        console.debug('[session-debug] exp claim not present');
+        console.debug('[session] token missing expiry claim');
         return null;
       }
       const expiryMs = Number(decodedPayload.exp) * 1000;
-      console.debug('[session-debug] parsed token expiry', {
-        expiryMs,
-        expiryIso: new Date(expiryMs).toISOString(),
-        nowMs: Date.now(),
-      });
+      console.debug('[session] token expiry computed');
       return expiryMs;
     } catch (error) {
-      console.debug('[session-debug] failed to parse token expiry', error);
+      console.debug('[session] token parsing failed');
       return null;
     }
   };
@@ -181,21 +218,16 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.debug('[session-debug] token check on auth change', {
-      hasToken: !!token,
-      tokenLength: token ? token.length : 0,
-      userLogged,
-    });
+    // Security: Safe logging without exposing token information
+    console.debug('[session] authentication state check completed');
     if (!token) {
       setSessionEndsAt(null);
       setShowExpiryDialog(false);
       return;
     }
     const expiry = parseTokenExpiry(token);
-    console.debug('[session-debug] computed session end', {
-      expiryMs: expiry,
-      expiryIso: expiry ? new Date(expiry).toISOString() : null,
-    });
+    // Security: Safe logging without exposing session timing details
+    console.debug('[session] session end time computed');
     setSessionEndsAt(expiry);
   }, [userLogged]);
 
@@ -209,7 +241,7 @@ function App() {
     }
 
     const now = Date.now();
-    const warningDelay = Math.max(sessionEndsAt - now - 60000, 0);
+    const warningDelay = Math.max(sessionEndsAt - now - 300000, 0);
     const logoutDelay = Math.max(sessionEndsAt - now, 0);
 
     const warningTimer = window.setTimeout(() => {
@@ -264,6 +296,41 @@ function App() {
     };
   }, [showExpiryDialog, sessionEndsAt]);
 
+  const crossTabLogout = useCallback((shouldClearStorage: boolean = false) => {
+    if (shouldClearStorage) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token');
+    }
+    CheckAuth.setIsUnauthorized();
+    setShowExpiryDialog(false);
+    setSessionEndsAt(null);
+
+    // Set a flag so Landing.tsx knows we were kicked out and shouldn't auto-login
+    sessionStorage.setItem('kicked_out_crosstab', 'true');
+    navigate('/login');
+  }, [navigate]);
+
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      // 1. Detect explicit logouts
+      if (e.key === 'token' && e.newValue === null) {
+        crossTabLogout(false);
+      }
+      // 2. Detect ANY login
+      if (e.key === 'login_timestamp' && e.newValue !== e.oldValue) {
+        crossTabLogout(false);
+      }
+      // 3. Detect if another tab was opened and claimed the session
+      if (e.key === 'active_tab_id' && e.newValue && e.newValue !== TAB_ID) {
+        crossTabLogout(false);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [crossTabLogout]);
+
+
+
   //   useEffect(() => {
   //     setSelfRatingLink('0');
   // })
@@ -278,7 +345,7 @@ function App() {
         >
         </Header>
         <Routes>
-          <Route path='/' element={userLogged ? <Home /> : <Landing />}></Route>
+          <Route path='/' element={userLogged && localStorage.getItem('token') ? <Home /> : <Landing />}></Route>
           <Route path='/admin' element={
             <UserAdminRoute> <Admin checkUnAuth={CheckAuth.isUnauthorized} /> </UserAdminRoute>
           }></Route>
@@ -314,9 +381,9 @@ function App() {
           </Route>
 
           <Route path='workflow' element={
-            <PrivateRoute>
+            <UserRoute>
               <Workflow checkUnAuth={CheckAuth.isUnauthorized} />
-            </PrivateRoute>
+            </UserRoute>
           }>
           </Route>
 
@@ -563,7 +630,7 @@ function App() {
           </DialogTitle>
           <DialogContent sx={{ py: 3, px: 3, textAlign: 'left' }}>
             <Typography variant="body1" sx={{ mb: 1, mt: 2, color: '#1e293b', fontWeight: 700, fontSize: '16px' }}>
-              Your session will expire in less than 1 minute.
+              Your session will expire in less than 5 minutes.
             </Typography>
             <Typography variant="body2" sx={{ mb: 3, color: '#64748b', fontSize: '14px', lineHeight: 1.5 }}>
               You might lose unsaved information if you don't refresh your session.

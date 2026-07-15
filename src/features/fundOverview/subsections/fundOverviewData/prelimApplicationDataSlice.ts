@@ -181,6 +181,9 @@ const prelimApplicationDataSlice = createSlice({
         if (payload?.responseCode === ResponseCode.NOT_FOUND) {
           state.prelimApplication = { ...defaultIPrelimApplicationData };
         }
+        if (payload?.responseCode === ResponseCode.FORBIDDEN) {
+          state.prelimApplication = { ...defaultIPrelimApplicationData };
+        }
       })
 
       .addCase(createPrelimStarterAsync.pending, state => {

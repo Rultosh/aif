@@ -10,6 +10,9 @@ import { selectUsers } from '../admin/adminSlice'
 import FileUploadService from "../../components/FileUploadService";
 import { getFileServerBaseUrl } from "../../lib/fileServerBaseUrl";
 import { markQueriesAsRead } from './queryResolutionApi';
+import { Download } from "@mui/icons-material";
+import { secureDownload } from '../../utils/downloadUtils';
+import FileUploadDisclaimer from "../../components/FileUploadDisclaimer";
 
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
@@ -80,7 +83,7 @@ export const QueryResolutionModal = (props: any) => {
         return dayjs(dateValue).format('DD-MM-YYYY HH:mm:ss');
     };
 
-    async function handleSubmit(){
+    async function handleSubmit() {
         const trimmedQuery = String(formData.query || "").trim();
         if (!trimmedQuery && !queryFiles.length) {
             setSubmitError("Please add a comment or upload a document.");
@@ -101,8 +104,10 @@ export const QueryResolutionModal = (props: any) => {
             if (queryFiles.length) {
                 const bucket = `prelim-query-${id}`;
                 const uploadedNames: string[] = [];
-                for (const file of queryFiles) {
-                    const uploaded = await FileUploadService.upload(bucket, file, false, () => {});
+                for (const originalFile of queryFiles) {
+                    const sanitizedFileName = originalFile.name.replace(/[^a-zA-Z0-9.\\-_ ]/g, '_');
+                    const file = new File([originalFile], sanitizedFileName, { type: originalFile.type });
+                    const uploaded = await FileUploadService.upload(bucket, file, false, () => { });
                     uploadedNames.push(uploaded?.data?.name || file.name);
                 }
                 attachmentBucket = bucket;
@@ -168,22 +173,22 @@ export const QueryResolutionModal = (props: any) => {
         onClose={props.close}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-        className= "special_modal"
+        className="special_modal"
     >
         <Box sx={style}>
             <Box sx={{ backgroundColor: 'white', borderRadius: 1, }}>
-            <Typography variant="h6" sx={{ flex: 1, fontWeight: 700, color: '#1e293b', mb: 1 }}>
-                Query & Resolution
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
-                {usersState.role === 'ADMIN'
-                    ? `To: ${props?.prelimDetails?.createdByName || "Applicant"}`
-                    : null}
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#334155', mb: 2, fontWeight: 600 }}>
-                {"Subject: Query for " + (props?.prelimDetails?.registrationAifName || props?.prelimDetails?.nameOfTheFund || `Application #${id || '-'}`)}
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
+                <Typography variant="h6" sx={{ flex: 1, fontWeight: 700, color: '#1e293b', mb: 1 }}>
+                    Query & Resolution
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
+                    {usersState.role === 'ADMIN'
+                        ? `To: ${props?.prelimDetails?.createdByName || "Applicant"}`
+                        : null}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#334155', mb: 2, fontWeight: 600 }}>
+                    {"Subject: Query for " + (props?.prelimDetails?.registrationAifName || props?.prelimDetails?.nameOfTheFund || `Application #${id || '-'}`)}
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
                 <Card sx={{ display: 'flex', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                     <CardContent sx={{ flex: 1, maxHeight: '45vh', overflow: 'auto' }}>
                         {state?.queries?.length ? state?.queries?.map((q: IQueryResolution) => (
@@ -252,6 +257,7 @@ export const QueryResolutionModal = (props: any) => {
                                         <input
                                             type="file"
                                             hidden
+                                            accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,application/x-zip-compressed"
                                             onChange={(e) => {
                                                 const picked = Array.from(e.target.files || []);
                                                 if (!picked.length) return;
@@ -272,6 +278,7 @@ export const QueryResolutionModal = (props: any) => {
                                             }}
                                         />
                                     </Button>
+                                    <FileUploadDisclaimer />
                                 </Stack>
                                 {queryFiles.length ? (
                                     <Box sx={{ mt: 1 }}>

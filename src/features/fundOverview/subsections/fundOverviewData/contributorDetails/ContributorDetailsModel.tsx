@@ -12,6 +12,7 @@ import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import UploadComponents from "../../../../DetailedApplicationComponent/subsections/uploadComponents";
 import { selectContributorDetails } from './contributorDetailsSlice'
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, blockOverflowNumericInput } from "../../../../../utils/validationUtils";
 
 
 interface ContrinutorDetailsModelProps {
@@ -324,7 +325,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
           </Grid>
           <Grid item xs={12} md={4}>
             <TextField
-              type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+              type="number" onKeyDown={blockOverflowNumericInput}
               required
               fullWidth
               id="percentOfCorpus"
@@ -468,7 +469,7 @@ export const ContributorDetailsModel = (props: ContrinutorDetailsModelProps) => 
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                  type="number" onKeyDown={blockOverflowNumericInput}
                   id="percentOfActualCorpusRaisedPrev"
                   label="% Of Actual Corpus Raised In Last Fund"
                   inputProps={{ min: 0 }}

@@ -112,7 +112,7 @@ const selfRatingSlice = createSlice({
     saveFormData: (state, action: PayloadAction<any>) => {
 
       state.tableData = action.payload;
-      console.log("From Save:", state.tableData)
+
       //state.formdata[action.payload.id] = action.payload.value;
       //console.log("logging after slice-state - length",state.formdata.length)
     },
@@ -125,14 +125,14 @@ const selfRatingSlice = createSlice({
     builder.addCase(
       fetchSelfRatingAsync.fulfilled,
       (state, action: PayloadAction<ISelfRating[]>) => {
-        console.log("Full Payload", action.payload);
+
         if (action.payload.length === 0) {
           state.selfRatings = defaultIISelfRating;
         } else {
           state.selfRatings = action.payload[0]
         }
 
-        console.log(state.selfRatings)
+
         state.status.fetchStatus = FetchStatus.IDLE;
       }
 

@@ -6,6 +6,7 @@ export enum FetchStatus {
 
 export enum ResponseCode {
     NOT_FOUND = 404,
+    FORBIDDEN = 403,
     SUCCESS = 200,
     CONFLICT = 409,
 }

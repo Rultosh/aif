@@ -139,7 +139,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otMonitoringActivities?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
+                            inputProps={{ maxLength: FIELD_LIMITS.LONG_TEXT }}
                         />
                     </Grid>
 
@@ -154,7 +154,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otContributorTerms?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
+                            inputProps={{ maxLength: FIELD_LIMITS.LONG_TEXT }}
                         />
                     </Grid>
 
@@ -169,7 +169,7 @@ const Others = forwardRef((props: PrelimApplicationProps, ref) => {
                             helperText={errors.otDecisionApprovals?.message as string}
                             variant="outlined"
                             sx={fieldSx}
-                            inputProps={{maxLength: FIELD_LIMITS.LONG_TEXT}}
+                            inputProps={{ maxLength: FIELD_LIMITS.LONG_TEXT }}
                         />
                     </Grid>
 

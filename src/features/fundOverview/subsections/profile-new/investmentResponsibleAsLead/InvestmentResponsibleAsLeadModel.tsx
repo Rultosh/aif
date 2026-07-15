@@ -11,6 +11,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import { blockOverflowNumericInput } from "../../../../../utils/validationUtils";
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -172,6 +173,8 @@ console.log(investmentResponsibleAsLead);
                   error={(errors.amountInvested && getValues("amountInvested") == '') ? true : false}
                   variant="standard"
                   onChange={handleChange}
+                  onKeyDown={blockOverflowNumericInput}
+                  inputProps={{ min: 0, max: 9999, step: 0.01 }}
 
                   sx={{ display: 'flex' }}
                 />

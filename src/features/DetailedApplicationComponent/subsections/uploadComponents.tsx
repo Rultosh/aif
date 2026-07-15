@@ -6,6 +6,8 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DocumentUpload from "../../../components/DocumentUpload";
 import uuid from "react-uuid";
 import ListFiles from "../../../components/ListFiles";
+import FileUploadDisclaimer from "../../../components/FileUploadDisclaimer";
+import { isResumeField as checkIsResumeField } from "../../../utils/validationUtils";
 
 interface UploadComponentProps {
     id: String
@@ -18,6 +20,7 @@ export const UploadComponents = (props: UploadComponentProps) => {
     const handleSuccess = () => {
         setRefreshId(uuid());
     }
+    const isResumeField = checkIsResumeField(props.id as string);
 
     return (<>
         <Box>
@@ -45,6 +48,7 @@ export const UploadComponents = (props: UploadComponentProps) => {
                 </FileUploadIcon> */}
             </DocumentUpload>
         </Box>
+        <FileUploadDisclaimer isResume={isResumeField} />
         <ListFiles id={props.id} refreshId={refreshId} />
     </>
     );
