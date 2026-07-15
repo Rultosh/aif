@@ -51,13 +51,11 @@ function computeApplicantAssessmentLocked(
 export const SelfRating = (props: any) => {
 
     const { id } = useParams();
-   // console.log(id)
     const [actionUid] = useState(uuid());
 
     const selfRatingState = useAppSelector(selectSelfRatings)
 
     const [selfRatingValue, setSelfRatingValue] = useState<ISelfRating>(selfRatingState.selfRatings);
-   // console.log("selfRatingValue", selfRatingValue)
     const [firstTime] = useState<boolean>(selfRatingState.selfRatings.id !== undefined);
     const [scoreBoard, setScoreBoard] = useState({} as any);
     const [score, setScore] = useState('0');
@@ -126,7 +124,6 @@ export const SelfRating = (props: any) => {
     }, [selfRatingState.actionStatus.fetchStatus === FetchStatus.IDLE])
 
     useEffect(() => {
-        console.log("SelfRating data loaded:", selfRatingState.selfRatings);
         setSelfRatingValue(selfRatingState.selfRatings);
 
         // Initialize questions and scoreboard based on loaded data
@@ -152,7 +149,6 @@ export const SelfRating = (props: any) => {
                 }
             }
         });
-        console.log("Initialized ScoreBoard:", newScoreBoard);
         setScoreBoard(newScoreBoard);
 
         // Set isSubmitted based on initial data
@@ -168,7 +164,6 @@ export const SelfRating = (props: any) => {
 
     useEffect(() => {
         updateScore()
-        console.log("use Effect running due to scoreBoard change");
     }, [scoreBoard])
 
     useEffect(() => {
@@ -200,9 +195,6 @@ export const SelfRating = (props: any) => {
         if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, qc)) {
             return;
         }
-        console.log(selfRatingValue.id)
-        // console.log((!selfRatingValue.id))
-        // console.log(id)
         try {
             if (!selfRatingValue.id) {
                 if (Number(id)) {
@@ -234,7 +226,6 @@ export const SelfRating = (props: any) => {
     function calculateScore(v: any, sel: string, idx: number) {
         let i = v.options.indexOf(sel);
         let weight = v.weightage[i]
-        console.log('calculateScore', v);
         let contribution = v.contribution
         let copiedValue = { ...scoreBoard };
         copiedValue[idx] = { weight, contribution };
@@ -245,7 +236,6 @@ export const SelfRating = (props: any) => {
         let arr: { weight: number, contribution: number }[] = Object.values(scoreBoard)
         for (let i = 0; i < arr.length; i++) {
             let delta = arr[i] && arr[i].weight * arr[i].contribution;
-            console.log('delta' + i, delta, sum)
             sum += delta || 0;
         }
         let sumStr = sum.toFixed(2);
@@ -276,10 +266,6 @@ export const SelfRating = (props: any) => {
         const aifType = key === "fundType" ? newValue : (fundType || "Equity Oriented Fund");
         copiedValue['fundType'] = aifType;
         copiedValue['managerType'] = mType;
-        console.log("managerType", mType);
-        console.log("fundType", aifType);
-        console.log("fundType copiedValue", copiedValue['fundType']);
-        console.log("managerType copiedValue", copiedValue['managerType']);
         setManagerType(mType);
         setFundType(aifType);
         const questions = getRefinedQuestions(String(mType), String(aifType));
@@ -297,7 +283,6 @@ export const SelfRating = (props: any) => {
             return;
         }
         e.preventDefault();
-        console.log('checking state value', selfRatingValue, e.target.value, idx)
         let copiedValue = { ...selfRatingValue };
         let key = "q" + idx;
         copiedValue[key as keyof ISelfRating] = e.target.value as any;
@@ -541,20 +526,20 @@ export const SelfRating = (props: any) => {
                                                     First time IM/AMC?
                                                 </Typography>
                                                 <FormControl component="fieldset" disabled={assessmentLocked} sx={{ minWidth: 0 }}>
-                                                <RadioGroup
-                                                    row
-                                                    value={managerType === "Experienced Fund Manager" ? "no" : "yes"}
-                                                    name="managerType"
-                                                    onChange={(e) => {
-                                                        const value = e.target.value === "yes"
-                                                            ? "First Time Fund Manager"
-                                                            : "Experienced Fund Manager";
-                                                        handleChangeFundManagerType({ target: { name: "managerType", value } });
-                                                    }}
-                                                >
-                                                    <FormControlLabel value="yes" control={<Radio size="small" sx={controlSx} />} label="Yes" />
-                                                    <FormControlLabel value="no" control={<Radio size="small" sx={controlSx} />} label="No" />
-                                                </RadioGroup>
+                                                    <RadioGroup
+                                                        row
+                                                        value={managerType === "Experienced Fund Manager" ? "no" : "yes"}
+                                                        name="managerType"
+                                                        onChange={(e) => {
+                                                            const value = e.target.value === "yes"
+                                                                ? "First Time Fund Manager"
+                                                                : "Experienced Fund Manager";
+                                                            handleChangeFundManagerType({ target: { name: "managerType", value } });
+                                                        }}
+                                                    >
+                                                        <FormControlLabel value="yes" control={<Radio size="small" sx={controlSx} />} label="Yes" />
+                                                        <FormControlLabel value="no" control={<Radio size="small" sx={controlSx} />} label="No" />
+                                                    </RadioGroup>
                                                 </FormControl>
                                             </Box>
                                         </Grid>
@@ -564,17 +549,17 @@ export const SelfRating = (props: any) => {
                                                     Type of Fund?
                                                 </Typography>
                                                 <FormControl component="fieldset" disabled={assessmentLocked} sx={{ minWidth: 0 }}>
-                                                <RadioGroup
-                                                    row
-                                                    value={fundType || "Equity Oriented Fund"}
-                                                    name="fundType"
-                                                    onChange={(e) => {
-                                                        handleChangeFundManagerType(e);
-                                                    }}
-                                                >
-                                                    <FormControlLabel value="Equity Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Equity Oriented Fund" />
-                                                    <FormControlLabel value="Debt Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented Fund" />
-                                                </RadioGroup>
+                                                    <RadioGroup
+                                                        row
+                                                        value={fundType || "Equity Oriented Fund"}
+                                                        name="fundType"
+                                                        onChange={(e) => {
+                                                            handleChangeFundManagerType(e);
+                                                        }}
+                                                    >
+                                                        <FormControlLabel value="Equity Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Equity Oriented Fund" />
+                                                        <FormControlLabel value="Debt Oriented Fund" control={<Radio size="small" sx={controlSx} />} label="Debt Oriented Fund" />
+                                                    </RadioGroup>
                                                 </FormControl>
                                             </Box>
                                         </Grid>
@@ -777,7 +762,7 @@ export const SelfRating = (props: any) => {
                 onClose={() => {
                     setShowResultModal(false);
                     if (modalType === 'success') {
-                        handleNextClick({ preventDefault: () => {} } as any);
+                        handleNextClick({ preventDefault: () => { } } as any);
                     } else {
                         navigate('/home', { replace: true });
                     }

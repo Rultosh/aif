@@ -1,7 +1,8 @@
 import React, { ReactElement, useEffect, useState, useCallback } from "react";
 import FileUpload from "./FileUpload";
 import FileUploadService from "./FileUploadService";
-import { useDropzone } from 'react-dropzone'
+import { useDropzone } from 'react-dropzone';
+import { isResumeField as checkIsResumeField } from "../utils/validationUtils";
 
 interface DocumentChipProps {
   id: String,
@@ -23,14 +24,19 @@ export default function DocumentChip(props: DocumentChipProps) {
   const [progress, setProgress] = useState(0.0);
   const [error, setError] = useState('');
 
+  const isResumeField = checkIsResumeField(props.id as string);
+
   const onDrop = useCallback((acceptedFiles: any, fileRejections: any) => {
     if (fileRejections.length > 0) {
-      setError("Only Excel, Word, and PDF files are allowed.");
+      if (isResumeField) {
+        setError("Only Excel, Word, and PDF files are allowed.");
+      } else {
+        setError("Only Excel, Word, PDF, and ZIP files are allowed.");
+      }
       return;
     }
 
     acceptedFiles.forEach((file: File) => {
-      console.log(file);
       if (props.validationTitle) {
         const fileNameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
         if (fileNameWithoutExtension.toLowerCase() !== props.validationTitle.toLowerCase()) {
@@ -38,9 +44,15 @@ export default function DocumentChip(props: DocumentChipProps) {
           return;
         }
       }
+
+      if (isResumeField) {
+        if (!checkIsResumeField(file.name)) {
+          setError("Filename must contain CV, Resume, Experience, or Curriculum.");
+          return;
+        }
+      }
       setFileInfo({ "file": file });
 
-      console.log('uploading...', file);
       FileUploadService.upload(
         props.id,
         file,
@@ -49,7 +61,6 @@ export default function DocumentChip(props: DocumentChipProps) {
           let uploadProgress = Math.round((100 * event.loaded) / event.total);
           setProgress(progress)
         }).then((response) => {
-          console.log(response);
           setOpen(false);
           setFileInfo({ file: null });
           setError('');
@@ -58,19 +69,27 @@ export default function DocumentChip(props: DocumentChipProps) {
             response.data['message']
           )
         }).catch((error) => {
-          setError("Error uploading file.");
+          setError((error as any).message || "Error uploading file.");
         });
     })
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
+    accept: isResumeField ? {
       'application/pdf': ['.pdf'],
       'application/msword': ['.doc'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
       'application/vnd.ms-excel': ['.xls'],
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+    } : {
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/zip': ['.zip'],
+      'application/x-zip-compressed': ['.zip']
     },
     multiple: false
   })

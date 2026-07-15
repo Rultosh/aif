@@ -51,6 +51,8 @@ import FileUploadService from '../../components/FileUploadService';
 import { shouldShowListPaginationFooter } from '../../lib/listPaginationVisibility';
 import { computeCompositeQueueScore, experiencedImAmcTableLabel } from '../../lib/queueCompositeScore';
 import { opaqueInfoToastAlertSx } from '../../lib/ui/opaqueInfoToastAlertSx';
+import { secureDownload } from '../../utils/downloadUtils';
+import FileUploadDisclaimer from '../../components/FileUploadDisclaimer';
 
 /** Checker workflow list: exactly these five sections (no "All"). */
 const CHECKER_WORKFLOW_TAB_IDS = [
@@ -1378,14 +1380,14 @@ export const Home = (pros: any) => {
                                                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, width: '100%' }}>
                                                                 <Tooltip title={disableDownload ? "Not submitted yet" : "Download Preview"}>
                                                                     <span>
-                                                                        <IconButton disabled={disableDownload} size="small" sx={{ color: disableDownload ? 'action.disabled' : '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)}>
+                                                                        <IconButton disabled={disableDownload} size="small" sx={{ color: disableDownload ? 'action.disabled' : '#3f4bee', '&:hover': { backgroundColor: '#eff6ff' } }} onClick={() => secureDownload(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview`, `PrelimApplication_${row.nameOfTheFund}.pdf`)}>
                                                                             <FileDownloadIcon fontSize="small" />
                                                                         </IconButton>
                                                                     </span>
                                                                 </Tooltip>
                                                                 <Tooltip title={disableDownload ? "Not submitted yet" : "Download ZIP"}>
                                                                     <span>
-                                                                        <IconButton disabled={disableDownload} size="small" sx={{ color: disableDownload ? 'action.disabled' : '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)}>
+                                                                        <IconButton disabled={disableDownload} size="small" sx={{ color: disableDownload ? 'action.disabled' : '#2cc56c', '&:hover': { backgroundColor: '#f0fdf4' } }} onClick={() => secureDownload(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip`, `PrelimApplication_${row.nameOfTheFund}_files.zip`)}>
                                                                             <FileDownloadIcon fontSize="small" />
                                                                         </IconButton>
                                                                     </span>
@@ -1549,6 +1551,7 @@ export const Home = (pros: any) => {
                                 <Typography sx={{ mt: 1, fontSize: '13px', color: '#64748b' }}>
                                     {assignMakerFile ? assignMakerFile.name : 'Optional. Either remark or document is mandatory.'}
                                 </Typography>
+                                <FileUploadDisclaimer />
                             </Box>
                         </DialogContent>
                         <DialogActions>
@@ -1570,11 +1573,11 @@ export const Home = (pros: any) => {
                             />
                             <Box sx={{ mt: 2 }}>
                                 <Button variant="outlined" component="label">
-                                    Choose Memo File (PDF/DOCX)
+                                    Choose Memo File (PDF/DOCX/ZIP)
                                     <input
                                         type="file"
                                         hidden
-                                        accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,application/x-zip-compressed"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0] || null;
                                             setMemoFile(file);
@@ -1585,6 +1588,7 @@ export const Home = (pros: any) => {
                                 <Typography sx={{ mt: 1, fontSize: '13px', color: '#64748b' }}>
                                     {memoFile ? memoFile.name : 'No file selected'}
                                 </Typography>
+                                <FileUploadDisclaimer supportedFormats={['PDF', 'Word', 'ZIP']} />
                                 {memoError && (
                                     <Typography sx={{ mt: 1, fontSize: '12px', color: '#d32f2f' }}>
                                         {memoError}

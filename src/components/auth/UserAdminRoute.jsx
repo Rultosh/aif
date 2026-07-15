@@ -26,9 +26,14 @@ function UserAdminRoute({ children }) {
         }
     };
     
+    // Check if this is a stolen session
+    const tabId = sessionStorage.getItem('app_tab_id');
+    const activeTabId = localStorage.getItem('active_tab_id');
+    const isStolenSession = activeTabId && tabId && activeTabId !== tabId;
+    
     useEffect(() => {
         console.log(localStorage.getItem('token'));
-        if(!localStorage.getItem('token')) {
+        if(!localStorage.getItem('token') || isStolenSession) {
             // not logged in so redirect to login page with the return url
             // return <Navigate to="/login" state={ '/home' } />
             console.log('navigate to login page');
@@ -44,7 +49,11 @@ function UserAdminRoute({ children }) {
             pathname: '/login',
         })
        }
-    })
+    }, [navigate, isStolenSession]);
+
+    if (!localStorage.getItem('token') || isStolenSession) {
+        return null;
+    }
 
     return children;
 }

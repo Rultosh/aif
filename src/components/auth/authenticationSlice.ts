@@ -105,7 +105,8 @@ export const authenticateThunk = createAsyncThunk(
         return response.data as ILoginResponse;
       }
     } catch(reason) {
-      console.log(reason)
+      // Security: Log error without exposing sensitive authentication data
+      console.log("Authentication error occurred");
       return rejectWithValue(getError(reason));
     }
   }
@@ -147,6 +148,7 @@ const authticationSlice = createSlice({
     setSessionTokens: (state, action: PayloadAction<{ token: string; refreshToken?: string }>) => {
       state.token = action.payload.token;
       localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('login_timestamp', Date.now().toString());
       if (action.payload.refreshToken) {
         localStorage.setItem('refreshToken', action.payload.refreshToken);
       }
@@ -161,7 +163,7 @@ const authticationSlice = createSlice({
         authenticateThunk.fulfilled,
       (state, action: PayloadAction<ILoginResponse | undefined>) => {
         const payload = action.payload;
-        console.log(payload);
+        // Security: Removed token logging - console.log(payload);
         if (payload?.mfaRequired === true && payload.challengeId) {
           state.mfaPending = {
             challengeId: payload.challengeId,
@@ -183,9 +185,13 @@ const authticationSlice = createSlice({
             localStorage.removeItem("activeRole");
           }
           state.mfaPending = undefined;
-          console.log(JSON.stringify(state));
+          // Security: Safe logging without exposing tokens
+          console.log("Authentication successful - User roles:", state.availableRoles);
           state.response = undefined;
           localStorage.setItem('token', String(state.token));
+          localStorage.setItem('login_timestamp', Date.now().toString());
+          const tabId = sessionStorage.getItem('app_tab_id');
+          if (tabId) localStorage.setItem('active_tab_id', tabId);
           if (payload.refreshToken) {
             localStorage.setItem('refreshToken', String(payload.refreshToken));
           }
@@ -211,6 +217,9 @@ const authticationSlice = createSlice({
         state.mfaPending = undefined;
         state.response = undefined;
         localStorage.setItem('token', String(state.token));
+        localStorage.setItem('login_timestamp', Date.now().toString());
+        const tabId = sessionStorage.getItem('app_tab_id');
+        if (tabId) localStorage.setItem('active_tab_id', tabId);
         const refresh = action.payload?.refreshToken;
         if (refresh) {
           localStorage.setItem('refreshToken', String(refresh));
@@ -226,7 +235,8 @@ const authticationSlice = createSlice({
       // let errStr = "unknown error. please contact support"
       // const errOut = "Invalid Username / Password entered. Try again!"
       // state.response = action.payload?.message ? action.payload?.message.toLowerCase() == errStr ? errOut : action.payload?.message: "Error Contact Support";
-      console.log(action.payload);
+      // Security: Log error without exposing sensitive payload data
+      console.log("Authentication failed:", action.payload?.message || "Unknown error");
       state.response = action.payload.message;
       state.status.fetchStatus = FetchStatus.FAILED;
     })

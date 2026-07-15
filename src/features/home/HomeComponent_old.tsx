@@ -35,6 +35,7 @@ import { useNavigate } from 'react-router-dom';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { secureDownload } from '../../utils/downloadUtils';
 
 export const Home = (pros: any) => {
 
@@ -278,24 +279,24 @@ export const Home = (pros: any) => {
                                                         <div style={{ display: 'flex' }}>
                                                             <Tooltip title="Download">
                                                                 <IconButton>
-                                                                    <FileDownloadIcon sx={{ fill: '#3f4bee', fontSize: '30px' }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
+                                                                    <FileDownloadIcon sx={{ fill: '#3f4bee', fontSize: '30px' }} onClick={() => secureDownload(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadPreview`, `PrelimApplication_${row.nameOfTheFund}.pdf`)} />
                                                                 </IconButton>
                                                             </Tooltip>
                                                             <Tooltip title="Download All">
                                                                 <IconButton>
-                                                                    <FileDownloadIcon sx={{ fill: '#2cc56c', fontSize: '30px' }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip?access_token=${localStorage.getItem('token')}`)} />
+                                                                    <FileDownloadIcon sx={{ fill: '#2cc56c', fontSize: '30px' }} onClick={() => secureDownload(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${row.id}/downloadAsZip`, `PrelimApplication_${row.nameOfTheFund}_files.zip`)} />
                                                                 </IconButton>
                                                             </Tooltip></div>
                                                     </TableCell> : <TableCell align="center" component="th" scope="row" sx={{ borderBottomWidth: 0 }}>
                                                         <div style={{ display: 'flex' }}>
                                                             <Tooltip title="Download">
                                                                 <IconButton>
-                                                                    <FileDownloadIcon sx={{ fill: '#3f4bee', fontSize: '30px' }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadPreview?access_token=${localStorage.getItem('token')}`)} />
+                                                                    <FileDownloadIcon sx={{ fill: '#3f4bee', fontSize: '30px' }} onClick={() => secureDownload(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadPreview`, `DetailedApplication_${row.nameOfTheFund}.pdf`)} />
                                                                 </IconButton>
                                                             </Tooltip>
                                                             <Tooltip title="Download All">
                                                                 <IconButton>
-                                                                    <FileDownloadIcon sx={{ fill: '#2cc56c', fontSize: '30px' }} onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadAsZip?access_token=${localStorage.getItem('token')}`)} />
+                                                                    <FileDownloadIcon sx={{ fill: '#2cc56c', fontSize: '30px' }} onClick={() => secureDownload(`${process.env.REACT_APP_API_BASE_URL}/api/detailedApplications/${row.detailedApplicationId}/downloadAsZip`, `DetailedApplication_${row.nameOfTheFund}_files.zip`)} />
                                                                 </IconButton>
                                                             </Tooltip>
                                                         </div>

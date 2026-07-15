@@ -12,6 +12,7 @@ import React, * as Rect from 'react'
 import { getFileServerBaseUrl } from '../../lib/fileServerBaseUrl';
 import FileUploadService from "../../components/FileUploadService";
 import { IFile } from "../../components/IFile";
+import { secureDownload } from '../../utils/downloadUtils';
 
 function formatStatusLabel(status: string | undefined): string {
     if (!status) return '—';

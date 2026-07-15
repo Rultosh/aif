@@ -31,6 +31,8 @@ import { isAllDocsAvailable } from '../../fundOverview/subsections/preview/docsM
 import { ModalComponent } from '../../../components/ModalComponent'
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { secureDownload } from '../../../utils/downloadUtils';
+import { blockOverflowNumericInput } from '../../../utils/validationUtils';
 
 export const CarryDistribution = (props: any) => {
 
@@ -166,6 +168,9 @@ export const CarryDistribution = (props: any) => {
         })
         setFormDataDetailsList(outData)
     }
+
+    /** inputProps for all financial numeric inputs: no scientific notation, max 9999 */
+    const numericInputProps = { min: 0, max: 9999, step: 0.01 };
 
     const handleChange = (ev: any) => {
         ev.preventDefault();
@@ -452,6 +457,8 @@ export const CarryDistribution = (props: any) => {
                             <TextField
                                 required
                                 type="number"
+                                onKeyDown={blockOverflowNumericInput}
+                                inputProps={numericInputProps}
                                 id="percent"
                                 label=""
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
@@ -467,6 +474,8 @@ export const CarryDistribution = (props: any) => {
                             <TextField
                                 required
                                 type="number"
+                                onKeyDown={blockOverflowNumericInput}
+                                inputProps={numericInputProps}
                                 id="carryOutOfCrore"
                                 label=""
                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
@@ -532,6 +541,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="hurdle"
                                             label="Hurdle (%)"
                                             //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
@@ -555,6 +566,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="catchup"
                                             label="Catchup(%)"
                                             //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
@@ -578,6 +591,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="carry"
                                             label="Carry(%)"
                                             //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
@@ -602,6 +617,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="profit"
                                             label="Profit to investors(%)"
                                             //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
@@ -627,6 +644,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="corpusAssumed"
                                             label="Distributable corpus assumed for illustration[₹ Crore]"
                                             //defaultValue={formData.corpus === undefined ? " " : formData["corpus"]}
@@ -671,6 +690,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="capitalAmount"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["capitalAmount"] || ''}
@@ -690,6 +711,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="capitalBalance"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["capitalBalance"] || ''}
@@ -709,6 +732,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="hurdleAmount"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["hurdleAmount"] || ''}
@@ -728,6 +753,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="hurdleBalance"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["hurdleBalance"] || ''}
@@ -747,6 +774,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="catchupAmount"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["catchupAmount"] || ''}
@@ -766,6 +795,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="catchupBalance"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["catchupBalance"] || ''}
@@ -784,6 +815,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="profitAmount"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["profitAmount"] || ''}
@@ -803,6 +836,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="profitBalance"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["profitBalance"]}
@@ -822,6 +857,8 @@ console.log(prilimFormData);
                                         <TextField
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="carryAmount"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["carryAmount"]}
@@ -841,6 +878,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="carryBalance"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={formData["carryBalance"]}
@@ -876,6 +915,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="profittoInvestorsAmount"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={Number(formData.hurdleAmount || 0) + Number(formData.profitAmount || 0)}
@@ -892,6 +933,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="profittoInvestors"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={Number(formData.hurdleBalance || 0) + Number(formData.profitBalance || 0)}
@@ -914,6 +957,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="distributionAmount"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={Number(formData.catchupAmount || 0) + Number(formData.carryAmount || 0)}
@@ -930,6 +975,8 @@ console.log(prilimFormData);
                                             }}
                                             required
                                             type="number"
+                                            onKeyDown={blockOverflowNumericInput}
+                                            inputProps={numericInputProps}
                                             id="distribution"
                                             //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
                                             value={Number(formData.catchupBalance || 0) + Number(formData.carryBalance || 0)}
@@ -989,6 +1036,8 @@ console.log(prilimFormData);
                                             <TextField
                                                 required
                                                 type="number"
+                                                onKeyDown={blockOverflowNumericInput}
+                                                inputProps={numericInputProps}
                                                 id="percent"
                                                 label="%"
                                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}
@@ -1007,6 +1056,8 @@ console.log(prilimFormData);
                                             <TextField
                                                 required
                                                 type="number"
+                                                onKeyDown={blockOverflowNumericInput}
+                                                inputProps={numericInputProps}
                                                 id="carryOutOfCrore"
                                                 label=" "
                                                 //defaultValue={formData.fundLaunchedDate === undefined ? " " : formData["fundLaunchedDate"]}

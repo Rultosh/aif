@@ -21,7 +21,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { selectUsers } from '../../../admin/adminSlice';
 import { selectSelfRatings } from "../selfRating/selfRatingSlice";
 import { fetchSelfRatingAsync } from "../selfRating/selfRatingSlice";
-import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../utils/validationUtils";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount, standardNumericValidation, blockOverflowNumericInput } from "../../../../utils/validationUtils";
 
 interface PrelimApplicationProps {
     prelimApplicationId: String | undefined,
@@ -614,15 +614,15 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         carriedInterest: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Carried Interest must be a number").required("Carried Interest is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         description: Yup.string().required("Description is required").test("check-script", htmlTagsNotAllowed, checkScript).matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed").test("word-limit", "Description cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable(),
         // investmentStrategy: Yup.string().required("Investment Strategy is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
-        sdDescription: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Capital raised till date must be a number").required("Capital raised till date is required").min(0, "Negative values not allowed"),
-        sdTargetCorpusDomestic: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic must be a number").required("Domestic is required").min(0, "Negative values not allowed"),
-        sdTargetCorpusOverseas: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Overseas must be a number").required("Overseas is required").min(0, "Negative values not allowed"),
+        sdDescription: standardNumericValidation("Capital raised till date"),
+        sdTargetCorpusDomestic: standardNumericValidation("Domestic"),
+        sdTargetCorpusOverseas: standardNumericValidation("Overseas"),
         sdTotalTargetCorpus: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).required("Total Target Corpus is required").min(100, "Value less than Rs. 100 crores shall not be allowed"),
-        sdGreenShoeTargetCorpusDomestic: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic (Green Shoe) must be a number").required("Domestic (Green Shoe) is required").min(0, "Negative values not allowed"),
-        sdGreenShoeTargetCorpusOverseas: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Overseas (Green Shoe) must be a number").required("Overseas (Green Shoe) is required").min(0, "Negative values not allowed"),
-        sdGreenShoeTotalTargetCorpus: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Total Target Corpus (Green Shoe) must be a number").required("Total Target Corpus (Green Shoe) is required").min(0, "Negative values not allowed"),
-        sdFirstClosingDomesticAmount: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Domestic Amount must be a number").required("Domestic Amount is required").min(0, "Negative values not allowed"),
-        sdFirstClosingOverseasAmount: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Overseas Amount must be a number").required("Overseas Amount is required").min(0, "Negative values not allowed"),
+        sdGreenShoeTargetCorpusDomestic: standardNumericValidation("Domestic (Green Shoe)"),
+        sdGreenShoeTargetCorpusOverseas: standardNumericValidation("Overseas (Green Shoe)"),
+        sdGreenShoeTotalTargetCorpus: standardNumericValidation("Total Target Corpus (Green Shoe)"),
+        sdFirstClosingDomesticAmount: standardNumericValidation("Domestic Amount"),
+        sdFirstClosingOverseasAmount: standardNumericValidation("Overseas Amount"),
         sdFirstClosingDomesticAmountDate: Yup.date()
             .nullable()
             .transform((curr, orig) => orig === '' ? null : curr)
@@ -632,7 +632,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
         // sdFirstCorpusOverseasAmountDate: Yup.string().required("This value is required").nullable(),
         aifCategoryType: Yup.string().required("AIF Category Type is required").nullable(),
         targetReturnIRR: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Target Return must be a number").required("Target Return is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
-        fundSetupCost: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Fund set up cost must be a number").required("Fund set up cost is required").min(0, "Negative values not allowed"),
+        fundSetupCost: standardNumericValidation("Fund set up cost"),
         otherExpenses: Yup.number().transform((val) => (isNaN(val) ? undefined : val)).typeError("Other Expenses must be a number").required("Other Expenses is required").min(0, "Negative values not allowed").max(100, "Percentage cannot exceed 100"),
         //justificationForHurdleCarryInterestRate: Yup.string().required("Justification for Hurdle and carry interest rate is required").nullable(),
     });
@@ -1053,7 +1053,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            type="number" onKeyDown={blockOverflowNumericInput}
                             id="termOfFund"
                             label="Term of the Fund (Years)"
                             {...register("termOfFund")}
@@ -1072,7 +1072,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            type="number" onKeyDown={blockOverflowNumericInput}
                             id="commitmentPeriod"
                             label="Commitment Period (Years)"
                             value={prelimApplicationFormData.commitmentPeriod ?? ''}
@@ -1091,7 +1091,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            type="number" onKeyDown={blockOverflowNumericInput}
                             id="preferredReturn"
                             label="Preferred Return/Hurdle Rate p.a. (%)"
                             value={prelimApplicationFormData.preferredReturn ?? ''}
@@ -1108,7 +1108,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            type="number" onKeyDown={blockOverflowNumericInput}
                             id="targetReturnIRR"
                             label="Target Gross Return of the Fund (IRR in %)"
                             value={prelimApplicationFormData.targetReturnIRR ?? ''}
@@ -1125,7 +1125,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            type="number" onKeyDown={blockOverflowNumericInput}
                             id="managementFees"
                             label="Management Fee p.a. (%)"
                             value={prelimApplicationFormData.managementFees ?? ''}
@@ -1142,7 +1142,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            type="number" onKeyDown={blockOverflowNumericInput}
                             id="fundSetupCost"
                             label="Fund Set Up Cost (%)"
                             value={prelimApplicationFormData.fundSetupCost ?? ''}
@@ -1159,7 +1159,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            type="number" onKeyDown={blockOverflowNumericInput}
                             id="otherExpenses"
                             label="Operating expenses p.a. %"
                             value={prelimApplicationFormData.otherExpenses ?? ''}
@@ -1176,7 +1176,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                         <TextField
                             required
                             fullWidth
-                            type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            type="number" onKeyDown={blockOverflowNumericInput}
                             id="carriedInterest"
                             label="Carried Interest (%)"
                             value={prelimApplicationFormData.carriedInterest ?? ''}
@@ -1321,7 +1321,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdDescription"
                                         label="Capital Raised Till Date (₹ Crore)"
                                         value={prelimApplicationFormData.sdDescription ?? ''}
@@ -1352,7 +1352,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdTargetCorpusDomestic"
                                         label="Domestic (₹ Crore)"
                                         value={prelimApplicationFormData.sdTargetCorpusDomestic ?? ''}
@@ -1375,7 +1375,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdTargetCorpusOverseas"
                                         label="Overseas (₹ Crore)"
                                         value={prelimApplicationFormData.sdTargetCorpusOverseas ?? ''}
@@ -1398,7 +1398,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdTotalTargetCorpus"
                                         label="Total Target Corpus (₹ Crore)"
                                         value={prelimApplicationFormData.sdTotalTargetCorpus ?? ''}
@@ -1429,7 +1429,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdGreenShoeTargetCorpusDomestic"
                                         label="Domestic (Green Shoe) (₹ Crore)"
                                         value={prelimApplicationFormData.sdGreenShoeTargetCorpusDomestic ?? ''}
@@ -1452,7 +1452,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdGreenShoeTargetCorpusOverseas"
                                         label="Overseas (Green Shoe) (₹ Crore)"
                                         value={prelimApplicationFormData.sdGreenShoeTargetCorpusOverseas ?? ''}
@@ -1475,7 +1475,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdGreenShoeTotalTargetCorpus"
                                         label="Total (Green Shoe) (₹ Crore)"
                                         value={prelimApplicationFormData.sdGreenShoeTotalTargetCorpus ?? ''}
@@ -1538,7 +1538,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdFirstClosingDomesticAmount"
                                         label={prelimApplicationFormData.firstClosing ? "Domestic Amount (₹ Crore)" : "Expected Domestic Amount (₹ Crore)"}
                                         value={prelimApplicationFormData.sdFirstClosingDomesticAmount ?? ''}
@@ -1561,7 +1561,7 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
                                     <TextField
                                         required
                                         fullWidth
-                                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                                        type="number" onKeyDown={blockOverflowNumericInput}
                                         id="sdFirstClosingOverseasAmount"
                                         label={prelimApplicationFormData.firstClosing ? "Overseas Amount (₹ Crore)" : "Expected Overseas Amount (₹ Crore)"}
                                         value={prelimApplicationFormData.sdFirstClosingOverseasAmount ?? ''}
@@ -1670,7 +1670,5 @@ const PrelimApplicationData = forwardRef((props: PrelimApplicationProps, ref) =>
     else
         return <Box sx={{ p: 3, textAlign: 'center' }}><Typography>Loading...</Typography></Box>
 });
-
-
 
 export default PrelimApplicationData;

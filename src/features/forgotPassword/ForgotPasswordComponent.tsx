@@ -180,7 +180,11 @@ const ForgotPassword = () => {
                                 Please create a strong password for your account.
                             </Typography>
 
-                            <Grid container spacing={3}>
+                            <form autoComplete="off">
+                                {/* Security: Dummy input to prevent browser password saving */}
+                                <input type="password" name="password_fake" style={{ opacity: 0, position: 'absolute', top: -9999, left: -9999, zIndex: -1 }} aria-hidden="true" autoComplete="new-password" tabIndex={-1} />
+
+                                <Grid container spacing={3}>
                                     <Grid item xs={12}>
                                         <TextField
                                             required
@@ -190,6 +194,7 @@ const ForgotPassword = () => {
                                             label="New Password"
                                             value={formData["password"] || ''}
                                             onChange={handleChange}
+                                            autoComplete="new-password"
                                             placeholder="Enter new password"
                                             sx={fieldSx}
                                             InputProps={{
@@ -221,6 +226,7 @@ const ForgotPassword = () => {
                                             label="Confirm Password"
                                             value={formData["matchingPassword"] || ''}
                                             onChange={handleChange}
+                                            autoComplete="new-password"
                                             placeholder="Confirm your password"
                                             sx={fieldSx}
                                             InputProps={{
@@ -283,6 +289,7 @@ const ForgotPassword = () => {
                                         </Grid>
                                     )}
                                 </Grid>
+                                </form>
 
                             <Divider sx={{ my: 4 }} />
 

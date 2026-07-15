@@ -62,8 +62,12 @@ const AddOperationalUserModal = ({ open, onClose, onCreated }: Props) => {
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
           Add Operational User
         </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={6}><TextField fullWidth label="Email" value={formData.username} onChange={(e) => handleChange("username", e.target.value)} /></Grid>
+        <form autoComplete="off">
+          {/* Security: Dummy input to prevent browser credential saving */}
+          <input type="text" name="email_fake" style={{ opacity: 0, position: 'absolute', top: -9999, left: -9999, zIndex: -1 }} aria-hidden="true" autoComplete="off" tabIndex={-1} />
+          
+          <Grid container spacing={2}>
+            <Grid item xs={6}><TextField fullWidth label="Email" value={formData.username} onChange={(e) => handleChange("username", e.target.value)} autoComplete="off" /></Grid>
           <Grid item xs={6}><TextField fullWidth label="Contact Person" value={formData.contactPerson} onChange={(e) => handleChange("contactPerson", e.target.value)} /></Grid>
           <Grid item xs={6}><TextField fullWidth label="Company Name" value={formData.companyName} onChange={(e) => handleChange("companyName", e.target.value)} /></Grid>
           <Grid item xs={6}><TextField fullWidth label="Title" value={formData.title} onChange={(e) => handleChange("title", e.target.value)} /></Grid>
@@ -85,6 +89,7 @@ const AddOperationalUserModal = ({ open, onClose, onCreated }: Props) => {
           </Grid>
           <Grid item xs={6}><TextField fullWidth label="Address" value={formData.address} onChange={(e) => handleChange("address", e.target.value)} /></Grid>
         </Grid>
+        </form>
         {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
         <Box sx={{ display: "flex", gap: 2, mt: 3 }}>

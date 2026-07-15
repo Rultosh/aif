@@ -198,6 +198,7 @@ const ChangePassword = (props:any) => {
                                                     value={formData["oldPassword"] || ''}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
+                                                    autoComplete='off'
                                                 />
                                             </Grid>
 
@@ -211,6 +212,7 @@ const ChangePassword = (props:any) => {
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
                                                     helperText={STRONG_PASSWORD_HELPER_TEXT}
+                                                    autoComplete='off'
                                                 />
                                             </Grid>
 
@@ -223,6 +225,7 @@ const ChangePassword = (props:any) => {
                                                     value={formData["matchingPassword"] || ''}
                                                     onChange={handleChange}
                                                     sx={{ display: 'flex' }}
+                                                    autoComplete='off'
                                                 />
                                             </Grid>
 

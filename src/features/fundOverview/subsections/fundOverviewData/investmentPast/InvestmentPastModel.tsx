@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, FormControl, FormControlLabel, FormHelperText, Grid, InputLabel, MenuItem, Modal, Radio, RadioGroup, Select, TextField, Typography, Autocomplete } from "@mui/material";
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { createInvestmentPastAsync, updateInvestmentPastAsync } from './investmentPastSlice'
 import { useAppSelector, useAppDispatch } from '../../../../../app/hooks'
 import { wrapArgument } from "../../../../../lib/api-status/actionWrapper";
@@ -14,7 +14,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import { PrelimApplicationState, selectPrelimApplication } from "../prelimApplicationDataSlice";
-import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount, standardNumericValidation, blockOverflowNumericInput } from "../../../../../utils/validationUtils";
 
 interface InvestmentPastModelProps {
   investmentPastFormData: IInvestmentPast,
@@ -208,7 +208,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
 
   const checkScript = (value: any) => !value || !value.match(/<[^> ]*>/);
 
-  const validationSchema = Yup.object().shape({
+  const validationSchema = useMemo(() => Yup.object().shape({
     nameOfCompany: Yup.string().required("Name is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     sector: Yup.string().required("Sector is required").test("check-script", htmlTagsNotAllowed, checkScript).nullable(),
     briefProfile: Yup.string().required("Business Introduction is required").test("check-script", htmlTagsNotAllowed, checkScript).test("word-limit", "Business Introduction cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
@@ -231,13 +231,13 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
       : Yup.string().nullable(),
     moic: Yup.string().required("MOIC is required").nullable().matches(/^[0-9]+(\.[0-9]{1,2})?$/, "Only numbers and up to 2 decimal places are allowed"),
     grossIrr: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Gross IRR is required").nullable(),
-    timeTakenFromSourcingToClosure: Yup.number().transform((value, originalValue) => (originalValue === "" ? undefined : value)).typeError("Must be a number").required("Time taken from sourcing to closure is required").min(0, "Time cannot be negative").nullable(),
+    timeTakenFromSourcingToClosure: standardNumericValidation("Time taken from sourcing to closure"),
     // conflictOfInterest: Yup.string().required("Conflict of Interest is required").nullable(),
     conflictOfInterest: Yup.string().test("word-limit", "Conflict Of Interest cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     stakeOfEmployee: Yup.string().nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     investmentStageFundingRound: Yup.string().required("Investment Stage / Funding Round is required").test("word-limit", "Investment Stage / Funding Round cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
     investmentStageDealSourced: Yup.string().required("Deal Sourced Information is required").test("word-limit", "Deal Sourced Information cannot exceed " + FIELD_LIMITS.LONG_TEXT + " words", wordLimit(FIELD_LIMITS.LONG_TEXT)).nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
-  });
+  }), [isEquityOriented]);
 
   const {
     control,
@@ -291,7 +291,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
     "Telecommunication",
     "Textiles"
   ];
-  console.log(investmentPastFormData)
+  // console.log(investmentPastFormData)
 
   return <Modal
     open={props.open}
@@ -525,7 +525,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <TextField
               required
               fullWidth
-              type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+              type="number" onKeyDown={blockOverflowNumericInput}
               id="grossIrr"
               label="Gross IRR (%)"
               value={investmentPastFormData.grossIrr || ''}
@@ -594,7 +594,7 @@ export const InvestmentPastModel = (props: InvestmentPastModelProps) => {
             <TextField
               required
               fullWidth
-              type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+              type="number" onKeyDown={blockOverflowNumericInput}
               id="timeTakenFromSourcingToClosure"
               label="Time Taken From Sourcing To Closure (In Months)"
               inputProps={{ min: 0 }}

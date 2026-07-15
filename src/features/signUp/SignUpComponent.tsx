@@ -25,7 +25,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import { getCharCount, FIELD_LIMITS } from "../../utils/validationUtils";
+import { getCharCount, FIELD_LIMITS, freeformRegx } from "../../utils/validationUtils";
 
 const SignUp = () => {
     const fieldSx = {
@@ -148,12 +148,12 @@ const SignUp = () => {
         companyName: Yup
             .string()
             .trim()
-            .test("no-html-tags", "HTML tags are not allowed", (value: any) => !value || !String(value).match(/<[^>]*>/))
+            .matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed")
             .required("Company Name is required"),
         schemeName: Yup
             .string()
             .trim()
-            .test("no-html-tags", "HTML tags are not allowed", (value: any) => !value || !String(value).match(/<[^>]*>/))
+            .matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed")
             .max(200, "Scheme Name must be at most 200 characters")
             .required("Scheme Name is required"),
         sebiRegistration: Yup
@@ -172,7 +172,7 @@ const SignUp = () => {
         contactPerson: Yup
             .string()
             .trim()
-            .test("no-html-tags", "HTML tags are not allowed", (value: any) => !value || !String(value).match(/<[^>]*>/))
+            .matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed")
             .required("Contact Person is required"),
         sebiRegistrationDate: Yup.date()
             .nullable()
@@ -223,15 +223,7 @@ const SignUp = () => {
         }),
         address: Yup.string()
             .trim()
-            .test("Invalid input entered", function (value: any) {
-                const pattern = /[<>'=()[\]@$%*]/;
-                const isNotValidInput = pattern.test(value);
-                if (isNotValidInput) {
-                    return false;
-                } else {
-                    return true;
-                }
-            })
+            .matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed")
             .required("Address is required")
     });
 
@@ -329,8 +321,12 @@ const SignUp = () => {
                         </Grid>
                     </Grid>
 
-                    <Box sx={{ mt: 3 }}>
-                        <Grid container spacing={3}>
+                    <form autoComplete="off">
+                        {/* Security: Dummy inputs to prevent browser credential saving */}
+                        <input type="text" name="email_fake" style={{ opacity: 0, position: 'absolute', top: -9999, left: -9999, zIndex: -1 }} aria-hidden="true" autoComplete="off" tabIndex={-1} />
+                        
+                        <Box sx={{ mt: 3 }}>
+                            <Grid container spacing={3}>
                             <Grid item xs={4}>
                                 <TextField
                                     required
@@ -486,6 +482,7 @@ const SignUp = () => {
                                     error={!!errors.username}
                                     helperText={errors.username?.message as string}
                                     onChange={handleChange}
+                                    autoComplete="off"
                                     sx={fieldSx}
                                     inputProps={{maxLength: FIELD_LIMITS.SHORT_TEXT}}
                                 />
@@ -670,6 +667,7 @@ const SignUp = () => {
                             </Grid>
                         </Grid>
                     </Box>
+                    </form>
 
                     <Typography variant="body2" sx={{ mt: 1, textAlign: "center", color: '#000000' }}>
                         For any help, please feel free to contact us at <span style={{ color: '#000000', fontWeight: 600 }}>aif.investment@npstrust.org.in</span>

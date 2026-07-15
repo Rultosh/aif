@@ -8,9 +8,10 @@ const fileServer = axios.create({
 });
 
 fileServer.interceptors.request.use(function(config) {
-  if (config && config.headers)
-    console.log('Interceptor', localStorage.getItem('token'));
-    config.headers['Authorization'] = "Bearer " + localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    if(token) {
+        config.headers.Authorization = 'Bearer '+token;
+    }
     return config;
 })
 

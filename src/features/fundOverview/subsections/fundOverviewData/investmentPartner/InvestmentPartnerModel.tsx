@@ -19,7 +19,7 @@ import { IInvestmentResponsibleAsNonLead, defaultIIInvestmentResponsibleAsNonLea
 import Moment from 'moment';
 import DocumentChip from "../../../../../components/DocumentChip";
 import DownloadIcon from '@mui/icons-material/Download';
-import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount } from "../../../../../utils/validationUtils";
+import { FIELD_LIMITS, checkScript, htmlTagsNotAllowed, freeformRegx, wordLimit, getCharCount, getWordCount, standardNumericValidation, blockOverflowNumericInput } from "../../../../../utils/validationUtils";
 
 
 interface InvestmentPartnerModelProps {
@@ -137,7 +137,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
   };
   const investmentValidationSchema = Yup.object().shape({
     nameOfCompany: Yup.string().required("Name of company is required").nullable().matches(freeformRegx, "HTML/XML tags and braces (<, >, {, }, [, ]) are not allowed"),
-    amountInvested: Yup.number().typeError("Must be a number").required("Amount is required").min(0, "Amount cannot be negative"),
+    amountInvested: standardNumericValidation("Amount Invested"),
     dateOfInvestment: Yup.date()
       .nullable()
       .transform((curr, orig) => orig === '' ? null : curr)
@@ -426,7 +426,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               <TextField
                 required
                 fullWidth
-                type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                type="number" onKeyDown={blockOverflowNumericInput}
                 id="age"
                 label="Age"
                 inputProps={{ min: 0 }}
@@ -527,7 +527,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
               <TextField
                 required
                 fullWidth
-                type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                type="number" onKeyDown={blockOverflowNumericInput}
                 id="yearsWorkedTogether"
                 label="No. Of Years Worked Together Among Partners"
                 inputProps={{ min: 0 }}
@@ -607,7 +607,7 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
                       <TextField
                         required
                         fullWidth
-                        type="number" onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                        type="number" onKeyDown={blockOverflowNumericInput}
                         label="Amount Invested (₹ Crore)"
                         size="small"
                         inputProps={{ min: 0 }}
@@ -927,3 +927,4 @@ export const InvestmentPartnerModel = (props: InvestmentPartnerModelProps) => {
     </Modal >
   );
 }
+

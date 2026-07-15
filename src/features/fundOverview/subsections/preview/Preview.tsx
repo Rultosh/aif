@@ -14,6 +14,7 @@ import { defaultIPrelimApplicationData } from "../fundOverviewData/IPrelimApplic
 import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import DocumentChip from "../../../../components/DocumentChip";
+import { secureDownload } from '../../../../utils/downloadUtils';
 import client from '../../../../app/api'
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { fetchRoleAsync, selectUsers } from '../../../admin/adminSlice'
@@ -88,6 +89,7 @@ export const Preview = (props: any) => {
     const statusPrelims = prelimApplicationState.prelimApplication.status
     //const [statusPrelims, setStatusPrelims] = useState<String | undefined>(undefined);
     const [commentPreview, setCommentPreview] = useState<String | undefined>("");
+    const [previewBlobUrl, setPreviewBlobUrl] = useState<string | undefined>(undefined);
     const [actionUid] = useState(uuid());
     const usersState = useAppSelector(selectUsers)
     const reviewedById = prelimApplicationState.prelimApplication.reviewedByUserId
@@ -141,6 +143,36 @@ export const Preview = (props: any) => {
         navigate('/home')
     }
 
+
+    useEffect(() => {
+        let objectUrl: string | undefined;
+        const fetchPreviewBlob = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token || !id) return;
+                const url = `${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${token}`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const blob = await response.blob();
+                    objectUrl = URL.createObjectURL(blob);
+                    setPreviewBlobUrl(objectUrl);
+                } else {
+                    console.error("Failed to fetch preview document.");
+                }
+            } catch (err) {
+                console.error("Error fetching preview blob", err);
+            }
+        };
+        fetchPreviewBlob();
+        return () => {
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+        };
+    }, [id]);
 
     /*const validationSchema = Yup.object().shape({
         previewComments: Yup.string().required("Comments is required"),
@@ -335,7 +367,12 @@ export const Preview = (props: any) => {
         const bucket = `workflow-action-${applicationId}-${action.toLowerCase()}`;
         let uploadedName = '';
         for (let i = 0; i < actionFiles.length; i++) {
-            const file = actionFiles[i];
+            const originalFile = actionFiles[i];
+
+            // Sanitize filename: replace characters rejected by CheckScriptValidator with underscores
+            const sanitizedFileName = originalFile.name.replace(/[^a-zA-Z0-9.\\-_ ]/g, '_');
+            const file = new File([originalFile], sanitizedFileName, { type: originalFile.type });
+
             let uploaded: any;
             try {
                 uploaded = await FileUploadService.upload(bucket, file, false, () => { });
@@ -529,12 +566,18 @@ export const Preview = (props: any) => {
                                     Application Document Preview
                                 </Typography>
                             </Box>
-                            <iframe
-                                src={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/preview?access_token=${localStorage.getItem('token')}`}
-                                width="100%"
-                                height="600"
-                                style={{ border: 'none' }}
-                            ></iframe>
+                            {previewBlobUrl ? (
+                                <iframe
+                                    src={previewBlobUrl}
+                                    width="100%"
+                                    height="600"
+                                    style={{ border: 'none' }}
+                                ></iframe>
+                            ) : (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '600px' }}>
+                                    <CircularProgress />
+                                </Box>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -640,8 +683,7 @@ export const Preview = (props: any) => {
                                                     <Chip
                                                         icon={<FileDownloadIcon />}
                                                         label="Download Application"
-                                                        component="a"
-                                                        href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview?access_token=${localStorage.getItem('token')}`}
+                                                        onClick={() => secureDownload(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadPreview`, `PrelimApplication_${prelimApplicationState?.prelimApplication?.nameOfTheFund || 'Preview'}.pdf`)}
                                                         clickable
                                                         sx={{
                                                             backgroundColor: '#0295c9',
@@ -661,8 +703,7 @@ export const Preview = (props: any) => {
                                                     <Chip
                                                         icon={<FileDownloadIcon />}
                                                         label="Download All As Zip"
-                                                        component="a"
-                                                        href={`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip?access_token=${localStorage.getItem('token')}`}
+                                                        onClick={() => secureDownload(`${process.env.REACT_APP_API_BASE_URL}/api/prelims/${id}/downloadAsZip`, `PrelimApplication_Documents_${prelimApplicationState?.prelimApplication?.nameOfTheFund || 'Preview'}.zip`)}
                                                         clickable
                                                         sx={{
                                                             backgroundColor: '#0295c9',

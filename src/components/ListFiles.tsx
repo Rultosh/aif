@@ -14,6 +14,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import { secureDownload } from '../utils/downloadUtils';
 
 
 interface ListFilesProps {
@@ -81,13 +82,13 @@ export default function ListFiles(props: ListFilesProps) {
         </TableHead>
         <TableBody>
           {
-            files.map((file) => {
-              return <StyledTableRow>
+            files.map((file, index) => {
+              return <StyledTableRow key={file.name ? String(file.name) : index}>
                 <StyledTableCell sx={{ textAlign: "justify !important" }}>{file.name}</StyledTableCell>
                 <StyledTableCell align="right">
                   <div onClick={(event) => { event.stopPropagation(); deleteFile(file) }} style={{ display: "flex" }}>
                     <Tooltip title="Download">
-                      <IconButton href={`${file.url}?access_token=${localStorage.getItem('token')}`} onClick={(event) => { event.stopPropagation() }}>
+                      <IconButton onClick={(event) => { event.stopPropagation(); secureDownload(String(file.url), String(file.name)); }}>
                         <DownloadIcon style={{ fontSize: "20px", color: "green", fontWeight: "bold", verticalAlign: "bottom" }} />
                       </IconButton>
                     </Tooltip>
