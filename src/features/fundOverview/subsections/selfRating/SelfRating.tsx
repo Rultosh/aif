@@ -86,6 +86,15 @@ export const SelfRating = (props: any) => {
                 }
             });
         }
+        
+        if (manager !== "First Time Fund Manager" && category === "Equity Oriented Fund") {
+            // Question 8 is at index 7 for more than one manager
+            if (questions[7]) {
+                questions[7].options = questions[7].options.slice(0, 3);
+                questions[7].weightage = questions[7].weightage.slice(0, 3);
+            }
+        }
+
         return questions;
     };
 
