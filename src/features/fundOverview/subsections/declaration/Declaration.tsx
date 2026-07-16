@@ -412,7 +412,6 @@ const Declaration = (props: any) => {
                                                     id: "boardResolution",
                                                     validationTitle: "Annexure_II_KYC_Form"
                                                 }
-                                                
                                             ]
                                         },
                                         {
@@ -523,7 +522,7 @@ const Declaration = (props: any) => {
                                                     <DocumentChip hideDisclaimer={true} label="AIF Grading Report" validationTitle="AIF Grading Report" id={`sdAifGradingReport${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip hideDisclaimer={true} label="Shareholding Pattern of Sponsor/IM"  id={`sdShareholdingPattern${effectiveId}`} />
+                                                    <DocumentChip hideDisclaimer={true} label="Shareholding Pattern of Sponsor/IM" validationTitle="Shareholding Pattern of Sponsor IM" id={`sdShareholdingPattern${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
                                                     <DocumentChip hideDisclaimer={true} label="Policy of Carry" validationTitle="Policy of Carry" id={`sdPolicyOfCarry${effectiveId}`} />
