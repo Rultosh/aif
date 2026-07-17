@@ -179,7 +179,25 @@ export const FundOverview = (props: any) => {
         prelimApplicationState.status.fetchStatus === FetchStatus.FAILED &&
         prelimApplicationState.status.responseCode === ResponseCode.FORBIDDEN;
 
-    const isRestricted = applicationNotFound || applicationForbidden || adminCannotAccessPreliminary || userCannotAccessPreliminary || pfCannotAccessPreliminary;
+    const isPreviewPath = pathname.toLowerCase().includes('/preview');
+    const submitSuccessPendingForThisPrelim =
+        !isNewApplicationRoute &&
+        !!id &&
+        sessionStorage.getItem(`prelimSubmitSuccessPending:${id}`) === '1';
+
+    const keepApplicantSubmitSuccessVisible =
+        applicationForbidden &&
+        !isOperationalPrelimViewer &&
+        roleParts.includes('USER') &&
+        isPreviewPath &&
+        submitSuccessPendingForThisPrelim;
+
+    const isRestricted =
+        applicationNotFound ||
+        (applicationForbidden && !keepApplicantSubmitSuccessVisible) ||
+        adminCannotAccessPreliminary ||
+        userCannotAccessPreliminary ||
+        pfCannotAccessPreliminary;
     const isUserEditableFlow =
         !isOperationalPrelimViewer &&
         roleParts.includes('USER') &&

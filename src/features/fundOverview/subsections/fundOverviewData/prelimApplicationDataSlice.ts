@@ -132,7 +132,12 @@ export const createApplicationAsync = createAsyncThunk(
       if (args.argument) {
         const response = await postApplication(args.argument);
         console.log('applicationdata/create', args.argument);
-        return response.data;
+        // API returns a plain success message string — do not treat it as a prelim entity.
+        return {
+          applicationId: args.argument.id,
+          workflowAction: String(args.argument.status || ''),
+          message: response.data,
+        };
       }
     } catch (reason) {
       console.log("Error: " + reason)
@@ -261,10 +266,37 @@ const prelimApplicationDataSlice = createSlice({
       })
       .addCase(
         createApplicationAsync.fulfilled,
-        (state, action: PayloadAction<IPrelimApplicationData>) => {
-          console.log(action.payload)
-          state.prelimApplication = action.payload
+        (state, action) => {
           state.status.fetchStatus = FetchStatus.IDLE;
+          const payload = action.payload as
+            | { applicationId?: number; workflowAction?: string }
+            | undefined;
+          if (!payload?.applicationId || !state.prelimApplication) {
+            return;
+          }
+          if (Number(state.prelimApplication.id) !== Number(payload.applicationId)) {
+            return;
+          }
+          // Keep the loaded entity; only advance local status so Preview is not torn down
+          // by a FORBIDDEN refetch after applicant submit (backend blocks USER GET once SUBMITTED).
+          const actionKey = String(payload.workflowAction || '').trim().toLowerCase();
+          const statusByAction: Record<string, string> = {
+            submit: 'SUBMITTED',
+            revise: 'REVISE',
+            review: 'REVIEWED',
+            approve: 'APPROVED',
+            reject: 'REJECTED',
+            tempclose: 'TEMP_CLOSED',
+            permclose: 'CLOSED',
+            reopen: 'REVIEWED',
+          };
+          const nextStatus = statusByAction[actionKey];
+          if (nextStatus) {
+            state.prelimApplication = {
+              ...state.prelimApplication,
+              status: nextStatus,
+            };
+          }
         }
       )
       .addCase(createApplicationAsync.rejected, (state, action) => {

@@ -15,7 +15,7 @@ import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import DocumentChip from "../../../../components/DocumentChip";
 import { secureDownload } from '../../../../utils/downloadUtils';
-import client from '../../../../app/api'
+import client, { CheckAuth } from '../../../../app/api'
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { fetchRoleAsync, selectUsers } from '../../../admin/adminSlice'
 import { useForm } from "react-hook-form";
@@ -139,8 +139,13 @@ export const Preview = (props: any) => {
     const hasActionToPerform = isApplicantActionable || isOperationalActionable || isMakerActionable || isCheckerActionable || isScActionable || isPfActionable;
 
     const handleSuccessDialogClose = () => {
+        // Navigate first so Preview is not replaced by Access Restricted while dialog closes.
+        CheckAuth.resetToAuthorized();
+        if (id) {
+            sessionStorage.removeItem(`prelimSubmitSuccessPending:${id}`);
+        }
+        navigate('/home', { replace: true });
         setShowSuccessDialog(false);
-        navigate('/home')
     }
 
 
@@ -436,6 +441,9 @@ export const Preview = (props: any) => {
                 ).unwrap();
 
                 if (intendedStatus === 'submit') {
+                    if (id) {
+                        sessionStorage.setItem(`prelimSubmitSuccessPending:${id}`, '1');
+                    }
                     setShowSuccessDialog(true);
                 } else {
                     navigate('/home')

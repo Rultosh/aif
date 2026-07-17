@@ -427,6 +427,15 @@ export const Home = (pros: any) => {
     }, [activeRole]);
 
     useEffect(() => {
+        // Applicants (USER) do not need assignee email maps; avoid calling staff-only user lists
+        // on Home mount after submit (those calls can fail and previously triggered full logout).
+        const needsAssigneeEmails = hasActiveRole(
+            'CHECKER', 'MAKER', 'ADMIN', 'USERADMIN', 'PENSION_FUND'
+        );
+        if (!needsAssigneeEmails) {
+            setAssigneeEmailsById({});
+            return;
+        }
         const loadAssigneeEmails = async () => {
             try {
                 const [makersRes, checkersRes, userAdminsRes, pfUsersRes] = await Promise.all([
@@ -455,7 +464,7 @@ export const Home = (pros: any) => {
             }
         };
         void loadAssigneeEmails();
-    }, []);
+    }, [activeRole]);
 
     useEffect(() => {
         const isChecker = activeRole.split(',').map((r) => r.trim().toUpperCase()).includes('CHECKER');
@@ -1364,7 +1373,7 @@ export const Home = (pros: any) => {
                                                 <TableCell
                                                     align="left"
                                                     sx={{ fontWeight: 500, color: '#1e293b' }}
-                                                    title="Composite queue score (0–10): 70% Initial Assessment + 30% Target Corpus"
+                                                    title="Composite queue score (0–10): 85% Initial Assessment + 15% Target Corpus"
                                                 >
                                                     {(() => {
                                                         const total = computeCompositeQueueScore(row);
