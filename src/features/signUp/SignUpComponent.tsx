@@ -26,6 +26,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { getCharCount, FIELD_LIMITS, freeformRegx } from "../../utils/validationUtils";
+import { fetchPublicRegistrationStatus } from "../admin/adminApi";
+
+const REGISTRATION_CLOSED_MESSAGE =
+    "The application window for the first phase of the NPS Bharat Fund of Funds platform has now closed, as all applications for this phase have been received.\n\n"
+    + "The portal will reopen shortly for the second phase of applications. Please keep visiting the website for updates and announcements.\n\n"
+    + "Thank you for your patience and understanding";
 
 const SignUp = () => {
     const fieldSx = {
@@ -65,6 +71,32 @@ const SignUp = () => {
     const [showResponse, setShowResponse] = useState(false);
     const [formDataEmail, setFormDataEmail] = useState(false);
     const [registedWithSebi, setRegisteredWithSebi] = useState("no");
+    const [registrationBlocked, setRegistrationBlocked] = useState(false);
+    const [registrationClosedMessage, setRegistrationClosedMessage] = useState(REGISTRATION_CLOSED_MESSAGE);
+    const [registrationCheckDone, setRegistrationCheckDone] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+        const checkRegistration = async () => {
+            try {
+                const res = await fetchPublicRegistrationStatus();
+                if (cancelled) return;
+                const enabled = Boolean(res?.data?.registrationEnabled);
+                if (!enabled) {
+                    if (res?.data?.closedMessage) {
+                        setRegistrationClosedMessage(String(res.data.closedMessage));
+                    }
+                    setRegistrationBlocked(true);
+                }
+            } catch {
+                // Keep form available if status endpoint is unreachable; backend still enforces on submit.
+            } finally {
+                if (!cancelled) setRegistrationCheckDone(true);
+            }
+        };
+        void checkRegistration();
+        return () => { cancelled = true; };
+    }, []);
 
     async function handleSubmitForm(data: any) {
         console.log(data)
@@ -246,6 +278,39 @@ const SignUp = () => {
     };
 
     console.log("showResponse: ", showResponse, "signupState: ", signupState)
+
+    if (registrationCheckDone && registrationBlocked) {
+        return (
+            <Box sx={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
+                <Box sx={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1,
+                    backgroundImage: `url(${signupBg})`, backgroundSize: 'cover', backgroundPosition: 'center',
+                    filter: 'blur(2px)', transform: 'scale(1.1)',
+                    '&::after': {
+                        content: '""', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                    }
+                }} />
+                <Container maxWidth="sm" sx={{ pt: '120px', pb: '60px', position: 'relative', zIndex: 1 }}>
+                    <Paper elevation={0} sx={{ px: 4, py: 5, borderRadius: '6px', backgroundColor: 'rgba(255,255,255,0.95)' }}>
+                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', mb: 2 }}>
+                            Registration closed
+                        </Typography>
+                        <Typography sx={{ color: '#4a4a4a', fontSize: '1.05rem', lineHeight: 1.7, whiteSpace: 'pre-line', mb: 3 }}>
+                            {registrationClosedMessage}
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            onClick={() => navigate('/login')}
+                            sx={{ textTransform: 'none', fontWeight: 700, backgroundColor: '#FF671F', '&:hover': { backgroundColor: '#e55a1f' } }}
+                        >
+                            Back to Login
+                        </Button>
+                    </Paper>
+                </Container>
+            </Box>
+        );
+    }
 
     return (
         <Box sx={{ position: 'relative', minHeight: '100vh', width: '100%' }}>

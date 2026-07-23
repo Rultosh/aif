@@ -81,13 +81,15 @@ const MAKER_TAB_LABELS: Record<MakerWorkflowTabId, string> = {
     withApplicant: 'With Applicant',
 };
 
-/** PRELIM draft with IA completed: enriched average below 5 (aligned with self-rating submit rule). */
+/** PRELIM draft with IA completed below the configured pass threshold. */
 function isCheckerFailedIaOnlyDraft(row: IPrelimApplicationData | undefined, statusUpper: string): boolean {
     if (!row) return false;
     const draftLike = !statusUpper || statusUpper === 'CREATED' || statusUpper === 'REVISE';
     if (!draftLike) return false;
     const st = String(row.stage || '').trim().toUpperCase();
     if (st && st !== 'PRELIM') return false;
+    if (row.initialAssessmentPassed === false) return true;
+    if (row.initialAssessmentPassed === true) return false;
     const raw = row.initialSelfRatingScore;
     if (raw == null || String(raw).trim() === '') return false;
     const avg = parseFloat(String(raw).replace(/,/g, ''));
@@ -129,12 +131,18 @@ function checkerWorkflowTabForStatus(statusRaw: string | undefined, row?: IPreli
 
 /**
  * Applicant home list: omit CREATED applications until Initial Assessment is finished
- * (enriched average on the list row ≥ 5, same threshold as successful IA submit in SelfRating).
+ * and the average meets the configured pass threshold for that manager/fund type.
  */
 function applicantPrelimVisibleInHomeTable(row: IPrelimApplicationData): boolean {
     const status = String(row.status || '').trim().toUpperCase();
     if (status !== 'CREATED') {
         return true;
+    }
+    if (row.initialAssessmentPassed === true) {
+        return true;
+    }
+    if (row.initialAssessmentPassed === false) {
+        return false;
     }
     const raw = row.initialSelfRatingScore;
     if (raw == null || String(raw).trim() === '') {

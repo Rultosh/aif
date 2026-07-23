@@ -16,6 +16,13 @@ import uuid from 'react-uuid';
 import { FetchStatus } from "../../../../lib/api-status/IStatus";
 import { selectUsers } from '../../../admin/adminSlice'
 import { Controller } from "react-hook-form";
+import { fetchPublicIaPassThresholds } from '../../../admin/adminApi';
+import {
+    DEFAULT_IA_PASS_THRESHOLDS,
+    IaPassThresholds,
+    normalizeIaPassThresholds,
+    resolveIaPassThreshold,
+} from '../../../../lib/iaPassThresholds';
 // import { useForm } from "react-hook-form";
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import * as Yup from "yup";
@@ -32,7 +39,8 @@ function computeApplicantAssessmentLocked(
     role: string | undefined,
     prelimId: string | undefined,
     selfRating: ISelfRating,
-    questionCount: number
+    questionCount: number,
+    passThreshold: number
 ): boolean {
     const roleParts = String(role || '')
         .split(',')
@@ -45,7 +53,7 @@ function computeApplicantAssessmentLocked(
     if (!prelimId || String(prelimId).toUpperCase() === 'NEW' || !Number(prelimId)) return false;
     if (!selfRating?.id || questionCount <= 0) return false;
     const avg = Number(selfRating.score || 0) / questionCount;
-    return Number.isFinite(avg) && avg >= 5;
+    return Number.isFinite(avg) && avg >= passThreshold;
 }
 
 export const SelfRating = (props: any) => {
@@ -59,6 +67,7 @@ export const SelfRating = (props: any) => {
     const [firstTime] = useState<boolean>(selfRatingState.selfRatings.id !== undefined);
     const [scoreBoard, setScoreBoard] = useState({} as any);
     const [score, setScore] = useState('0');
+    const [iaPassThresholds, setIaPassThresholds] = useState<IaPassThresholds>(DEFAULT_IA_PASS_THRESHOLDS);
     const usersState = useAppSelector(selectUsers)
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
@@ -104,6 +113,13 @@ export const SelfRating = (props: any) => {
             selfRatingValue.fundType != null ? String(selfRatingValue.fundType) : undefined
         ).length;
 
+    const currentPassThreshold = () =>
+        resolveIaPassThreshold(
+            iaPassThresholds,
+            selfRatingValue.managerType != null ? String(selfRatingValue.managerType) : undefined,
+            selfRatingValue.fundType != null ? String(selfRatingValue.fundType) : undefined
+        );
+
     // const selfRatingCookie = getCookie('selfRating') || '0';
     // const [selfRating, setSelfRating] = useCookie('selfRating', selfRatingCookie);
 
@@ -116,6 +132,20 @@ export const SelfRating = (props: any) => {
         //     handleClickSave();
         // }
     })
+
+    useEffect(() => {
+        let cancelled = false;
+        fetchPublicIaPassThresholds()
+            .then((res) => {
+                if (!cancelled) {
+                    setIaPassThresholds(normalizeIaPassThresholds(res?.data));
+                }
+            })
+            .catch(() => {
+                // Keep defaults (5) if config cannot be loaded.
+            });
+        return () => { cancelled = true; };
+    }, []);
 
     const [hasJustSubmitted, setHasJustSubmitted] = useState(false);
 
@@ -162,14 +192,19 @@ export const SelfRating = (props: any) => {
 
         // Set isSubmitted based on initial data
         const initialScore = Number(selfRatingState.selfRatings.score || 0);
-        const averageScore = initialScore / selfQuestions.length;
-        if (selfRatingState.selfRatings.id && averageScore >= 5) {
+        const averageScore = questions.length > 0 ? initialScore / questions.length : 0;
+        const passThreshold = resolveIaPassThreshold(
+            iaPassThresholds,
+            String(currentManagerType),
+            String(currentOrientedType)
+        );
+        if (selfRatingState.selfRatings.id && averageScore >= passThreshold) {
             // if (selfRatingState.selfRatings.id) {
             setIsSubmitted(true);
         } else {
             setIsSubmitted(false);
         }
-    }, [selfRatingState.status.fetchStatus === FetchStatus.IDLE])
+    }, [selfRatingState.status.fetchStatus === FetchStatus.IDLE, iaPassThresholds])
 
     useEffect(() => {
         updateScore()
@@ -182,7 +217,7 @@ export const SelfRating = (props: any) => {
     const handleClick = async (ev: any, navTo: string) => {
         try {
             const qc = getQuestionCountForLock();
-            if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, qc)) {
+            if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, qc, currentPassThreshold())) {
                 if (navTo !== 'previous') {
                     navigate(`/preliminary/${id}/fund`);
                 }
@@ -201,7 +236,7 @@ export const SelfRating = (props: any) => {
 
     async function handleClickSave() {
         const qc = getQuestionCountForLock();
-        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, qc)) {
+        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, qc, currentPassThreshold())) {
             return;
         }
         try {
@@ -256,7 +291,7 @@ export const SelfRating = (props: any) => {
 
 
     const handleChangeFundManagerType = (e: any) => {
-        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock())) {
+        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock(), currentPassThreshold())) {
             return;
         }
         // ev.preventDefault();
@@ -288,7 +323,7 @@ export const SelfRating = (props: any) => {
 
 
     const handleChange = (e: any, idx: any) => {
-        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock())) {
+        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock(), currentPassThreshold())) {
             return;
         }
         e.preventDefault();
@@ -331,7 +366,8 @@ export const SelfRating = (props: any) => {
         usersState.role,
         id,
         selfRatingValue,
-        selfQuestions.length
+        selfQuestions.length,
+        currentPassThreshold()
     );
 
     for (let i = 0; i < selfQuestions.length; i++) {
@@ -420,7 +456,7 @@ export const SelfRating = (props: any) => {
     const [modalType, setModalType] = useState<'success' | 'fail'>('success');
 
     const handleSubmitClick = async () => {
-        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock())) {
+        if (computeApplicantAssessmentLocked(usersState.role, id, selfRatingValue, getQuestionCountForLock(), currentPassThreshold())) {
             return;
         }
         setIsLoading(true);
@@ -429,6 +465,7 @@ export const SelfRating = (props: any) => {
             await handleClickSave();
             const currentScore = Number(selfRatingValue.score || 0);
             const averageScore = (currentScore / selfQuestions.length);
+            const passThreshold = currentPassThreshold();
             const notifyOutcome = async (failed: boolean) => {
                 if (!Number(id)) return;
                 try {
@@ -438,7 +475,7 @@ export const SelfRating = (props: any) => {
                 }
             };
             // alert(averageScore)
-            if (averageScore >= 5) {
+            if (averageScore >= passThreshold) {
                 await notifyOutcome(false);
                 setModalType('success');
                 setIsSubmitted(true);

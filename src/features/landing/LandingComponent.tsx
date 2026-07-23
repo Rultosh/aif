@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, Divider, CircularProgress, Snackbar, Alert, MenuItem } from "@mui/material";
+import { Container, Grid, Card, CardContent, Box, Button, Toolbar, Typography, TextField, Modal, Divider, CircularProgress, Snackbar, Alert, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import logo from '../../images/logo_nps.png';
 import ffsLogo from '../../images/ffs_final_logo.png';
 import azadiLogo from '../../images/Azadi.png'
@@ -15,6 +15,7 @@ import uuid from "react-uuid";
 import { fetchRoleAsync, selectUsers } from '../admin/adminSlice'
 import { ModalComponent } from '../../components/ModalComponent'
 import { CheckAuth } from '../../app/api';
+import { fetchPublicRegistrationStatus } from '../admin/adminApi';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -72,7 +73,31 @@ const Landing = () => {
     const [otpValue, setOtpValue] = useState('');
     const [selectedRole, setSelectedRole] = useState<string>('');
     const usersState = useAppSelector(selectUsers)
+    const [registrationClosedOpen, setRegistrationClosedOpen] = useState(false);
+    const [registrationClosedMessage, setRegistrationClosedMessage] = useState(
+        "The application window for the first phase of the NPS Bharat Fund of Funds platform has now closed, as all applications for this phase have been received.\n\n"
+        + "The portal will reopen shortly for the second phase of applications. Please keep visiting the website for updates and announcements.\n\n"
+        + "Thank you for your patience and understanding"
+    );
     // console.log(usersState)
+
+    const handleRegisterHereClick = async () => {
+        try {
+            const res = await fetchPublicRegistrationStatus();
+            const enabled = Boolean(res?.data?.registrationEnabled);
+            if (enabled) {
+                navigate('/signUp');
+                return;
+            }
+            if (res?.data?.closedMessage) {
+                setRegistrationClosedMessage(String(res.data.closedMessage));
+            }
+            setRegistrationClosedOpen(true);
+        } catch {
+            // If public status API is unavailable, keep previous behaviour and allow signup navigation.
+            navigate('/signUp');
+        }
+    };
 
     useEffect(() => {
         const isKickedOut = sessionStorage.getItem('kicked_out_crosstab') === 'true';
@@ -482,7 +507,7 @@ const Landing = () => {
                             </Button>
 
                             <Typography sx={{ textAlign: 'center', fontSize: '15px', color: '#000000', fontWeight: 500, mb: 3 }}>
-                                Don't have account? <Box component="span" sx={{ color: '#FF671F', fontWeight: 500, cursor: 'pointer' }} onClick={() => navigate('/signUp')}>Register here</Box>
+                                Don't have account? <Box component="span" sx={{ color: '#FF671F', fontWeight: 500, cursor: 'pointer' }} onClick={() => { void handleRegisterHereClick(); }}>Register here</Box>
                             </Typography>
 
                             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
@@ -560,6 +585,31 @@ const Landing = () => {
                     {toastMessage}
                 </Alert>
             </Snackbar>
+
+            <Dialog
+                open={registrationClosedOpen}
+                onClose={() => setRegistrationClosedOpen(false)}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle sx={{ fontWeight: 800, color: '#0f172a' }}>
+                    Registration closed
+                </DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ color: '#4a4a4a', fontSize: '1.05rem', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+                        {registrationClosedMessage}
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button
+                        variant="contained"
+                        onClick={() => setRegistrationClosedOpen(false)}
+                        sx={{ textTransform: 'none', fontWeight: 700, backgroundColor: '#FF671F', '&:hover': { backgroundColor: '#e55a1f' } }}
+                    >
+                        OK
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     )
 }

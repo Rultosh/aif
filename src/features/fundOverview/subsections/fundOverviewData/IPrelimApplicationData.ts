@@ -135,6 +135,8 @@ export interface IPrelimApplicationData {
   lpacIndependentMembersDetails: String | undefined,
   /** Average IA (self-rating) score, same as preview Average Score (total / N by manager type); set on prelim list APIs. */
   initialSelfRatingScore?: string | undefined,
+  /** Whether average meets configured pass threshold for manager/fund type; set on prelim list APIs. */
+  initialAssessmentPassed?: boolean | undefined,
   /** Yes = first-time fund manager, No = experienced; set on prelim list APIs. */
   iaFundManagerExperience?: string | undefined,
   /** True when a self-rating row exists for this prelim id (GET /prelims/initial-assessment-in-progress). */
@@ -285,6 +287,7 @@ export const defaultIPrelimApplicationData: IPrelimApplicationData = {
   lpacDecisionMakingProcess: undefined,
   lpacIndependentMembersDetails: undefined,
   initialSelfRatingScore: undefined,
+  initialAssessmentPassed: undefined,
   iaFundManagerExperience: undefined,
   initialAssessmentLinked: undefined,
   registrationAifName: undefined,

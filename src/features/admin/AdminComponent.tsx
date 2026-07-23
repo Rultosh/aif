@@ -20,6 +20,11 @@ import {
     IconButton,
     Divider,
     Chip,
+    Tabs,
+    Tab,
+    Alert,
+    CircularProgress,
+    TextField,
 } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -35,8 +40,18 @@ import { Delete, Edit, InfoOutlined, Close as CloseDialogIcon } from '@mui/icons
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
 import dayjs from "dayjs";
-import { assignUserAdminRole, sendSetPasswordEmail, getUserApplicationCount } from "./adminApi";
+import { assignUserAdminRole, sendSetPasswordEmail, getUserApplicationCount, fetchRegistrationConfig, updateRegistrationConfig, fetchIaPassThresholdsConfig, updateIaPassThresholdsConfig } from "./adminApi";
 import AddOperationalUserModal from "./AddOperationalUserModal";
+import {
+    DEFAULT_IA_PASS_THRESHOLDS,
+    IaPassThresholds,
+    normalizeIaPassThresholds,
+} from "../../lib/iaPassThresholds";
+
+const REGISTRATION_CLOSED_PREVIEW =
+    "The application window for the first phase of the NPS Bharat Fund of Funds platform has now closed, as all applications for this phase have been received.\n\n"
+    + "The portal will reopen shortly for the second phase of applications. Please keep visiting the website for updates and announcements.\n\n"
+    + "Thank you for your patience and understanding";
 
 const Admin = (props: any) => {
 
@@ -50,6 +65,16 @@ const Admin = (props: any) => {
     const [openAddOperational, setOpenAddOperational] = useState(false);
     const [detailUser, setDetailUser] = useState<IUser | null>(null);
     const navigate = useNavigate();
+    const [adminTab, setAdminTab] = useState(0);
+    const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [registrationConfigLoading, setRegistrationConfigLoading] = useState(false);
+    const [registrationConfigSaving, setRegistrationConfigSaving] = useState(false);
+    const [registrationConfigError, setRegistrationConfigError] = useState('');
+    const [registrationConfigSaved, setRegistrationConfigSaved] = useState(false);
+    const [iaThresholds, setIaThresholds] = useState<IaPassThresholds>(DEFAULT_IA_PASS_THRESHOLDS);
+    const [iaThresholdsSaving, setIaThresholdsSaving] = useState(false);
+    const [iaThresholdsError, setIaThresholdsError] = useState('');
+    const [iaThresholdsSaved, setIaThresholdsSaved] = useState(false);
 
     const formatVal = (v: unknown) => {
         if (v == null || String(v).trim() === '') return '—';
@@ -80,6 +105,89 @@ const Admin = (props: any) => {
         ))
 
     }, [open])
+
+    useEffect(() => {
+        if (adminTab !== 1) return;
+        let cancelled = false;
+        const loadConfig = async () => {
+            setRegistrationConfigLoading(true);
+            setRegistrationConfigError('');
+            setRegistrationConfigSaved(false);
+            setIaThresholdsError('');
+            setIaThresholdsSaved(false);
+            try {
+                const [regRes, iaRes] = await Promise.all([
+                    fetchRegistrationConfig(),
+                    fetchIaPassThresholdsConfig(),
+                ]);
+                if (!cancelled) {
+                    setRegistrationEnabled(Boolean(regRes?.data?.registrationEnabled));
+                    setIaThresholds(normalizeIaPassThresholds(iaRes?.data));
+                }
+            } catch (e: any) {
+                if (!cancelled) {
+                    setRegistrationConfigError(e?.response?.data?.message || e?.message || 'Failed to load configuration.');
+                }
+            } finally {
+                if (!cancelled) setRegistrationConfigLoading(false);
+            }
+        };
+        void loadConfig();
+        return () => { cancelled = true; };
+    }, [adminTab]);
+
+    const handleRegistrationToggle = async (enabled: boolean) => {
+        setRegistrationConfigSaving(true);
+        setRegistrationConfigError('');
+        setRegistrationConfigSaved(false);
+        try {
+            const res = await updateRegistrationConfig(enabled);
+            setRegistrationEnabled(Boolean(res?.data?.registrationEnabled));
+            setRegistrationConfigSaved(true);
+        } catch (e: any) {
+            setRegistrationConfigError(e?.response?.data?.message || e?.message || 'Failed to save configuration.');
+        } finally {
+            setRegistrationConfigSaving(false);
+        }
+    };
+
+    const clampIaThreshold = (n: number) => Math.min(10, Math.max(0, n));
+
+    const handleIaThresholdFieldChange = (key: keyof IaPassThresholds, raw: string) => {
+        const n = parseFloat(raw);
+        setIaThresholds((prev) => ({
+            ...prev,
+            [key]: Number.isFinite(n) ? clampIaThreshold(n) : prev[key],
+        }));
+        setIaThresholdsSaved(false);
+        setIaThresholdsError('');
+    };
+
+    const handleSaveIaThresholds = async () => {
+        const values = Object.values(iaThresholds);
+        if (values.some((v) => !Number.isFinite(v) || v < 0 || v > 10)) {
+            setIaThresholdsError('Each threshold must be between 0 and 10.');
+            return;
+        }
+        setIaThresholdsSaving(true);
+        setIaThresholdsError('');
+        setIaThresholdsSaved(false);
+        try {
+            const clamped: IaPassThresholds = {
+                firstTimeEquity: clampIaThreshold(iaThresholds.firstTimeEquity),
+                firstTimeDebt: clampIaThreshold(iaThresholds.firstTimeDebt),
+                experiencedEquity: clampIaThreshold(iaThresholds.experiencedEquity),
+                experiencedDebt: clampIaThreshold(iaThresholds.experiencedDebt),
+            };
+            const res = await updateIaPassThresholdsConfig(clamped);
+            setIaThresholds(normalizeIaPassThresholds(res?.data));
+            setIaThresholdsSaved(true);
+        } catch (e: any) {
+            setIaThresholdsError(e?.response?.data?.message || e?.message || 'Failed to save IA pass thresholds.');
+        } finally {
+            setIaThresholdsSaving(false);
+        }
+    };
 
     function handleSubmitForm() {
         //controller.save(formData);
@@ -442,6 +550,21 @@ const Admin = (props: any) => {
             {true ?
                 <Container maxWidth="xl" sx={{ pt: '120px' }}>
                     <Paper elevation={0} sx={{ backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                        <Box sx={{ px: 2.5, pt: 1, backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0' }}>
+                            <Tabs
+                                value={adminTab}
+                                onChange={(_e, v) => setAdminTab(v)}
+                                textColor="primary"
+                                indicatorColor="primary"
+                                sx={{ minHeight: 48 }}
+                            >
+                                <Tab label="Users" sx={{ textTransform: 'none', fontWeight: 700 }} />
+                                <Tab label="Configurations" sx={{ textTransform: 'none', fontWeight: 700 }} />
+                            </Tabs>
+                        </Box>
+
+                        {adminTab === 0 && (
+                            <>
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', p: 2.5, borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff' }}>
                             <Button variant="contained" onClick={() => setOpenAddOperational(true)} sx={{ textTransform: 'none', fontWeight: 700, borderRadius: '10px', px: 2.5, boxShadow: '0 2px 8px rgba(67, 56, 163, 0.25)' }}>
                                 Add operational user
@@ -472,6 +595,132 @@ const Admin = (props: any) => {
                             </Typography>
                             {renderUsersTable(applicantUsers, 'Registered applicants', 'applicant')}
                         </Box>
+                            </>
+                        )}
+
+                        {adminTab === 1 && (
+                            <Box sx={{ p: 3, backgroundColor: '#fff' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', mb: 1 }}>
+                                    Portal configurations
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#64748b', mb: 3 }}>
+                                    Control registration and Initial Assessment pass thresholds.
+                                </Typography>
+                                {registrationConfigLoading ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 2 }}>
+                                        <CircularProgress size={22} />
+                                        <Typography variant="body2">Loading configuration...</Typography>
+                                    </Box>
+                                ) : (
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, maxWidth: 720 }}>
+                                        <Paper elevation={0} sx={{ p: 2.5, border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={registrationEnabled}
+                                                        disabled={registrationConfigSaving}
+                                                        onChange={(e) => handleRegistrationToggle(e.target.checked)}
+                                                        color="primary"
+                                                    />
+                                                }
+                                                label={
+                                                    <Box>
+                                                        <Typography sx={{ fontWeight: 700, color: '#0f172a' }}>
+                                                            Enable user registration
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ color: '#64748b' }}>
+                                                            {registrationEnabled
+                                                                ? 'Registration is open. “Register here” opens the signup form.'
+                                                                : 'Registration is closed. “Register here” shows the phase-closed message.'}
+                                                        </Typography>
+                                                    </Box>
+                                                }
+                                                sx={{ alignItems: 'flex-start', m: 0 }}
+                                            />
+                                            {!registrationEnabled && (
+                                                <Alert severity="info" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
+                                                    {REGISTRATION_CLOSED_PREVIEW}
+                                                </Alert>
+                                            )}
+                                            {registrationConfigSaved && (
+                                                <Alert severity="success" sx={{ mt: 2 }}>
+                                                    Registration configuration saved.
+                                                </Alert>
+                                            )}
+                                            {registrationConfigError && (
+                                                <Alert severity="error" sx={{ mt: 2 }}>
+                                                    {registrationConfigError}
+                                                </Alert>
+                                            )}
+                                        </Paper>
+
+                                        <Paper elevation={0} sx={{ p: 2.5, border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                                            <Typography sx={{ fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
+                                                Initial Assessment pass thresholds
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
+                                                Average score required to pass (0–10). Used on Self Rating submit and home/list filters.
+                                            </Typography>
+                                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                                                <TextField
+                                                    label="First Time · Equity"
+                                                    type="number"
+                                                    size="small"
+                                                    value={iaThresholds.firstTimeEquity}
+                                                    onChange={(e) => handleIaThresholdFieldChange('firstTimeEquity', e.target.value)}
+                                                    inputProps={{ min: 0, max: 10, step: 0.1 }}
+                                                />
+                                                <TextField
+                                                    label="First Time · Debt"
+                                                    type="number"
+                                                    size="small"
+                                                    value={iaThresholds.firstTimeDebt}
+                                                    onChange={(e) => handleIaThresholdFieldChange('firstTimeDebt', e.target.value)}
+                                                    inputProps={{ min: 0, max: 10, step: 0.1 }}
+                                                />
+                                                <TextField
+                                                    label="Experienced · Equity"
+                                                    type="number"
+                                                    size="small"
+                                                    value={iaThresholds.experiencedEquity}
+                                                    onChange={(e) => handleIaThresholdFieldChange('experiencedEquity', e.target.value)}
+                                                    inputProps={{ min: 0, max: 10, step: 0.1 }}
+                                                />
+                                                <TextField
+                                                    label="Experienced · Debt"
+                                                    type="number"
+                                                    size="small"
+                                                    value={iaThresholds.experiencedDebt}
+                                                    onChange={(e) => handleIaThresholdFieldChange('experiencedDebt', e.target.value)}
+                                                    inputProps={{ min: 0, max: 10, step: 0.1 }}
+                                                />
+                                            </Box>
+                                            <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <Button
+                                                    variant="contained"
+                                                    disabled={iaThresholdsSaving}
+                                                    onClick={() => void handleSaveIaThresholds()}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    {iaThresholdsSaving ? 'Saving...' : 'Save thresholds'}
+                                                </Button>
+                                            </Box>
+                                            {iaThresholdsSaved && (
+                                                <Alert severity="success" sx={{ mt: 2 }}>
+                                                    IA pass thresholds saved.
+                                                </Alert>
+                                            )}
+                                            {iaThresholdsError && (
+                                                <Alert severity="error" sx={{ mt: 2 }}>
+                                                    {iaThresholdsError}
+                                                </Alert>
+                                            )}
+                                        </Paper>
+                                    </Box>
+                                )}
+                            </Box>
+                        )}
+
                         {open ? <RoleComponent open={open} userDetails={selectedRow} handleClose={handleClose}></RoleComponent> : <></>}
                         <AddOperationalUserModal
                             open={openAddOperational}

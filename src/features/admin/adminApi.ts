@@ -94,3 +94,52 @@ export function patchUserRoles(userId: number, role: string) {
   });
 }
 
+export function fetchRegistrationConfig() {
+  return api({
+    method: 'get',
+    url: `useradmin/config/registration`,
+  });
+}
+
+export function updateRegistrationConfig(registrationEnabled: boolean) {
+  return api({
+    method: 'patch',
+    url: `useradmin/config/registration`,
+    data: { registrationEnabled },
+  });
+}
+
+export function fetchIaPassThresholdsConfig() {
+  return api({
+    method: 'get',
+    url: `useradmin/config/ia-pass-thresholds`,
+  });
+}
+
+export function updateIaPassThresholdsConfig(payload: {
+  firstTimeEquity: number;
+  firstTimeDebt: number;
+  experiencedEquity: number;
+  experiencedDebt: number;
+}) {
+  return api({
+    method: 'patch',
+    url: `useradmin/config/ia-pass-thresholds`,
+    data: payload,
+  });
+}
+
+/** Public (no auth) — used on login / signup pages. */
+export async function fetchPublicRegistrationStatus() {
+  const baseURL = process.env.REACT_APP_API_BASE_URL;
+  const axios = (await import('axios')).default;
+  return axios.get(`${baseURL}/auth/registration-status`);
+}
+
+/** Public — SelfRating pass thresholds (manager type × fund type). */
+export async function fetchPublicIaPassThresholds() {
+  const baseURL = process.env.REACT_APP_API_BASE_URL;
+  const axios = (await import('axios')).default;
+  return axios.get(`${baseURL}/auth/ia-pass-thresholds`);
+}
+
