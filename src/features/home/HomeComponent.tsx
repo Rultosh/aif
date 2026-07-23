@@ -220,7 +220,7 @@ export const Home = (pros: any) => {
 
     const isApplicantUser = activeRole === 'USER';
 
-    /** Maps AIF Category Type (fund form) to table Fund Type: Equity / Debt. */
+    /** Maps AIF Category Type (fund form) — or IA self-rating fund type when form is empty — to Equity / Debt. */
     const getFundTypeTableLabel = (row: IPrelimApplicationData) => {
         const raw = String(row.aifCategoryType || '').trim();
         if (!raw) return '—';
@@ -1351,9 +1351,12 @@ export const Home = (pros: any) => {
                                                 </TableCell>
                                                 )}
                                                 <TableCell align="left" sx={{ color: '#64748b', whiteSpace: 'nowrap' }}>
-                                                    {row.applicationSubmissionDate
-                                                        ? Moment(String(row.applicationSubmissionDate)).format('DD MMM YYYY')
-                                                        : '-'}
+                                                    {(() => {
+                                                        const startRaw = row.applicationSubmissionDate || row.createdOn;
+                                                        return startRaw
+                                                            ? Moment(String(startRaw)).format('DD MMM YYYY')
+                                                            : '-';
+                                                    })()}
                                                 </TableCell>
                                                 <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>{targetCorpusDisplay}</TableCell>
                                                 <TableCell align="left" sx={{ fontWeight: 500, color: '#1e293b' }}>
