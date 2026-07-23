@@ -1,11 +1,12 @@
 {
   "files": {
     "main.css": "/aif/static/css/main.47124d7e.css",
-    "main.js": "/aif/static/js/main.f75b8012.js",
+    "main.js": "/aif/static/js/main.5e22cebe.js",
+    "static/js/477.afd90057.chunk.js": "/aif/static/js/477.afd90057.chunk.js",
     "static/js/787.51358596.chunk.js": "/aif/static/js/787.51358596.chunk.js",
     "static/media/login_videos.mp4": "/aif/static/media/login_videos.7124616488525dc40951.mp4",
     "static/media/user_manual.pdf": "/aif/static/media/user_manual.ac832908c3da5c92068b.pdf",
-    "static/media/FAQs.pdf": "/aif/static/media/FAQs.d8c48027b109f6453f5c.pdf",
+    "static/media/FAQs.pdf": "/aif/static/media/FAQs.de790925c38e6e7fcc33.pdf",
     "static/media/signup_ai.jpeg": "/aif/static/media/signup_ai.0145f0050347981ce5fb.jpeg",
     "static/media/Poppins-Regular.ttf": "/aif/static/media/Poppins-Regular.4211496d0e075ffe7c2f.ttf",
     "static/media/Poppins-Medium.ttf": "/aif/static/media/Poppins-Medium.c5eb70982e90502d0d01.ttf",
@@ -24,11 +25,12 @@
     "static/media/arrow_sign_in.svg": "/aif/static/media/arrow_sign_in.228104960787599be75a.svg",
     "static/media/arrow_check_eligibility.svg": "/aif/static/media/arrow_check_eligibility.7fe4472e8e96a76b31f6.svg",
     "main.47124d7e.css.map": "/aif/static/css/main.47124d7e.css.map",
-    "main.f75b8012.js.map": "/aif/static/js/main.f75b8012.js.map",
+    "main.5e22cebe.js.map": "/aif/static/js/main.5e22cebe.js.map",
+    "477.afd90057.chunk.js.map": "/aif/static/js/477.afd90057.chunk.js.map",
     "787.51358596.chunk.js.map": "/aif/static/js/787.51358596.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.47124d7e.css",
-    "static/js/main.f75b8012.js"
+    "static/js/main.5e22cebe.js"
   ]
 }
