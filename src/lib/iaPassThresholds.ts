@@ -39,7 +39,7 @@ export function normalizeIaPassThresholds(raw: any): IaPassThresholds {
   const num = (v: unknown, fallback: number) => {
     const n = typeof v === 'number' ? v : parseFloat(String(v ?? ''));
     if (!Number.isFinite(n)) return fallback;
-    return Math.min(10, Math.max(0, n));
+    return Math.min(10, Math.max(1, n));
   };
   return {
     firstTimeEquity: num(raw?.firstTimeEquity, DEFAULT_IA_PASS_THRESHOLDS.firstTimeEquity),

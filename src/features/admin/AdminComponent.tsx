@@ -72,6 +72,13 @@ const Admin = (props: any) => {
     const [registrationConfigError, setRegistrationConfigError] = useState('');
     const [registrationConfigSaved, setRegistrationConfigSaved] = useState(false);
     const [iaThresholds, setIaThresholds] = useState<IaPassThresholds>(DEFAULT_IA_PASS_THRESHOLDS);
+    /** String drafts so users can clear/retype freely; clamped to 1–10 on blur/save. */
+    const [iaThresholdDrafts, setIaThresholdDrafts] = useState<Record<keyof IaPassThresholds, string>>({
+        firstTimeEquity: String(DEFAULT_IA_PASS_THRESHOLDS.firstTimeEquity),
+        firstTimeDebt: String(DEFAULT_IA_PASS_THRESHOLDS.firstTimeDebt),
+        experiencedEquity: String(DEFAULT_IA_PASS_THRESHOLDS.experiencedEquity),
+        experiencedDebt: String(DEFAULT_IA_PASS_THRESHOLDS.experiencedDebt),
+    });
     const [iaThresholdsSaving, setIaThresholdsSaving] = useState(false);
     const [iaThresholdsError, setIaThresholdsError] = useState('');
     const [iaThresholdsSaved, setIaThresholdsSaved] = useState(false);
@@ -122,7 +129,14 @@ const Admin = (props: any) => {
                 ]);
                 if (!cancelled) {
                     setRegistrationEnabled(Boolean(regRes?.data?.registrationEnabled));
-                    setIaThresholds(normalizeIaPassThresholds(iaRes?.data));
+                    const normalized = normalizeIaPassThresholds(iaRes?.data);
+                    setIaThresholds(normalized);
+                    setIaThresholdDrafts({
+                        firstTimeEquity: formatThresholdDisplay(normalized.firstTimeEquity),
+                        firstTimeDebt: formatThresholdDisplay(normalized.firstTimeDebt),
+                        experiencedEquity: formatThresholdDisplay(normalized.experiencedEquity),
+                        experiencedDebt: formatThresholdDisplay(normalized.experiencedDebt),
+                    });
                 }
             } catch (e: any) {
                 if (!cancelled) {
@@ -151,22 +165,50 @@ const Admin = (props: any) => {
         }
     };
 
-    const clampIaThreshold = (n: number) => Math.min(10, Math.max(0, n));
+    const clampIaThreshold = (n: number) => Math.min(10, Math.max(1, n));
+
+    const formatThresholdDisplay = (n: number) => {
+        const rounded = Math.round(n * 100) / 100;
+        return String(rounded);
+    };
+
+    const syncDraftsFromThresholds = (next: IaPassThresholds) => {
+        setIaThresholdDrafts({
+            firstTimeEquity: formatThresholdDisplay(next.firstTimeEquity),
+            firstTimeDebt: formatThresholdDisplay(next.firstTimeDebt),
+            experiencedEquity: formatThresholdDisplay(next.experiencedEquity),
+            experiencedDebt: formatThresholdDisplay(next.experiencedDebt),
+        });
+    };
 
     const handleIaThresholdFieldChange = (key: keyof IaPassThresholds, raw: string) => {
-        const n = parseFloat(raw);
-        setIaThresholds((prev) => ({
-            ...prev,
-            [key]: Number.isFinite(n) ? clampIaThreshold(n) : prev[key],
-        }));
+        // Allow empty / partial decimals while typing (e.g. "6." then "6.5"); do not clamp here.
+        if (raw !== '' && !/^\d{0,2}(\.\d{0,2})?$/.test(raw)) {
+            return;
+        }
+        setIaThresholdDrafts((prev) => ({ ...prev, [key]: raw }));
         setIaThresholdsSaved(false);
         setIaThresholdsError('');
     };
 
+    const handleIaThresholdFieldBlur = (key: keyof IaPassThresholds) => {
+        const raw = iaThresholdDrafts[key];
+        const n = parseFloat(raw);
+        const nextVal = Number.isFinite(n) ? clampIaThreshold(n) : iaThresholds[key];
+        setIaThresholds((prev) => ({ ...prev, [key]: nextVal }));
+        setIaThresholdDrafts((prev) => ({ ...prev, [key]: formatThresholdDisplay(nextVal) }));
+    };
+
     const handleSaveIaThresholds = async () => {
-        const values = Object.values(iaThresholds);
-        if (values.some((v) => !Number.isFinite(v) || v < 0 || v > 10)) {
-            setIaThresholdsError('Each threshold must be between 0 and 10.');
+        const parsed: IaPassThresholds = {
+            firstTimeEquity: parseFloat(iaThresholdDrafts.firstTimeEquity),
+            firstTimeDebt: parseFloat(iaThresholdDrafts.firstTimeDebt),
+            experiencedEquity: parseFloat(iaThresholdDrafts.experiencedEquity),
+            experiencedDebt: parseFloat(iaThresholdDrafts.experiencedDebt),
+        };
+        const values = Object.values(parsed);
+        if (values.some((v) => !Number.isFinite(v) || v < 1 || v > 10)) {
+            setIaThresholdsError('Each threshold must be a number from 1 to 10 (decimals allowed, e.g. 6.5).');
             return;
         }
         setIaThresholdsSaving(true);
@@ -174,13 +216,15 @@ const Admin = (props: any) => {
         setIaThresholdsSaved(false);
         try {
             const clamped: IaPassThresholds = {
-                firstTimeEquity: clampIaThreshold(iaThresholds.firstTimeEquity),
-                firstTimeDebt: clampIaThreshold(iaThresholds.firstTimeDebt),
-                experiencedEquity: clampIaThreshold(iaThresholds.experiencedEquity),
-                experiencedDebt: clampIaThreshold(iaThresholds.experiencedDebt),
+                firstTimeEquity: clampIaThreshold(parsed.firstTimeEquity),
+                firstTimeDebt: clampIaThreshold(parsed.firstTimeDebt),
+                experiencedEquity: clampIaThreshold(parsed.experiencedEquity),
+                experiencedDebt: clampIaThreshold(parsed.experiencedDebt),
             };
             const res = await updateIaPassThresholdsConfig(clamped);
-            setIaThresholds(normalizeIaPassThresholds(res?.data));
+            const normalized = normalizeIaPassThresholds(res?.data);
+            setIaThresholds(normalized);
+            syncDraftsFromThresholds(normalized);
             setIaThresholdsSaved(true);
         } catch (e: any) {
             setIaThresholdsError(e?.response?.data?.message || e?.message || 'Failed to save IA pass thresholds.');
@@ -659,40 +703,44 @@ const Admin = (props: any) => {
                                                 Initial Assessment pass thresholds
                                             </Typography>
                                             <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
-                                                Average score required to pass (0–10). Used on Self Rating submit and home/list filters.
+                                                Average score required to pass (1–10). Decimals allowed (e.g. 6.5).
                                             </Typography>
                                             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                                                 <TextField
                                                     label="First Time · Equity"
-                                                    type="number"
+                                                    type="text"
                                                     size="small"
-                                                    value={iaThresholds.firstTimeEquity}
+                                                    value={iaThresholdDrafts.firstTimeEquity}
                                                     onChange={(e) => handleIaThresholdFieldChange('firstTimeEquity', e.target.value)}
-                                                    inputProps={{ min: 0, max: 10, step: 0.1 }}
+                                                    onBlur={() => handleIaThresholdFieldBlur('firstTimeEquity')}
+                                                    inputProps={{ inputMode: 'decimal', pattern: '[0-9.]*', min: 1, max: 10 }}
                                                 />
                                                 <TextField
                                                     label="First Time · Debt"
-                                                    type="number"
+                                                    type="text"
                                                     size="small"
-                                                    value={iaThresholds.firstTimeDebt}
+                                                    value={iaThresholdDrafts.firstTimeDebt}
                                                     onChange={(e) => handleIaThresholdFieldChange('firstTimeDebt', e.target.value)}
-                                                    inputProps={{ min: 0, max: 10, step: 0.1 }}
+                                                    onBlur={() => handleIaThresholdFieldBlur('firstTimeDebt')}
+                                                    inputProps={{ inputMode: 'decimal', pattern: '[0-9.]*', min: 1, max: 10 }}
                                                 />
                                                 <TextField
                                                     label="Experienced · Equity"
-                                                    type="number"
+                                                    type="text"
                                                     size="small"
-                                                    value={iaThresholds.experiencedEquity}
+                                                    value={iaThresholdDrafts.experiencedEquity}
                                                     onChange={(e) => handleIaThresholdFieldChange('experiencedEquity', e.target.value)}
-                                                    inputProps={{ min: 0, max: 10, step: 0.1 }}
+                                                    onBlur={() => handleIaThresholdFieldBlur('experiencedEquity')}
+                                                    inputProps={{ inputMode: 'decimal', pattern: '[0-9.]*', min: 1, max: 10 }}
                                                 />
                                                 <TextField
                                                     label="Experienced · Debt"
-                                                    type="number"
+                                                    type="text"
                                                     size="small"
-                                                    value={iaThresholds.experiencedDebt}
+                                                    value={iaThresholdDrafts.experiencedDebt}
                                                     onChange={(e) => handleIaThresholdFieldChange('experiencedDebt', e.target.value)}
-                                                    inputProps={{ min: 0, max: 10, step: 0.1 }}
+                                                    onBlur={() => handleIaThresholdFieldBlur('experiencedDebt')}
+                                                    inputProps={{ inputMode: 'decimal', pattern: '[0-9.]*', min: 1, max: 10 }}
                                                 />
                                             </Box>
                                             <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>

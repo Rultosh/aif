@@ -131,6 +131,7 @@ const Declaration = (props: any) => {
 
     const supportingDocumentBuckets = [
         "sdPvtPlacementMemorandum",
+        "sdPreviousFundPpm",
         "sdLatestInvestorPresentation",
         "sdImAgreement",
         "sdTrustDeal",
@@ -148,6 +149,26 @@ const Declaration = (props: any) => {
         "detailsOfContributorToTheFund",
         "pastInvestmentTrackRecord",
     ];
+
+    const supportingDocumentLabels: Record<string, string> = {
+        sdPvtPlacementMemorandum: "Private Placement Memorandum",
+        sdPreviousFundPpm: "Previous Fund PPM",
+        sdLatestInvestorPresentation: "Latest Investor Presentation",
+        sdImAgreement: "IM Agreement",
+        sdTrustDeal: "Trust Deed",
+        sdSEBICertificate: "SEBI Registration Certificate",
+        sdShareholdingPattern: "Shareholding Pattern of Sponsor/IM",
+        sdPolicyOfCarry: "Policy of Carry",
+        sdContributionAgreement: "Draft Contribution Agreement",
+        sdInvestmentPolicy: "Investment and Other Policies",
+        sdInvestmentCommitteeNote: "Sample Investment Committee Note",
+        sdHrPolicy: "HR Policy",
+        sdOrganisationStructure: "Organisation Structure",
+        sdEsgPolicy: "ESG Policy",
+        detailsOfInvestmentCommitteeMembers: "Details of Investment Committee Members",
+        detailsOfContributorToTheFund: "Details of contributors of Current Fund",
+        pastInvestmentTrackRecord: "Past Investment Track Record Of IM or AMC",
+    };
 
     const handleInternalSaveAndContinue = async (currentPanel: string, nextPanel: string) => {
         if (!Number(effectiveId)) {
@@ -175,7 +196,7 @@ const Declaration = (props: any) => {
             // setDeclarationValidateTitle('Validating supporting documents…');
             setDeclarationDocsValidating(true);
             try {
-                const ok = await validateRequiredDocuments(supportingDocumentBuckets);
+                const ok = await validateRequiredDocuments(supportingDocumentBuckets, supportingDocumentLabels);
                 if (!ok) {
                     setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '2'])));
                     return;
@@ -505,6 +526,9 @@ const Declaration = (props: any) => {
                                             <Grid container spacing={2}>
                                                 <Grid item xs="auto">
                                                     <DocumentChip hideDisclaimer={true} label="Private Placement Memorandum" validationTitle="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${effectiveId}`} />
+                                                </Grid>
+                                                <Grid item xs="auto">
+                                                    <DocumentChip hideDisclaimer={true} label="Previous Fund PPM" validationTitle="Previous_Fund_PPM" id={`sdPreviousFundPpm${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
                                                     <DocumentChip hideDisclaimer={true} label="Latest Investor Presentation" validationTitle="Latest Investor Presentation" id={`sdLatestInvestorPresentation${effectiveId}`} />
