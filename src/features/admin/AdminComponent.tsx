@@ -712,47 +712,49 @@ const Admin = (props: any) => {
                                                         <Typography variant="body2" sx={{ color: '#64748b' }}>
                                                             {registrationEnabled
                                                                 ? 'Registration is open. “Register here” opens the signup form.'
-                                                                : 'Registration is closed. “Register here” shows the message below.'}
+                                                                : 'Registration is closed. Customize the message shown to applicants below.'}
                                                         </Typography>
                                                     </Box>
                                                 }
                                                 sx={{ alignItems: 'flex-start', m: 0 }}
                                             />
-                                            <Typography sx={{ fontWeight: 700, color: '#0f172a', mt: 2.5, mb: 0.5 }}>
-                                                Registration closed message
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ color: '#64748b', mb: 1.5 }}>
-                                                Shown to applicants when registration is disabled (login “Register here” and signup page). Maximum 7000 characters.
-                                            </Typography>
-                                            <TextField
-                                                fullWidth
-                                                multiline
-                                                minRows={5}
-                                                value={registrationClosedMessage}
-                                                onChange={(e) => {
-                                                    setRegistrationClosedMessage(e.target.value);
-                                                    setRegistrationConfigSaved(false);
-                                                    setRegistrationConfigError('');
-                                                }}
-                                                disabled={registrationConfigSaving}
-                                                inputProps={{ maxLength: 7000 }}
-                                                helperText={`${registrationClosedMessage.length} / 7000 characters`}
-                                                sx={{ mb: 1.5 }}
-                                            />
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                                                <Button
-                                                    variant="contained"
-                                                    disabled={registrationConfigSaving}
-                                                    onClick={() => void handleSaveRegistrationMessage()}
-                                                    sx={{ textTransform: 'none' }}
-                                                >
-                                                    {registrationConfigSaving ? 'Saving...' : 'Save message'}
-                                                </Button>
-                                            </Box>
                                             {!registrationEnabled && (
-                                                <Alert severity="info" sx={{ mt: 1, whiteSpace: 'pre-line' }}>
-                                                    Preview:{'\n'}{registrationClosedMessage}
-                                                </Alert>
+                                                <>
+                                                    <Typography sx={{ fontWeight: 700, color: '#0f172a', mt: 2.5, mb: 0.5 }}>
+                                                        Registration closed message
+                                                    </Typography>
+                                                    <Typography variant="body2" sx={{ color: '#64748b', mb: 1.5 }}>
+                                                        Shown to applicants on login “Register here” and the signup page. Maximum 7000 characters.
+                                                    </Typography>
+                                                    <TextField
+                                                        fullWidth
+                                                        multiline
+                                                        minRows={5}
+                                                        value={registrationClosedMessage}
+                                                        onChange={(e) => {
+                                                            setRegistrationClosedMessage(e.target.value);
+                                                            setRegistrationConfigSaved(false);
+                                                            setRegistrationConfigError('');
+                                                        }}
+                                                        disabled={registrationConfigSaving}
+                                                        inputProps={{ maxLength: 7000 }}
+                                                        helperText={`${registrationClosedMessage.length} / 7000 characters`}
+                                                        sx={{ mb: 1.5 }}
+                                                    />
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+                                                        <Button
+                                                            variant="contained"
+                                                            disabled={registrationConfigSaving}
+                                                            onClick={() => void handleSaveRegistrationMessage()}
+                                                            sx={{ textTransform: 'none' }}
+                                                        >
+                                                            {registrationConfigSaving ? 'Saving...' : 'Save message'}
+                                                        </Button>
+                                                    </Box>
+                                                    <Alert severity="info" sx={{ mt: 1, whiteSpace: 'pre-line' }}>
+                                                        Preview:{'\n'}{registrationClosedMessage}
+                                                    </Alert>
+                                                </>
                                             )}
                                             {registrationConfigSaved && (
                                                 <Alert severity="success" sx={{ mt: 2 }}>
