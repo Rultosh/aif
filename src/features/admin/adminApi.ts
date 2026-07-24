@@ -101,11 +101,14 @@ export function fetchRegistrationConfig() {
   });
 }
 
-export function updateRegistrationConfig(registrationEnabled: boolean) {
+export function updateRegistrationConfig(payload: {
+  registrationEnabled: boolean;
+  closedMessage?: string;
+}) {
   return api({
     method: 'patch',
     url: `useradmin/config/registration`,
-    data: { registrationEnabled },
+    data: payload,
   });
 }
 

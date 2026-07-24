@@ -48,7 +48,7 @@ import {
     normalizeIaPassThresholds,
 } from "../../lib/iaPassThresholds";
 
-const REGISTRATION_CLOSED_PREVIEW =
+const DEFAULT_REGISTRATION_CLOSED_MESSAGE =
     "The application window for the first phase of the NPS Bharat Fund of Funds platform has now closed, as all applications for this phase have been received.\n\n"
     + "The portal will reopen shortly for the second phase of applications. Please keep visiting the website for updates and announcements.\n\n"
     + "Thank you for your patience and understanding";
@@ -67,6 +67,7 @@ const Admin = (props: any) => {
     const navigate = useNavigate();
     const [adminTab, setAdminTab] = useState(0);
     const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [registrationClosedMessage, setRegistrationClosedMessage] = useState(DEFAULT_REGISTRATION_CLOSED_MESSAGE);
     const [registrationConfigLoading, setRegistrationConfigLoading] = useState(false);
     const [registrationConfigSaving, setRegistrationConfigSaving] = useState(false);
     const [registrationConfigError, setRegistrationConfigError] = useState('');
@@ -129,6 +130,8 @@ const Admin = (props: any) => {
                 ]);
                 if (!cancelled) {
                     setRegistrationEnabled(Boolean(regRes?.data?.registrationEnabled));
+                    const msg = String(regRes?.data?.closedMessage || '').trim();
+                    setRegistrationClosedMessage(msg || DEFAULT_REGISTRATION_CLOSED_MESSAGE);
                     const normalized = normalizeIaPassThresholds(iaRes?.data);
                     setIaThresholds(normalized);
                     setIaThresholdDrafts({
@@ -155,11 +158,45 @@ const Admin = (props: any) => {
         setRegistrationConfigError('');
         setRegistrationConfigSaved(false);
         try {
-            const res = await updateRegistrationConfig(enabled);
+            const res = await updateRegistrationConfig({
+                registrationEnabled: enabled,
+                closedMessage: registrationClosedMessage,
+            });
             setRegistrationEnabled(Boolean(res?.data?.registrationEnabled));
+            const msg = String(res?.data?.closedMessage || '').trim();
+            if (msg) setRegistrationClosedMessage(msg);
             setRegistrationConfigSaved(true);
         } catch (e: any) {
             setRegistrationConfigError(e?.response?.data?.message || e?.message || 'Failed to save configuration.');
+        } finally {
+            setRegistrationConfigSaving(false);
+        }
+    };
+
+    const handleSaveRegistrationMessage = async () => {
+        const trimmed = registrationClosedMessage.trim();
+        if (!trimmed) {
+            setRegistrationConfigError('Closed message cannot be empty.');
+            return;
+        }
+        if (trimmed.length > 8000) {
+            setRegistrationConfigError('Closed message must be at most 8000 characters.');
+            return;
+        }
+        setRegistrationConfigSaving(true);
+        setRegistrationConfigError('');
+        setRegistrationConfigSaved(false);
+        try {
+            const res = await updateRegistrationConfig({
+                registrationEnabled,
+                closedMessage: trimmed,
+            });
+            setRegistrationEnabled(Boolean(res?.data?.registrationEnabled));
+            const msg = String(res?.data?.closedMessage || '').trim();
+            setRegistrationClosedMessage(msg || DEFAULT_REGISTRATION_CLOSED_MESSAGE);
+            setRegistrationConfigSaved(true);
+        } catch (e: any) {
+            setRegistrationConfigError(e?.response?.data?.message || e?.message || 'Failed to save closed message.');
         } finally {
             setRegistrationConfigSaving(false);
         }
@@ -675,15 +712,46 @@ const Admin = (props: any) => {
                                                         <Typography variant="body2" sx={{ color: '#64748b' }}>
                                                             {registrationEnabled
                                                                 ? 'Registration is open. “Register here” opens the signup form.'
-                                                                : 'Registration is closed. “Register here” shows the phase-closed message.'}
+                                                                : 'Registration is closed. “Register here” shows the message below.'}
                                                         </Typography>
                                                     </Box>
                                                 }
                                                 sx={{ alignItems: 'flex-start', m: 0 }}
                                             />
+                                            <Typography sx={{ fontWeight: 700, color: '#0f172a', mt: 2.5, mb: 0.5 }}>
+                                                Registration closed message
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: '#64748b', mb: 1.5 }}>
+                                                Shown to applicants when registration is disabled (login “Register here” and signup page).
+                                            </Typography>
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                minRows={5}
+                                                value={registrationClosedMessage}
+                                                onChange={(e) => {
+                                                    setRegistrationClosedMessage(e.target.value);
+                                                    setRegistrationConfigSaved(false);
+                                                    setRegistrationConfigError('');
+                                                }}
+                                                disabled={registrationConfigSaving}
+                                                inputProps={{ maxLength: 8000 }}
+                                                helperText={`${registrationClosedMessage.length}/8000`}
+                                                sx={{ mb: 1.5 }}
+                                            />
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+                                                <Button
+                                                    variant="contained"
+                                                    disabled={registrationConfigSaving}
+                                                    onClick={() => void handleSaveRegistrationMessage()}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    {registrationConfigSaving ? 'Saving...' : 'Save message'}
+                                                </Button>
+                                            </Box>
                                             {!registrationEnabled && (
-                                                <Alert severity="info" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
-                                                    {REGISTRATION_CLOSED_PREVIEW}
+                                                <Alert severity="info" sx={{ mt: 1, whiteSpace: 'pre-line' }}>
+                                                    Preview:{'\n'}{registrationClosedMessage}
                                                 </Alert>
                                             )}
                                             {registrationConfigSaved && (
