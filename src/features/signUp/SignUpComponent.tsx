@@ -294,7 +294,7 @@ const SignUp = () => {
                 <Container maxWidth="sm" sx={{ pt: '120px', pb: '60px', position: 'relative', zIndex: 1 }}>
                     <Paper elevation={0} sx={{ px: 4, py: 5, borderRadius: '6px', backgroundColor: 'rgba(255,255,255,0.95)' }}>
                         <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', mb: 2 }}>
-                            Registration closed
+                            Registration Update
                         </Typography>
                         <Typography sx={{ color: '#4a4a4a', fontSize: '1.05rem', lineHeight: 1.7, whiteSpace: 'pre-line', mb: 3 }}>
                             {registrationClosedMessage}

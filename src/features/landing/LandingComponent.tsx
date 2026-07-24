@@ -593,7 +593,7 @@ const Landing = () => {
                 fullWidth
             >
                 <DialogTitle sx={{ fontWeight: 800, color: '#0f172a' }}>
-                    Registration closed
+                    Registration Update
                 </DialogTitle>
                 <DialogContent>
                     <Typography sx={{ color: '#4a4a4a', fontSize: '1.05rem', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
