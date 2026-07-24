@@ -179,8 +179,8 @@ const Admin = (props: any) => {
             setRegistrationConfigError('Closed message cannot be empty.');
             return;
         }
-        if (trimmed.length > 8000) {
-            setRegistrationConfigError('Closed message must be at most 8000 characters.');
+        if (trimmed.length > 7000) {
+            setRegistrationConfigError('Closed message must be at most 7000 characters.');
             return;
         }
         setRegistrationConfigSaving(true);
@@ -722,7 +722,7 @@ const Admin = (props: any) => {
                                                 Registration closed message
                                             </Typography>
                                             <Typography variant="body2" sx={{ color: '#64748b', mb: 1.5 }}>
-                                                Shown to applicants when registration is disabled (login “Register here” and signup page).
+                                                Shown to applicants when registration is disabled (login “Register here” and signup page). Maximum 7000 characters.
                                             </Typography>
                                             <TextField
                                                 fullWidth
@@ -735,8 +735,8 @@ const Admin = (props: any) => {
                                                     setRegistrationConfigError('');
                                                 }}
                                                 disabled={registrationConfigSaving}
-                                                inputProps={{ maxLength: 8000 }}
-                                                helperText={`${registrationClosedMessage.length}/8000`}
+                                                inputProps={{ maxLength: 7000 }}
+                                                helperText={`${registrationClosedMessage.length} / 7000 characters`}
                                                 sx={{ mb: 1.5 }}
                                             />
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
