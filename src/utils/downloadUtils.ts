@@ -52,3 +52,19 @@ export const secureDownload = async (url: string, filename: string, body?: any) 
         alert('Failed to download file. Please try again.');
     }
 };
+
+/** Fetch a file with auth and return an object URL (caller must revoke). */
+export const fetchSecureBlobUrl = async (url: string): Promise<string> => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error('Failed to load file');
+    }
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+};

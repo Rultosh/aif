@@ -1,6 +1,6 @@
 import { Alert, Backdrop, Card, CardContent, Typography, Grid, Accordion, AccordionSummary, AccordionDetails, Box, Chip, Button, TextField, FormControlLabel, Divider, Checkbox, FormGroup, Switch, Dialog, DialogContent, Zoom, CircularProgress, Snackbar } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -25,11 +25,21 @@ import DocumentChip from "../../../../components/DocumentChip";
 import FileUploadDisclaimer from "../../../../components/FileUploadDisclaimer";
 import FileUploadService from "../../../../components/FileUploadService";
 import { opaqueInfoToastAlertSx } from "../../../../lib/ui/opaqueInfoToastAlertSx";
+import NdaPdfViewer from "./NdaPdfViewer";
+import { fetchActiveNdaConfig } from "../../../admin/adminApi";
+import { fetchSecureBlobUrl } from "../../../../utils/downloadUtils";
+import { IFile } from "../../../../components/IFile";
 
 const MANDATORY_DOCUMENTS_UPLOAD_MESSAGE =
     'Please upload all mandatory documents before proceeding.';
 
 const DECLARATION_ACCEPT_MESSAGE = 'Please accept the declaration to continue.';
+
+const NDA_ACCEPT_MESSAGE =
+    'Please read the NDA to the end and accept both acknowledgements before continuing.';
+
+const NDA_SCROLL_MESSAGE =
+    'Please scroll to the end of the NDA before accepting.';
 
 const Declaration = (props: any) => {
 
@@ -43,7 +53,7 @@ const Declaration = (props: any) => {
     const [agreed, setAgreed] = useState<boolean>(!!prelimApplicationState.prelimApplication.declarationAccepted);
     const [expanded, setExpanded] = useState<string | false>("1");
     const [documentError, setDocumentError] = useState<string>('');
-    /** Accordion panels "1"|"2" with document / prelim-id validation issues (mild red shell). */
+    /** Accordion panels "1"|"2"|"3" with document / NDA validation issues (mild red shell). */
     const [declarationDocAccordionErrors, setDeclarationDocAccordionErrors] = useState<string[]>([]);
     const [declarationDocsValidating, setDeclarationDocsValidating] = useState(false);
     // const [declarationValidateTitle, setDeclarationValidateTitle] = useState('');
@@ -51,6 +61,18 @@ const Declaration = (props: any) => {
     const [declarationSoftToastMessage, setDeclarationSoftToastMessage] = useState<string | null>(null);
     /** True after user tries “Save & Continue to Preview” without accepting; cleared when they accept. */
     const [declarationContinueBlocked, setDeclarationContinueBlocked] = useState(false);
+
+    const initiallyNdaAccepted = !!prelimApplicationState.prelimApplication.ndaAccepted;
+    const [ndaScrolledToEnd, setNdaScrolledToEnd] = useState<boolean>(initiallyNdaAccepted);
+    const [ndaReadUnderstood, setNdaReadUnderstood] = useState<boolean>(initiallyNdaAccepted);
+    const [ndaUnconditionallyAgree, setNdaUnconditionallyAgree] = useState<boolean>(initiallyNdaAccepted);
+    const [ndaContinueBlocked, setNdaContinueBlocked] = useState(false);
+    const [ndaPdfBlobUrl, setNdaPdfBlobUrl] = useState<string | null>(null);
+    const [ndaLoadError, setNdaLoadError] = useState('');
+    const [ndaLoading, setNdaLoading] = useState(false);
+    const ndaBlobUrlRef = useRef<string | null>(null);
+
+    const ndaFullyAccepted = ndaReadUnderstood && ndaUnconditionallyAgree;
 
     const validationSchema = Yup.object().shape({
         sdDescription: Yup.string().label("Capital Raised Till Date").nullable(),
@@ -70,8 +92,19 @@ const Declaration = (props: any) => {
     });
 
     const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+        if (isExpanded && panel === "4" && !ndaFullyAccepted) {
+            setNdaContinueBlocked(true);
+            setDeclarationSoftToastMessage(NDA_ACCEPT_MESSAGE);
+            setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '3'])));
+            setExpanded("3");
+            return;
+        }
         setExpanded(isExpanded ? panel : false);
     };
+
+    const handleNdaScrolledToEnd = useCallback(() => {
+        setNdaScrolledToEnd(true);
+    }, []);
 
     const hasUploadedFiles = async (bucketId: string): Promise<boolean> => {
         try {
@@ -131,7 +164,7 @@ const Declaration = (props: any) => {
 
     const supportingDocumentBuckets = [
         "sdPvtPlacementMemorandum",
-        "sdPreviousFundPpm",
+        // sdPreviousFundPpm is optional
         "sdLatestInvestorPresentation",
         "sdImAgreement",
         "sdTrustDeal",
@@ -207,6 +240,33 @@ const Declaration = (props: any) => {
             }
         }
 
+        if (currentPanel === "3") {
+            if (!ndaScrolledToEnd) {
+                setNdaContinueBlocked(true);
+                setDeclarationSoftToastMessage(NDA_SCROLL_MESSAGE);
+                setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '3'])));
+                return;
+            }
+            if (!ndaFullyAccepted) {
+                setNdaContinueBlocked(true);
+                setDeclarationSoftToastMessage(NDA_ACCEPT_MESSAGE);
+                setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '3'])));
+                return;
+            }
+            setNdaContinueBlocked(false);
+            setDeclarationDocAccordionErrors((prev) => prev.filter((p) => p !== '3'));
+            setDeclarationSoftToastMessage((prev) =>
+                prev === NDA_ACCEPT_MESSAGE || prev === NDA_SCROLL_MESSAGE ? null : prev
+            );
+            try {
+                await handleClickSave();
+            } catch (error: any) {
+                console.error("NDA save failure:", error);
+                alert(error?.message || "An unexpected error occurred while saving NDA acceptance.");
+                return;
+            }
+        }
+
         setDocumentError('');
         setDeclarationSoftToastMessage((prev) =>
             prev === MANDATORY_DOCUMENTS_UPLOAD_MESSAGE ? null : prev
@@ -248,10 +308,23 @@ const Declaration = (props: any) => {
                             prev === MANDATORY_DOCUMENTS_UPLOAD_MESSAGE ? null : prev
                         );
 
+                        if (!ndaFullyAccepted) {
+                            setNdaContinueBlocked(true);
+                            setDeclarationContinueBlocked(false);
+                            setDeclarationSoftToastMessage(NDA_ACCEPT_MESSAGE);
+                            setDeclarationDocAccordionErrors((prev) => Array.from(new Set([...prev, '3'])));
+                            setExpanded('3');
+                            return;
+                        }
+                        setNdaContinueBlocked(false);
+                        setDeclarationSoftToastMessage((prev) =>
+                            prev === NDA_ACCEPT_MESSAGE || prev === NDA_SCROLL_MESSAGE ? null : prev
+                        );
+
                         if (!agreed) {
                             setDeclarationContinueBlocked(true);
                             setDeclarationSoftToastMessage(DECLARATION_ACCEPT_MESSAGE);
-                            setExpanded('3');
+                            setExpanded('4');
                             return;
                         }
                         setDeclarationContinueBlocked(false);
@@ -292,6 +365,10 @@ const Declaration = (props: any) => {
     useEffect(() => {
         if (prelimApplicationState.status.fetchStatus === FetchStatus.IDLE) {
             setAgreed(!!prelimApplicationState.prelimApplication.declarationAccepted);
+            const ndaOk = !!prelimApplicationState.prelimApplication.ndaAccepted;
+            setNdaScrolledToEnd(ndaOk);
+            setNdaReadUnderstood(ndaOk);
+            setNdaUnconditionallyAgree(ndaOk);
             reset(prelimApplicationState.prelimApplication);
         }
     }, [prelimApplicationState.status.fetchStatus === FetchStatus.IDLE])
@@ -305,8 +382,94 @@ const Declaration = (props: any) => {
         }
     }, [agreed]);
 
+    useEffect(() => {
+        if (ndaFullyAccepted) {
+            setNdaContinueBlocked(false);
+            setDeclarationDocAccordionErrors((prev) => prev.filter((p) => p !== '3'));
+            setDeclarationSoftToastMessage((prev) =>
+                prev === NDA_ACCEPT_MESSAGE || prev === NDA_SCROLL_MESSAGE ? null : prev
+            );
+        }
+    }, [ndaFullyAccepted]);
+
+    useEffect(() => {
+        let cancelled = false;
+        const loadNda = async () => {
+            setNdaLoading(true);
+            setNdaLoadError('');
+            try {
+                const res = await fetchActiveNdaConfig();
+                const cfg = res?.data;
+                if (!cfg?.available || !cfg?.fileName) {
+                    if (!cancelled) {
+                        setNdaPdfBlobUrl(null);
+                        setNdaLoadError('No active NDA document is available. Please contact the administrator.');
+                    }
+                    return;
+                }
+                const listRes = await FileUploadService.list(cfg.bucket || 'configNdaActive');
+                const files: IFile[] = Array.isArray(listRes?.data) ? listRes.data : [];
+                const match =
+                    files.find((f) => String(f.name) === String(cfg.fileName)) ||
+                    files.find((f) => String(f.name || '').toLowerCase().endsWith('.pdf')) ||
+                    files[0];
+                if (!match?.url) {
+                    if (!cancelled) {
+                        setNdaPdfBlobUrl(null);
+                        setNdaLoadError('NDA file could not be found. Please contact the administrator.');
+                    }
+                    return;
+                }
+                const blobUrl = await fetchSecureBlobUrl(String(match.url));
+                if (cancelled) {
+                    URL.revokeObjectURL(blobUrl);
+                    return;
+                }
+                if (ndaBlobUrlRef.current) {
+                    URL.revokeObjectURL(ndaBlobUrlRef.current);
+                }
+                ndaBlobUrlRef.current = blobUrl;
+                setNdaPdfBlobUrl(blobUrl);
+            } catch (e: any) {
+                if (!cancelled) {
+                    setNdaPdfBlobUrl(null);
+                    setNdaLoadError(e?.message || 'Failed to load the NDA document.');
+                }
+            } finally {
+                if (!cancelled) setNdaLoading(false);
+            }
+        };
+        void loadNda();
+        return () => {
+            cancelled = true;
+            if (ndaBlobUrlRef.current) {
+                URL.revokeObjectURL(ndaBlobUrlRef.current);
+                ndaBlobUrlRef.current = null;
+            }
+        };
+    }, []);
+
     function handleAgreementChange() {
         setAgreed(!agreed)
+    }
+
+    function handleNdaReadChange(_ev: React.ChangeEvent<HTMLInputElement>, checked: boolean) {
+        if (checked && !ndaScrolledToEnd) {
+            setDeclarationSoftToastMessage(NDA_SCROLL_MESSAGE);
+            return;
+        }
+        setNdaReadUnderstood(checked);
+        if (!checked) {
+            setNdaUnconditionallyAgree(false);
+        }
+    }
+
+    function handleNdaAgreeChange(_ev: React.ChangeEvent<HTMLInputElement>, checked: boolean) {
+        if (checked && !ndaReadUnderstood) {
+            setDeclarationSoftToastMessage(NDA_ACCEPT_MESSAGE);
+            return;
+        }
+        setNdaUnconditionallyAgree(checked);
     }
 
     async function handleClickSave(formData?: IPrelimApplicationData) {
@@ -315,7 +478,13 @@ const Declaration = (props: any) => {
             await dispatch(
                 updatePrelimApplicationAsync(
                     wrapArgument(
-                        actionUid, { ...defaultIPrelimApplicationData, ...dataToUpdate, id: Number(id), declarationAccepted: agreed }
+                        actionUid, {
+                            ...defaultIPrelimApplicationData,
+                            ...dataToUpdate,
+                            id: Number(id),
+                            declarationAccepted: agreed,
+                            ndaAccepted: ndaFullyAccepted,
+                        }
                     )
                 )
             ).unwrap();
@@ -330,7 +499,8 @@ const Declaration = (props: any) => {
     const declarationAccordionShellSx = (panelId: string) => {
         const hasErr =
             declarationDocAccordionErrors.includes(panelId) ||
-            (panelId === '3' && (declarationContinueBlocked || declarationFormFieldErrors));
+            (panelId === '3' && ndaContinueBlocked) ||
+            (panelId === '4' && (declarationContinueBlocked || declarationFormFieldErrors));
         return {
             border: '1px solid rgba(0,0,0,0.08)',
             borderRadius: '12px !important',
@@ -528,7 +698,7 @@ const Declaration = (props: any) => {
                                                     <DocumentChip hideDisclaimer={true} label="Private Placement Memorandum" validationTitle="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip hideDisclaimer={true} label="Previous Fund PPM" validationTitle="Previous_Fund_PPM" id={`sdPreviousFundPpm${effectiveId}`} />
+                                                    <DocumentChip hideDisclaimer={true} label="Previous Fund PPM (Optional)" validationTitle="Previous_Fund_PPM" id={`sdPreviousFundPpm${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
                                                     <DocumentChip hideDisclaimer={true} label="Latest Investor Presentation" validationTitle="Latest Investor Presentation" id={`sdLatestInvestorPresentation${effectiveId}`} />
@@ -710,7 +880,7 @@ const Declaration = (props: any) => {
                             </AccordionDetails>
                         </Accordion>
 
-                        {/* Accordion 3: Declaration */}
+                        {/* Accordion 3: NDA */}
                         <Accordion
                             elevation={0}
                             sx={declarationAccordionShellSx('3')}
@@ -724,6 +894,100 @@ const Declaration = (props: any) => {
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <Box sx={stepNumberSx("3")}>3</Box>
                                     <Typography sx={{ fontWeight: 700, color: expanded === "3" ? '#363062' : '#444' }}>
+                                        NDA
+                                    </Typography>
+                                </Box>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{ px: 3, pb: 4, pt: 1 }}>
+                                <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
+                                    Please read the Non-Disclosure Agreement in full. Download is disabled; scroll to the end to enable acceptance.
+                                </Typography>
+                                {ndaLoading ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 3 }}>
+                                        <CircularProgress size={22} />
+                                        <Typography variant="body2">Loading NDA…</Typography>
+                                    </Box>
+                                ) : ndaLoadError && !ndaPdfBlobUrl ? (
+                                    <Alert severity="warning" sx={{ mb: 2 }}>{ndaLoadError}</Alert>
+                                ) : (
+                                    <NdaPdfViewer
+                                        fileUrl={ndaPdfBlobUrl}
+                                        initiallyComplete={!!prelimApplicationState.prelimApplication.ndaAccepted}
+                                        onScrolledToEnd={handleNdaScrolledToEnd}
+                                    />
+                                )}
+                                {!ndaScrolledToEnd && ndaPdfBlobUrl && (
+                                    <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#64748b' }}>
+                                        Scroll to the end of the document to enable the acknowledgements below.
+                                    </Typography>
+                                )}
+                                <Box sx={{
+                                    mt: 3,
+                                    backgroundColor: ndaFullyAccepted ? 'rgba(76, 175, 80, 0.08)' : 'rgba(54, 48, 98, 0.04)',
+                                    p: 2,
+                                    borderRadius: '12px',
+                                    border: ndaFullyAccepted ? '1px solid rgba(76, 175, 80, 0.2)' : '1px solid rgba(54, 48, 98, 0.1)',
+                                }}>
+                                    <FormGroup>
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={ndaReadUnderstood}
+                                                    onChange={handleNdaReadChange}
+                                                    disabled={!ndaScrolledToEnd}
+                                                    color="success"
+                                                />
+                                            }
+                                            label={
+                                                <Typography sx={{ fontWeight: 600, color: '#363062', fontSize: '0.95rem' }}>
+                                                    We have read and understood all the terms of this Non-Disclosure Agreement (NDA)
+                                                </Typography>
+                                            }
+                                        />
+                                        <FormControlLabel
+                                            sx={{ mt: 1, alignItems: 'flex-start' }}
+                                            control={
+                                                <Checkbox
+                                                    checked={ndaUnconditionallyAgree}
+                                                    onChange={handleNdaAgreeChange}
+                                                    disabled={!ndaReadUnderstood}
+                                                    color="success"
+                                                />
+                                            }
+                                            label={
+                                                <Typography sx={{ fontWeight: 600, color: '#363062', fontSize: '0.95rem', pt: 0.5 }}>
+                                                    We unconditionally agree to all the terms of this NDA and wish to proceed to next stage of the application process by submitting requisite information/documents.
+                                                </Typography>
+                                            }
+                                        />
+                                    </FormGroup>
+                                </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => handleInternalSaveAndContinue("3", "4")}
+                                        sx={internalButtonSx}
+                                    >
+                                        Save & Continue
+                                    </Button>
+                                </Box>
+                            </AccordionDetails>
+                        </Accordion>
+
+                        {/* Accordion 4: Declaration */}
+                        <Accordion
+                            elevation={0}
+                            sx={declarationAccordionShellSx('4')}
+                            expanded={expanded === "4"}
+                            onChange={handleAccordionChange("4")}
+                        >
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon sx={{ color: expanded === "4" ? '#363062' : '#666' }} />}
+                                sx={accordionSummarySx}
+                            >
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Box sx={stepNumberSx("4")}>4</Box>
+                                    <Typography sx={{ fontWeight: 700, color: expanded === "4" ? '#363062' : '#444' }}>
                                         Declaration
                                     </Typography>
                                 </Box>

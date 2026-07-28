@@ -36,18 +36,22 @@ import NavigationBar from '../../components/NavigationBar'
 import { deleteUserAsync, fetchUsersAsync, selectUsers, updateUserOtpRequiredAsync, updateUserRolesAsync } from './adminSlice'
 import { wrapArgument } from "../../lib/api-status/actionWrapper";
 import { FetchStatus } from "../../lib/api-status/IStatus";
-import { Delete, Edit, InfoOutlined, Close as CloseDialogIcon } from '@mui/icons-material'
+import { Delete, Edit, InfoOutlined, Close as CloseDialogIcon, Download as DownloadIcon, Visibility as VisibilityIcon, UploadFile as UploadFileIcon } from '@mui/icons-material'
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
 import dayjs from "dayjs";
-import { assignUserAdminRole, sendSetPasswordEmail, getUserApplicationCount, fetchRegistrationConfig, updateRegistrationConfig, fetchIaPassThresholdsConfig, updateIaPassThresholdsConfig } from "./adminApi";
+import { assignUserAdminRole, sendSetPasswordEmail, getUserApplicationCount, fetchRegistrationConfig, updateRegistrationConfig, fetchIaPassThresholdsConfig, updateIaPassThresholdsConfig, fetchNdaConfig, updateNdaConfig } from "./adminApi";
 import AddOperationalUserModal from "./AddOperationalUserModal";
 import {
     DEFAULT_IA_PASS_THRESHOLDS,
     IaPassThresholds,
     normalizeIaPassThresholds,
 } from "../../lib/iaPassThresholds";
+import FileUploadService from "../../components/FileUploadService";
+import { secureDownload, fetchSecureBlobUrl } from "../../utils/downloadUtils";
+import { IFile } from "../../components/IFile";
 
+const NDA_CONFIG_BUCKET = 'configNdaActive';
 const DEFAULT_REGISTRATION_CLOSED_MESSAGE =
     "The application window for the first phase of the NPS Bharat Fund of Funds platform has now closed, as all applications for this phase have been received.\n\n"
     + "The portal will reopen shortly for the second phase of applications. Please keep visiting the website for updates and announcements.\n\n"
@@ -83,6 +87,16 @@ const Admin = (props: any) => {
     const [iaThresholdsSaving, setIaThresholdsSaving] = useState(false);
     const [iaThresholdsError, setIaThresholdsError] = useState('');
     const [iaThresholdsSaved, setIaThresholdsSaved] = useState(false);
+    const [ndaFileName, setNdaFileName] = useState<string | null>(null);
+    const [ndaFileUrl, setNdaFileUrl] = useState<string | null>(null);
+    const [ndaAvailable, setNdaAvailable] = useState(false);
+    const [ndaUploading, setNdaUploading] = useState(false);
+    const [ndaError, setNdaError] = useState('');
+    const [ndaSaved, setNdaSaved] = useState(false);
+    const [ndaViewOpen, setNdaViewOpen] = useState(false);
+    const [ndaViewBlobUrl, setNdaViewBlobUrl] = useState<string | null>(null);
+    const [ndaViewLoading, setNdaViewLoading] = useState(false);
+    const ndaFileInputRef = Rect.useRef<HTMLInputElement | null>(null);
 
     const formatVal = (v: unknown) => {
         if (v == null || String(v).trim() === '') return '—';
@@ -124,9 +138,10 @@ const Admin = (props: any) => {
             setIaThresholdsError('');
             setIaThresholdsSaved(false);
             try {
-                const [regRes, iaRes] = await Promise.all([
+                const [regRes, iaRes, ndaRes] = await Promise.all([
                     fetchRegistrationConfig(),
                     fetchIaPassThresholdsConfig(),
+                    fetchNdaConfig(),
                 ]);
                 if (!cancelled) {
                     setRegistrationEnabled(Boolean(regRes?.data?.registrationEnabled));
@@ -140,6 +155,26 @@ const Admin = (props: any) => {
                         experiencedEquity: formatThresholdDisplay(normalized.experiencedEquity),
                         experiencedDebt: formatThresholdDisplay(normalized.experiencedDebt),
                     });
+                    setNdaAvailable(Boolean(ndaRes?.data?.available));
+                    setNdaFileName(ndaRes?.data?.fileName || null);
+                    setNdaSaved(false);
+                    setNdaError('');
+                    const bucket = ndaRes?.data?.bucket || NDA_CONFIG_BUCKET;
+                    try {
+                        const listRes = await FileUploadService.list(bucket);
+                        const files: IFile[] = Array.isArray(listRes?.data) ? listRes.data : [];
+                        const match =
+                            files.find((f) => String(f.name) === String(ndaRes?.data?.fileName)) ||
+                            files.find((f) => String(f.name || '').toLowerCase().endsWith('.pdf')) ||
+                            files[0];
+                        setNdaFileUrl(match?.url ? String(match.url) : null);
+                        if (match?.name && !ndaRes?.data?.fileName) {
+                            setNdaFileName(String(match.name));
+                            setNdaAvailable(true);
+                        }
+                    } catch {
+                        setNdaFileUrl(null);
+                    }
                 }
             } catch (e: any) {
                 if (!cancelled) {
@@ -153,6 +188,77 @@ const Admin = (props: any) => {
         return () => { cancelled = true; };
     }, [adminTab]);
 
+    const refreshNdaFileMeta = async (preferredName?: string | null) => {
+        const listRes = await FileUploadService.list(NDA_CONFIG_BUCKET);
+        const files: IFile[] = Array.isArray(listRes?.data) ? listRes.data : [];
+        const match =
+            (preferredName ? files.find((f) => String(f.name) === String(preferredName)) : undefined) ||
+            files.find((f) => String(f.name || '').toLowerCase().endsWith('.pdf')) ||
+            files[0];
+        setNdaFileUrl(match?.url ? String(match.url) : null);
+        return match;
+    };
+
+    const handleNdaDownload = async () => {
+        if (!ndaFileUrl || !ndaFileName) {
+            setNdaError('No active NDA file to download.');
+            return;
+        }
+        await secureDownload(ndaFileUrl, ndaFileName);
+    };
+
+    const handleNdaView = async () => {
+        if (!ndaFileUrl) {
+            setNdaError('No active NDA file to view.');
+            return;
+        }
+        setNdaViewLoading(true);
+        setNdaError('');
+        try {
+            if (ndaViewBlobUrl) {
+                URL.revokeObjectURL(ndaViewBlobUrl);
+            }
+            const blobUrl = await fetchSecureBlobUrl(ndaFileUrl);
+            setNdaViewBlobUrl(blobUrl);
+            setNdaViewOpen(true);
+        } catch (e: any) {
+            setNdaError(e?.message || 'Failed to open NDA for viewing.');
+        } finally {
+            setNdaViewLoading(false);
+        }
+    };
+
+    const handleNdaReplaceClick = () => {
+        ndaFileInputRef.current?.click();
+    };
+
+    const handleNdaFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+        if (!file) return;
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            setNdaError('Please upload a PDF file.');
+            return;
+        }
+        setNdaUploading(true);
+        setNdaError('');
+        setNdaSaved(false);
+        try {
+            const listRes = await FileUploadService.list(NDA_CONFIG_BUCKET);
+            const existing: IFile[] = Array.isArray(listRes?.data) ? listRes.data : [];
+            await Promise.all(existing.map((f) => FileUploadService.delete(f)));
+            await FileUploadService.upload(NDA_CONFIG_BUCKET, file, false);
+            const res = await updateNdaConfig({ fileName: file.name });
+            setNdaAvailable(Boolean(res?.data?.available));
+            setNdaFileName(res?.data?.fileName || file.name);
+            await refreshNdaFileMeta(res?.data?.fileName || file.name);
+            setNdaSaved(true);
+        } catch (e: any) {
+            setNdaError(e?.response?.data?.message || e?.message || 'Failed to replace NDA.');
+        } finally {
+            setNdaUploading(false);
+        }
+    };
     const handleRegistrationToggle = async (enabled: boolean) => {
         setRegistrationConfigSaving(true);
         setRegistrationConfigError('');
@@ -685,7 +791,7 @@ const Admin = (props: any) => {
                                     Portal configurations
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: '#64748b', mb: 3 }}>
-                                    Control registration and Initial Assessment pass thresholds.
+                                    Control registration, Initial Assessment pass thresholds, and the active NDA PDF.
                                 </Typography>
                                 {registrationConfigLoading ? (
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 2 }}>
@@ -834,10 +940,111 @@ const Admin = (props: any) => {
                                                 </Alert>
                                             )}
                                         </Paper>
+
+                                        <Paper elevation={0} sx={{ p: 2.5, border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                                            <Typography sx={{ fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
+                                                Non-Disclosure Agreement (NDA)
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
+                                                Applicants must view and accept the active NDA before Declaration and Preview. Upload a PDF to set or replace it.
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: '#0f172a', mb: 2 }}>
+                                                {ndaAvailable && ndaFileName
+                                                    ? <>Active file: <strong>{ndaFileName}</strong></>
+                                                    : 'No active NDA is configured yet.'}
+                                            </Typography>
+                                            <input
+                                                ref={ndaFileInputRef}
+                                                type="file"
+                                                accept="application/pdf,.pdf"
+                                                style={{ display: 'none' }}
+                                                onChange={(e) => void handleNdaFileSelected(e)}
+                                            />
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    startIcon={<VisibilityIcon />}
+                                                    disabled={!ndaFileUrl || ndaViewLoading || ndaUploading}
+                                                    onClick={() => void handleNdaView()}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    {ndaViewLoading ? 'Opening…' : 'View'}
+                                                </Button>
+                                                <Button
+                                                    variant="outlined"
+                                                    startIcon={<DownloadIcon />}
+                                                    disabled={!ndaFileUrl || ndaUploading}
+                                                    onClick={() => void handleNdaDownload()}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    Download
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    startIcon={<UploadFileIcon />}
+                                                    disabled={ndaUploading}
+                                                    onClick={handleNdaReplaceClick}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    {ndaUploading ? 'Uploading…' : (ndaAvailable ? 'Replace NDA' : 'Upload NDA')}
+                                                </Button>
+                                            </Box>
+                                            {ndaSaved && (
+                                                <Alert severity="success" sx={{ mt: 2 }}>
+                                                    Active NDA updated.
+                                                </Alert>
+                                            )}
+                                            {ndaError && (
+                                                <Alert severity="error" sx={{ mt: 2 }}>
+                                                    {ndaError}
+                                                </Alert>
+                                            )}
+                                        </Paper>
                                     </Box>
                                 )}
                             </Box>
                         )}
+
+                        <Dialog
+                            open={ndaViewOpen}
+                            onClose={() => {
+                                setNdaViewOpen(false);
+                                if (ndaViewBlobUrl) {
+                                    URL.revokeObjectURL(ndaViewBlobUrl);
+                                    setNdaViewBlobUrl(null);
+                                }
+                            }}
+                            maxWidth="md"
+                            fullWidth
+                        >
+                            <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
+                                <Typography component="span" variant="h6" sx={{ fontWeight: 700 }}>
+                                    Active NDA{ndaFileName ? ` — ${ndaFileName}` : ''}
+                                </Typography>
+                                <IconButton
+                                    aria-label="Close"
+                                    onClick={() => {
+                                        setNdaViewOpen(false);
+                                        if (ndaViewBlobUrl) {
+                                            URL.revokeObjectURL(ndaViewBlobUrl);
+                                            setNdaViewBlobUrl(null);
+                                        }
+                                    }}
+                                    size="small"
+                                >
+                                    <CloseDialogIcon />
+                                </IconButton>
+                            </DialogTitle>
+                            <DialogContent dividers sx={{ p: 0, height: '70vh' }}>
+                                {ndaViewBlobUrl ? (
+                                    <iframe
+                                        title="Active NDA"
+                                        src={ndaViewBlobUrl}
+                                        style={{ width: '100%', height: '100%', border: 'none' }}
+                                    />
+                                ) : null}
+                            </DialogContent>
+                        </Dialog>
 
                         {open ? <RoleComponent open={open} userDetails={selectedRow} handleClose={handleClose}></RoleComponent> : <></>}
                         <AddOperationalUserModal

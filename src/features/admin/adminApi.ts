@@ -132,6 +132,35 @@ export function updateIaPassThresholdsConfig(payload: {
   });
 }
 
+export type NdaConfigResponse = {
+  fileName?: string | null;
+  bucket: string;
+  available: boolean;
+};
+
+export function fetchNdaConfig() {
+  return api({
+    method: 'get',
+    url: `useradmin/config/nda`,
+  });
+}
+
+export function updateNdaConfig(payload: { fileName: string }) {
+  return api({
+    method: 'patch',
+    url: `useradmin/config/nda`,
+    data: payload,
+  });
+}
+
+/** Authenticated applicants / staff — active NDA metadata. */
+export function fetchActiveNdaConfig() {
+  return api({
+    method: 'get',
+    url: `api/config/nda`,
+  });
+}
+
 /** Public (no auth) — used on login / signup pages. */
 export async function fetchPublicRegistrationStatus() {
   const baseURL = process.env.REACT_APP_API_BASE_URL;
