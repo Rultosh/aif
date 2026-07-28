@@ -195,7 +195,7 @@ const Declaration = (props: any) => {
 
     const supportingDocumentLabels: Record<string, string> = {
         sdPvtPlacementMemorandum: "Private Placement Memorandum",
-        sdPreviousFundPpm: "Previous Fund PPM",
+        sdPreviousFundPpm: "Last Fund PPM",
         sdLatestInvestorPresentation: "Latest Investor Presentation",
         sdImAgreement: "IM Agreement",
         sdTrustDeal: "Trust Deed",
@@ -731,7 +731,7 @@ const Declaration = (props: any) => {
                                                     <DocumentChip hideDisclaimer={true} label="Private Placement Memorandum" validationTitle="Private Placement Memorandum" id={`sdPvtPlacementMemorandum${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
-                                                    <DocumentChip hideDisclaimer={true} label="Previous Fund PPM (Optional)" validationTitle="Previous_Fund_PPM" id={`sdPreviousFundPpm${effectiveId}`} />
+                                                    <DocumentChip hideDisclaimer={true} label="Last Fund PPM (Optional)" validationTitle="Last_Fund_PPM" id={`sdPreviousFundPpm${effectiveId}`} />
                                                 </Grid>
                                                 <Grid item xs="auto">
                                                     <DocumentChip hideDisclaimer={true} label="Latest Investor Presentation" validationTitle="Latest Investor Presentation" id={`sdLatestInvestorPresentation${effectiveId}`} />

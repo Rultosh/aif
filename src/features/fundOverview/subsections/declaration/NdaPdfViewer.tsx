@@ -13,15 +13,20 @@ type NdaPdfViewerProps = {
   onScrolledToEnd: () => void;
 };
 
+const SCROLL_END_TOLERANCE_PX = 16;
+
 /**
- * Scrollable in-app NDA PDF viewer (no download UI). Fires onScrolledToEnd once the user reaches the bottom.
+ * Scrollable in-app NDA PDF viewer (no download UI).
+ * Enables acceptance only after the user reaches the bottom (or content fits after full render).
  */
 export default function NdaPdfViewer({ fileUrl, initiallyComplete, onScrolledToEnd }: NdaPdfViewerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [numPages, setNumPages] = useState(0);
+  const [pagesRendered, setPagesRendered] = useState(0);
   const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(false);
   const completedRef = useRef(false);
+  const allPagesReady = numPages > 0 && pagesRendered >= numPages;
 
   useEffect(() => {
     completedRef.current = !!initiallyComplete;
@@ -32,6 +37,7 @@ export default function NdaPdfViewer({ fileUrl, initiallyComplete, onScrolledToE
 
   useEffect(() => {
     setNumPages(0);
+    setPagesRendered(0);
     setLoadError("");
     setLoading(!!fileUrl);
     if (!initiallyComplete) {
@@ -47,18 +53,30 @@ export default function NdaPdfViewer({ fileUrl, initiallyComplete, onScrolledToE
 
   const checkScrollPosition = useCallback(() => {
     const el = containerRef.current;
-    if (!el || completedRef.current) return;
+    if (!el || completedRef.current || !allPagesReady) return;
+
+    const overflow = el.scrollHeight - el.clientHeight;
+    // Content fits in the viewport — no scroll possible; allow acceptance.
+    if (overflow <= SCROLL_END_TOLERANCE_PX) {
+      markComplete();
+      return;
+    }
     const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
-    if (remaining <= 24) {
+    if (remaining <= SCROLL_END_TOLERANCE_PX) {
       markComplete();
     }
-  }, [markComplete]);
+  }, [allPagesReady, markComplete]);
 
+  // Only evaluate after every page has rendered (avoids false "already at bottom" while height is still growing).
   useEffect(() => {
-    // Short single-page PDFs may already fit without scrolling.
-    const t = window.setTimeout(() => checkScrollPosition(), 200);
+    if (!allPagesReady || initiallyComplete) return;
+    const t = window.setTimeout(() => checkScrollPosition(), 100);
     return () => window.clearTimeout(t);
-  }, [numPages, fileUrl, checkScrollPosition]);
+  }, [allPagesReady, initiallyComplete, checkScrollPosition]);
+
+  const onPageRenderSuccess = useCallback(() => {
+    setPagesRendered((n) => n + 1);
+  }, []);
 
   if (!fileUrl) {
     return (
@@ -100,6 +118,7 @@ export default function NdaPdfViewer({ fileUrl, initiallyComplete, onScrolledToE
           loading=""
           onLoadSuccess={({ numPages: n }) => {
             setNumPages(n);
+            setPagesRendered(0);
             setLoading(false);
           }}
           onLoadError={() => {
@@ -114,6 +133,7 @@ export default function NdaPdfViewer({ fileUrl, initiallyComplete, onScrolledToE
                 width={Math.min(720, (typeof window !== "undefined" ? window.innerWidth : 720) - 120)}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
+                onRenderSuccess={onPageRenderSuccess}
               />
             </Box>
           ))}

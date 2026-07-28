@@ -60,7 +60,7 @@ export const questionsForMoreThanOne = {
             "id": 8,
             "text": "LP Advisory Committee/Advisory Board",
            "options": [
-                "The fund had an Advisory Board/LPAC with more than 50% of seats allocated to institutional investors.",
+                "The fund had an Advisory Board/LPAC with more than 50% of seats allocated to institutional investors in the last fund.",
                 "The fund had an Advisory Board/LPAC with representation from major investors, collectively accounting for at least 50% of the total targeted corpus in the last fund.",
                 "The fund propose to have such Board/Committee",
                 "The fund do not proposes to have such Board/Committee proposed"
