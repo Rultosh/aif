@@ -30,6 +30,9 @@ declare module "react-pdf" {
         width?: number;
         renderTextLayer?: boolean;
         renderAnnotationLayer?: boolean;
+        onLoadSuccess?: (page: unknown) => void;
+        onRenderSuccess?: (page: unknown) => void;
+        onRenderError?: (error: Error) => void;
     };
 
     export const Document: ComponentType<DocumentProps>;
