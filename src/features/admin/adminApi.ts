@@ -153,6 +153,13 @@ export function updateNdaConfig(payload: { fileName: string }) {
   });
 }
 
+export function clearNdaConfig() {
+  return api({
+    method: 'delete',
+    url: `useradmin/config/nda`,
+  });
+}
+
 /** Authenticated applicants / staff — active NDA metadata. */
 export function fetchActiveNdaConfig() {
   return api({

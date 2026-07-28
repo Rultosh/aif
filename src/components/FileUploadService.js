@@ -68,11 +68,13 @@ class FileUploadService {
   }
 
   delete(file) {
+    const bucket = encodeURIComponent(String(file.bucket || ''));
+    // Encode each path segment but keep the filename readable for Spring `{name:.+}`
+    const name = encodeURIComponent(String(file.name || '')).replace(/%2F/gi, '');
     return api({
       method: 'delete',
-      url: `/files/${file.bucket}/${file.name}`,
+      url: `/files/${bucket}/${name}`,
     });
-
   }
 }
 

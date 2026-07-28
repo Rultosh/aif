@@ -40,7 +40,7 @@ import { Delete, Edit, InfoOutlined, Close as CloseDialogIcon, Download as Downl
 import RoleComponent from './RoleComponent'
 import { IUser } from "./IUser";
 import dayjs from "dayjs";
-import { assignUserAdminRole, sendSetPasswordEmail, getUserApplicationCount, fetchRegistrationConfig, updateRegistrationConfig, fetchIaPassThresholdsConfig, updateIaPassThresholdsConfig, fetchNdaConfig, updateNdaConfig } from "./adminApi";
+import { assignUserAdminRole, sendSetPasswordEmail, getUserApplicationCount, fetchRegistrationConfig, updateRegistrationConfig, fetchIaPassThresholdsConfig, updateIaPassThresholdsConfig, fetchNdaConfig, updateNdaConfig, clearNdaConfig } from "./adminApi";
 import AddOperationalUserModal from "./AddOperationalUserModal";
 import {
     DEFAULT_IA_PASS_THRESHOLDS,
@@ -232,6 +232,50 @@ const Admin = (props: any) => {
         ndaFileInputRef.current?.click();
     };
 
+    const deleteNdaBucketFiles = async () => {
+        const listRes = await FileUploadService.list(NDA_CONFIG_BUCKET);
+        const existing: IFile[] = Array.isArray(listRes?.data) ? listRes.data : [];
+        const errors: string[] = [];
+        for (const f of existing) {
+            try {
+                await FileUploadService.delete(f);
+            } catch (e: any) {
+                errors.push(e?.response?.data?.message || e?.message || String(f.name));
+            }
+        }
+        return { remainingAttempted: existing.length, errors };
+    };
+
+    const handleNdaDelete = async () => {
+        if (!ndaAvailable && !ndaFileUrl) {
+            setNdaError('No active NDA file to delete.');
+            return;
+        }
+        setNdaUploading(true);
+        setNdaError('');
+        setNdaSaved(false);
+        try {
+            const { errors } = await deleteNdaBucketFiles();
+            await clearNdaConfig();
+            setNdaAvailable(false);
+            setNdaFileName(null);
+            setNdaFileUrl(null);
+            if (errors.length > 0) {
+                setNdaError(
+                    'NDA config cleared, but some file(s) could not be removed from storage: '
+                    + errors.join('; ')
+                    + '. Redeploy the file server if delete keeps failing.'
+                );
+            } else {
+                setNdaSaved(true);
+            }
+        } catch (e: any) {
+            setNdaError(e?.response?.data?.message || e?.message || 'Failed to delete NDA.');
+        } finally {
+            setNdaUploading(false);
+        }
+    };
+
     const handleNdaFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         event.target.value = '';
@@ -240,19 +284,45 @@ const Admin = (props: any) => {
             setNdaError('Please upload a PDF file.');
             return;
         }
+        // File server rejects multi-dot names (e.g. report.final.pdf)
+        if ((file.name.match(/\./g) || []).length !== 1) {
+            setNdaError('NDA file name must have a single extension (e.g. NDA.pdf).');
+            return;
+        }
         setNdaUploading(true);
         setNdaError('');
         setNdaSaved(false);
         try {
-            const listRes = await FileUploadService.list(NDA_CONFIG_BUCKET);
-            const existing: IFile[] = Array.isArray(listRes?.data) ? listRes.data : [];
-            await Promise.all(existing.map((f) => FileUploadService.delete(f)));
-            await FileUploadService.upload(NDA_CONFIG_BUCKET, file, false);
+            const { errors: deleteErrors } = await deleteNdaBucketFiles();
+            try {
+                await FileUploadService.upload(NDA_CONFIG_BUCKET, file, false);
+            } catch (uploadErr: any) {
+                // If old file could not be deleted, same name may conflict — upload with unique name.
+                const status = uploadErr?.response?.status;
+                if (status === 409) {
+                    const uniqueName = `NDA_${Date.now()}.pdf`;
+                    const renamed = new File([file], uniqueName, { type: file.type || 'application/pdf' });
+                    await FileUploadService.upload(NDA_CONFIG_BUCKET, renamed, false);
+                    const res = await updateNdaConfig({ fileName: uniqueName });
+                    setNdaAvailable(Boolean(res?.data?.available));
+                    setNdaFileName(res?.data?.fileName || uniqueName);
+                    await refreshNdaFileMeta(res?.data?.fileName || uniqueName);
+                    setNdaSaved(true);
+                    if (deleteErrors.length > 0) {
+                        setNdaError('NDA replaced using a new file name because the previous file could not be deleted.');
+                    }
+                    return;
+                }
+                throw uploadErr;
+            }
             const res = await updateNdaConfig({ fileName: file.name });
             setNdaAvailable(Boolean(res?.data?.available));
             setNdaFileName(res?.data?.fileName || file.name);
             await refreshNdaFileMeta(res?.data?.fileName || file.name);
             setNdaSaved(true);
+            if (deleteErrors.length > 0) {
+                setNdaError('NDA uploaded, but removing the previous file failed. Redeploy the file server if this persists.');
+            }
         } catch (e: any) {
             setNdaError(e?.response?.data?.message || e?.message || 'Failed to replace NDA.');
         } finally {
@@ -987,6 +1057,15 @@ const Admin = (props: any) => {
                                                     sx={{ textTransform: 'none' }}
                                                 >
                                                     {ndaUploading ? 'Uploading…' : (ndaAvailable ? 'Replace NDA' : 'Upload NDA')}
+                                                </Button>
+                                                <Button
+                                                    variant="outlined"
+                                                    color="error"
+                                                    disabled={ndaUploading || (!ndaAvailable && !ndaFileUrl)}
+                                                    onClick={() => void handleNdaDelete()}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    Delete NDA
                                                 </Button>
                                             </Box>
                                             {ndaSaved && (
