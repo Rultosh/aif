@@ -58,6 +58,15 @@ class FileUploadService {
     }).then(res => res.data);
   }
 
+  /** Fetch file bytes with auth (absolute or relative file-server URL). */
+  getBlob(url) {
+    return api({
+      method: 'get',
+      url,
+      responseType: 'blob',
+    }).then((response) => response.data);
+  }
+
   delete(file) {
     return api({
       method: 'delete',
