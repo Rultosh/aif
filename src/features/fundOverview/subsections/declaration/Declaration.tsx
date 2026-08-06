@@ -26,9 +26,7 @@ import FileUploadDisclaimer from "../../../../components/FileUploadDisclaimer";
 import FileUploadService from "../../../../components/FileUploadService";
 import { opaqueInfoToastAlertSx } from "../../../../lib/ui/opaqueInfoToastAlertSx";
 import NdaPdfViewer from "./NdaPdfViewer";
-import { fetchActiveNdaConfig } from "../../../admin/adminApi";
-import { IFile } from "../../../../components/IFile";
-import { getFileServerBaseUrl } from "../../../../lib/fileServerBaseUrl";
+import { getCachedOrFetchNdaPdf } from "../../../admin/ndaDocumentCache";
 
 const MANDATORY_DOCUMENTS_UPLOAD_MESSAGE =
     'Please upload all mandatory documents before proceeding.';
@@ -40,16 +38,6 @@ const NDA_ACCEPT_MESSAGE =
 
 const NDA_SCROLL_MESSAGE =
     'Please scroll to the end of the NDA before accepting.';
-
-/** Build NDA download URL: prefer file-server stored URL, else config bucket + file name. */
-function resolveNdaFileUrl(storedUrl: string | undefined, bucket: string, fileName: string): string {
-    if (storedUrl && /^https?:\/\//i.test(storedUrl)) {
-        return storedUrl;
-    }
-    const base = getFileServerBaseUrl().replace(/\/+$/, '');
-    const safeName = String(fileName).split('/').pop() || String(fileName);
-    return `${base}/files/${bucket}/${encodeURIComponent(safeName).replace(/%2F/gi, '')}`;
-}
 
 const Declaration = (props: any) => {
 
@@ -408,61 +396,15 @@ const Declaration = (props: any) => {
             setNdaLoading(true);
             setNdaLoadError('');
             try {
-                const res = await fetchActiveNdaConfig();
-                const cfg = res?.data;
-                if (!cfg?.available || !cfg?.fileName) {
-                    if (!cancelled) {
-                        setNdaPdfBlobUrl(null);
-                        setNdaLoadError('No active NDA document is available. Please contact the administrator.');
-                    }
+                const result = await getCachedOrFetchNdaPdf();
+                if (cancelled) return;
+                if (!result.ok) {
+                    setNdaPdfBlobUrl(null);
+                    setNdaLoadError(result.error);
                     return;
                 }
-                const listRes = await FileUploadService.list(cfg.bucket || 'configNdaActive');
-                const files: IFile[] = Array.isArray(listRes?.data)
-                    ? listRes.data
-                    : (Array.isArray((listRes as any)?.data?.files) ? (listRes as any).data.files : []);
-                const match =
-                    files.find((f) => String(f.name) === String(cfg.fileName)) ||
-                    files.find((f) => String(f.name || '').toLowerCase().endsWith('.pdf')) ||
-                    files[0];
-                const bucket = cfg.bucket || 'configNdaActive';
-                const fileName = String(match?.name || cfg.fileName);
-                if (!fileName) {
-                    if (!cancelled) {
-                        setNdaPdfBlobUrl(null);
-                        setNdaLoadError('NDA file could not be found. Please contact the administrator.');
-                    }
-                    return;
-                }
-                const fileUrl = resolveNdaFileUrl(match?.url ? String(match.url) : undefined, bucket, fileName);
-                let blob: Blob;
-                try {
-                    blob = await FileUploadService.getBlob(fileUrl);
-                } catch (fetchErr: any) {
-                    const status = fetchErr?.response?.status;
-                    throw new Error(
-                        status === 404
-                            ? 'NDA file could not be downloaded (not found). Re-upload the NDA in Admin → Configurations, and ensure the file server was restarted after the latest update.'
-                            : (fetchErr?.message || 'Failed to load file')
-                    );
-                }
-                if (!(blob instanceof Blob) || blob.size === 0) {
-                    throw new Error('Failed to load file');
-                }
-                // Force PDF MIME so react-pdf can render even if the server omits content-type.
-                const pdfBlob = blob.type === 'application/pdf'
-                    ? blob
-                    : new Blob([blob], { type: 'application/pdf' });
-                const blobUrl = URL.createObjectURL(pdfBlob);
-                if (cancelled) {
-                    URL.revokeObjectURL(blobUrl);
-                    return;
-                }
-                if (ndaBlobUrlRef.current) {
-                    URL.revokeObjectURL(ndaBlobUrlRef.current);
-                }
-                ndaBlobUrlRef.current = blobUrl;
-                setNdaPdfBlobUrl(blobUrl);
+                ndaBlobUrlRef.current = result.blobUrl;
+                setNdaPdfBlobUrl(result.blobUrl);
             } catch (e: any) {
                 if (!cancelled) {
                     setNdaPdfBlobUrl(null);
@@ -475,10 +417,8 @@ const Declaration = (props: any) => {
         void loadNda();
         return () => {
             cancelled = true;
-            if (ndaBlobUrlRef.current) {
-                URL.revokeObjectURL(ndaBlobUrlRef.current);
-                ndaBlobUrlRef.current = null;
-            }
+            // Keep shared cache blob URL alive across remounts; do not revoke here.
+            ndaBlobUrlRef.current = null;
         };
     }, []);
 

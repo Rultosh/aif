@@ -50,6 +50,7 @@ import {
 import FileUploadService from "../../components/FileUploadService";
 import { secureDownload, fetchSecureBlobUrl } from "../../utils/downloadUtils";
 import { IFile } from "../../components/IFile";
+import { invalidateNdaDocumentCache } from "./ndaDocumentCache";
 
 const NDA_CONFIG_BUCKET = 'configNdaActive';
 const DEFAULT_REGISTRATION_CLOSED_MESSAGE =
@@ -257,6 +258,7 @@ const Admin = (props: any) => {
         try {
             const { errors } = await deleteNdaBucketFiles();
             await clearNdaConfig();
+            invalidateNdaDocumentCache();
             setNdaAvailable(false);
             setNdaFileName(null);
             setNdaFileUrl(null);
@@ -304,6 +306,7 @@ const Admin = (props: any) => {
                     const renamed = new File([file], uniqueName, { type: file.type || 'application/pdf' });
                     await FileUploadService.upload(NDA_CONFIG_BUCKET, renamed, false);
                     const res = await updateNdaConfig({ fileName: uniqueName });
+                    invalidateNdaDocumentCache();
                     setNdaAvailable(Boolean(res?.data?.available));
                     setNdaFileName(res?.data?.fileName || uniqueName);
                     await refreshNdaFileMeta(res?.data?.fileName || uniqueName);
@@ -316,6 +319,7 @@ const Admin = (props: any) => {
                 throw uploadErr;
             }
             const res = await updateNdaConfig({ fileName: file.name });
+            invalidateNdaDocumentCache();
             setNdaAvailable(Boolean(res?.data?.available));
             setNdaFileName(res?.data?.fileName || file.name);
             await refreshNdaFileMeta(res?.data?.fileName || file.name);
